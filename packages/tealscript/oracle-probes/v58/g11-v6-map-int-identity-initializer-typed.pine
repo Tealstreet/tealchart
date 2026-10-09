@@ -1,9 +1,0 @@
-//@version=6
-indicator("G6 alias terminal boundary")
-score(map<string,int> xs) => 10
-score(map<string,float> xs) => 20
-identity(map<string,int> z) => z
-relay(map<string,int> xs, map<string,float> ys) =>
-    copied = identity(xs)
-    score(copied)
-plot(relay(map.new<string,int>(),map.new<string,float>()))

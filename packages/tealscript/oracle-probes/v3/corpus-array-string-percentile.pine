@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-CORPUS-ARRAY-STRING-PERCENTILE")
-values = array.from(1.0, 2.0, 3.0)
-plot(values.percentile_nearest_rank("50"), "OUTCOME")

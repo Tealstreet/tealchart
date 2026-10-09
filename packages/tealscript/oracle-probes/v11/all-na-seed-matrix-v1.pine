@@ -1,7 +1,0 @@
-//@version=6
-indicator("V11 all-na-seed-matrix-v1", max_bars_back=256)
-float missing = na
-plot(float(bar_index), "BAR_INDEX")
-plot(fixnan(missing), "FIXNAN_ALL_NA")
-plot(ta.max(missing), "MAX_ALL_NA")
-plot(ta.min(missing), "MIN_ALL_NA")

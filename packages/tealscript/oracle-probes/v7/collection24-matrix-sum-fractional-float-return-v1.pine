@@ -1,5 +1,0 @@
-//@version=6
-indicator("Collection24 sum fractional probe v1", overlay=false)
-left = matrix.new<int>(1, 1, 1)
-matrix<float> result = matrix.sum(left, 0.5)
-plot(matrix.get(result, 0, 0), "OUTCOME")

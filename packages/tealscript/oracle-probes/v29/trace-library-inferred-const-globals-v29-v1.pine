@@ -1,8 +1,0 @@
-//@version=5
-library("Trace inferred const globals v29")
-var int limit = 4999
-logTwo = math.log(2)
-export readLimit(int x) => x + limit
-export readLog(float x) => math.log(x) / logTwo
-plot(readLimit(1), title="literal_var_global")
-plot(readLog(8.0), title="const_math_global")

@@ -1,2 +1,0 @@
-CE10123 {'line': 3, 'column': 30}: Cannot call "plotshape" with argument "style"="7". An argument of "literal int" type was used but a "input string"  is expected.
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

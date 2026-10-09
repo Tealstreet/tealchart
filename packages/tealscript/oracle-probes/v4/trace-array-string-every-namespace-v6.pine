@@ -1,5 +1,0 @@
-//@version=6
-indicator("V4-ARRAY-STRING-EVERY-NAMESPACE-V6")
-values = array.from("", "alpha")
-result = array.every(values)
-plot(result == true ? 1 : result == false ? 0 : -1, "OUTCOME")

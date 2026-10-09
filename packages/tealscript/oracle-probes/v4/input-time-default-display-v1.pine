@@ -1,6 +1,0 @@
-//@version=6
-indicator("INPUT-TIME-DISPLAY-AUTHORITY")
-omitted=input.time(1700000000000,"TimeDefault")
-shown=input.time(1700000060000,"TimeAll",display=display.all)
-hidden=input.time(1700000120000,"TimeNone",display=display.none)
-plot(close,"OUTCOME")

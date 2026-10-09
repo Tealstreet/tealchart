@@ -1,6 +1,0 @@
-//@version=6
-indicator("str-replace-input-occurrence-title")
-value = input.int(0)
-result = str.replace(source="a-a", target="a", replacement="X", occurrence=value)
-plot(close, title=result)
-plot(bar_index, "SOURCE_INDEX")

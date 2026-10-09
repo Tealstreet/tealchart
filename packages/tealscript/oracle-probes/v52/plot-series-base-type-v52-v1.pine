@@ -1,4 +1,0 @@
-//@version=6
-indicator("V52 plot-series-base-type", overlay=true, calc_bars_count=32)
-plot(series="bad", title="CANDIDATE")
-plot(bar_index, "SOURCE_INDEX", display=display.data_window)

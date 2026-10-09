@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-compile-third-v5-polyline-missing-id-cast-v1")
-missing_id = polyline(na)
-plot(na(missing_id) ? 1 : 0, "TARGET_MISSING")

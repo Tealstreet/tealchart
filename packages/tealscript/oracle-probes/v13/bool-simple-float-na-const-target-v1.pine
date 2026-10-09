@@ -1,5 +1,0 @@
-//@version=6
-indicator("Bool simple float NA const target v1")
-simple float source = float(na)
-const bool converted = bool(source)
-plot(converted ? 1 : 0, title="CONVERTED")

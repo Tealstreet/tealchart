@@ -1,8 +1,0 @@
-//@version=6
-indicator("V7 udf-size-shadow-v6-v1")
-type Font
-    float normal = 3.0
-f(Font size) =>
-    size.normal
-float value = f(Font.new())
-plot(value,"FIELD")

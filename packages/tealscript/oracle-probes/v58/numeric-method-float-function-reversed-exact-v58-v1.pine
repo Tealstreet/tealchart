@@ -1,7 +1,0 @@
-//@version=6
-indicator("1X method-float-function-reversed", dynamic_requests=false)
-method sample(int self)=>request.security("REMOTE","1D",close,lookahead=barmerge.lookahead_on)
-method sample(float self)=>self
-float selected = sample(close)
-plot(selected,"Chart")
-plot(request.security("REMOTE","1D",selected,lookahead=barmerge.lookahead_on),"Result")

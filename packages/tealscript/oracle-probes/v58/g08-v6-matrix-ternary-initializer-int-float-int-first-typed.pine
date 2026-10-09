@@ -1,8 +1,0 @@
-//@version=6
-indicator("G6 adversarial alias")
-score(matrix<int> xs) => 10
-score(matrix<float> xs) => 20
-relay(matrix<int> xs, matrix<float> ys) =>
-    copied = close > 0 ? xs : xs
-    score(copied)
-plot(relay(matrix.new<int>(1,1,3),matrix.new<float>(1,1,1.5)))

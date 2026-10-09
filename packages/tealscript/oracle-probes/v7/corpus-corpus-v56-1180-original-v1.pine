@@ -1,3 +1,0 @@
-// @version=5
-indicator("V7 malformed directive src")
-plot(src,"TARGET")

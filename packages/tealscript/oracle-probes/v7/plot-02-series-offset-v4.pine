@@ -1,4 +1,0 @@
-//@version=4
-study("V3-PLOT-SERIES-OFFSET-PINE4")
-o = close > open ? 1 : -1
-plot(close, "OUTCOME", offset=o)

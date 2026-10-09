@@ -1,4 +1,0 @@
-//@version=6
-const float VALUE = 2.0
-indicator("calc_bars_count float alias", calc_bars_count=VALUE)
-plot(close)

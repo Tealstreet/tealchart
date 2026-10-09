@@ -1,4 +1,0 @@
-//@version=5
-indicator("V7 plotshape-series-offset-v5-v1")
-o = close > open ? 1 : -1
-plotshape(close > open,title="TARGET",offset=o)

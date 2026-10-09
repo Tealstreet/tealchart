@@ -1,8 +1,0 @@
-//@version=6
-indicator("V42 tostring-format-string")
-value = str.tostring("abc", "#.00")
-plot(bar_index, "SOURCE_INDEX")
-plot(str.length(value), "LENGTH")
-if barstate.isfirst
-    log.info("{0}", value)
-    label.new(bar_index, high, text=value)

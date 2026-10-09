@@ -1,9 +1,0 @@
-//@version=5
-indicator("V7 ta-cross-nullable-operands-v5-v1")
-phase = bar_index % 8
-a = phase == 2 or phase == 3 ? na : phase * 1.0
-b = phase == 5 ? na : 3.5
-x = ta.cross(a, b)
-plot(a, "A")
-plot(b, "B")
-plot(na(x) ? -1 : x ? 1 : 0, "BOOL_NA_MINUS1")

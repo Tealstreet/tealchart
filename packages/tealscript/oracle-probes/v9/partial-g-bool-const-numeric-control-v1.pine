@@ -1,4 +1,0 @@
-//@version=6
-indicator("Bool constant numeric control")
-const bool converted = bool(1)
-plot(converted ? 1 : 0)

@@ -1,7 +1,0 @@
-//@version=6
-indicator("viewport-context-witness-v30-tk-v1")
-plot(chart.left_visible_bar_time, title="LEFT_VISIBLE_MS")
-plot(chart.right_visible_bar_time, title="RIGHT_VISIBLE_MS")
-plot(time, title="INPUT_TIME_MS")
-plot(bar_index, title="INPUT_INDEX")
-plot(last_bar_index, title="LAST_INPUT_INDEX")

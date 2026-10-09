@@ -1,6 +1,0 @@
-//@version=5
-indicator("V3-CORPUS-V5-TUPLE-CALL-TARGET")
-pair() => [1, 2]
-values = map.new<string, int>()
-[first, values.get("value")] = pair()
-plot(first, "OUTCOME")

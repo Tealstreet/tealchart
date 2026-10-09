@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-compile-third-v5-comma-imports-v1")
-import TradingView/ta/7 as tvta, import PineCoders/Time/3 as pct
-plot(close, "TARGET")

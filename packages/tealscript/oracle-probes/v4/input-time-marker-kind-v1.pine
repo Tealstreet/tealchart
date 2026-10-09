@@ -1,4 +1,0 @@
-//@version=6
-indicator("INPUT-TIME-MARKER-AUTHORITY")
-selected=input.time(1700000000000,"TimeMarker",confirm=true)
-plot(close,"OUTCOME")

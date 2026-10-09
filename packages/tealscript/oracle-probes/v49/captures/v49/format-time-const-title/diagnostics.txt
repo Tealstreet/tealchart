@@ -1,2 +1,0 @@
-CE10123 {'line': 4, 'column': 19}: Cannot call "plot" with argument "title"="value". An argument of "series string" type was used but a "const string"  is expected.
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

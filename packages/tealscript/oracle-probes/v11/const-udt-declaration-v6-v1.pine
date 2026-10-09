@@ -1,6 +1,0 @@
-//@version=6
-indicator("Const UDT annotation")
-type Node
-    float price
-const Node value = Node.new(close)
-plot(value.price, "OUTCOME")

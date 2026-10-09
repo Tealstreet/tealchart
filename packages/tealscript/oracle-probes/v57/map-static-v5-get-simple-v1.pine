@@ -1,7 +1,0 @@
-//@version=5
-indicator("V5 static map get simple", precision=8)
-m=map.new<string,int>()
-map.put(m,"k",7)
-simple int x=map.get(m,"k")
-plot(x,"VALUE")
-plot(bar_index,"BAR_INDEX")

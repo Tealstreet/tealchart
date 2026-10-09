@@ -1,6 +1,0 @@
-//@version=6
-indicator("V4-DRAWING-BOX-EQ",overlay=true)
-var a=box.new(bar_index,high,bar_index+1,low)
-b=a
-var other=box.new(bar_index,high,bar_index+1,low)
-plot((a == b ? 1 : 0) + 2 * (a == other ? 1 : 0),"OUTCOME")

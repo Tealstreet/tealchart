@@ -1,6 +1,0 @@
-//@version=6
-indicator("V42 floor-input-consumer-tostring-format")
-source = input.float(1.2, "Source")
-value = str.tostring(source, "#.00")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

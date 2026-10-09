@@ -1,5 +1,0 @@
-//@version=6
-indicator("corpus-compile-third-v6-forward-global-v1")
-readGlobal() => wActifLvl
-wActifLvl = close
-plot(readGlobal(), "TARGET")

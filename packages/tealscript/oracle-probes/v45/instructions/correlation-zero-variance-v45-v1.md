@@ -1,7 +1,0 @@
-# correlation-zero-variance-v45-v1 capture instructions v1
-
-Use the unchanged source on BINANCE:BTCUSDT, standard 2-minute candles, regular session, display timezone Etc/UTC. No Bar Replay or synthetic OHLC. Record account/build, exact chart symbol/timeframe/settings, source SHA256 and compile/runtime outcome. Native phase and values are UNSPECIFIED; do not repair the source or substitute the local engine's predictions.
-
-Export full public CSV with every named plot and chart time/OHLCV. Preserve blank cells and numeric text. Record the last confirmed historical timestamp/cutoff and visible INDEX/PHASE where present. At least 64 closed rows are required; first-index0 is useful but a later complete cycle can settle the mature clauses. A CSV ordinal is never Pine INDEX. If compilation/runtime refuses, save the earliest complete diagnostic text/code/site/bar; later targets are MASKED. If export is unavailable, mark numeric evidence UNOBSERVED rather than treating it as a compiler refusal.
-
-Question: what does correlation publish when the left operand, right operand, or both operands are constant over a ready length4 window? Preserve LEFT/RIGHT/BOTH_CONSTANT, their NA markers and NZ42 values alongside READY and the varying standard-deviation carrier. POSITIVE_CONTROL and NEGATIVE_CONTROL prevent interpreting always-missing output as generic correlation behavior. This script does not ask for asymmetric-hole pairing or a near-zero variance threshold, which already have different probes.

@@ -1,3 +1,0 @@
-//@version=5
-indicator("V3-CORPUS-V5-UNKNOWN-HYPOT")
-plot(math.hypot(close, open), "OUTCOME")

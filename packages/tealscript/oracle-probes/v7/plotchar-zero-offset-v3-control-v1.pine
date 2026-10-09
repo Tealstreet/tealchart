@@ -1,4 +1,0 @@
-//@version=3
-study("V7 plotchar-zero-offset-v3-control-v1")
-o = close > open ? 1 : -1
-plotchar(close > open, title="TARGET", char="X", offset=0)

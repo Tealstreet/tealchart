@@ -1,4 +1,0 @@
-//@version=6
-indicator("INPUT-GENERIC-SOURCE-DEFAULT-AUTHORITY")
-selected=input(close*2,"ComputedSource")
-plot(close,"OUTCOME")

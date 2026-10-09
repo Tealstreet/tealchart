@@ -1,1 +1,0 @@
-{"artifact":"TradingView Pine Logs v1","origin":"native-tradingview-study-logs","indicator":"V11 default-string-text-pair-v1","captured_at_utc":"2026-10-04T15:41:48.222Z","entries":[{"barTime":1791128280000,"time":1791128280000,"level":4,"source":{"start":{"line":6,"column":5},"end":{"line":6,"column":61}},"message":"FIRST=[78477.5908] SECOND=[0.3333333333]"}]}

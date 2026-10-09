@@ -1,6 +1,0 @@
-//@version=5
-indicator("Exported method bare discriminator")
-import faiyaz7283/tools/15 as lib
-bool obj = bar_index % 2 == 0
-bool result = _bool(obj)
-plot(result ? 1 : 0, "exported_method_bare")

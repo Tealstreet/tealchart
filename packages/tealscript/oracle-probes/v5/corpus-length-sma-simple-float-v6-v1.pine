@@ -1,4 +1,0 @@
-//@version=6
-indicator("V5-CORPUS-SMA-SIMPLE-FLOAT-V1")
-length = input.int(6, "Numerator") / timeframe.multiplier
-plot(ta.sma(close, length), "OUTCOME")

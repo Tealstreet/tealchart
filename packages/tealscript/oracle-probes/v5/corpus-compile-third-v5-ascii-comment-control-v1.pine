@@ -1,6 +1,0 @@
-//@version=5
-indicator("corpus-compile-third-v5-ascii-comment-control-v1")
-    // ASCII layout control; literal and trailing comment retain U+3000.
-text = " 　  " //　corpus string/comment control
-plot(close, "PRICE_CONTROL")
-plot(str.length(text), "STRING_LENGTH_CONTROL")

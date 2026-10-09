@@ -1,4 +1,0 @@
-//@version=6
-indicator("Local numeric control")
-method pick(float self)=>self+10
-plot(float(3.0).pick())

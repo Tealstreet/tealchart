@@ -1,4 +1,0 @@
-//@version=6
-indicator("Bool input numeric return")
-const bool converted = bool(input.int(1))
-plot(converted ? 1 : 0)

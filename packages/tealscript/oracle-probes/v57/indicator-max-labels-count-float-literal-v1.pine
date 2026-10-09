@@ -1,3 +1,0 @@
-//@version=6
-indicator("max_labels_count float literal", max_labels_count=2.0)
-plot(close)

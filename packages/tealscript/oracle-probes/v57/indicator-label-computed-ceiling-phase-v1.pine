@@ -1,3 +1,0 @@
-//@version=6
-indicator("Label computed-ceiling phase v1", max_labels_count=250 * 2)
-plot(close, title="Close control")

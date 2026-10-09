@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-CONST-REF-MATRIX-ACCEPT-MUTATE")
-const matrix<float> value = matrix.new<float>(1, 1, close)
-matrix.set(value, 0, 0, close + 1)
-plot(matrix.get(value, 0, 0), "OUTCOME")

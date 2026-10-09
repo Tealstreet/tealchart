@@ -1,6 +1,0 @@
-//@version=6
-indicator("V3-VARIP-04")
-enum V3Enum
-    member
-varip V3Enum value = V3Enum.member
-plot(value == V3Enum.member ? 1 : 0, "OUTCOME")

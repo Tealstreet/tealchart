@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-BOUNDS-10", max_bars_back=256)
-l=label.new(bar_index,close)
-label.set_size(l,-1)
-plot(close, "OUTCOME")

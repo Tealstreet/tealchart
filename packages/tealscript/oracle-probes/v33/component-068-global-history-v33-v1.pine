@@ -1,5 +1,0 @@
-//@version=6
-indicator("V33 isolated global history")
-n = bar_index + close
-plot(bar_index, "INDEX")
-plot(last_bar_index[1], "VALUE_1")

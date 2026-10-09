@@ -1,9 +1,0 @@
-//@version=3
-study("V13 plotchar v3 zero", overlay=true)
-phase = n % 16
-shift = phase < 8 ? 2 : -2
-code = phase == 2 ? 1 : phase == 5 ? 2 : phase == 10 ? 3 : phase == 13 ? 4 : 0
-plotchar(code > 0, title="TARGET", char="X", location=location.abovebar, color=red, offset=0)
-plot(n, "N", transp=100)
-plot(code, "SOURCE_CODE", transp=100)
-plot(shift, "SOURCE_OFFSET", transp=100)

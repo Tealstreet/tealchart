@@ -1,4 +1,0 @@
-//@version=6
-indicator("corpus-array-get-negative-fraction-v6-v1")
-a = array.from(10, 20, 30)
-plot(array.get(a, -0.5), "negative_fraction")

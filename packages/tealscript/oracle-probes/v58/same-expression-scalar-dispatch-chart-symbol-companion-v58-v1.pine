@@ -1,6 +1,0 @@
-//@version=6
-indicator("Nested method")
-method sample(int self) => self + 100
-method sample(float self) => self
-outer(value) => request.security(syminfo.tickerid,"1D",request.security(syminfo.tickerid,"1D",value.sample() + int(7).sample(),lookahead=barmerge.lookahead_on),lookahead=barmerge.lookahead_on)
-plot(outer(close))

@@ -1,7 +1,0 @@
-//@version=5
-indicator("corpus-table-text-wrap-v5-v1")
-var t = table.new(position.top_left, 1, 1)
-if barstate.islast
-    table.cell(t, 0, 0, "text")
-    table.cell_set_text_wrap(t, 0, 0, text.wrap_auto)
-plot(close)

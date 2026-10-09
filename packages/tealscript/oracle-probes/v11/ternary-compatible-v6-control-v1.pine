@@ -1,8 +1,0 @@
-//@version=6
-indicator("V6 ternary compatible control")
-a = close > open ? 1 : 1.5
-b = close > open ? true : false
-c = close > open ? "one" : "two"
-d = close > open ? color.red : color.blue
-e = close > open ? 1 : na
-plot(a + (b ? 1 : 0) + str.length(c) + nz(e), display=display.data_window)

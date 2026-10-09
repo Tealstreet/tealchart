@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-VARIP-01")
-varip chart.point value = chart.point.now(close)
-plot(value.price, "OUTCOME")

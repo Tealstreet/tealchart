@@ -1,8 +1,0 @@
-//@version=6
-indicator("V16 visual21 856 curve", max_polylines_count=2)
-if barstate.islastconfirmedhistory
-    points = array.from(chart.point.from_index(bar_index-12, 0), chart.point.from_index(bar_index-10, 80), chart.point.from_index(bar_index-4, -20), chart.point.from_index(bar_index-1, 40))
-    polyline.new(points, curved=false, closed=false, line_color=color.gray, line_width=1)
-    polyline.new(points, curved=true, closed=false, line_color=color.red, line_width=1)
-plot(bar_index, "N", display=display.data_window)
-plot(barstate.islastconfirmedhistory ? 1 : 0, "ANCHOR", display=display.data_window)

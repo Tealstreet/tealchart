@@ -1,7 +1,0 @@
-//@version=6
-indicator("TRACE720 mature HMA hole", overlay=false)
-float source = bar_index == 40 ? na : float(bar_index * bar_index + 7 * (bar_index % 5))
-float value = ta.hma(source, 16)
-plot(value, "OUTCOME")
-if bar_index >= 37 and bar_index <= 45
-    log.info("bar=" + str.tostring(bar_index) + " source=" + str.tostring(source, "#.################") + " hma=" + str.tostring(value, "#.################"))

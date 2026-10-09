@@ -1,3 +1,0 @@
-//@version=6
-indicator("max_boxes_count float literal", max_boxes_count=2.0)
-plot(close)

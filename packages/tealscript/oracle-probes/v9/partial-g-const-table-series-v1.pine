@@ -1,5 +1,0 @@
-//@version=6
-indicator("Const table reference")
-const table marker = table.new(position.top_right, 1, 1)
-table.cell(marker, 0, 0, "mutable")
-plot(1)

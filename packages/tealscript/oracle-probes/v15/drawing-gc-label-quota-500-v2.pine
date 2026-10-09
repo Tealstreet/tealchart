@@ -1,7 +1,0 @@
-//@version=6
-indicator("Drawing GC label quota 500 v2", max_labels_count=500)
-label.new(bar_index, 1.0)
-int count = array.size(label.all)
-int oldest = count > 0 ? label.get_x(array.get(label.all, 0)) : na
-plot(count, "VISIBLE_COUNT")
-plot(oldest, "OLDEST_INDEX")

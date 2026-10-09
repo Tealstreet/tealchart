@@ -1,6 +1,0 @@
-//@version=6
-indicator("Collection08 equal slice endpoints")
-a = array.from(10, 20, 30)
-s = array.slice(a, 1, 1)
-plot(s.size(), "slice_size")
-plot(a.size(), "parent_size")

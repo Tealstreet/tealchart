@@ -1,9 +1,0 @@
-//@version=6
-indicator("matrix-pinv-cutoff-small16-v1")
-var m=matrix.new<float>(2,2,0.0)
-matrix.set(m,0,0,1.0)
-matrix.set(m,1,1,1e-16)
-p=matrix.pinv(m)
-plot(matrix.get(p,0,0),"pinv00")
-plot(matrix.get(p,1,1),"pinv11")
-plot(matrix.get(m,1,1),"source11")

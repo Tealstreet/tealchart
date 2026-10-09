@@ -1,5 +1,0 @@
-//@version=5
-indicator("Table cell set text color coordinate bounds")
-table_id = table.new(position.top_left, 2, 1)
-table.cell_set_text_color(table_id, 2, 0, color.red)
-plot(close)

@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 varip-footprint-eligibility-v6-v1")
-varip footprint x = na
-plot(na(x) ? 1 : 0,"MISSING")

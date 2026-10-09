@@ -1,6 +1,0 @@
-//@version=6
-indicator("V11 hline-gradient-six-slots-v1", max_bars_back=256)
-upper = hline(100, "UPPER", color.red)
-lower = hline(0, "LOWER", color.blue)
-fill(upper, lower, 100, 0, color.red, color.blue)
-plot(50, "MIDPOINT")

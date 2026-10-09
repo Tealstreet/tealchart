@@ -1,6 +1,0 @@
-//@version=6
-indicator("TRACE705 chart foreground", overlay=false)
-int encoded = int(color.r(chart.fg_color)) * 65536 + int(color.g(chart.fg_color)) * 256 + int(color.b(chart.fg_color))
-plot(encoded, "OUTCOME")
-if barstate.islast
-    log.info("background=" + str.tostring(chart.bg_color) + " foreground=" + str.tostring(chart.fg_color) + " rgb=" + str.tostring(encoded, "#"))

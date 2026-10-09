@@ -1,5 +1,0 @@
-//@version=4
-study("V7 nz-bool-default-v4-v1")
-bool missing = na
-bool result = nz(missing)
-plot(na(result) ? -1 : result ? 1 : 0,"OUTCOME")

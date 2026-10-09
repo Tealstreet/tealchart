@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 axis last defined",overlay=true)
-s = bar_index % 8 == 6 or bar_index % 8 == 7 ? na : close
-c = bar_index % 8 < 4 ? color.red : color.blue
-plot(s,"LAST_DEFINED",color=c,trackprice=true)

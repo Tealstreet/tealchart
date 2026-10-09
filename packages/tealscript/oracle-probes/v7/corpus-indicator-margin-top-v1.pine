@@ -1,3 +1,0 @@
-//@version=5
-indicator("V7 margin",margin_top=5)
-plot(close)

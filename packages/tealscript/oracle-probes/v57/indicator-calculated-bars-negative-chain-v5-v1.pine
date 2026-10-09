@@ -1,5 +1,0 @@
-//@version=5
-const int NEGATIVE = -1
-const int VALUE = NEGATIVE
-indicator("Calculated bars domain", calc_bars_count=VALUE)
-plot(close)

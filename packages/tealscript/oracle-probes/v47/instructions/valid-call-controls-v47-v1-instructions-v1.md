@@ -1,3 +1,0 @@
-# v47 valid-call controls capture instructions v1
-
-Use the common v47 chart setup. Run this unchanged script independently even if another source refuses. Export INDEX,CONTROL_CLOSE,FORMAT_CONTROL,TIME_LITERAL_CONTROL,TIME_BINDING_CONTROL,SUBSTRING_CONTROL with raw time/OHLCV; save Data Window and any earliest diagnostic. Values/phase remain UNSPECIFIED until captured. Record native build/account/settings, source SHA and actual exported INDEX range. Return valid-call-controls-v47-v1-attempt1.csv under captures/v47 and summarize RESPONSE-v47.md. A valid companion cannot certify a refused target call or its hidden outputs.

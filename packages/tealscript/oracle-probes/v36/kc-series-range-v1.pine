@@ -1,7 +1,0 @@
-//@version=6
-indicator("ta-b authority kc-series-range-v1")
-[m,u,l] = ta.kc(close,3,2.0,close > open)
-plot(m, "middle", display=display.data_window)
-plot(u, "upper", display=display.data_window)
-plot(l, "lower", display=display.data_window)
-plot(bar_index, "input_bar_index", display=display.data_window)

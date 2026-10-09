@@ -1,4 +1,0 @@
-//@version=6
-const int BASE = 4999
-indicator("History depth domain", max_bars_back=BASE + 1)
-plot(close, "Close")

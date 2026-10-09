@@ -1,4 +1,0 @@
-//@version=5
-indicator("Reserved variable text v5")
-float text = close
-plot(text, "VALUE")

@@ -1,6 +1,0 @@
-//@version=6
-indicator("V52 kcw-series-usetruerange", calc_bars_count=32)
-candidateArgument = bar_index % 2 == 0
-plot(ta.kcw(series=close, length=3, mult=2.0, useTrueRange=candidateArgument), "RESULT")
-plot(candidateArgument ? 1 : 0, "ARGUMENT")
-plot(bar_index, "SOURCE_INDEX")

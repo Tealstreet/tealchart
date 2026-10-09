@@ -1,5 +1,0 @@
-//@version=5
-indicator("V7 history-negative-v5-v1")
-o = -1
-plot(close[o], "TARGET")
-plot(close, "CONTROL")

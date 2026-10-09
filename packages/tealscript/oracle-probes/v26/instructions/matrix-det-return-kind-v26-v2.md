@@ -1,7 +1,0 @@
-# Matrix determinant return-kind capture instructions v1
-
-Compile/run the exact v2 source unchanged. No special chart context is needed. If RUNS, export all6 data-window columns; capture compile/runtime phase, complete code/text/line/bar, source hash, context and screenshot. Native phase and values are UNSPECIFIED.
-
-Both matrices have identical numeric determinant6. The two same-name required-parameter overloads deliberately return1 for int and2 for float. Thus each rank column distinguishes static element-preserving type from generic float or value-based numeric-int routing: R1324/R1328 are float namespace/method, R1325/R1329 int namespace/method. Literal controls must distinguish6->int overload1 and6.0->float overload2 before determinant type credit. If the native overload declarations refuse, this source is inconclusive for determinant return kind; preserve the refusal, do not infer a type. No int-only consumer is allowed to mask the other forms.
-
-Local exact-L preflight compiles without diagnostics: controls publish1/2 while all four determinant-overload columns are NA. That is an engine observation only; do not substitute it for native outcomes. This source is separate from the8-rank batch so a compilation error cannot hide unrelated columns. The older pivot-control capture proves numeric values only; equal numeric6 determinants here deliberately eliminate numeric value as a type discriminator.

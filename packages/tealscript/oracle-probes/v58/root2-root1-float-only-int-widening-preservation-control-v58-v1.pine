@@ -1,4 +1,0 @@
-//@version=6
-indicator("Imported numeric widening")
-import CAPTURE_OWNER/R2Ns34c7d0619d7b/1 as lib
-plot(int(3).pick())

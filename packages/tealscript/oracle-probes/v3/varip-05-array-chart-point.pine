@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-VARIP-05")
-varip array<chart.point> value = array.new<chart.point>(0)
-plot(array.size(value), "OUTCOME")

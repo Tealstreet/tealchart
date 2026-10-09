@@ -1,5 +1,0 @@
-# Imported nested UDT field identity discriminator v1
-
-Capture the published-printer10 source independently. Record native compile diagnostics or the named output. Preserve exact revision10 and alias prnt. The synthetic two-body minimal sources accompany the actual existing-library witness for root isolation; no synthetic publication is required. Native outcome is unspecified. This family is native-held with W8 alias identity, not production-granted.
-
-Use BINANCE:BTCUSDT 2m standard candles, Etc/UTC, source-default inputs and at least32closedbars. Run nested-udt-field-identity-v5-v1.pine unchanged. Record exact compile/runtime phase and diagnostic text/code/line/column. If RUNS, export time/OHLCV and nested_identity_assignment for all loaded closedbars, with actual count/cutoff/settings. If printer/10 is inaccessible, classify UNAVAILABLE-LIBRARY separately from UDT assignment refusal. Earlier library-body refusal leaves target identity held. Synthetic test/Types library/consumer are local reductions ONLY, not native capture sources and require no publication. Native phase/values UNSPECIFIED.

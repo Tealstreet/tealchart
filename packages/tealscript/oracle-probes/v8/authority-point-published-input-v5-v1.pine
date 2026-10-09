@@ -1,5 +1,0 @@
-//@version=5
-indicator("Authority published point division v1")
-len = input.int(50)
-p = chart.point.from_index(bar_index + (len / 2 - 1), close)
-plot(p.index - bar_index)

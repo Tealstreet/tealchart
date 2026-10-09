@@ -1,3 +1,0 @@
-//@version=5
-library("R2Ns7300f5f6f0f4")
-export method pick(float self) => self + 10

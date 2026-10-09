@@ -1,3 +1,0 @@
-//@version=5
-indicator("V29 time close named offset v5")
-plot(time_close("",bars_back=1),"TARGET")

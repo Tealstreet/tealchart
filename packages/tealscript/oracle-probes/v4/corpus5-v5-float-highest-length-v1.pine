@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus5-v5-float-highest-length-v1")
-length = timeframe.in_seconds("15") / timeframe.in_seconds(timeframe.period)
-plot(ta.highest(length), "OUTCOME")

@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-compile-third-v5-polyline-typed-na-control-v1")
-var polyline missing_id = na
-plot(na(missing_id) ? 1 : 0, "TYPED_MISSING_CONTROL")

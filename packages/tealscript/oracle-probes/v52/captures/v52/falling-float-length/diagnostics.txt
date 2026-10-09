@@ -1,2 +1,0 @@
-CE10123 {'line': 3, 'column': 24}: Cannot call "ta.falling" with argument "length"="3". An argument of "literal float" type was used but a "series int"  is expected.
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

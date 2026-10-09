@@ -1,9 +1,0 @@
-//@version=6
-indicator("Empty binary_search_leftmost v1")
-empty = array.new<int>(0)
-value = array.binary_search_leftmost(empty, 17)
-plot(value, "EMPTY_RESULT")
-plot(na(value) ? 1 : 0, "EMPTY_MISSING")
-plot(empty.size(), "EMPTY_SIZE")
-control = array.from(5, 17, 43)
-plot(array.binary_search_leftmost(control, 17), "CONTROL_EXACT")

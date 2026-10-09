@@ -1,8 +1,0 @@
-//@version=6
-indicator("V13 SAR actual missing extrema v1", precision=16)
-plot(time, "INPUT_TIME")
-plot(high, "ACTUAL_HIGH")
-plot(low, "ACTUAL_LOW")
-plot(close, "ACTUAL_CLOSE")
-plot(na(high) or na(low) or na(close) ? 1 : 0, "OHLC_MISSING")
-plot(ta.sar(0.02, 0.02, 0.2), "TARGET")

@@ -1,6 +1,0 @@
-//@version=6
-indicator("V42 floor-input-consumer-format")
-source = input.string("abc", "Source")
-value = str.format("{0}", source)
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

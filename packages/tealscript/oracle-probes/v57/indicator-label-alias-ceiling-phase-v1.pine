@@ -1,5 +1,0 @@
-//@version=6
-const int BASE = 499
-const int COUNT = BASE + 1
-indicator("Label alias-ceiling phase v1", max_labels_count=COUNT)
-plot(close, title="Close control")

@@ -1,8 +1,0 @@
-//@version=5
-indicator("V29 barsince rename v5-bare-canonical J v1")
-bool event = bar_index % 5 == 2
-value = barssince(event)
-plot(bar_index, "CHART_INDEX")
-plot(event ? 1 : 0, "EVENT")
-plot(value, "TARGET")
-plot(na(value) ? 1 : 0, "TARGET_NA")

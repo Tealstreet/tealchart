@@ -1,4 +1,0 @@
-//@version=5
-indicator("V7 corpus-input-step-v1")
-x = input(1.0,step=0.5)
-plot(x)

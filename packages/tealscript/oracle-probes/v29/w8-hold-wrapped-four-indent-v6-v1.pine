@@ -1,7 +1,0 @@
-//@version=6
-indicator("w8-hold-wrapped-four-indent-v6-v1",overlay=false)
-value = math.max(
-    close,
-    open)
-plot(value,"TARGET")
-plot(math.max(close,open),"CONTROL")

@@ -1,8 +1,0 @@
-//@version=6
-indicator("v40 string valid controls v1")
-plot(bar_index, "INDEX", display=display.data_window)
-plot(str.tonumber("12.5"), "DECIMAL_CONTROL", display=display.data_window)
-plot(str.substring("abc", 0, 2) == "ab" ? 1 : 0, "SUBSTRING_CONTROL", display=display.data_window)
-plot(str.replace_all("ab", "a", "-") == "-b" ? 1 : 0, "REPLACE_CONTROL", display=display.data_window)
-plot(str.format("{0}", 7) == "7" ? 1 : 0, "FORMAT_CONTROL", display=display.data_window)
-plot(str.tostring(7, "#") == "7" ? 1 : 0, "TOSTRING_CONTROL", display=display.data_window)

@@ -1,4 +1,0 @@
-//@version=6
-indicator("V6 ternary bool-int")
-value = close > open ? true : 1
-plot(close, display=display.data_window)

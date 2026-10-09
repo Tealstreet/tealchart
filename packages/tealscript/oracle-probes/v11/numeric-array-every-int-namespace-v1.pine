@@ -1,4 +1,0 @@
-//@version=6
-indicator("V11 numeric-array-every-int-namespace-v1", max_bars_back=256)
-array<int> items = array.from(0, na, 2)
-plot(array.every(items) ? 1 : 0, "RESULT")

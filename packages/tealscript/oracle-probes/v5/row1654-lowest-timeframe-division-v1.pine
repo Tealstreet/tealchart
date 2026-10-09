@@ -1,8 +1,0 @@
-//@version=5
-indicator("row1654-lowest-timeframe-division-v1", overlay=true)
-tfMultiplier = timeframe.multiplier
-lookbackLength = 1440 / tfMultiplier
-priceLowest = ta.lowest(low, lookbackLength)
-plot(priceLowest, "target")
-plot(ta.lowest(low, int(lookbackLength)), "explicit_int_control")
-plot(lookbackLength, "division_value")

@@ -1,9 +1,0 @@
-//@version=6
-indicator("corpus-compile-third-v6-name-binding-controls-v1")
-wActifLvl = close
-readGlobal() => wActifLvl
-relVol = close
-plot(readGlobal(), "EARLIER_GLOBAL_CONTROL")
-plot(relVol, "DECLARED_VALUE_CONTROL")
-plot(close, "COLOR_CONTROL", color=color.new(color.red, 80), linewidth=2)
-plot(close, "SINGLE_COLOR_CONTROL", color.blue, linewidth=2)

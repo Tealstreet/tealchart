@@ -1,3 +1,0 @@
-//@version=6
-indicator("calc_bars_count float arithmetic", calc_bars_count=1 + 0.5)
-plot(close)

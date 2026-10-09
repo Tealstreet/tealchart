@@ -1,3 +1,0 @@
-//@version=6
-indicator("V3-REQUEST-07", max_bars_back=256)
-plot(request.currency_rate("INVALID","USD",ignore_invalid_currency=false), "OUTCOME")

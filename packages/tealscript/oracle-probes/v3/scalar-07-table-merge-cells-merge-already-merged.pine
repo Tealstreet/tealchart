@@ -1,6 +1,0 @@
-//@version=6
-indicator("V3-SCALAR-07", max_bars_back=256)
-t=table.new(position.top_right,2,2)
-table.merge_cells(t, 0, 0, 1, 0)
-table.merge_cells(t, 0, 0, 1, 0)
-plot(1, "OUTCOME")

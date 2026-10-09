@@ -1,7 +1,0 @@
-//@version=6
-indicator("Silent audit line-width-151 v13 v1", overlay=true, precision=16)
-if barstate.islast
-    line.new(bar_index-4, 1, bar_index-1, 1, width=100, color=color.blue)
-    line.new(bar_index-4, 2, bar_index-1, 2, width=151, color=color.red)
-plot(bar_index, "INPUT_BAR_INDEX", display=display.data_window)
-plot(151, "REQUESTED_WIDTH", display=display.data_window)

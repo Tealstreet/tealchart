@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-CONST-REF-ARRAY-ACCEPT-MUTATE")
-const array<float> value = array.new<float>(1, close)
-array.set(value, 0, close + 1)
-plot(array.get(value, 0), "OUTCOME")

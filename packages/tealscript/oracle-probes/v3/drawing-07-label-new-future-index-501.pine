@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-DRAWING-07", max_bars_back=256)
-label.new(bar_index+501,close)
-plot(1, "OUTCOME")

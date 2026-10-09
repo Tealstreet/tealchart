@@ -1,4 +1,0 @@
-//@version=6
-indicator("CORPUS5-MATRIX-NEGATIVE-IDENTITY-POWER-V1")
-value = matrix.pow(matrix.new<float>(1, 1, 1.0), -1)
-plot(matrix.get(value, 0, 0), "OUTCOME")

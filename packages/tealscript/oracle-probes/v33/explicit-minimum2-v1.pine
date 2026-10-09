@@ -1,4 +1,0 @@
-//@version=6
-indicator("Small minimum", max_bars_back=2)
-offset = bar_index == 200 ? bar_index : 1
-plot(close[offset], "Past")

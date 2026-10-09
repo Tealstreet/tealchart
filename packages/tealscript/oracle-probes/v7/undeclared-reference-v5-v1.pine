@@ -1,3 +1,0 @@
-//@version=5
-indicator("V7 undeclared-reference-v5-v1")
-plot(missingName,"TARGET")

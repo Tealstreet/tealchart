@@ -1,7 +1,0 @@
-V33 MFI signed holes bounds discriminator v1
-Question: For length3 MFI with the exported negative/positive source pattern, source holes at cycle positions2/7/10, and one leading missing source, which exact MFI/NA and bounds outputs does TV return?
-Export all8 named columns for at least64 bars on BINANCE:BTCUSDT 1m. Preserve source/CSV/context hashes. Native expected values remain UNSPECIFIED. The negative-source documented formula and earlier native mixed-sign capture already disprove universal0..100; this question observes missing-flow/startup values without fitting them to the local engine.
-The gate fixture has synthetic volumes100+10*i, with leading fixture volumeNA at0. Native chart volumes differ and are explicitly exported. This probe does not reconstruct those synthetic fixtures: retain HOST-CONTEXT hold on their exact per-bar values unless a matching volume/input feed is available.
-Ranks/components: invariant.mfi.bounds(component96), invariant.mfi.leading-na-bounds(component97). No production edits.
-
-Use standard candles, Etc/UTC, no Bar Replay, unchanged source/default settings. Record actual historical count and cutoff. Save full earliest native compile/runtime diagnostic and screenshot if export is prevented; mark masked columns UNOBSERVED. Preserve raw CSV precision and missing values, including time/OHLCV, all named plots and Pine-index column. Do not equate CSV row ordinal with Pine bar_index.

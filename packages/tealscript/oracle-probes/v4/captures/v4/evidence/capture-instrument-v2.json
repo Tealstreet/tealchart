@@ -1,7 +1,0 @@
-{
-  "artifact": "Capture instrument UI interruption v2",
-  "observed_utc": "2026-10-04T02:14:00.776871+00:00",
-  "intended_source": "corpus5-v6-equal-lower-timeframe-v1.pine",
-  "failure": "Create new menu was focused but Indicator submenu was not present after initial click. Target source not yet installed; no native target result.",
-  "recovery": "Use fresh snapshots with a short menu-render wait and native hover on observed Create new item."
-}

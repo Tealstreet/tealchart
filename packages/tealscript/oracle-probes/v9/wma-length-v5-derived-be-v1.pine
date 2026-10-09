@@ -1,4 +1,0 @@
-//@version=5
-indicator("derived")
-n = input.int(9)
-plot(ta.wma(close, n / 2))

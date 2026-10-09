@@ -1,4 +1,0 @@
-//@version=6
-indicator("V34 tr-omitted-handle-na", overlay=false)
-plot(ta.tr(), "TARGET", display=display.data_window)
-plot(bar_index, "INDEX", display=display.data_window)

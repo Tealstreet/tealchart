@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 ta-percentrank-clean-ties-warmup-v6-v1")
-s = bar_index % 8 < 2 ? 1.0 : bar_index % 8 < 4 ? 2.0 : bar_index % 8 < 6 ? 2.0 : 4.0
-plot(s,"SOURCE")
-plot(ta.percentrank(s,4),"TARGET")

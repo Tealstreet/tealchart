@@ -1,1 +1,0 @@
-RE10008 [{'n': '#main', 'p': 5}]: Error on bar 0: The script attempts to reference historical data that is too far from the current bar (-1 bars back). The history-referencing length for the expression must be a value between 0 and 10000.

@@ -1,9 +1,0 @@
-//@version=5
-indicator("Mutable EMA separate UDF calls native")
-smooth(int length) => ta.ema(close, length)
-var seriesLen = 1
-seriesLen += 1
-plot(smooth(seriesLen), "MUTABLE_UDF_TWO")
-plot(smooth(4), "FIXED_UDF_FOUR")
-plot(ta.ema(close, 2), "FIXED_TWO")
-plot(ta.ema(close, 4), "FIXED_FOUR")

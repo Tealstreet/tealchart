@@ -1,7 +1,0 @@
-//@version=6
-indicator("s4-time-close-negative-overflow-dynamic-v29-v1", precision=16)
-int offset=bar_index<3?0:-501
-int result=time_close("1",bars_back=offset)
-plot(offset,"REQUESTED_OFFSET")
-plot(result,"TIME_CLOSE_RESULT")
-plot(bar_index,"CHART_INDEX")

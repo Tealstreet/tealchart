@@ -1,6 +1,0 @@
-//@version=6
-indicator("V7 array-min-allna-empty-v6-v1")
-a = array.new<float>(3,na)
-b = array.new<float>(0)
-plot(array.min(a),"ALL_NA")
-plot(array.min(b),"EMPTY")

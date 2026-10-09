@@ -1,6 +1,0 @@
-//@version=6
-indicator("Corpus local UDF scope discriminator")
-if barstate.islast
-    _cell(r, lbl, val) => val
-    value = _cell(4, "z RSI", close)
-plot(close, "CONTROL", display=display.data_window)

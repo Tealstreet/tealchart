@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 plotshape-textcolor-na-v6-v1")
-c = bar_index % 8 == 3 or bar_index % 8 == 4 ? na : color.black
-plotshape(true,"TARGET",style=shape.labelup,text="X",color=color.yellow,textcolor=c)

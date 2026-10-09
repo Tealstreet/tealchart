@@ -1,7 +1,0 @@
-//@version=6
-indicator("V33 isolated component")
-plot(bar_index, "INDEX")
-[plus, minus, adx] = ta.dmi(3, 3)
-plot(plus, "VALUE_1")
-plot(minus, "VALUE_2")
-plot(adx, "VALUE_3")

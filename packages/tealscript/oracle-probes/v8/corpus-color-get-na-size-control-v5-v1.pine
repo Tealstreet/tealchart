@@ -1,9 +1,0 @@
-//@version=5
-indicator("V5 missing size control v1")
-var colors = array.new_color(na)
-if barstate.isfirst
-    for i = 0 to 100
-        array.push(colors, color.blue)
-value = array.get(colors, math.round(na))
-plot(array.size(colors), title="size")
-plot(na(value) ? -1 : value == color.blue ? 0 : value == color.red ? 100 : 999, title="color_code")

@@ -1,3 +1,0 @@
-//@version=6
-indicator("Calculated bars domain", calc_bars_count=0 - 1)
-plot(close)

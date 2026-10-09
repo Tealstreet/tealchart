@@ -1,7 +1,0 @@
-{
-  "artifact": "Context summary SHA256 v1",
-  "files": {
-    "marker-color-context-summary-v1.json": "8488356aadfa9faed53301b5b8443a024ec1c2e8e109835e0d568bd65942db07",
-    "qualifier-retention-context-summary-v1.json": "9404b9a0b694ec4f94bd5fc6efdfae41f88527de99d78760c7638ffeed3f9538"
-  }
-}

@@ -1,5 +1,0 @@
-//@version=6
-indicator("Global enabled request or", dynamic_requests=true)
-value = close > open or request.security(syminfo.tickerid, timeframe.period, close > open)
-plot(value ? 1 : 0, "VALUE")
-plot(close, "CONTROL_CLOSE")

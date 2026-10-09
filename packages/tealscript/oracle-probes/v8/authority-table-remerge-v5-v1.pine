@@ -1,7 +1,0 @@
-//@version=5
-indicator("Authority table remerge v1")
-var t = table.new(position.top_right, 2, 1)
-table.merge_cells(t, 0, 0, 1, 0)
-if barstate.islast
-    table.cell(t, 0, 0, "merged")
-plot(close)

@@ -1,2 +1,0 @@
-CE10123 {'line': 5, 'column': 14}: Cannot call "consume" with argument "sampleText"="value". An argument of "series string" type was used but a "simple string"  is expected.
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

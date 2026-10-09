@@ -1,3 +1,0 @@
-//@version=6
-indicator("V3-HISTORY-UNAVAILABLE-OFFSET")
-plot(close[int(na)], "OUTCOME")

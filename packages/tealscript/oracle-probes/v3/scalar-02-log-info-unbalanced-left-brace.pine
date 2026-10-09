@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-SCALAR-02", max_bars_back=256)
-log.info("ab {0", close)
-plot(1, "OUTCOME")

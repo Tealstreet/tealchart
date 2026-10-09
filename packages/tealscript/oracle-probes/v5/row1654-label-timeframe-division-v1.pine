@@ -1,7 +1,0 @@
-//@version=5
-indicator("row1654-label-timeframe-division-v1", overlay=true)
-tfMultiplier = timeframe.multiplier
-if barstate.islast
-    for barIndex = 0 to 1
-        label.new(bar_index + barIndex * 60 / tfMultiplier, low, "target", xloc=xloc.bar_index)
-plot(close, "compile_control")

@@ -1,3 +1,0 @@
-//@version=6
-indicator("rename-authority-atan-angle-v6-probe-v1")
-plot(math.atan(angle=0.5),"result")

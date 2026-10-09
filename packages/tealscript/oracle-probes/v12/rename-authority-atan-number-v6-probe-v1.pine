@@ -1,3 +1,0 @@
-//@version=6
-indicator("rename-authority-atan-number-v6-probe-v1")
-plot(math.atan(number=0.5),"result")

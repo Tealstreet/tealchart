@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-CONST-REF-MATRIX-QUALIFIER-DIAGNOSTIC")
-const matrix<float> value = matrix.new<float>(1, 1, close)
-plot(value, "OUTCOME")

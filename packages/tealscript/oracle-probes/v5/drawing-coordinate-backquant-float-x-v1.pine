@@ -1,3 +1,0 @@
-//@version=6
-indicator("BackQuant coordinate v1")
-label.new(bar_index + (1 + 2) / 2, close)

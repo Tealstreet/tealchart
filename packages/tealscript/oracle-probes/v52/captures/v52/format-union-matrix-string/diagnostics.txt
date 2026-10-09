@@ -1,2 +1,0 @@
-CE10122 {'line': 3, 'column': 27}: Cannot call "str.format" with argument "arg_1"="call "matrix.new" (matrix<string>)". An argument of "matrix<string>" type was used but one from "simple int/float/bool/string" is expected
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but one from "{expectedType}" is expected

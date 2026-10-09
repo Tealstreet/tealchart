@@ -1,7 +1,0 @@
-//@version=6
-indicator("V7 nested-dynamic-request-v6-v1")
-inner = request.security(syminfo.tickerid,"5",close)
-outer = request.security(syminfo.tickerid,"15",inner)
-plot(inner,"INNER")
-plot(outer,"OUTER")
-plot(request.security(syminfo.tickerid,"15",close),"DIRECT")

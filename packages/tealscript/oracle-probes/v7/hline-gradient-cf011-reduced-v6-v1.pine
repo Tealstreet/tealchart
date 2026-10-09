@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 hline-gradient-cf011-reduced-v6-v1")
-cf011_top = hline(100,color=color.red)
-cf011_bot = hline(0,color=color.blue)
-fill(cf011_top,cf011_bot,100,0,color.red,color.blue)

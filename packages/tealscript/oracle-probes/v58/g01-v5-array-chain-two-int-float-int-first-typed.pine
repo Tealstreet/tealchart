@@ -1,9 +1,0 @@
-//@version=5
-indicator("G6 adversarial alias")
-score(array<int> xs) => 10
-score(array<float> xs) => 20
-relay(array<int> xs, array<float> ys) =>
-    copied = xs
-    second = copied
-    score(second)
-plot(relay(array.new<int>(1,3),array.new<float>(1,1.5)))

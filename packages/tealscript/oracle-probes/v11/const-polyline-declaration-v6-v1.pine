@@ -1,5 +1,0 @@
-//@version=6
-indicator("Const polyline declaration")
-points = array.from(chart.point.from_index(bar_index - 1, close[1]), chart.point.from_index(bar_index, close))
-const polyline value = polyline.new(points)
-plot(close, "OUTCOME")

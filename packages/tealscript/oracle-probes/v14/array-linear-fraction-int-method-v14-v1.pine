@@ -1,9 +1,0 @@
-//@version=6
-indicator("array-linear-fraction-int-method v14 v1", precision=16)
-a = array.from(10, 21)
-plot(bar_index, "INPUT_BAR_INDEX", display=display.data_window)
-plot(a.percentile_linear_interpolation(0), "PERCENTILE_0", display=display.data_window)
-plot(a.percentile_linear_interpolation(25), "PERCENTILE_25", display=display.data_window)
-plot(a.percentile_linear_interpolation(50), "PERCENTILE_50", display=display.data_window)
-plot(a.percentile_linear_interpolation(75), "PERCENTILE_75", display=display.data_window)
-plot(a.percentile_linear_interpolation(100), "PERCENTILE_100", display=display.data_window)

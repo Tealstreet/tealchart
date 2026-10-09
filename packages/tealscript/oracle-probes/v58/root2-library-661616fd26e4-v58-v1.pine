@@ -1,3 +1,0 @@
-//@version=6
-library("R2Ns661616fd26e4")
-export pick(int self)=>self+10

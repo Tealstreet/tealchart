@@ -1,3 +1,0 @@
-//@version=6
-indicator("V3-BOUNDS-04", max_bars_back=256)
-plot(ta.percentile_linear_interpolation(close, 5, 101.0), "OUTCOME")

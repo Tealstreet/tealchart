@@ -1,3 +1,0 @@
-//@version=6
-indicator("qualification compile")
-plot(1)

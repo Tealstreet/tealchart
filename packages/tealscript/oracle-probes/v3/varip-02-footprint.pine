@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-VARIP-02")
-varip footprint value = na
-plot(1, "OUTCOME")

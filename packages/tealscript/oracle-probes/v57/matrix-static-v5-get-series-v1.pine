@@ -1,6 +1,0 @@
-//@version=5
-indicator("matrix-static-v5-get-series-v1")
-m=matrix.new<int>(1,1,7)
-series int x=matrix.get(m,0,0)
-plot(x,"VALUE")
-plot(bar_index,"BAR_INDEX")

@@ -1,6 +1,0 @@
-//@version=6
-indicator("varip enum array eligibility")
-enum State
-    member
-varip array<State> values = array.new<State>()
-plot(array.size(values), "OUTCOME")

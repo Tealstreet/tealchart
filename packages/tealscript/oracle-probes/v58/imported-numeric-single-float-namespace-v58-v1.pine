@@ -1,4 +1,0 @@
-//@version=6
-indicator("Single imported method")
-import Test/Nums/1 as lib
-plot(lib.pick(float(3.0)))

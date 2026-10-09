@@ -1,3 +1,0 @@
-//@version=6
-indicator("V11 Style gradient result", overlay=false)
-plot(close, "PRICE", color=color.from_gradient(0.5, 0.0, 1.0, color.blue, color.red), editable=true)

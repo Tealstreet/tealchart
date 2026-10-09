@@ -1,6 +1,0 @@
-//@version=6
-indicator("str-upper-input-source-title")
-value = input.string("Ab")
-result = str.upper(source=value)
-plot(close, title=result)
-plot(bar_index, "SOURCE_INDEX")
