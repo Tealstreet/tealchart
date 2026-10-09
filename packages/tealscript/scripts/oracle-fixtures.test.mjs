@@ -5,6 +5,7 @@ import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { assertManaged, assertReady, validateLock, verifyFiles } from './oracle-fixtures.mjs';
 
 const repository = 'https://github.com/Tealstreet/tealscript-oracle.git';
@@ -182,4 +183,13 @@ test('assertManaged preserves ignored capture work rather than treating it as di
   await writeFile(join(root, 'new-capture.csv'), 'ignored capture');
   assert.throws(() => assertManaged(root), /changed oracle fixtures/);
   assert.equal(await readFile(join(root, 'new-capture.csv'), 'utf8'), 'ignored capture');
+});
+
+test('CLI symlink invocation reports invalid commands instead of silently succeeding', async t => {
+  const root = await temporaryRoot(t);
+  const entry = join(root, 'oracle-cli.mjs');
+  await symlink(fileURLToPath(new URL('./oracle-fixtures.mjs', import.meta.url)), entry);
+  const result = spawnSync(process.execPath, [entry, 'invalid-command'], { encoding: 'utf8' });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Usage:.*fetch\|verify\|guard/);
 });

@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
-import { createReadStream, existsSync, readFileSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, realpathSync } from 'node:fs';
 import { lstat, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
 const lockPath = join(packageRoot, 'oracle-fixtures.json');
@@ -150,6 +150,6 @@ async function main() {
   } else throw new Error('Usage: node scripts/oracle-fixtures.mjs fetch|verify|guard');
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (process.argv[1] && existsSync(process.argv[1]) && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {
   main().catch(error => { console.error(error.message); process.exitCode = 1; });
 }

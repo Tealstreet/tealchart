@@ -3408,7 +3408,7 @@ guard rejects declarations inside another UDF, without extending that refusal
 to top-level if/loop blocks. Their exact native admission is still unobserved,
 so preserving these local behaviors is not a native Pine acceptance claim.
 Exact byte-preserved sources and isolated controls remain registered in archive
-`oracle-probes/v5-outcomes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md` under the shared
+[GAPS43 corpus refusal blockers](https://github.com/Tealstreet/tealscript-oracle/blob/8425039c3539ac14152e305ee4b627128efc2551/v5-outcomes/GAPS43-CORPUS-REFUSAL-BLOCKERS-v1.md) under the shared
 bundle lock. Retain the v6 duplicate-signature and genuine nested-UDF refusal
 controls, and require zero new refusals in the previous-OK corpus gate.
 
