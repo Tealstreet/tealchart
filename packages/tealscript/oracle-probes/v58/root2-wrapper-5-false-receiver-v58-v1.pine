@@ -1,6 +1,0 @@
-//@version=5
-indicator("Namespace methods")
-import CAPTURE_OWNER/R2Nseb54acaa28f5/1 as lib
-read(value) => value.pick()
-plot(read(close))
-plot(read(int(close)))

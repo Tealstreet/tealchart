@@ -1,8 +1,0 @@
-//@version=6
-indicator("V3-SPLIT-EMPTY-SEPARATOR-SIZES")
-a = str.split("", "")
-b = str.split("abc", "")
-if barstate.isfirst
-    log.info("EMPTY=" + str.tostring(array.size(a)))
-    log.info("ABC=" + str.tostring(array.size(b)))
-plot(1, "OUTCOME")

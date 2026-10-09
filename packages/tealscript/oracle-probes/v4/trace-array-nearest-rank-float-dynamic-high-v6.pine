@@ -1,8 +1,0 @@
-//@version=6
-indicator("trace-array-nearest-rank-float-dynamic-high-v6")
-a = array.from(10.5, 20.5, 30.5, 40.5, 50.5)
-percentage = bar_index < 40 ? 50.0 : 101.0
-result = array.percentile_nearest_rank(a, percentage)
-plot(bar_index, "BAR_INDEX", display=display.data_window)
-plot(percentage, "PERCENTAGE", display=display.data_window)
-plot(result, "OUTCOME", display=display.data_window)

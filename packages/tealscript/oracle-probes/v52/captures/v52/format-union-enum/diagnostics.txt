@@ -1,3 +1,0 @@
-CE10124 {'line': 5, 'column': 27}: Cannot call "str.format()" to collect the "one" field from an object of the "ReviewEnum" type. The field"s type is "const ReviewEnum", but the "simple int/float/bool/string" type is expected.
-CE10122 {'line': 10, 'column': 30}: Cannot call "log.info" with argument "arg_1"="value". An argument of "unknown" type was used but one from "series int/float/bool/string/array<int/float/bool/string>" is expected
-None None: Cannot call "{funId}()" to collect the "{field}" field from an object of the "{name}" type. The field"s type is "{argumentType}", but the "{expectedType}" type is expected.

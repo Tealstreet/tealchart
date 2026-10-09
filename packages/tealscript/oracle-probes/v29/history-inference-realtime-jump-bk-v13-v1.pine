@@ -1,8 +1,0 @@
-//@version=6
-indicator("V13 history inference realtime jump BK v1")
-offset = barstate.ishistory ? 100 : 150
-plot(close[offset], "TARGET")
-plot(offset, "OFFSET")
-plot(barstate.isrealtime ? 1 : 0, "REALTIME")
-plot(bar_index, "BAR_INDEX")
-plot(close, "CLOSE_CONTROL")

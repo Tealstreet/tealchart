@@ -1,3 +1,0 @@
-//@version=6
-indicator("rename-authority-barssince-v6-probe-v1")
-plot(ta.barssince(bar_index>0),"result")

@@ -1,5 +1,0 @@
-//@version=6
-indicator("s4-time-close-endpoints-v29-v1", precision=16)
-plot(time_close("1",bars_back=5000),"PAST_5000")
-plot(time_close("1",bars_back=-500),"FUTURE_500")
-plot(bar_index,"CHART_INDEX")

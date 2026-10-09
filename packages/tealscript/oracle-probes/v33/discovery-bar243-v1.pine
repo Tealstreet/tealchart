@@ -1,4 +1,0 @@
-//@version=6
-indicator("Discovery prefix")
-offset = bar_index == 243 ? bar_index * 6 : 1
-plot(close[offset], "Past")

@@ -1,3 +1,0 @@
-//@version=6
-indicator("rename-authority-acos-angle-v6-probe-v1")
-plot(math.acos(angle=0.5),"result")

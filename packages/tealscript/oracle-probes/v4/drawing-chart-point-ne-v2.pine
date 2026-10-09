@@ -1,6 +1,0 @@
-//@version=6
-indicator("V4-DRAWING-CHART-POINT-NE",overlay=true)
-var a=chart.point.from_index(bar_index,high)
-b=a
-var other=chart.point.from_index(bar_index,high)
-plot((a != b ? 1 : 0) + 2 * (a != other ? 1 : 0),"OUTCOME")

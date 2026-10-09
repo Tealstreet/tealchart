@@ -1,4 +1,0 @@
-//@version=6
-indicator("V6 ternary color-string")
-value = close > open ? color.red : "red"
-plot(close, display=display.data_window)

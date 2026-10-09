@@ -1,7 +1,0 @@
-//@version=6
-indicator("Drawing GC line quota 5 v2", max_lines_count=5)
-line.new(bar_index, 1.0, bar_index + 1, 1.0)
-int count = array.size(line.all)
-int oldest = count > 0 ? line.get_x1(array.get(line.all, 0)) : na
-plot(count, "VISIBLE_COUNT")
-plot(oldest, "OLDEST_INDEX")

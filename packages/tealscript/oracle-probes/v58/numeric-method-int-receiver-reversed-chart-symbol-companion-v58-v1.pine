@@ -1,7 +1,0 @@
-//@version=6
-indicator("1X method-int-receiver-reversed", dynamic_requests=false)
-method sample(float self)=>request.security(syminfo.tickerid,"1D",close,lookahead=barmerge.lookahead_on)
-method sample(int self)=>self
-float selected = int(close).sample()
-plot(selected,"Chart")
-plot(request.security(syminfo.tickerid,"1D",selected,lookahead=barmerge.lookahead_on),"Result")

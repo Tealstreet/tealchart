@@ -1,6 +1,0 @@
-//@version=5
-library("R2Ns2da86fb61908")
-export type Point
-    float value
-export method pick(Point self) => self.value + 1
-export method pick(array<float> self) => self.get(0) + 2

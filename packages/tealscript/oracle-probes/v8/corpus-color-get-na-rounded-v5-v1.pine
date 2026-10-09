@@ -1,8 +1,0 @@
-//@version=5
-indicator("V5 color missing-index v1")
-colors = array.new_color(101, color.blue)
-array.set(colors, 100, color.red)
-int index = math.round(na)
-value = array.get(colors, index)
-plot(array.size(colors), title="size")
-plot(na(value) ? -1 : value == color.blue ? 0 : value == color.red ? 100 : 999, title="color_code")

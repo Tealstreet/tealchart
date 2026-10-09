@@ -1,6 +1,0 @@
-{
-  "artifact": "Input confirmation instrument interruption v1",
-  "script": "input-time-marker-kind-v1.pine",
-  "observed_utc": "2026-10-04T02:25:54.116Z",
-  "failure": "No active study during pending input.time confirm placement; automatic reset canceled placement. Reset history did not settle with a study."
-}

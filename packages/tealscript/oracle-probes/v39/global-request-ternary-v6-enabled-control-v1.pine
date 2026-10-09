@@ -1,5 +1,0 @@
-//@version=6
-indicator("Global enabled request ternary", dynamic_requests=true)
-value = close > open ? request.security(syminfo.tickerid, timeframe.period, close) : 0
-plot(value, "VALUE")
-plot(close, "CONTROL_CLOSE")

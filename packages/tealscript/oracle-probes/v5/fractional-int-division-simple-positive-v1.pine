@@ -1,9 +1,0 @@
-//@version=6
-indicator("V5-FRACTIONAL-INT-DIVISION-SIMPLE-POSITIVE-V1", precision=16)
-simple int numerator = timeframe.in_seconds() > 0 ? 5 : 7
-int assigned = numerator / 2
-plot(time, "INPUT_TIME")
-plot(numerator, "NUMERATOR")
-plot(numerator / 2, "RAW")
-plot(assigned, "ASSIGNED")
-plot(assigned * 2 - numerator, "RESIDUAL")

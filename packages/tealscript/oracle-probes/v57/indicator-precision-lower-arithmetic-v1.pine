@@ -1,3 +1,0 @@
-//@version=6
-indicator("Precision lower arithmetic", precision=0 - 1)
-plot(close, "Close")

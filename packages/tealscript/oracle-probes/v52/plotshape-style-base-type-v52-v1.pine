@@ -1,4 +1,0 @@
-//@version=6
-indicator("V52 plotshape-style-base-type", overlay=true, calc_bars_count=32)
-plotshape(series=true, style=7, title="CANDIDATE")
-plot(bar_index, "SOURCE_INDEX", display=display.data_window)

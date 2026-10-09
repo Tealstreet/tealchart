@@ -1,5 +1,0 @@
-//@version=6
-indicator("Namespace ambiguity")
-import CAPTURE_OWNER/R2Ns7c5a88f50ae8/1 as lib
-read(value) => lib.pick(value)
-plot(read(close))

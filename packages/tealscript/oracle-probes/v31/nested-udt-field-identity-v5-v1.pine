@@ -1,6 +1,0 @@
-//@version=5
-indicator("Imported nested UDT identity discriminator")
-import faiyaz7283/printer/10 as prnt
-style = prnt.cellStyle.new()
-style.dynamicColor := prnt.dynamicColor.new(offsetItem="text")
-plot(style.dynamicColor.offsetItem == "text" ? 1 : 0, "nested_identity_assignment")

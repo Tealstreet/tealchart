@@ -1,9 +1,0 @@
-//@version=6
-indicator("V16 visual21 705 foreground")
-plot(color.r(chart.bg_color), "BG_R", display=display.data_window)
-plot(color.g(chart.bg_color), "BG_G", display=display.data_window)
-plot(color.b(chart.bg_color), "BG_B", display=display.data_window)
-plot(color.r(chart.fg_color), "FG_R", display=display.data_window)
-plot(color.g(chart.fg_color), "FG_G", display=display.data_window)
-plot(color.b(chart.fg_color), "FG_B", display=display.data_window)
-plot(color.t(chart.fg_color), "FG_T", display=display.data_window)

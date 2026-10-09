@@ -1,9 +1,0 @@
-//@version=6
-indicator("V11 inactive-if-string-pair-v1", max_bars_back=256)
-text = if bar_index % 2 == 0
-    "SET"
-plot(float(bar_index), "BAR_INDEX")
-plot(na(text) ? 1 : 0, "STRING_IS_NA")
-plot(str.length(text), "STRING_LENGTH")
-if bar_index < 8
-    log.info("BAR=" + str.tostring(bar_index) + " TEXT=[" + text + "] NA=" + str.tostring(na(text)))

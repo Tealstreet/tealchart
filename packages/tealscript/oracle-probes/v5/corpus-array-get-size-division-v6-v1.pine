@@ -1,5 +1,0 @@
-//@version=6
-indicator("corpus-array-get-size-division-v6-v1")
-sorted = array.from(10.0, 20.0, 30.0, 40.0, 50.0)
-sz = array.size(sorted)
-plot(array.get(sorted, sz / 2), "size_division")

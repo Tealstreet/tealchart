@@ -1,5 +1,0 @@
-//@version=6
-indicator("V42 floor-const-title-tostring-format")
-value = str.tostring(1.2, "#.00")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

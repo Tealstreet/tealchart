@@ -1,9 +1,0 @@
-//@version=5
-indicator("Nested default overload")
-method score(array<int> xs) => 10
-method score(array<float> xs) => 20
-seed = array.new<float>(1,0)
-read(value=seed.score()) => value
-outer() => read()
-x = outer()
-plot(x)

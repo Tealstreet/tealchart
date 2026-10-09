@@ -1,9 +1,0 @@
-//@version=6
-indicator("Negative overflow map key v13 v1", precision=16)
-m = map.new<float, int>()
-k = -math.exp(1000.0)
-m.put(k, 7)
-plot(bar_index, "INPUT_BAR_INDEX", display=display.data_window)
-plot(k, "KEY", display=display.data_window)
-plot(m.size(), "SIZE", display=display.data_window)
-plot(m.get(k), "VALUE", display=display.data_window)

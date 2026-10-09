@@ -1,9 +1,0 @@
-//@version=6
-indicator("array-percentrank-upper-after20-bbi-v1")
-a = array.from(1.0, 4.0, 6.0, 9.0)
-int index = bar_index < 20 ? 3 : 4
-plot(bar_index, "BAR_INDEX")
-plot(index, "INDEX")
-plot(array.percentrank(a, 0), "INDEX_ZERO_CONTROL")
-plot(array.percentrank(a, 3), "INDEX_THREE_CONTROL")
-plot(array.percentrank(a, index), "UPPER_BOUND_TARGET")

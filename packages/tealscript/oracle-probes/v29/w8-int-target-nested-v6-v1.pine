@@ -1,9 +1,0 @@
-//@version=6
-indicator("w8-int-target-nested-v6-v1", overlay=false, max_labels_count=10)
-n = input.int(9, "Numerator", minval=1)
-d = input.int(2, "Divisor", minval=1)
-int target = math.min(math.max(2, n / d), 10)
-plot(bar_index,"CHART_INDEX")
-plot(math.min(math.max(2, n / d), 10),"RAW_QUOTIENT")
-plot(target,"INT_TARGET")
-plot(int(math.min(math.max(2, n / d), 10)),"EXPLICIT_INT_CONTROL")

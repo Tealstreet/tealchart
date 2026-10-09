@@ -1,2 +1,0 @@
-CE10123 {'line': 5, 'column': 41}: Cannot call "plot" with argument "linewidth"="value". An argument of "simple int" type was used but a "input int"  is expected.
-None None: Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.

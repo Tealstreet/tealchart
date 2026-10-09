@@ -1,5 +1,0 @@
-//@version=6
-indicator("V52 qualifier-format-time-const-title", calc_bars_count=32)
-value = str.format_time(0, "yyyy", "UTC")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

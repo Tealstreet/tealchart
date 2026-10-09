@@ -1,4 +1,0 @@
-//@version=6
-const float VALUE = 2.0
-indicator("max_polylines_count float alias", max_polylines_count=VALUE)
-plot(close)

@@ -1,6 +1,0 @@
-//@version=6
-indicator("V5-CORPUS-ATR-SERIES-INT-V1")
-length = 14
-if close > open
-    length := 10
-plot(ta.atr(length), "OUTCOME")

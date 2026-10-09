@@ -1,7 +1,0 @@
-# lastindexof UDT search capture v1
-
-Use TradingView Pine Editor with the source unchanged. Standard candles, BINANCE:BTCUSDT, 2 minutes, chart timezone Etc/UTC. Default indicator settings. Load at least32 closed historical bars. Paste each probe separately so a refusal does not hide another result.
-
-If compilation refuses, save exact error text/code/line and a screenshot including source and error. Otherwise add it, export chart CSV including every indicator plot; preserve raw CSV bytes and chart symbol/timeframe/settings. Include a Data Window screenshot of one closed bar with all seven named columns. Record any runtime refusal with exact text/bar/site and retain available partial output. Bar Replay and live ticks are unnecessary.
-
-Question: does lastindexof compare UDT object references or their field values? The first six named columns, in source order, discriminate reference identity [2, 1, -1, 2, 1, -1] from structural field comparison [2, 2, 2, 2, 1, 1]. These are candidate model answers, NOT native expectations. SAME_REFERENCE_AFTER_FIELD_WRITE also checks that mutation does not break alias identity; EQUAL_FIELDS_NOT_STORED is an independently allocated equal-field object. Different result => retain exact outputs as OTHER; compiler/runtime refusal => refuse-phase answer, comparator remains UNOBSERVED. BAR_INDEX is context only. Never substitute == for a search call or mutate the source.

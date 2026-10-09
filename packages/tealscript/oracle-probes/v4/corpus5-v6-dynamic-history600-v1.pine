@@ -1,4 +1,0 @@
-//@version=6
-indicator("corpus5-v6-dynamic-history600-v1")
-offset = bar_index % 601
-plot(close[offset], "OUTCOME")

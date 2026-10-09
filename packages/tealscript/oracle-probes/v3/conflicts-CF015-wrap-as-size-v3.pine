@@ -1,9 +1,0 @@
-//@version=6
-indicator("CF015 wrap constant as size v3", max_boxes_count=2)
-if barstate.islastconfirmedhistory
-    box.new(bar_index - 5, 100, bar_index, 0, text="ALPHA BETA GAMMA DELTA EPSILON ZETA ETA THETA IOTA KAPPA LAMBDA MU NU XI OMICRON PI RHO SIGMA TAU", text_size=text.wrap_auto, text_wrap=text.wrap_auto)
-
-plot(time, "CTRL_time", display=display.data_window)
-plot(bar_index, "CTRL_bar_index", display=display.data_window)
-plot(close, "CTRL_close", display=display.data_window)
-plot(1, "CTRL_sentinel", display=display.data_window)

@@ -1,3 +1,0 @@
-//@version=6
-indicator("corpus-compile-third-v6-color-linewidth-v1")
-plot(close, "TARGET", color=color.new(color.red, 80, linewidth=2))

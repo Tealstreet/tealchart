@@ -1,7 +1,0 @@
-{
-  "artifact": "Capture instrument failure v1",
-  "tool": "Chrome MCP evaluate_script",
-  "error": "Cannot read properties of undefined (reading exports)",
-  "cause": "Monaco module absent after full reload with the editor closed",
-  "resolution": "Runtime error remains native authority; compiler markers left empty when no editor module is loaded; collection resumed unchanged."
-}

@@ -1,8 +1,0 @@
-//@version=6
-indicator("Linefill inequality array-handle v33", overlay=false)
-a = linefill.new(line.new(0,13,1,-7),line.new(0,19,1,-23),color.red)
-b = a
-value = array.get(array.from(a),0) != b
-plot(value ? 1 : 0, "OUTCOME", display=display.data_window)
-plot(na(a) ? 0 : 1, "HANDLE_PRESENT", display=display.data_window)
-plot(bar_index, "INPUT_BAR_INDEX", display=display.data_window)

@@ -1,6 +1,0 @@
-//@version=6
-indicator("Corpus matrix remove_col missing index v1")
-values = matrix.new<float>(1, 1, close)
-matrix.remove_col(values, int(na))
-plot(matrix.columns(values), "columns_after")
-plot(close, "close_control")

@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-CORPUS-HLINE-CHART-POINT")
-hline(chart.point.now(close))
-plot(1, "OUTCOME")

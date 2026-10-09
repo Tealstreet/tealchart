@@ -1,9 +1,0 @@
-//@version=6
-indicator("V3-COLOR-NEW-DYNAMIC-HIGH")
-transparency = bar_index == 0 ? 25.0 : 101.0
-if bar_index < 2
-    log.info("BEFORE bar=" + str.tostring(bar_index) + " transparency=" + str.tostring(transparency))
-result = color.new(#123456, transparency)
-if bar_index < 2
-    log.info("AFTER bar=" + str.tostring(bar_index) + " transparency=" + str.tostring(color.t(result)))
-plot(color.t(result), "OUTCOME")

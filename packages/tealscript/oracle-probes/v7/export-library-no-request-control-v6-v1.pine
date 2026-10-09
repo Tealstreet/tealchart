@@ -1,4 +1,0 @@
-//@version=6
-library("V7ExportControl",overlay=false,dynamic_requests=true)
-export fetch(simple string symbol) =>
-    str.length(symbol)

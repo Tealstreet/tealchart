@@ -1,6 +1,0 @@
-//@version=6
-indicator("Even slice array median")
-parent = array.from(97.0, -31.0, 5.0, 17.0, -8.0, -83.0)
-a = array.slice(parent, 1, 5)
-plot(array.median(a), "EVEN_MEDIAN")
-plot(array.size(a), "SLICE_SIZE")

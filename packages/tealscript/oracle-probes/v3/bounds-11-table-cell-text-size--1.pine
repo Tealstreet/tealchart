@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-BOUNDS-11", max_bars_back=256)
-t=table.new(position.top_right,1,1)
-table.cell(t,0,0,"x",text_size=-1)
-plot(close, "OUTCOME")

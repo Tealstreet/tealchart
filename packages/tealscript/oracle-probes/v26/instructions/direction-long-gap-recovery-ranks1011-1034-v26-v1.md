@@ -1,9 +1,0 @@
-# Capture instructions v1
-
-Run this unchanged Pine v6 indicator on BINANCE:BTCUSDT, standard2m candles, Etc/UTC. Record native account/build, chart/source first time, historical cutoff and compile/runtime phase with full diagnostic line/bar/text. Native phase and values are UNSPECIFIED. Export every named plot as raw CSV, including empty cells; no rounding or NA-to-zero replacement. Preserve exact source SHA and CSV SHA. At least128 closed historical bars are required; retain first source bars and at least three complete32-bar cycles. Bar_index defines the source sequence, so do not realign it to a different dataset origin. Realtime/tick behavior is outside scope.
-
-The R1011/R1012/R1034 columns distinguish retained adjacent-pair counts, resetting on missing pairs, bridging the last valid value, and a last3-valid extrema comparison. Phases7–10 and26–29 are long gaps; phase15 is an equality break, phase12 reverses direction, phases17–25 recover/rise/fall. Observe the target on holes and the first/two later recovered bars. Candidate MODEL columns are explicit competing constructions, not expected native outcomes. The prior native adjacent-change ruling is not revoked; this asks about its exact long-gap/equality/recovery boundary. Clean controls expose nonmissing consecutive trends.
-
-This extends prior v7 sixteen-bar short-gap sources with32-bar long gaps, extrema ties and explicit competing models; it does not request another identical capture. No native whole-clause, live stream or universal window policy credit is permitted before outcomes adjudication. Engine preflight output is instrument-only.
-
-Falling length5 target and models distinguish a retained4-pair state from a fifth bridged change after the final gap. Preserve those recovery bars. Phase21 equals prior18, then phases22–25 make four declines.

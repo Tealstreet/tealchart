@@ -1,8 +1,0 @@
-//@version=6
-indicator("V7 map-float-key-overflow-v6-v1")
-var m = map.new<float,int>()
-x = math.exp(1000.0)
-map.put(m,x,7)
-plot(x,"KEY")
-plot(map.size(m),"SIZE")
-plot(map.get(m,x),"VALUE")

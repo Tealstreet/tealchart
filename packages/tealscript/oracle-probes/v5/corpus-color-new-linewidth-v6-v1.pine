@@ -1,3 +1,0 @@
-//@version=6
-indicator("corpus-color-new-linewidth-v6-v1")
-plot(close, color=color.new(color.blue, 60, color=color.yellow, linewidth=2), linewidth=2)

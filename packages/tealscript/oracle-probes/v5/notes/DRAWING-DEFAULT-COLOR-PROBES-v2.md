@@ -1,5 +1,0 @@
-# Drawing default color probes v2
-
-Two separate v5/v6 scripts compare five constructor default slots/overloads against explicit color.blue, legacy #2196F3 and native-v6 #2962FF controls. Capture the five-by-four drawing grid in a lossless screenshot and export OUTCOME close for execution control. OUTCOME is not a color getter. Native explicit constant evidence does not directly capture omitted defaults. Reference predicts symbolic color.blue equality for box border/bg and polyline line color; keep observed literal mapping separate by version. No engine change or native settlement is claimed by these scripts.
-
-Capture routing: v5-outcomes per overseer. v4 originals remain frozen in already shipped4559fcd46b. This v2 pair is the requested capture target; no native default outcome claimed.

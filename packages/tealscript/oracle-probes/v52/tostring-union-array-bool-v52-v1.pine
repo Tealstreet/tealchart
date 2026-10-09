@@ -1,9 +1,0 @@
-//@version=6
-indicator("V52 tostring-union-array-bool", calc_bars_count=32)
-value = str.tostring(array.new<bool>(2, true), "#.00")
-plot(bar_index, "SOURCE_INDEX")
-plot(str.length(value), "RESULT_LENGTH")
-plot(na(value) ? 1 : 0, "RESULT_NA")
-if barstate.islastconfirmedhistory
-    log.info("RESULT=[{0}]", value)
-    label.new(bar_index, high, text=value)

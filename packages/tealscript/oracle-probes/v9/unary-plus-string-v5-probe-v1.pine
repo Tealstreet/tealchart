@@ -1,5 +1,0 @@
-//@version=5
-indicator("Unary plus string discriminator")
-valueText() => "value"
-label.new(bar_index, close, "Prefix" + +valueText())
-plot(1, "OUTCOME")

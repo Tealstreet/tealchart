@@ -1,4 +1,0 @@
-//@version=5
-indicator("V3-CORPUS-V5-ELLIPSIS-PLACEHOLDER")
-value(x) => x
-plot(value(...), "OUTCOME")

@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-CONST-REF-ARRAY-REPLACE-ID")
-const array<float> value = array.new<float>(1, close)
-value := array.new<float>(1, close)
-plot(array.get(value, 0), "OUTCOME")

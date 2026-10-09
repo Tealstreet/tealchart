@@ -1,5 +1,0 @@
-Capture instructions v1
-
-Use BINANCE:BTCUSDT, 2-minute standard candles, chart timezone Etc/UTC, unchanged source and default settings. Load at least 650 closed historical bars, without Bar Replay. Record actual historical count and cutoff. Export chart CSV including time, OHLC and the Past plot, preserving missing cells. Identify Pine bar_index 243 from the dataset origin; do not substitute a CSV row ordinal when leading rows are absent. Save full compiler/runtime error text, code, source site and error bar if refused. If dataset origin cannot be established, retain the capture but mark the target-bar facet UNOBSERVED.
-
-Discriminator: native may run and publish the historical close, run with a missing Past value, or refuse. No phase/value is predicted. Preserve any other result. Synthetic engine fixture prices are not TradingView expectations; compare Past to the exported chart close at the requested historical offset where that row exists. An earlier refusal prevents a target-bar value conclusion.

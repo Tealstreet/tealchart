@@ -1,7 +1,0 @@
-//@version=6
-indicator("trace-accdist-host-missing-v1")
-plot(ta.accdist,"ACCDIST")
-plot(na(ta.accdist)?1:0,"ACCDIST_MISSING")
-plot(na(volume)?1:0,"VOLUME_MISSING")
-plot(na(high) or na(low) or na(close)?1:0,"PRICE_MISSING")
-plot(high==low?1:0,"FLAT_RANGE")

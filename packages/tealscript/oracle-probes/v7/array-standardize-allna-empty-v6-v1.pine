@@ -1,7 +1,0 @@
-//@version=6
-indicator("V7 array-standardize-allna-empty-v6-v1")
-a = array.standardize(array.new<float>(3,na))
-b = array.standardize(array.new<float>(0))
-plot(array.size(a),"ALL_NA_SIZE")
-plot(array.size(a) > 0 ? array.get(a,0) : na,"ALL_NA_FIRST")
-plot(array.size(b),"EMPTY_SIZE")

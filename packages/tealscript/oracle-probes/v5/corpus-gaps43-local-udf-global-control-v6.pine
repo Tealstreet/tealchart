@@ -1,5 +1,0 @@
-//@version=6
-indicator("Corpus global UDF scope control")
-_cell(r, lbl, val) => val
-value = _cell(4, "z RSI", close)
-plot(value, "CONTROL", display=display.data_window)

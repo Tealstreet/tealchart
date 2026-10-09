@@ -1,3 +1,0 @@
-//@version=5
-indicator("V3-LEDGER-DIV-V5-NEGATIVE-DENOMINATOR")
-plot(5 / (-2), "OUTCOME")

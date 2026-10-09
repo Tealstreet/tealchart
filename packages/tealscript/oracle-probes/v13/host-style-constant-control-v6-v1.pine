@@ -1,3 +1,0 @@
-//@version=6
-indicator("V11 Style constant control", overlay=false)
-plot(close, "PRICE", color=color.new(color.blue, 25), editable=true)

@@ -1,7 +1,0 @@
-HANDOFF-v22-v1.md
-SHA256SUMS
-SHIP-FILES-v1.txt
-TIMESTAMP-PROVENANCE-v1.json
-bundle-manifest-v2.json
-instructions/request-timestamp-exchange-zone-v22-v1.md
-request-timestamp-exchange-zone-v22-v1.pine

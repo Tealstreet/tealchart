@@ -1,5 +1,0 @@
-//@version=6
-indicator("TK library",dynamic_requests=true)
-import TK/Lib/1 as l
-tkRun()=>l.read(request.security("REMOTE","1D",close,lookahead=barmerge.lookahead_on))
-plot(tkRun())

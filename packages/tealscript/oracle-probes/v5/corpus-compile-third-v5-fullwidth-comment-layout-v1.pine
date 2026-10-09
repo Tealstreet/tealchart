@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-compile-third-v5-fullwidth-comment-layout-v1")
-    　　// Full-width spaces before a comment, matching the corpus construct.
-plot(close, "TARGET")

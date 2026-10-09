@@ -1,4 +1,0 @@
-//@version=5
-indicator("V7 corpus-array-matrix-unparameterized-v1")
-x = array.new<matrix>()
-plot(array.size(x))

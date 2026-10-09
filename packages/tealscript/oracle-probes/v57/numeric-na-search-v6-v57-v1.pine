@@ -1,9 +1,0 @@
-//@version=6
-indicator("Numeric NA search v6 v57 v1")
-a = array.from(na, 5.0, -3.0, na, 1.0)
-plot(a.indexof(na), "NA_INDEX")
-plot(a.includes(na) ? 1 : 0, "NA_INCLUDES")
-plot(a.indexof(1.0), "PRESENT_INDEX")
-plot(a.includes(1.0) ? 1 : 0, "PRESENT_INCLUDES")
-plot(a.indexof(9.0), "ABSENT_INDEX")
-plot(a.includes(9.0) ? 1 : 0, "ABSENT_INCLUDES")

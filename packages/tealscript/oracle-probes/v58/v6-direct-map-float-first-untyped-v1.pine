@@ -1,8 +1,0 @@
-//@version=6
-indicator("Forwarded regular collection overload")
-score(map<string,int> xs) => 10
-score(map<string,float> xs) => 20
-relay(xs) => score(xs)
-[x,y] = [relay(map.new<string,float>()),relay(map.new<string,int>())]
-plot(x)
-plot(y)

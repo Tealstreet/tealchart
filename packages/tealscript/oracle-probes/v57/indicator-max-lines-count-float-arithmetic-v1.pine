@@ -1,3 +1,0 @@
-//@version=6
-indicator("max_lines_count float arithmetic", max_lines_count=1 + 0.5)
-plot(close)

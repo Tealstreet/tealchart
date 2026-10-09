@@ -1,4 +1,0 @@
-//@version=6
-indicator("Imported function control")
-import CAPTURE_OWNER/R2Ns661616fd26e4/1 as lib
-plot(lib.pick(int(3)))

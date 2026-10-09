@@ -1,7 +1,0 @@
-# cci-zero-mad-v45-v1 capture instructions v1
-
-Use the unchanged source on BINANCE:BTCUSDT, standard 2-minute candles, regular session, display timezone Etc/UTC. No Bar Replay or synthetic OHLC. Record account/build, exact chart symbol/timeframe/settings, source SHA256 and compile/runtime outcome. Native phase and values are UNSPECIFIED; do not repair the source or substitute the local engine's predictions.
-
-Export full public CSV with every named plot and chart time/OHLCV. Preserve blank cells and numeric text. Record the last confirmed historical timestamp/cutoff and visible INDEX/PHASE where present. At least 64 closed rows are required; first-index0 is useful but a later complete cycle can settle the mature clauses. A CSV ordinal is never Pine INDEX. If compilation/runtime refuses, save the earliest complete diagnostic text/code/site/bar; later targets are MASKED. If export is unavailable, mark numeric evidence UNOBSERVED rather than treating it as a compiler refusal.
-
-Question: on a ready contiguous length3 window whose MAD carrier is exactly zero, does CCI publish NA, zero, or another outcome? Capture CCI, CCI_IS_NA, CCI_NZ42, BASIS, MAD and READY together. The phase 8..10 nonconstant transition is a finite-control discriminator. Distinguish initial warmup from mature zero-deviation observations and retain third outcomes. No assertion about near-zero/private thresholds is requested.

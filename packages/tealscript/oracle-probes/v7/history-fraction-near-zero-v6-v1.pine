@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 history-fraction-near-zero-v6-v1")
-o = -0.9
-plot(close[o], "TARGET")
-plot(close, "CONTROL")

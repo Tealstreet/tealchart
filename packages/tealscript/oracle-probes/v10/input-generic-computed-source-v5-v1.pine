@@ -1,5 +1,0 @@
-//@version=5
-indicator("INPUT-GENERIC-COMPUTED-SOURCE-V5")
-selected=input(close*2,"ComputedSource")
-plot(close,"OUTCOME")
-plot(bar_index,"BAR_INDEX")

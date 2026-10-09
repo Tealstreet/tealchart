@@ -1,7 +1,0 @@
-//@version=5
-indicator("Namespace methods")
-import CAPTURE_OWNER/R2Ns2da86fb61908/1 as lib
-p = lib.Point.new(3)
-a = array.from(float(4))
-plot(p.pick())
-plot(a.pick())

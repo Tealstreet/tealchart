@@ -1,4 +1,0 @@
-//@version=6
-indicator("V52 plotcandle-format-base-type", overlay=true, calc_bars_count=32)
-plotcandle(open=1.0, high=2.0, low=0.0, close=1.5, format=7, title="CANDIDATE")
-plot(bar_index, "SOURCE_INDEX", display=display.data_window)

@@ -1,6 +1,0 @@
-//@version=6
-indicator("V33 isolated component")
-plot(bar_index, "INDEX")
-[trend, direction] = ta.supertrend(3, 14)
-plot(trend, "VALUE_1")
-plot(direction, "VALUE_2")

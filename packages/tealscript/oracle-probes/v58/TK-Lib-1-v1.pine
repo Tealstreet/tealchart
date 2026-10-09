@@ -1,4 +1,0 @@
-//@version=6
-library("TK library",dynamic_requests=true)
-seed()=>request.security("REMOTE","1D",close,lookahead=barmerge.lookahead_on)
-export read(float x=seed())=>x

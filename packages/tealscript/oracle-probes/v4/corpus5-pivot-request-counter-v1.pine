@@ -1,9 +1,0 @@
-//@version=5
-indicator("CORPUS5-PIVOT-REQUEST-COUNTER-V1")
-f_counter(bool changed) =>
-    var count = 0
-    if changed
-        count += 1
-    count
-[pivots, count] = request.security(syminfo.tickerid, "1D", [ta.pivot_point_levels("Traditional", timeframe.change("1D")), f_counter(timeframe.change("1D"))], lookahead=barmerge.lookahead_on)
-plot(count, "OUTCOME")

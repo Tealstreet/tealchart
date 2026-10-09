@@ -1,3 +1,0 @@
-//@version=6
-indicator("W8 timeframe seconds-control v1")
-plot(timeframe.in_seconds("1S"), "RESULT")

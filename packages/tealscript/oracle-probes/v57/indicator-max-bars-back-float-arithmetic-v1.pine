@@ -1,3 +1,0 @@
-//@version=6
-indicator("max_bars_back float arithmetic", max_bars_back=1 + 0.5)
-plot(close)

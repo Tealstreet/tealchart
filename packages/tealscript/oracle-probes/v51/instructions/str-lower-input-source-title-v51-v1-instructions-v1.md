@@ -1,9 +1,0 @@
-# str.lower input source title capture v1
-
-Paste `str-lower-input-source-title-v51-v1.pine` unchanged into TradingView Pine Editor. Use BINANCE:BTCUSDT, 2-minute standard candles, regular session, chart timezone Etc/UTC, at least 32 closed historical bars and the original input defaults. Capture each source independently; do not repair a refusal, wrap the result, add a cast or declare it const. Disable Bar Replay.
-
-Question: Does str.lower with input-qualified source satisfy plot's const string title consumer, and what actual qualified type does native report on refusal? Native phase, qualified type and values are UNSPECIFIED. Record the first full diagnostic with code, line/column, actual and required qualified types, and a screenshot including the exact source. A title-site diagnostic can distinguish input, simple or series even when each refuses a const consumer. A diagnostic at str.lower itself, or a generic refusal without qualified types, leaves the result floor unresolved.
-
-If compilation succeeds, add the indicator and record any earliest runtime refusal with the executing bar and site. If it runs, save raw chart CSV with time/OHLCV and both indicator plots, retaining the actual dynamic title and SOURCE_INDEX. Include a Data Window screenshot, startup SOURCE_INDEX 0..15 and the full closed historical export. RUNS establishes const-title compatibility only for this exact input slot and defaults; do not infer all qualifiers or other overloads.
-
-Record TradingView build/account tier, symbol, timeframe, exchange/chart timezone, session, settings, bar count, index origin, historical cutoff and source/CSV/screenshot SHA256. Keep live rows separate. Return source-bound attempts to `v51/captures/v51/RESPONSE-v51.md`; preserve raw evidence rather than choosing an expected answer.

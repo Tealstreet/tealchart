@@ -1,4 +1,0 @@
-//@version=6
-indicator("label minimum 0 v57", max_labels_count=0)
-label.new(bar_index, close, "minimum")
-plot(close, "CLOSE_CONTROL")

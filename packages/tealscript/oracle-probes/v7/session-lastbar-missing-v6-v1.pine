@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 session-lastbar-missing-v6-v1")
-plot(session.islastbar ? 1 : 0,"LASTBAR")
-plot(time,"TIME")

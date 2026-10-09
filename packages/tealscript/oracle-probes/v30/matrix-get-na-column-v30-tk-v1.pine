@@ -1,4 +1,0 @@
-//@version=6
-indicator("matrix-get-na-column-v30-tk-v1")
-m = matrix.new<float>(1, 2, 3.0)
-plot(matrix.get(m, 0, int(na)), title="TARGET")

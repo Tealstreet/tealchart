@@ -1,5 +1,0 @@
-//@version=5
-indicator("V7 history-na-v5-v1")
-o = int(na)
-plot(close[o], "TARGET")
-plot(close, "CONTROL")

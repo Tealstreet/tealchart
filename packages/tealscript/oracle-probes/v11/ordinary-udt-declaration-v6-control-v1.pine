@@ -1,6 +1,0 @@
-//@version=6
-indicator("Ordinary UDT control")
-type Node
-    float price
-Node value = Node.new(close)
-plot(value.price, "OUTCOME")

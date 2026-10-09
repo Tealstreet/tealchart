@@ -1,7 +1,0 @@
-//@version=6
-indicator("V5 drawing future index first-last", max_lines_count=10)
-if barstate.isfirst
-    line.new(last_bar_index + 501, close, bar_index, close)
-plot(bar_index, "BAR_INDEX")
-plot(last_bar_index, "LAST_BAR_INDEX")
-plot(1, "OUTCOME")

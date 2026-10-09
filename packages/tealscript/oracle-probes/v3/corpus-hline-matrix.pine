@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-CORPUS-HLINE-MATRIX")
-hline(matrix.new<int>(1, 1, 1))
-plot(1, "OUTCOME")

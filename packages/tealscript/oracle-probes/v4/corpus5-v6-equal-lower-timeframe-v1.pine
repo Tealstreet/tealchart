@@ -1,4 +1,0 @@
-//@version=6
-indicator("corpus5-v6-equal-lower-timeframe-v1")
-values = request.security_lower_tf(syminfo.tickerid, "2", close)
-plot(array.size(values), "OUTCOME")

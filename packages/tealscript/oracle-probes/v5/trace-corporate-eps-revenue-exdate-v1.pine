@@ -1,8 +1,0 @@
-//@version=6
-indicator("trace-corporate-eps-revenue-exdate-v1")
-plot(earnings.future_eps,"EPS")
-plot(na(earnings.future_eps)?1:0,"EPS_MISSING")
-plot(earnings.future_revenue,"REVENUE")
-plot(na(earnings.future_revenue)?1:0,"REVENUE_MISSING")
-plot(dividends.future_ex_date,"EX_DATE")
-plot(na(dividends.future_ex_date)?1:0,"EX_DATE_MISSING")

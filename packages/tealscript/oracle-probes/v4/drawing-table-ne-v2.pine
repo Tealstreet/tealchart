@@ -1,6 +1,0 @@
-//@version=6
-indicator("V4-DRAWING-TABLE-NE",overlay=true)
-var a=table.new(position.top_left,1,1)
-b=a
-var other=table.new(position.top_left,1,1)
-plot((a != b ? 1 : 0) + 2 * (a != other ? 1 : 0),"OUTCOME")

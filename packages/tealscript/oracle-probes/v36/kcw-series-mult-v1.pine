@@ -1,4 +1,0 @@
-//@version=6
-indicator("ta-b authority kcw-series-mult-v1")
-plot(ta.kcw(close,3,close), "candidate", display=display.data_window)
-plot(bar_index, "input_bar_index", display=display.data_window)

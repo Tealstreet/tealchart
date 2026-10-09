@@ -1,7 +1,0 @@
-//@version=5
-indicator("corpus5-v5-bb-zero-v1")
-[basis, upper, lower] = ta.bb(close, 0, 2.0)
-plot(basis, "BASIS_TARGET")
-plot(upper, "UPPER_TARGET")
-plot(lower, "LOWER_TARGET")
-plot(ta.sma(close, 1), "LENGTH1_CONTROL")

@@ -1,4 +1,0 @@
-//@version=6
-library("R2Ns547eb85fa13d")
-export method pick(float self)=>100
-export method pick(int self)=>200

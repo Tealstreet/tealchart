@@ -1,3 +1,0 @@
-//@version=6
-indicator("max_polylines_count float arithmetic", max_polylines_count=1 + 0.5)
-plot(close)

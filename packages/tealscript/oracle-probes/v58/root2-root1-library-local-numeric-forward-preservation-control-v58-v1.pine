@@ -1,4 +1,0 @@
-//@version=6
-indicator("Library local numeric method")
-import CAPTURE_OWNER/R2Nsaa411cdaddab/1 as lib
-plot(lib.forward(float(3.0)))

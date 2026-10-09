@@ -1,3 +1,0 @@
-//@version=5
-indicator("V7 plotshape-zero-offset-v5-control-v1")
-plotshape(close > open,title="CONTROL",offset=0)

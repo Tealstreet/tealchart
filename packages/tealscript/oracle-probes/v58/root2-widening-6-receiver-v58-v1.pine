@@ -1,4 +1,0 @@
-//@version=6
-indicator("Namespace methods")
-import CAPTURE_OWNER/R2Ns97602e8de8f2/1 as lib
-plot(int(3).pick())

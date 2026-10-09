@@ -1,4 +1,0 @@
-[2026-08-31T00:00:00.000Z]: BEFORE bar=0 transparency=25
-[2026-08-31T00:00:00.000Z]: AFTER bar=0 transparency=25
-[2026-08-31T00:02:00.000Z]: BEFORE bar=1 transparency=-1
-[2026-08-31T00:02:00.000Z]: AFTER bar=1 transparency=0

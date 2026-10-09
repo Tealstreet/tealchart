@@ -1,5 +1,0 @@
-//@version=6
-indicator("V7 named-session-futures-v6-v1")
-regular = ticker.new(syminfo.prefix,syminfo.ticker,session.regular)
-plot(request.security(regular,timeframe.period,close,gaps=barmerge.gaps_on),"REGULAR")
-plot(close,"CHART")

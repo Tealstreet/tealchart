@@ -1,5 +1,0 @@
-//@version=6
-indicator("V42 floor-const-title-replace-all")
-value = str.replace_all("abc", "b", "X")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

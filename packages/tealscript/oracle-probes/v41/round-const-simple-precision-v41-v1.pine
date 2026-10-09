@@ -1,8 +1,0 @@
-//@version=6
-indicator("Round const with simple precision")
-simple int precision = int(syminfo.mintick) > 0 ? 1 : 2
-const float positional = math.round(1.125, precision)
-const float named = math.round(precision=precision, number=1.125)
-plot(precision, title="Simple_precision")
-plot(positional, title="Const_positional")
-plot(named, title="Const_named")

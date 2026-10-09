@@ -1,7 +1,0 @@
-//@version=6
-indicator("V52 kc-float-length", calc_bars_count=32)
-[middle, upper, lower] = ta.kc(close, 3.0, 2.0)
-plot(middle, "MIDDLE")
-plot(upper, "UPPER")
-plot(lower, "LOWER")
-plot(bar_index, "SOURCE_INDEX")

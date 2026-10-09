@@ -1,5 +1,0 @@
-//@version=6
-indicator("Imported UDT method")
-import CAPTURE_OWNER/R2Nsb4ecc84ae239/1 as lib
-p = lib.Point.new(3)
-plot(p.pick())

@@ -1,3 +1,0 @@
-//@version=6
-indicator("V23 explicit plot type keyword")
-plot value = plot(1, "Value", display=display.data_window)

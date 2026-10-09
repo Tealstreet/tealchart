@@ -1,3 +1,0 @@
-//@version=5
-indicator("V29 version selection v5")
-plot(close,"TARGET")

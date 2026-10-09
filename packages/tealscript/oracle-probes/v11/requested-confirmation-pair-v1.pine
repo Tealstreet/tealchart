@@ -1,8 +1,0 @@
-//@version=6
-indicator("V11 requested-confirmation-pair-v1", max_bars_back=256)
-higher = input.timeframe("15", "Requested timeframe")
-remote = request.security(syminfo.tickerid, higher, barstate.isconfirmed)
-plot(barstate.isconfirmed ? 1 : 0, "LOCAL_CONFIRMED")
-plot(remote ? 1 : 0, "REQUEST_CONFIRMED")
-plot(time, "LOCAL_TIME")
-plot(request.security(syminfo.tickerid, higher, time), "REQUEST_TIME")

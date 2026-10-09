@@ -1,4 +1,0 @@
-//@version=4
-study("V3-LEDGER-DIV-V4-INPUT-CONTROL")
-denominator = input(2, "Denominator", type=input.integer, minval=1)
-plot((-5) / denominator, "OUTCOME")

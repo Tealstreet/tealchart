@@ -1,6 +1,0 @@
-{
-  "artifact": "Context summary integrity v5",
-  "evidence_sha256": {
-    "captures/v7/evidence/chart-context-lifecycle-summary-v1.json": "df5d19497b61dd0c4b135ce6ed3ebcc1bd66bb8d378d4bcc9936c267b1ac3330"
-  }
-}

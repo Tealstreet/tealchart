@@ -1,6 +1,0 @@
-//@version=5
-indicator("same-receiver-identity local-control v5")
-method combine(float self, int other) => self + other + 100
-method combine(float self, float other) => self + other + 200
-plot(float(3.0).combine(int(3)), "LOCAL_INT_ARG")
-plot(float(3.0).combine(float(3.0)), "LOCAL_FLOAT_ARG")

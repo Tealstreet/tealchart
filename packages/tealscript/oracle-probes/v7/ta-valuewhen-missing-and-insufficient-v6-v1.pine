@@ -1,8 +1,0 @@
-//@version=6
-indicator("V7 ta-valuewhen-missing-and-insufficient-v6-v1")
-hit = bar_index % 8 == 2
-s = bar_index % 16 == 2 ? na : bar_index * 1.0
-plot(hit ? 1 : 0, "HIT")
-plot(s, "SOURCE")
-plot(ta.valuewhen(hit,s,0), "OCCURRENCE0")
-plot(ta.valuewhen(hit,s,2), "OCCURRENCE2")

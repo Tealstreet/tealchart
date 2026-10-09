@@ -1,5 +1,0 @@
-//@version=5
-indicator("V4-ARRAY-STRING-SOME-NAMESPACE-V5")
-values = array.from("", "alpha")
-result = array.some(values)
-plot(result == true ? 1 : result == false ? 0 : -1, "OUTCOME")

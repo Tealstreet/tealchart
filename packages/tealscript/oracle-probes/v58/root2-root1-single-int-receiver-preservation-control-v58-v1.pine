@@ -1,4 +1,0 @@
-//@version=6
-indicator("Single imported method")
-import CAPTURE_OWNER/R2Nsb4dddfb489fd/1 as lib
-plot(int(3).pick())

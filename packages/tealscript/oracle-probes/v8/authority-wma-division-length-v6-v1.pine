@@ -1,4 +1,0 @@
-//@version=6
-indicator("Authority WMA division v1")
-length = input.int(5)
-plot(ta.wma(close, length / 2))

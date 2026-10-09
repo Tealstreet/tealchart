@@ -1,6 +1,0 @@
-//@version=6
-indicator("V42 floor-input-consumer-replace-all")
-source = input.string("abc", "Source")
-value = str.replace_all(source, "b", "X")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

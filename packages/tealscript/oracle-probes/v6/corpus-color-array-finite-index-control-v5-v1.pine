@@ -1,7 +1,0 @@
-//@version=5
-indicator("Color array finite index control v1")
-var colors = array.new_color(101, color.blue)
-_percent = close - close
-int index = math.round(_percent)
-color selected = array.get(colors, index)
-plot(na(selected) ? 1 : 0, "OUTCOME")

@@ -1,3 +1,0 @@
-//@version=6
-indicator("V3-BOUNDS-08", max_bars_back=256)
-plot(color.r(color.rgb(256, 0, 0)), "OUTCOME")

@@ -1,5 +1,0 @@
-//@version=6
-indicator("int-overload-variance-v57-v1", precision=16)
-a = array.from(-3, 2)
-int x = array.variance(a)
-plot(x, "INT_DECLARED_RESULT")

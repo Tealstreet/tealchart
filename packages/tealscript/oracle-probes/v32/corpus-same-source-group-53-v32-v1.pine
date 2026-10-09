@@ -1,9 +1,0 @@
-//@version=5
-indicator("Unsupported closed trade fields in indicator")
-plot(strategy.closedtrades.entry_price(0))
-plot(strategy.closedtrades.profit_percent(0))
-plot(strategy.closedtrades.max_runup_percent(0))
-plot(strategy.closedtrades.max_drawdown_percent(0))
-plot(strategy.opentrades.profit_percent(0))
-plot(strategy.opentrades.max_runup_percent(0))
-plot(strategy.opentrades.max_drawdown_percent(0))

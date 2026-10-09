@@ -1,4 +1,0 @@
-//@version=6
-indicator("V23 inferred plot and hline control")
-p = plot(1, "CONTROL", display=display.data_window)
-h = hline(1, "Level")

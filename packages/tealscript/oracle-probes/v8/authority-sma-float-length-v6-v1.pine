@@ -1,4 +1,0 @@
-//@version=6
-indicator("Authority SMA float v1")
-length = input.float(5.0)
-plot(ta.sma(close, length))

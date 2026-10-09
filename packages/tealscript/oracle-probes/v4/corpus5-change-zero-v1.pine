@@ -1,4 +1,0 @@
-//@version=5
-indicator("CORPUS5-CHANGE-ZERO-V1")
-value = ta.change(close, 0)
-plot(value, "OUTCOME")

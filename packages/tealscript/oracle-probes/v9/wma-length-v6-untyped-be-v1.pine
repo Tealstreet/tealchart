@@ -1,4 +1,0 @@
-//@version=6
-indicator("untyped")
-f(n) => ta.wma(close, n / 2)
-plot(f(input.int(9)))

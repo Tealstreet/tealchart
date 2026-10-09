@@ -1,9 +1,0 @@
-//@version=6
-indicator("Forwarded regular collection overload")
-score(array<int> xs) => 10
-score(array<float> xs) => 20
-relayInt(array<int> xs) => score(xs)
-relayFloat(array<float> xs) => score(xs)
-[x,y] = [relayFloat(array.new<float>(1,0)),relayInt(array.new<int>(1,0))]
-plot(x)
-plot(y)

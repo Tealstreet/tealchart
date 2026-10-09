@@ -1,5 +1,0 @@
-//@version=6
-indicator("Matrix swap_columns na index")
-
-values = matrix.new<float>(1, 1, close)
-matrix.swap_columns(values, int(na), 0)

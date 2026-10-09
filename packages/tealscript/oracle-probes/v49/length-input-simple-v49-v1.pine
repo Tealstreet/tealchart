@@ -1,9 +1,0 @@
-//@version=6
-indicator("V49 length-input-simple")
-sourceText = input.string("abc", "Source")
-value = str.length(sourceText)
-consume(simple int sampleNumber) => sampleNumber
-plot(consume(value), "CONSUMER")
-plot(value, "TARGET")
-plot(bar_index, "INDEX")
-plot(close, "CONTROL_CLOSE")

@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus5-v5-history-price-offset-v1")
-offset = close
-plot(close[offset], "OUTCOME")

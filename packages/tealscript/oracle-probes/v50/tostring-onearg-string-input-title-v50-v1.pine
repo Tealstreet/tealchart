@@ -1,6 +1,0 @@
-//@version=6
-indicator("Tostring string input title")
-value = input.string("A")
-result = str.tostring(value)
-plot(close, title=result)
-plot(bar_index, "SOURCE_INDEX")

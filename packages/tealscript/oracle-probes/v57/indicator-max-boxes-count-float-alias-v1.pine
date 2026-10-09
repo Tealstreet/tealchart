@@ -1,4 +1,0 @@
-//@version=6
-const float VALUE = 2.0
-indicator("max_boxes_count float alias", max_boxes_count=VALUE)
-plot(close)

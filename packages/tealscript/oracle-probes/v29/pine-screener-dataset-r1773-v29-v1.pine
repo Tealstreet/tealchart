@@ -1,9 +1,0 @@
-//@version=6
-indicator("V29 Pine Screener dataset identity J v1", precision=16)
-var int origin = time
-var int initializedAt = timenow
-plot(close, "DATASET_CLOSE")
-plot(time, "DATASET_TIME_MS")
-plot(origin, "DATASET_ORIGIN_MS")
-plot(initializedAt, "INITIALIZED_WALL_MS")
-plot(bar_index, "DATASET_LAST_INDEX")

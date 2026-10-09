@@ -1,2 +1,0 @@
-[2026-10-03T13:02:00.000Z]: HOST tickerid=BINANCE:BTCUSDT period=2 mintick=0.01
-[2026-10-03T13:02:52.643Z]: HOST tickerid=BINANCE:BTCUSDT period=2 mintick=0.01

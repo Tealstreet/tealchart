@@ -1,4 +1,0 @@
-//@version=6
-library("R2Nsaa411cdaddab")
-method pick(float self)=>self+10
-export forward(float self)=>self.pick()

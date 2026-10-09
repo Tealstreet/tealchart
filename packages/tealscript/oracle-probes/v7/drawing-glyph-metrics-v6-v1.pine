@@ -1,6 +1,0 @@
-//@version=6
-indicator("V7 drawing-glyph-metrics-v6-v1")
-if barstate.islastconfirmedhistory
-    label.new(bar_index-4,1,"Wim 0123",style=label.style_label_left,size=size.normal)
-    line.new(bar_index-8,0,bar_index,0,style=line.style_dashed,width=2)
-plot(1,"SCALE")

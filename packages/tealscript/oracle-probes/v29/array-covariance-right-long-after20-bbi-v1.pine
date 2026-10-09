@@ -1,9 +1,0 @@
-//@version=6
-indicator("array-covariance-right-long-after20-bbi-v1")
-longer = array.from(1.0, 2.0, 8.0)
-shorter = bar_index < 20 ? array.from(4.0, 10.0, 7.0) : array.from(4.0, 10.0)
-plot(bar_index, "BAR_INDEX")
-plot(array.size(longer), "LONG_SIZE")
-plot(array.size(shorter), "SHORT_SIZE")
-plot(array.covariance(array.from(1.0, 2.0), array.from(4.0, 10.0), true), "ALIGNED_TWO_CONTROL")
-plot(array.covariance(shorter, longer, true), "UNEQUAL_BIASED_TARGET")

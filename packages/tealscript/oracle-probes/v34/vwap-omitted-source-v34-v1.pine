@@ -1,4 +1,0 @@
-//@version=6
-indicator("V34 vwap-omitted-source", overlay=false)
-plot(ta.vwap(anchor=bar_index == 3), "TARGET", display=display.data_window)
-plot(bar_index, "INDEX", display=display.data_window)

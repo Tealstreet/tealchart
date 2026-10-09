@@ -1,7 +1,0 @@
-//@version=6
-indicator("Authority published label division v1", overlay=true)
-int X_START = 40
-int X_END = 200
-if barstate.islast
-    label.new(bar_index + (X_START + X_END) / 2, high, "published")
-plot(close)

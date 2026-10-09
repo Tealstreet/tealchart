@@ -1,6 +1,0 @@
-//@version=6
-indicator("V42 floor-input-consumer-format-time")
-source = input.int(0, "Source")
-value = str.format_time(source, "yyyy", "UTC")
-plot(close, title=value)
-plot(bar_index, "SOURCE_INDEX")

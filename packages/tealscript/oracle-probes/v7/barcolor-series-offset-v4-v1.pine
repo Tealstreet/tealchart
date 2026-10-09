@@ -1,4 +1,0 @@
-//@version=4
-study("V7 barcolor-series-offset-v4-v1")
-o = close > open ? 1 : -1
-barcolor(color.red, offset=o)

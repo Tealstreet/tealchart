@@ -1,4 +1,0 @@
-//@version=6
-indicator("INPUT-GENERIC-BARE-VOLUME-V6")
-selected=input(volume,"Volume")
-plot(close,"OUTCOME")

@@ -1,9 +1,0 @@
-{
-  "artifact": "Context summary SHA256 v3",
-  "files": {
-    "framework-length-coordinate-context-summary-v1.json": "e4408f8b84911ec1e9de56b6a80cecf6e8d197cdbabe0886d968e988045bab8c",
-    "marker-color-context-summary-v1.json": "8488356aadfa9faed53301b5b8443a024ec1c2e8e109835e0d568bd65942db07",
-    "percentile-coordinate-table-context-summary-v1.json": "80a95be790ec8d01b0c51c0b90a3b071998e2eeeb4908524d37803a235cba542",
-    "qualifier-retention-context-summary-v1.json": "9404b9a0b694ec4f94bd5fc6efdfae41f88527de99d78760c7638ffeed3f9538"
-  }
-}

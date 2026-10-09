@@ -1,4 +1,0 @@
-//@version=6
-indicator("V7 varip-volume-row-eligibility-v6-v1")
-varip volume_row x = na
-plot(na(x) ? 1 : 0,"MISSING")

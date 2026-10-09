@@ -1,9 +1,0 @@
-//@version=6
-indicator("w8-hold-simple-input-loop-counter-v6-v1",overlay=false)
-f(simple int x) => x
-limit = input.int(3,"Limit",minval=0,maxval=10)
-float total = 0
-for i = 0 to limit
-    total += f(i)
-plot(total,"SUM")
-plot(limit*(limit+1)/2,"CONTROL")

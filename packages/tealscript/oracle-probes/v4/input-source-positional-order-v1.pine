@@ -1,4 +1,0 @@
-//@version=6
-indicator("INPUT-GENERIC-SOURCE-POSITIONAL-AUTHORITY")
-selected=input(close,"SourceTitle","SLOT3","SLOT4","SLOT5",display.none,true)
-plot(close,"OUTCOME")

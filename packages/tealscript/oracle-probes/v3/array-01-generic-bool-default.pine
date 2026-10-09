@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-GENERIC-BOOL-DEFAULT")
-values = array.new<bool>(3)
-plot(array.get(values, 0) ? 1 : 0, "OUTCOME")

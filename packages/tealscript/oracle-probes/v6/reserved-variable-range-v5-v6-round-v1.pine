@@ -1,4 +1,0 @@
-//@version=5
-indicator("Reserved variable range v5")
-float range = close
-plot(range, "VALUE")

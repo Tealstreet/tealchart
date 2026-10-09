@@ -1,4 +1,0 @@
-//@version=6
-indicator("V33 isolated component")
-plot(bar_index, "INDEX")
-plot(ta.obv, "VALUE_1")

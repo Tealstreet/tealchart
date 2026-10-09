@@ -1,4 +1,0 @@
-//@version=5
-indicator("corpus-v5-color-get-finite-control-namespace-v1")
-colors = array.from(color.red, color.green, color.blue)
-plot(array.get(colors, 0) == color.red ? 1 : 0, "OUTCOME")

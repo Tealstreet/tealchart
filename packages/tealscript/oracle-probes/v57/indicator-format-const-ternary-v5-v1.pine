@@ -1,3 +1,0 @@
-//@version=5
-indicator("Conditional domain", format=true ? "not_a_format" : "not_a_format")
-plot(close)

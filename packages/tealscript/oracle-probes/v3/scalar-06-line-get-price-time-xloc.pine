@@ -1,4 +1,0 @@
-//@version=6
-indicator("V3-SCALAR-06", max_bars_back=256)
-l=line.new(time,close,time+120000,close,xloc=xloc.bar_time)
-plot(line.get_price(l, bar_index), "OUTCOME")

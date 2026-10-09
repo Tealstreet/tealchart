@@ -1,4 +1,0 @@
-{
-  "artifact": "Table view clarification v2",
-  "note": "The parent legend setting was set false, but the source legend remained visible in the native screenshot. White-background table views improve black-text visibility; table Text still slightly overlaps the legend. Original pixels and requested settings are retained; no source or table style edits."
-}

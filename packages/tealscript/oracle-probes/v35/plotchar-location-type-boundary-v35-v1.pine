@@ -1,3 +1,0 @@
-//@version=6
-indicator("authority", overlay=true)
-plotchar(series=close>open, title="Authority", char="❄", location=7, color=#123456, offset=2, text="line one\nline two", textcolor=#123456, editable=false, size=size.small, show_last=2, display=display.all, format=format.price, precision=2, force_overlay=true)

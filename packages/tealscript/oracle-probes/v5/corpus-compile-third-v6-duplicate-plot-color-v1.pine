@@ -1,3 +1,0 @@
-//@version=6
-indicator("corpus-compile-third-v6-duplicate-plot-color-v1")
-plot(close, "TARGET", color.blue, color=color.yellow, linewidth=2)

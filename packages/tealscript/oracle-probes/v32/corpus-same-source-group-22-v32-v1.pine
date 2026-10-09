@@ -1,8 +1,0 @@
-//@version=5
-indicator("Unsupported dynamic history switch result")
-
-offset = switch bar_index
-    0 => close
-    => close
-
-plot(close[offset])

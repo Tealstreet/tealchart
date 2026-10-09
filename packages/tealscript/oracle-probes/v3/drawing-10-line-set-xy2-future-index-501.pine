@@ -1,5 +1,0 @@
-//@version=6
-indicator("V3-DRAWING-10", max_bars_back=256)
-l=line.new(bar_index,close,bar_index+1,close)
-line.set_xy2(l,bar_index+501,close)
-plot(1, "OUTCOME")

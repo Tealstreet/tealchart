@@ -1,7 +1,0 @@
-//@version=5
-indicator("CNF local string nz and builtin bool discriminator")
-nz(string source, string replacement) => na(source) ? replacement : source
-bool nullableBool = na
-bool restored = nz(nullableBool, true)
-plot(restored ? 1 : 0, "bool_builtin_or_compile_refusal")
-plot(nz("kept", "replacement") == "kept" ? 1 : 0, "string_local_control")

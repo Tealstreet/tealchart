@@ -1,6 +1,0 @@
-//@version=6
-indicator("Corpus matrix swap_columns missing index v1")
-values = matrix.new<float>(1, 1, close)
-matrix.swap_columns(values, int(na), 0)
-plot(matrix.columns(values), "columns_after")
-plot(close, "close_control")

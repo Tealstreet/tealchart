@@ -1,9 +1,0 @@
-//@version=5
-indicator("Corpus distinct method signature control")
-type Point
-    float x
-method shift(Point p) => p.x
-method shift(Point p, float delta) => p.x + delta
-p = Point.new(close)
-plot(p.shift(), "ONE", display=display.data_window)
-plot(p.shift(1.0), "TWO", display=display.data_window)

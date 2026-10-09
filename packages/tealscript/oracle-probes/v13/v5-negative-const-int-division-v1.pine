@@ -1,7 +1,0 @@
-//@version=5
-indicator("V13 negative const int division v1", precision=16)
-const int numerator = -5
-plot(numerator / 2, "CONST_NEGATIVE")
-plot(-5 / 2, "LITERAL_NEGATIVE")
-plot(-5.0 / 2.0, "FLOAT_CONTROL")
-plot(int(-5.0 / 2.0), "EXPLICIT_CAST_CONTROL")
