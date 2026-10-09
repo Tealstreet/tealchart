@@ -50,6 +50,14 @@ const ellipse = (cx: number, cy: number, rx: number, ry: number): DrawingIconNod
 const def = (nodes: DrawingIconNode[]): DrawingIconDefinition => ({ nodes });
 
 export const DRAWING_ICONS = {
+  analysisWand: def([
+    p('M4 20 17 7l3 3L7 23z'),
+    line(13, 3, 13, 6),
+    line(18, 1, 18, 4),
+    line(21, 5, 24, 5),
+    line(3, 9, 6, 9),
+    line(7, 2, 7, 5),
+  ]),
   // --- Cursor / selection ---
   // Crosshair cursor to match TradingView's default pointer.
   select: def([

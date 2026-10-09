@@ -11,6 +11,7 @@
  */
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { AnalysisSelectionFrame } from '../analysis/analysisSelection';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
@@ -1933,6 +1934,34 @@ export class ChartCore {
       this.options.onUserDrawingCancelDraft?.();
       this.scheduleRender();
     }
+  }
+
+  getAnalysisSelectionFrame(identity: string | null): AnalysisSelectionFrame | null {
+    if (!identity || !this.bars.length || !this.viewport) return null;
+    const mainPane = computePaneGeometry({
+      paneLayout: this.getUnifiedLayout(),
+      height: this.options.height,
+      topOffset: this.margins.top,
+    }).find((pane) => pane.type === 'main');
+    if (!mainPane || mainPane.height <= 0) return null;
+    return {
+      identity,
+      scaleIdentity: JSON.stringify(this.options.renderOptions),
+      timeRange: { from: this.viewport.startTime, to: this.viewport.endTime },
+      priceRange: { from: this.viewport.priceMin, to: this.viewport.priceMax },
+      projectionLeft: this.margins.left,
+      projectionRight: this.options.width,
+      plot: {
+        left: this.margins.left,
+        top: mainPane.top,
+        width: this.options.width - this.margins.left - this.margins.right,
+        height: mainPane.height,
+      },
+    };
+  }
+
+  canStartAnalysisSelection(): boolean {
+    return !this.eventManager.getIsDragging() && !this.priceLineManager?.isDragging();
   }
 
   private isMainPaneVisible(): boolean {

@@ -2,8 +2,18 @@
  * TealchartApi - Per-chart API that mirrors TradingView's IChartWidgetApi
  * Provides access to chart-specific functionality like subscriptions, trading lines, etc.
  */
+import type {
+  AnalysisContextReadResult,
+  AnalysisSnapshotRequest,
+  AnalysisSnapshotResult,
+  LoadedAnalysisContext,
+  SimilarPatternsRequest,
+  SimilarPatternsResult,
+} from './analysis/types';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
+import { getLoadedAnalysisSnapshot } from './analysis/loadedBars';
+import { findLoadedSimilarPatterns } from './analysis/similarPatterns';
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_COLOR,
@@ -429,6 +439,10 @@ export interface CreateMultipointShapeOptions<TOverrides extends object> {
 export type EntityId = string & { __entityId?: never };
 
 export class TealchartApi {
+  private _analysisContextReader?: () => AnalysisContextReadResult;
+  private _analysisContextRevision = 0;
+  private _analysisOwnerRevision?: number;
+  private _analysisDisposed = false;
   private _symbol: string;
   private _interval: ResolutionString;
   private _account?: string;
@@ -533,6 +547,7 @@ export class TealchartApi {
   // Studies
   private _studies: Map<string, ManagedStudy> = new Map();
   private _studyIdCounter = 0;
+  private _onBuiltinIndicatorAdd?: (indicatorId: string) => Promise<IStudyApi | null>;
   private _onStudyCreate?: StudyCreateCallback;
   private _onStudyRemove?: (studyId: string) => void;
   private _onStudyVisibilityChange?: StudyVisibilityCallback;
@@ -599,6 +614,7 @@ export class TealchartApi {
    */
   setSymbol(symbol: string): void {
     if (this._symbol !== symbol) {
+      this._analysisContextRevision++;
       this._symbol = symbol;
       this._symbolInfo = null;
       this._symbolChangedSubscription.emit();
@@ -619,6 +635,7 @@ export class TealchartApi {
   setResolution(interval: ResolutionInput): void {
     const normalizedInterval = normalizeResolution(interval, this._interval);
     if (this._interval !== normalizedInterval) {
+      this._analysisContextRevision++;
       this._interval = normalizedInterval;
       this._intervalChangedSubscription.emit(normalizedInterval);
       this._onIntervalChange?.(normalizedInterval);
@@ -716,7 +733,45 @@ export class TealchartApi {
    * from real-time feed, and triggers a full reload cycle.
    */
   resetData(): void {
+    this._analysisContextRevision++;
     this._onResetData?.();
+  }
+
+  getAnalysisSnapshot(request: AnalysisSnapshotRequest = {}): AnalysisSnapshotResult {
+    const result = this._readAnalysisContext();
+    return result.status === 'unavailable' ? result : getLoadedAnalysisSnapshot(result.context, request);
+  }
+
+  /** @internal Reads owner readiness and identity without traversing loaded bars. */
+  getAnalysisContextIdentity(): string | null {
+    const result = this._readAnalysisContext();
+    return result.status === 'ready'
+      ? `${result.context.symbol}\n${result.context.interval}\n${result.context.contextRevision}`
+      : null;
+  }
+
+  findSimilarPatterns(request: SimilarPatternsRequest): SimilarPatternsResult {
+    const result = this._readAnalysisContext();
+    return result.status === 'unavailable' ? result : findLoadedSimilarPatterns(result.context, request);
+  }
+
+  /** @internal Owners supply loaded data; this reader must never request history. */
+  setAnalysisContextReader(reader: (() => AnalysisContextReadResult) | undefined): void {
+    if (this._analysisContextReader !== reader) this._analysisContextRevision++;
+    this._analysisContextReader = reader;
+    this._analysisOwnerRevision = undefined;
+  }
+
+  private _readAnalysisContext(): AnalysisContextReadResult {
+    if (this._analysisDisposed) return { status: 'unavailable', reason: 'disposed' };
+    const result = this._analysisContextReader?.() ?? { status: 'unavailable', reason: 'unsupported' };
+    if (result.status === 'unavailable') return result;
+    if (result.context.contextRevision !== this._analysisOwnerRevision) {
+      this._analysisOwnerRevision = result.context.contextRevision;
+      this._analysisContextRevision++;
+    }
+    const context: LoadedAnalysisContext = { ...result.context, contextRevision: this._analysisContextRevision };
+    return { status: 'ready', context };
   }
 
   // ============================================================================
@@ -1902,6 +1957,13 @@ export class TealchartApi {
   // Studies
   // ============================================================================
 
+  /** Add a built-in through the owner's saved indicator path. */
+  async addBuiltinIndicator(indicatorId: string): Promise<IStudyApi | null> {
+    if (this._analysisDisposed) throw new Error('The chart is no longer available.');
+    if (!this._onBuiltinIndicatorAdd) throw new Error('This chart does not support saved built-in indicator additions.');
+    return this._onBuiltinIndicatorAdd(indicatorId);
+  }
+
   /**
    * Create a study on the chart.
    *
@@ -2062,6 +2124,11 @@ export class TealchartApi {
     this._onStudyCreate = callback;
   }
 
+  /** @internal Owners provide their normal persisted indicator creation path. */
+  setOnBuiltinIndicatorAdd(callback: ((indicatorId: string) => Promise<IStudyApi | null>) | undefined): void {
+    this._onBuiltinIndicatorAdd = callback;
+  }
+
   /**
    * @internal Set callback for study removal (called by widget)
    */
@@ -2122,6 +2189,9 @@ export class TealchartApi {
    * @internal Clean up all subscriptions, lines, and studies
    */
   dispose(): void {
+    this._analysisDisposed = true;
+    this._analysisContextReader = undefined;
+    this._onBuiltinIndicatorAdd = undefined;
     if (this._lineRemovalTimer !== null) {
       clearTimeout(this._lineRemovalTimer);
       this._lineRemovalTimer = null;
@@ -2169,6 +2239,7 @@ export class TealchartApi {
    * @internal Set account for enhanced crosshair state
    */
   setAccount(account: string): void {
+    if (this._account !== account) this._analysisContextRevision++;
     this._account = account;
   }
 

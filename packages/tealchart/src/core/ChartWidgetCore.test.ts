@@ -2,6 +2,7 @@ import type { DatafeedBar, IBasicDataFeed, LibrarySymbolInfo, PeriodParams, Reso
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { findLoadedSimilarPatterns, getLoadedAnalysisSnapshot } from '../analysis';
 import { ChartWidgetCore } from './ChartWidgetCore';
 import { MAX_HISTORY_BACKFILL_BAR_COUNT } from './historyBackfill';
 
@@ -101,6 +102,71 @@ function createControlledDatafeed(): {
     unsubscribedGuids,
   };
 }
+
+describe('ChartWidgetCore loaded analysis ownership', () => {
+  it('reads only loaded bars and keeps context stable across ticks and viewport changes', () => {
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'no-data' });
+    core.initialize();
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'loading' });
+    historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    const result = core.getAnalysisContext({ from: 1_000_000, to: 2_200_000 });
+    if (result.status !== 'ready') throw new Error('Expected loaded analysis context');
+    const snapshot = getLoadedAnalysisSnapshot(result.context);
+    expect(snapshot.status).toBe('ready');
+    if (snapshot.status !== 'ready') throw new Error('Expected loaded snapshot');
+    expect(snapshot.snapshot.bars).toHaveLength(5);
+    expect(snapshot.snapshot.bars[0]!.time).toBe(1_000_000);
+    expect(findLoadedSimilarPatterns(result.context, { range: { from: 1_000_000, to: 2_200_000 } }).status).toBe('ready');
+    subscriptions[0]!.onTick({ ...makeBars(1_000_000, 5 * 60_000, 10).at(-1)!, close: 110 });
+    const afterTick = core.getAnalysisContext({ from: 1_300_000, to: 2_500_000 });
+    expect(afterTick).toMatchObject({ status: 'ready', context: { contextRevision: result.context.contextRevision } });
+    expect(historyRequests).toHaveLength(1);
+    core.dispose();
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'disposed' });
+  });
+
+  it('refuses retained bars after failed market and interval transitions', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    const before = core.getAnalysisContext();
+    if (before.status !== 'ready') throw new Error('Expected loaded analysis context');
+    core.setSymbol('ETH');
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'loading' });
+    historyRequests.at(-1)!.onError('failed market load');
+    expect(core.getBars()).toHaveLength(10);
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'stale-market' });
+    core.setSymbol('BTC');
+    historyRequests.at(-1)!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    const returned = core.getAnalysisContext();
+    if (returned.status !== 'ready') throw new Error('Expected returned market context');
+    expect(returned.context.contextRevision).toBeGreaterThan(before.context.contextRevision);
+    core.setInterval('15');
+    historyRequests.at(-1)!.onError('failed interval load');
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'stale-market' });
+    core.dispose();
+  });
+
+  it('retains same-market bars after a failed reset while advancing the source revision', () => {
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    const before = core.getAnalysisContext();
+    if (before.status !== 'ready') throw new Error('Expected loaded analysis context');
+    subscriptions[0]!.onReset();
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'loading' });
+    historyRequests.at(-1)!.onError('failed same-market reset');
+    const retained = core.getAnalysisContext();
+    if (retained.status !== 'ready') throw new Error('Expected same-market retained context');
+    expect(retained.context.bars).toBe(before.context.bars);
+    expect(retained.context.contextRevision).toBeGreaterThan(before.context.contextRevision);
+    core.dispose();
+  });
+});
 
 describe('ChartWidgetCore bar subscription after a failed reset reload', () => {
   // `ChartWidgetCore` is the engine behind the NATIVE Skia chart, so this is the

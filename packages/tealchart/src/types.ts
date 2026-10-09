@@ -13,6 +13,7 @@ import type {
   ToWorkerMessage,
   WorkerError,
 } from '@tealstreet/tealscript';
+import type { AnalysisRequestIntent } from './analysis/analysisSelection';
 import type {
   UserDrawingCommandEvent,
   UserDrawingCommandEventListener,
@@ -1176,6 +1177,7 @@ export interface TealchartWidgetOptions {
   showTopBar?: boolean;
   /** Enable the expandable indicator Data Window (default: false). */
   showDataWindow?: boolean;
+  onAnalysisRequest?: (intent: AnalysisRequestIntent) => void;
   /** Called when the built-in top bar symbol control is clicked. */
   onSymbolClick?: () => void;
   /**

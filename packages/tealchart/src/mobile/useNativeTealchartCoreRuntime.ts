@@ -171,6 +171,7 @@ export function useNativeTealchartCoreRuntime({
     bars,
     barsContext,
     chartApi,
+    core: coreResult.core,
     forceUpdate,
     imperativeTheme,
     indicatorManager: indicatorManagerRef.current,

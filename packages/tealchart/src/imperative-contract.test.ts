@@ -214,6 +214,12 @@ const TRADINGVIEW_WIDGET_METHODS = [
 
 const TRADINGVIEW_WEB_WIDGET_METHODS = ['onShortcut'];
 
+const TEALCHART_ANALYSIS_WIDGET_METHODS = [
+  'cancelAnalysisSelection',
+  'setAnalysisRequestHandler',
+  'startAnalysisSelection',
+];
+
 const KNOWN_STUB_WIDGET_METHODS = ['applyStudiesOverrides', 'saveChartToServer', 'setCSSCustomProperty'];
 
 const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
@@ -516,11 +522,11 @@ describe('imperative chart API contract', () => {
     expect(layoutEffect).toContain('chartApi.setSymbol(propSymbol)');
   });
 
-  it('keeps the shared widget contract aligned to the consumed TradingView surface', () => {
+  it('keeps the shared widget contract aligned to TradingView and Tealchart analysis extensions', () => {
     const contract = readSource('widgetContract.ts');
 
     expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWidget'))).toEqual(
-      TRADINGVIEW_WIDGET_METHODS,
+      [...TRADINGVIEW_WIDGET_METHODS, ...TEALCHART_ANALYSIS_WIDGET_METHODS].sort(),
     );
     expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWebWidget'))).toEqual(
       TRADINGVIEW_WEB_WIDGET_METHODS,

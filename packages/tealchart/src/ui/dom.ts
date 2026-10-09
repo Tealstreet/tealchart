@@ -289,6 +289,7 @@ export function svg(
 // ============================================================================
 
 export const icons = {
+  analysisWand: (size = 16, color = 'currentColor'): SVGElement => renderDrawingIcon('analysisWand', { size, color })!,
   /** Eye icon (visible) */
   eye: (size = 16, color = 'currentColor'): SVGElement => svg('svg', {
     width: String(size),

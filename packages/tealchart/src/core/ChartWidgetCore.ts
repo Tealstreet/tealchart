@@ -9,6 +9,7 @@
  * - Mobile: useTealchartCore() hook wraps ChartWidgetCore for React
  */
 
+import type { AnalysisContextReadResult, AnalysisTimeRange } from '../analysis/types';
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type {
   Bar,
@@ -118,6 +119,7 @@ export class ChartWidgetCore {
   // this: an exchange-prefixed request resolves to a clean-symbol name.
   protected _symbolInfoSymbol: string | null = null;
   protected _bars: Bar[] = [];
+  private _barsDataContext?: ChartWidgetDataContext;
   protected _viewport: Viewport | null = null;
   protected _plots: PlotOutput[] = [];
 
@@ -350,6 +352,7 @@ export class ChartWidgetCore {
       ...this._getDataContext(),
       source,
     };
+    if (source === 'history') this._barsDataContext = context;
     this._onBarsChanged?.(this._bars, context);
   }
 
@@ -736,6 +739,24 @@ export class ChartWidgetCore {
 
   getBars(): Bar[] {
     return this._bars;
+  }
+
+  getAnalysisContext(visibleRange?: AnalysisTimeRange): AnalysisContextReadResult {
+    if (this._disposed) return { status: 'unavailable', reason: 'disposed' };
+    if (this._isLoading) return { status: 'unavailable', reason: 'loading' };
+    if (!this._bars.length) return { status: 'unavailable', reason: 'no-data' };
+    if (this._barsDataContext?.symbol !== this._symbol || this._barsDataContext?.interval !== this._interval)
+      return { status: 'unavailable', reason: 'stale-market' };
+    return {
+      status: 'ready',
+      context: {
+        bars: this._bars,
+        symbol: this._symbol,
+        interval: this._interval,
+        contextRevision: this._resolveSymbolRequestId + this._loadBarsRequestId,
+        visibleRange,
+      },
+    };
   }
 
   getSymbol(): string {

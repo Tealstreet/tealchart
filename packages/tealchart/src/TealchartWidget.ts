@@ -9,6 +9,7 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
+import type { AnalysisRequestIntent } from './analysis/analysisSelection';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
@@ -59,6 +60,7 @@ import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { IStudyApi } from './types';
 import type { ResolutionInput } from './utils/normalizeResolution';
 import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { CustomIndicatorEditorActions } from './ui/IndicatorsModal';
@@ -425,6 +427,27 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
+    this._chartApi.setAnalysisContextReader(() => {
+      if (this._disposed) return { status: 'unavailable', reason: 'disposed' };
+      if (this._isLoadingBars) return { status: 'unavailable', reason: 'loading' };
+      if (!this._bars.length) return { status: 'unavailable', reason: 'no-data' };
+      if (
+        !this._barsAreForRequestedMarket() ||
+        getCleanSymbol(this._chartApi.symbol()) !== this._symbol ||
+        this._chartApi.resolution() !== this._interval
+      )
+        return { status: 'unavailable', reason: 'stale-market' };
+      return {
+        status: 'ready',
+        context: {
+          bars: this._bars,
+          symbol: this._symbol,
+          interval: this._interval,
+          contextRevision: this._resolveSymbolRequestId + this._loadBarsRequestId,
+          visibleRange: this._viewport ? { from: this._viewport.startTime, to: this._viewport.endTime } : undefined,
+        },
+      };
+    });
     this._setRenderOptions(mergeChartThemeRenderOptions(options.theme, options.renderOptions));
     this._userDrawingState = createUserDrawingState(options.userDrawingState);
 
@@ -437,6 +460,11 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._chartApi.setOnSymbolChange((symbol) => this._handleSymbolChange(symbol));
     this._chartApi.setOnIntervalChange((interval) => this._handleIntervalChange(interval));
     this._chartApi.setOnResetData(() => this._handleResetData());
+    this._chartApi.setOnBuiltinIndicatorAdd((indicatorId) => {
+      const indicator = getIndicatorById(indicatorId);
+      if (!indicator || isJailbreakIndicator(indicator)) throw new Error('Unsupported built-in Tealscript indicator.');
+      return this._handleAddIndicator(indicator);
+    });
 
     // Subscribe to order/position line changes to trigger re-renders
     this._chartApi.setOnLinesChanged(() => {
@@ -1264,6 +1292,8 @@ export class TealchartWidget implements ITealchartWebWidget {
   }
 
   private _clearRuntimeIndicators(): void {
+    this._indicatorStudyMap.clear();
+    this._studyInstanceMap.clear();
     for (const study of this._chartApi.getAllStudies()) {
       this._chartApi.removeStudy(study.id);
     }
@@ -1273,8 +1303,6 @@ export class TealchartWidget implements ITealchartWebWidget {
     }
     this._jailbreakInstanceIds.clear();
 
-    this._indicatorStudyMap.clear();
-    this._studyInstanceMap.clear();
     this._indicatorConfigMap.clear();
     this._indicatorDeclarationMap.clear();
     this._paneManager.reset();
@@ -1424,6 +1452,8 @@ export class TealchartWidget implements ITealchartWebWidget {
       interval: this._interval,
       showTopBar,
       showDataWindow: this._options.showDataWindow,
+      onAnalysisRequest: this._options.onAnalysisRequest,
+      getAnalysisIdentity: () => this._chartApi.getAnalysisContextIdentity(),
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
       additionalIndicatorCategories: this._getAdditionalIndicatorCategories(),
@@ -1968,7 +1998,8 @@ export class TealchartWidget implements ITealchartWebWidget {
   /**
    * Handle adding a built-in indicator
    */
-  private _handleAddIndicator(indicator: BuiltinIndicator): void {
+  private async _handleAddIndicator(indicator: BuiltinIndicator): Promise<IStudyApi | null> {
+    if (this._disposed) return null;
     if (isTealchartIndicatorAuditEnabled()) {
       console.info('[tealchart:indicator-audit] picker add requested', {
         id: indicator.id,
@@ -1985,74 +2016,63 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Handle jailbreak indicators
     if (isJailbreakIndicator(indicator)) {
       this._handleAddJailbreakIndicator(indicator);
-      return;
+      return null;
     }
 
     if (!this._tealScriptManager) {
       this._logger?.warn(LogCategory.Indicators, 'Tealscript not available - cannot add indicator');
-      return;
+      return null;
     }
 
     // Generate a persistent instance ID
     const instanceId = generateIndicatorId(indicator.id);
     const restoreGeneration = this._indicatorRestoreGeneration;
 
-    // Create a study using the indicator's Tealscript code
-    this._chartApi
-      .createStudy(
+    try {
+      const studyApi = await this._chartApi.createStudy(
         indicator.code,
-        indicator.overlay, // forceOverlay
-        false, // lock
-        {}, // inputs
-        {}, // overrides
-        { displayName: indicator.name }, // Use friendly name for display
-      )
-      .then((studyApi) => {
-        if (studyApi) {
-          const studyId = studyApi.getId();
-          if (this._disposed || restoreGeneration !== this._indicatorRestoreGeneration) {
-            this._chartApi.removeStudy(studyId);
-            return;
-          }
+        indicator.overlay,
+        false,
+        {},
+        {},
+        { displayName: indicator.name },
+      );
+      if (!studyApi) return null;
+      const studyId = studyApi.getId();
+      if (this._disposed || restoreGeneration !== this._indicatorRestoreGeneration) {
+        this._chartApi.removeStudy(studyId);
+        return null;
+      }
 
-          // Track the mapping from instance ID to study ID
-          this._indicatorStudyMap.set(instanceId, studyId);
-
-          // Also track reverse mapping for persistence updates
-          this._studyInstanceMap.set(studyId, instanceId);
-
-          // Store indicator config for pane lookup
-          this._indicatorConfigMap.set(studyId, indicator);
-
-          // Persist to settings
-          this._persistAddIndicator(instanceId, indicator);
-          if (indicator.sourceKind === 'custom_tealchart_study') {
-            this.setCustomTealscriptIndicators(this._customTealscriptIndicators);
-          }
-
-          // Trigger immediate re-render to update chart layout for the new pane
-          this._scheduler.markDirty(DIRTY.FULL);
-          if (isTealchartIndicatorAuditEnabled()) {
-            console.info('[tealchart:indicator-audit] picker add study resolved', {
-              requestedId: indicator.id,
-              instanceId,
-              studyId,
-              name: indicator.name,
-            });
-          }
-        }
-      })
-      .catch((error) => {
-        if (isTealchartIndicatorAuditEnabled()) {
-          console.error('[tealchart:indicator-audit] picker add study failed', {
-            requestedId: indicator.id,
-            instanceId,
-            name: indicator.name,
-            error,
-          });
-        }
-        this._logger?.error(LogCategory.Indicators, `Failed to add indicator ${indicator.name}`, error);
-      });
+      this._indicatorStudyMap.set(instanceId, studyId);
+      this._studyInstanceMap.set(studyId, instanceId);
+      this._indicatorConfigMap.set(studyId, indicator);
+      this._persistAddIndicator(instanceId, indicator);
+      if (indicator.sourceKind === 'custom_tealchart_study') {
+        this.setCustomTealscriptIndicators(this._customTealscriptIndicators);
+      }
+      this._scheduler.markDirty(DIRTY.FULL);
+      if (isTealchartIndicatorAuditEnabled()) {
+        console.info('[tealchart:indicator-audit] picker add study resolved', {
+          requestedId: indicator.id,
+          instanceId,
+          studyId,
+          name: indicator.name,
+        });
+      }
+      return { ...studyApi, remove: () => this._handleRemoveIndicator(studyId) };
+    } catch (error) {
+      if (isTealchartIndicatorAuditEnabled()) {
+        console.error('[tealchart:indicator-audit] picker add study failed', {
+          requestedId: indicator.id,
+          instanceId,
+          name: indicator.name,
+          error,
+        });
+      }
+      this._logger?.error(LogCategory.Indicators, `Failed to add indicator ${indicator.name}`, error);
+      return null;
+    }
   }
 
   /**
@@ -4311,10 +4331,23 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._ui?.setContextMenuCloseHandler(handler);
   }
 
-  /**
-   * Register context menu callback
-   * Called with (unixTime, price) when user right-clicks on chart or clicks "+" button
-   */
+  setAnalysisRequestHandler(handler: ((intent: AnalysisRequestIntent) => void) | undefined): void {
+    if (this._disposed) return;
+    this._options.onAnalysisRequest = handler;
+    this._ui?.setAnalysisRequestHandler(handler);
+  }
+
+  startAnalysisSelection(): boolean {
+    if (this._disposed || !this._options.onAnalysisRequest) return false;
+    this._ensureUI();
+    return this._ui?.startAnalysisSelection() ?? false;
+  }
+
+  cancelAnalysisSelection(): void {
+    this._ui?.cancelAnalysisSelection();
+  }
+
+  /** Register the context menu callback for right-click or the "+" button. */
   onContextMenu(callback: ContextMenuCallback): void {
     this._contextMenuCallback = callback;
     // Update the UI's context menu callback so it can handle clicks
@@ -4402,8 +4435,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
 
-    this._replaceRuntimeIndicators(settings.indicators || []);
-
     // The store alone does not render. Volume is drawn from _renderOptions, so a
     // loaded layout has to reach it or the chart shows the previous layout's
     // volume while claiming the new one's on the next save.
@@ -4416,6 +4447,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       showVolume: settings.showVolume,
       showIndicatorOutputAxisLabels: settings.showIndicatorOutputAxisLabels,
     });
+    this._replaceRuntimeIndicators(settings.indicators || []);
 
     this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
       markLayoutDirty: false,

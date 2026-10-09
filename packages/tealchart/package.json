@@ -13,7 +13,8 @@
     "./src/jailbreak/*": "./src/jailbreak/*",
     "./src/types": "./src/types.ts",
     "./hosted": "./src/hosted/index.ts",
-    "./hosted/menu": "./src/hosted/menu.ts"
+    "./hosted/menu": "./src/hosted/menu.ts",
+    "./analysis": "./src/analysis/index.ts"
   },
   "scripts": {
     "build": "echo \"Unrequired and disabled when using tsconfig paths aliases, run 'build-force' to test a build.\"",

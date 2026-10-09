@@ -904,6 +904,30 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 
 ## External chart hosts
 
+The `./analysis` source entry exposes pure loaded-bar snapshots, inclusive
+millisecond range selection, normalized OHLC shape similarity and a curated
+loaded-bars-only builtin descriptor catalog. It imports no UI, model or fetch
+runtime. `TealchartApi.getAnalysisSnapshot` returns at most 500 newest contiguous
+bars within the requested range, with clipping and truncation metadata; defaults
+use the owner's visible range. Similarity requires a fully loaded 5–500-bar
+query, excludes overlapping query windows and scans at most 2,000 newest
+candidate windows. Results disclose the searched range/count and scan cap.
+Web and native install readers from their authoritative data owners; loading,
+stale market, disposal and invalid data return explicit unavailable reasons.
+Native reads also wait for held frames and viewport layout to settle.
+Snapshots clone only finite OHLCV fields from sorted unique timestamps.
+`contextRevision` advances on market/account/reset changes and owner history
+generations, retaining a stable identity during ticks and viewport movement.
+The package owns no AI provider credentials, prompts, transport or extra history.
+
+`TealchartApi.addBuiltinIndicator(id)` is the awaitable saved-indicator capability.
+The web owner uses the picker path, including instance mapping, layout dirtiness,
+save/restore and removal through the returned study. Raw `createStudy` retains
+its managed-script semantics. Owners without this capability fail explicitly;
+native analysis currently has no saved-indicator owner. Runtime replacement
+detaches old instance mappings before teardown so restored settings survive.
+Layout loading applies render options before creating replacement workers.
+
 `@tealstreet/tealchart/hosted` is the narrow web entry for hosts that supply their
 own candles, data, and viewport. It exports the real `TealchartApi` and snapshot
 reader, `OemsTradingRuntime`, `PriceLineManager`, shared trading-line assembly,
@@ -1460,3 +1484,20 @@ tests retain the mounted picture before changing shared viewport values.
 `IndicatorSettingsModal.openWith` accepts optional Style input definitions for
 canvas indicators without plot outputs. Colors preserve hex alpha and expose
 opacity; Defaults resets both Inputs and Style input values.
+
+Analysis controls are package-owned and model-neutral on web and Skia. The host
+opts in with `onAnalysisRequest` and may toggle it without remounting through
+`setAnalysisRequestHandler`; no handler means no controls. `startAnalysisSelection`
+arms a temporary main-plot time-span selector, and `cancelAnalysisSelection`
+clears it. Selection uses the candle projection width, excludes axes/study panes,
+freezes geometry until completion, and visibly cancels on identity, viewport,
+layout or focus changes. Its input surface contains financial mouse/touch events;
+native selection disables the normal canvas gestures and reserves measured real
+controls. Completed requests leave a passive identity-bound range highlight.
+
+Native widget mount activity is separate from terminal `remove()`. React StrictMode
+layout-effect replay restores liveness before owner layout callbacks; it cannot revive a removed
+widget. Analysis readers and imperative handlers share this liveness predicate.
+
+Replacing a native `ChartWidgetCore` rebinds its analysis reader and advances the
+public analysis revision even when market and per-core request counters repeat.

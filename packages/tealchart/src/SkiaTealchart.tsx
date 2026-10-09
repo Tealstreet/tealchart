@@ -9,6 +9,7 @@ import type {
 } from '@tealstreet/tealscript';
 import type { ReactNode } from 'react';
 import type { LayoutRectangle } from 'react-native';
+import type { AnalysisRequestIntent, AnalysisSelectionFrame } from './analysis/analysisSelection';
 import type {
   UserDrawingCommandEventListener,
   UserDrawingSelectedActionSurfaceCommand,
@@ -19,6 +20,7 @@ import type {
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativePaneDividerBand } from './mobile/interaction/nativePaneDivider';
+import type { NativeAnalysisSelectorHandle } from './mobile/render/NativeAnalysisSelectorOverlay';
 import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
 import type {
   NativeLegendActionCommand,
@@ -104,6 +106,7 @@ import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserD
 import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
+import { NativeAnalysisSelectorOverlay } from './mobile/render/NativeAnalysisSelectorOverlay';
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import {
   NativeChartSettingsButton,
@@ -138,6 +141,7 @@ import { useTealscriptWebViewWorkerBridge } from './mobile/TealscriptWebViewWork
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
+import { readNativeAnalysisContext } from './mobile/nativeAnalysisContext';
 import {
   createNativeChartLayoutSettings,
   resolveNativeDefaultLayoutPersistence,
@@ -165,6 +169,7 @@ import { applyChartOverridesToRenderOptions } from './overrides';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore, setMapStoreKey } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
+import { normalizeResolution } from './utils/normalizeResolution';
 import { NATIVE_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
 import { intervalToMs } from './viewport/viewScale';
@@ -231,6 +236,7 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   onIndicatorsClick?: () => void;
   onContextMenu?: ContextMenuCallback;
+  onAnalysisRequest?: (intent: AnalysisRequestIntent) => void;
   /**
    * Renders the whole menu instead of a list of items. Given one, the chart
    * places and dismisses it exactly as it would its own menu and draws nothing
@@ -279,6 +285,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     supportedResolutions,
     userDrawingState,
     onContextMenu,
+    onAnalysisRequest,
     renderContextMenu,
     onContextMenuClose,
     onViewportChange,
@@ -449,6 +456,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bars,
     barsContext,
     chartApi,
+    core: analysisCore,
     forceUpdate,
     imperativeTheme,
     indicatorManager,
@@ -870,10 +878,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const widgetEmitterRef = useRef<EventEmitter | null>(null);
   if (!widgetEmitterRef.current) widgetEmitterRef.current = new EventEmitter();
   const widgetEmitter = widgetEmitterRef.current;
-  const widgetDisposedRef = useRef(false);
-  useEffect(() => {
+  const widgetMountedRef = useRef(true);
+  const widgetRemovedRef = useRef(false);
+  const isWidgetDisposed = useCallback(() => widgetRemovedRef.current || !widgetMountedRef.current, []);
+  const nativeAnalysisSelectorRef = useRef<NativeAnalysisSelectorHandle | null>(null);
+  const [nativeAnalysisSelectionActive, setNativeAnalysisSelectionActive] = useState(false);
+  const [nativeAnalysisControlZones, setNativeAnalysisControlZones] = useState<readonly NativeGestureControlZone[]>([]);
+  useLayoutEffect(() => {
+    widgetMountedRef.current = true;
     return () => {
-      widgetDisposedRef.current = true;
+      widgetMountedRef.current = false;
       widgetEmitter.removeAllListeners();
     };
   }, [widgetEmitter]);
@@ -925,7 +939,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return Promise.resolve();
       },
       onChartReady(callback: () => void): void {
-        if (widgetDisposedRef.current) return;
+        if (isWidgetDisposed()) return;
         if (chartReadyRef.current) {
           callback();
           return;
@@ -941,13 +955,30 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       onContextMenu(callback: ContextMenuCallback): void {
         setImperativeContextMenu(() => callback);
       },
+      setAnalysisRequestHandler(handler): void {
+        if (isWidgetDisposed()) return;
+        nativeAnalysisSelectorRef.current?.setHandler(
+          handler
+            ? (intent) => {
+                if (!isWidgetDisposed()) handler(intent);
+              }
+            : undefined,
+        );
+      },
+      startAnalysisSelection(): boolean {
+        return !isWidgetDisposed() && (nativeAnalysisSelectorRef.current?.start() ?? false);
+      },
+      cancelAnalysisSelection(): void {
+        nativeAnalysisSelectorRef.current?.cancel();
+      },
       /**
        * React owns this component's teardown — unmount effects dispose Skia
        * images, timers and subscriptions. Tearing those down while still mounted
        * would render freed Skia resources, so this only marks the widget dead.
        */
       remove(): void {
-        widgetDisposedRef.current = true;
+        widgetRemovedRef.current = true;
+        nativeAnalysisSelectorRef.current?.setHandler(undefined);
         widgetEmitter.removeAllListeners();
       },
       /** @stub Accepted and dropped — native persists through its save/load adapter. */
@@ -957,14 +988,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       /** @stub Accepted and dropped — there is no CSS surface to target. */
       setCSSCustomProperty(): void {},
       subscribe(event, callback): void {
-        if (widgetDisposedRef.current) return;
+        if (isWidgetDisposed()) return;
         widgetEmitter.subscribe(event, callback as (...args: unknown[]) => void);
       },
       unsubscribe(event, callback): void {
         widgetEmitter.unsubscribe(event, callback as (...args: unknown[]) => void);
       },
     }),
-    [chartApi, setImperativeTheme, widgetEmitter],
+    [chartApi, isWidgetDisposed, setImperativeTheme, widgetEmitter],
   );
 
   const { frame, margins, onLayout, options } = useNativeSkiaLayoutRuntime({
@@ -1185,6 +1216,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [nativeRenderProjection],
   );
   const nativeRenderViewport = nativeRenderSnapshot.viewport;
+  const analysisPropKey = `${propSymbol}\n${normalizeResolution(propInterval)}`;
+  const analysisPropsRef = useRef({ key: analysisPropKey, pending: false });
+  if (analysisPropsRef.current.key !== analysisPropKey)
+    analysisPropsRef.current = { key: analysisPropKey, pending: true };
+  if (analysisPropKey === `${symbol}\n${interval}`) analysisPropsRef.current.pending = false;
+  const analysisRenderBlocked =
+    nativeRenderTransitionPending || dataLoadRenderBlocked ||
+    shouldHoldNativeRenderSnapshot || !hasDataViewport;
+  const analysisStateRef = useRef({ analysisCore, interval, symbol, renderBlocked: analysisRenderBlocked });
+  analysisStateRef.current = { analysisCore, interval, symbol, renderBlocked: analysisRenderBlocked };
+  useLayoutEffect(() => {
+    chartApi.setAnalysisContextReader(() => {
+      const state = analysisStateRef.current;
+      return readNativeAnalysisContext({
+        core: state.analysisCore,
+        disposed: isWidgetDisposed(),
+        currentSymbol: state.symbol,
+        currentInterval: state.interval,
+        requestedSymbol: chartApi.symbol(),
+        requestedInterval: chartApi.resolution(),
+        pendingProps: analysisPropsRef.current.pending,
+        renderBlocked: state.renderBlocked,
+        visibleRange: {
+          from: sharedViewport.startTime.value,
+          to: sharedViewport.endTime.value,
+        },
+      });
+    });
+    return () => chartApi.setAnalysisContextReader(undefined);
+  }, [analysisCore, chartApi, isWidgetDisposed, sharedViewport]);
   const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
     dataLoadRenderBlocked,
     holdingSnapshot: shouldHoldNativeRenderSnapshot,
@@ -1993,6 +2054,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     zones.push(...nativeLegendActionTargets);
     zones.push(...nativeChartSettingsActionTargets);
+    zones.push(...nativeAnalysisControlZones);
 
     return zones;
   }, [
@@ -2003,6 +2065,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
+    nativeAnalysisControlZones,
   ]);
   const nativeOverlayActionTargets = useMemo(() => [], []);
   // Same outcome as the reset button, different input. The button also hides
@@ -2098,7 +2161,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     drawingSelectionEnabled: nativeDrawingSelectionEnabled,
     frame,
     hasContextMenu: hasNativeContextMenu,
-    hasDataViewport,
+    hasDataViewport: hasDataViewport && !nativeAnalysisSelectionActive,
     intervalMs: intervalToMs(nativeRenderInterval),
     leftToolRailLayout,
     orderDragState,
@@ -2155,6 +2218,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeUserDrawingDraftAnchors = nativeUserDrawingDraft?.anchors ?? EMPTY_NATIVE_USER_DRAWING_ANCHORS;
   const nativeUserDrawingDraftAnchorColor = nativeUserDrawingDraft?.style.lineColor;
   const nativeCanvasLoading = nativeRenderTransitionPending && nativeRenderBars.length > 0;
+  const nativeAnalysisIdentity = analysisRenderBlocked ? null : chartApi.getAnalysisContextIdentity();
+  const nativeAnalysisFrame: AnalysisSelectionFrame | null =
+    frame && nativeAnalysisIdentity && frame.mainPane.height > 0
+      ? {
+          identity: nativeAnalysisIdentity,
+          scaleIdentity: JSON.stringify(options),
+          timeRange: { from: sharedViewport.startTime.value, to: sharedViewport.endTime.value },
+          priceRange: { from: sharedViewport.priceMin.value, to: sharedViewport.priceMax.value },
+          projectionLeft: frame.contentLeft,
+          projectionRight: frame.contentRight,
+          plot: {
+            left: frame.contentLeft,
+            top: frame.mainPane.top,
+            width: frame.priceAxisLeft - frame.contentLeft,
+            height: frame.mainPane.height,
+          },
+        }
+      : null;
   const nativeLegendLoading = nativeRenderTransitionPending || isLoadingMoreBars;
 
   useLayoutEffect(() => {
@@ -2205,6 +2286,31 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   return (
     <View style={[styles.container, { backgroundColor }]} onLayout={onLayout}>
+      <NativeAnalysisSelectorOverlay
+        ref={nativeAnalysisSelectorRef}
+        frame={nativeAnalysisFrame}
+        canStart={() =>
+          !isWidgetDisposed() &&
+          !analysisRenderBlocked &&
+          !panActive.value &&
+          !pinchActive.value &&
+          !priceScaleActive.value &&
+          !timeScaleActive.value &&
+          !orderDragState.active.value &&
+          !bracketDragActive.value &&
+          viewportGestureOwner.owner.value === 'none' &&
+          !nativeUserDrawingEditDragActive &&
+          !nativeUserDrawingDraft &&
+          !nativeUserDrawingTextEdit
+        }
+        onAnalysisRequest={isWidgetDisposed() ? undefined : onAnalysisRequest}
+        onActiveChange={setNativeAnalysisSelectionActive}
+        onControlZonesChange={setNativeAnalysisControlZones}
+        liveViewport={sharedViewport}
+        backgroundColor={chromeTheme.popoverBackgroundColor}
+        textColor={chromeTheme.textColor}
+        borderColor={chromeTheme.borderColor}
+      />
       {liveChartMounted ? (
         <View
           pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'}

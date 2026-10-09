@@ -1,4 +1,5 @@
 import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tealscript';
+import type { AnalysisRequestIntent } from '../analysis/analysisSelection';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
@@ -69,6 +70,7 @@ import {
 import { getChartStore } from '../state/chartState';
 import { getIndicatorOutputReadouts, resolveIndicatorReadoutSourceIndex } from '../rendering/indicatorOutputReadouts';
 import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
+import { AnalysisSelector } from './AnalysisSelector';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import { ChartSettingsModal } from './ChartSettingsModal';
@@ -112,6 +114,8 @@ const TOP_BAR_HEIGHT = WEB_CHART_CHROME_METRICS.topBarHeight;
 // ============================================================================
 
 export interface TealchartWidgetUIOptions {
+  onAnalysisRequest?: (intent: AnalysisRequestIntent) => void;
+  getAnalysisIdentity?: () => string | null;
   /** Container element */
   container: HTMLElement;
   overlayHost?: WebOverlayHostFactory;
@@ -312,6 +316,7 @@ export class TealchartWidgetUI {
 
   // Components
   private chartCore: ChartCore | null = null;
+  private analysisSelector: AnalysisSelector | null = null;
   private topBar: ChartTopBar | null = null;
   private legend: ChartLegend | null = null;
   private dataWindow: IndicatorDataWindow | null = null;
@@ -450,6 +455,7 @@ export class TealchartWidgetUI {
 
     // Initialize chart core after getting dimensions
     this.initChartCore();
+    if (options.onAnalysisRequest) this.ensureAnalysisSelector();
     this.uiPreferencesUnsubscribe = this.chartStore.uiPreferences.listen(() => {
       this.updateUiPreferenceGeometry();
     });
@@ -1040,6 +1046,7 @@ export class TealchartWidgetUI {
   setSymbol(symbol: string, exchangeName?: string): void {
     this.topBar?.setSymbol(symbol, exchangeName);
     this.legend?.setSymbol(symbol, exchangeName);
+    this.analysisSelector?.update();
   }
 
   /**
@@ -1049,6 +1056,7 @@ export class TealchartWidgetUI {
     this.topBar?.setInterval(interval);
     this.legend?.setInterval(interval);
     this.chartCore?.setInterval(interval);
+    this.analysisSelector?.update();
   }
 
   /**
@@ -1117,11 +1125,43 @@ export class TealchartWidgetUI {
     return this.overlayRoot;
   }
 
+  setAnalysisRequestHandler(handler: ((intent: AnalysisRequestIntent) => void) | undefined): void {
+    this.options.onAnalysisRequest = handler;
+    if (handler) this.ensureAnalysisSelector();
+    this.analysisSelector?.setHandler(handler);
+  }
+
+  startAnalysisSelection(): boolean {
+    return this.analysisSelector?.start() ?? false;
+  }
+  cancelAnalysisSelection(): void {
+    this.analysisSelector?.cancel();
+  }
+
+  private ensureAnalysisSelector(): void {
+    if (this.analysisSelector) return;
+    this.analysisSelector = new AnalysisSelector({
+      container: this.overlayRoot,
+      getFrame: () => this.chartCore?.getAnalysisSelectionFrame(this.options.getAnalysisIdentity?.() ?? null) ?? null,
+      canStart: () =>
+        Boolean(this.chartCore?.canStartAnalysisSelection()) &&
+        !this.options.userDrawingState?.draft &&
+        !this.options.userDrawingState?.textEdit,
+      onAnalysisRequest: this.options.onAnalysisRequest,
+    });
+    this.analysisSelector.setColors(
+      'var(--tc-popover-bg, #131722)',
+      'var(--tc-text, #d1d4dc)',
+      'var(--tc-border, #2a2e39)',
+    );
+  }
+
   resize(width?: number, height?: number): void {
     const rect = this.chartArea.getBoundingClientRect();
     const w = width ?? rect.width;
     const h = height ?? rect.height;
     this.chartCore?.resize(w, h);
+    this.analysisSelector?.update();
     this.updateUserDrawingSelectionActionAnchor();
   }
 
@@ -1266,6 +1306,7 @@ export class TealchartWidgetUI {
    */
   paint(dirty: DirtyFlags): void {
     this.chartCore?.paint(dirty);
+    this.analysisSelector?.update();
   }
 
   /**
@@ -1275,6 +1316,7 @@ export class TealchartWidgetUI {
     this.uiPreferencesUnsubscribe?.();
     this.uiPreferencesUnsubscribe = null;
     this.removeUserDrawingTextEditor();
+    this.analysisSelector?.dispose();
     this.chartCore?.dispose(preserveDom);
     this.topBar?.unmount();
     this.legend?.unmount();

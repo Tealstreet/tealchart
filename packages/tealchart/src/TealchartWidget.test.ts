@@ -33,6 +33,7 @@ import {
 import { DIRTY } from './rendering/RenderScheduler';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
+import { loadAsTealchart, saveTealchartLayout } from './transformer/saveLoadIntegration';
 
 // Track calls at module level (survives mockReset)
 const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
@@ -446,6 +447,61 @@ describe('TealchartWidget', () => {
     }
   });
 
+  describe('loaded analysis ownership', () => {
+    it('does not arm analysis selection without a host callback or after retirement', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      expect(widget.startAnalysisSelection()).toBe(false);
+      widget.remove();
+      widget.setAnalysisRequestHandler(vi.fn());
+      expect(widget.startAnalysisSelection()).toBe(false);
+    });
+    it('reads the loaded viewport without candle requests and blocks retained bars after a failed market switch', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      const api = widget.activeChart();
+      expect(api.getAnalysisSnapshot().status).toBe('unavailable');
+      completeInit(datafeed);
+      const before = api.getAnalysisSnapshot({ range: { from: 1_000_000, to: 1_240_000 } });
+      if (before.status !== 'ready') throw new Error('Expected loaded snapshot');
+      expect(before.snapshot.bars).toHaveLength(5);
+      expect(api.getAnalysisSnapshot().status).toBe('ready');
+      expect(api.findSimilarPatterns({ range: { from: 1_000_000, to: 1_240_000 } }).status).toBe('ready');
+      expect(datafeed._getBarsCalls).toHaveLength(1);
+      api.setSymbol('ETHUSDT');
+      datafeed._resolveSymbolCb?.({ ...defaultSymbolInfo, name: 'ETHUSDT', full_name: 'ETHUSDT' });
+      expect(api.getAnalysisSnapshot()).toEqual({ status: 'unavailable', reason: 'loading' });
+      datafeed._getBarsErrCb?.('failed market load');
+      expect(api.getAnalysisSnapshot()).toEqual({ status: 'unavailable', reason: 'stale-market' });
+      api.setSymbol('BTCUSDT');
+      completeInit(datafeed);
+      const returned = api.getAnalysisSnapshot({ range: { from: 1_000_000, to: 1_240_000 } });
+      if (returned.status !== 'ready') throw new Error('Expected returned market snapshot');
+      expect(returned.snapshot.contextRevision).toBeGreaterThan(before.snapshot.contextRevision);
+      widget.remove();
+      expect(api.getAnalysisSnapshot()).toEqual({ status: 'unavailable', reason: 'disposed' });
+    });
+
+    it('advances reset revisions and allows retained bars only for the same market after failure', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      const api = widget.activeChart();
+      const before = api.getAnalysisSnapshot();
+      if (before.status !== 'ready') throw new Error('Expected loaded snapshot');
+      api.resetData();
+      expect(api.getAnalysisSnapshot()).toEqual({ status: 'unavailable', reason: 'loading' });
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+      datafeed._getBarsErrCb?.('failed same-market reset');
+      const retained = api.getAnalysisSnapshot();
+      if (retained.status !== 'ready') throw new Error('Expected retained same-market snapshot');
+      expect(retained.snapshot.bars).toEqual(before.snapshot.bars);
+      expect(retained.snapshot.contextRevision).toBeGreaterThan(before.snapshot.contextRevision);
+      widget.remove();
+    });
+  });
+
   // ============================================================================
   // TealScript Rendering
   // ============================================================================
@@ -548,6 +604,110 @@ describe('TealchartWidget', () => {
           executionBackendOverride: 'compiled',
         },
       });
+      widget.remove();
+    });
+
+    it('persists awaitable built-in additions and removes their saved instance with the returned study', async () => {
+      const datafeed = createMockDatafeed();
+      const worker = new TealscriptTestWorker();
+      const widget = createWidget(datafeed, { createTealscriptWorker: () => worker as unknown as Worker });
+      completeInit(datafeed);
+      const created = widget.activeChart().addBuiltinIndicator('rsi');
+      worker.emit({ type: 'ready' });
+      const study = await created;
+      const state = widget as unknown as {
+        _getCurrentSettings: () => ChartSettings;
+        _chartStore: { isDirty: { get(): boolean; set(value: boolean): void } };
+        _studyInstanceMap: Map<string, string>;
+      };
+      expect(widget.activeChart().getAllStudies()).toHaveLength(1);
+      expect(state._getCurrentSettings().indicators).toEqual([
+        expect.objectContaining({ builtinId: 'rsi', name: 'Relative Strength Index' }),
+      ]);
+      expect(state._chartStore.isDirty.get()).toBe(true);
+      expect(state._studyInstanceMap.has(study!.getId())).toBe(true);
+      state._chartStore.isDirty.set(false);
+      study!.remove();
+      expect(widget.activeChart().getAllStudies()).toEqual([]);
+      expect(state._getCurrentSettings().indicators).toEqual([]);
+      expect(state._studyInstanceMap.size).toBe(0);
+      expect(state._chartStore.isDirty.get()).toBe(true);
+      widget.remove();
+    });
+
+    it('round-trips a managed addition through the actual layout adapter and restores exactly one study', async () => {
+      const datafeed = createMockDatafeed();
+      const workers: TealscriptTestWorker[] = [];
+      const widget = createWidget(datafeed, {
+        createTealscriptWorker: () => {
+          const worker = new TealscriptTestWorker();
+          workers.push(worker);
+          return worker as unknown as Worker;
+        },
+      });
+      completeInit(datafeed);
+      const addition = widget.activeChart().addBuiltinIndicator('rsi');
+      workers[0].emit({ type: 'ready' });
+      const study = (await addition)!;
+      const state = widget as unknown as {
+        _getCurrentSettings: () => ChartSettings;
+        _handleLoadLayout: (settings: ChartSettings, warnings: string[], id: string, name: string) => void;
+      };
+      let savedContent = '';
+      const adapter = {
+        saveChart: vi.fn(async (chart: { content: string }) => {
+          savedContent = chart.content;
+          return 'saved';
+        }),
+        getChartContent: async () => savedContent,
+        getAllCharts: async () => [],
+        removeChart: async () => undefined,
+      };
+      await saveTealchartLayout(state._getCurrentSettings(), 'Saved', adapter);
+      const loaded = await loadAsTealchart('saved', adapter);
+      expect(loaded.data.indicators).toEqual([expect.objectContaining({ builtinId: 'rsi' })]);
+      state._handleLoadLayout(loaded.data, loaded.warnings, 'saved', 'Saved');
+      workers.at(-1)!.emit({ type: 'ready' });
+      await vi.waitFor(() => expect(widget.activeChart().getAllStudies()).toHaveLength(1));
+      expect(widget.activeChart().getAllStudies()[0].id).not.toBe(study.getId());
+      expect(state._getCurrentSettings().indicators).toEqual(loaded.data.indicators);
+      widget.activeChart().getStudyById(widget.activeChart().getAllStudies()[0].id)!.remove();
+      expect(state._getCurrentSettings().indicators).toEqual([]);
+      widget.remove();
+    });
+
+    it('removes an addition completed after layout replacement and rejects executable indicator ids', async () => {
+      const datafeed = createMockDatafeed();
+      const worker = new TealscriptTestWorker();
+      const widget = createWidget(datafeed, { createTealscriptWorker: () => worker as unknown as Worker });
+      completeInit(datafeed);
+      await expect(widget.activeChart().addBuiltinIndicator('//@version=6\nplot(close)')).rejects.toThrow(/Unsupported/);
+      expect(worker.messages).toEqual([]);
+      const addition = widget.activeChart().addBuiltinIndicator('rsi');
+      const state = widget as unknown as {
+        _getCurrentSettings: () => ChartSettings;
+        _replaceRuntimeIndicators: (indicators: ChartSettings['indicators']) => void;
+        _studyInstanceMap: Map<string, string>;
+      };
+      state._replaceRuntimeIndicators([]);
+      worker.emit({ type: 'ready' });
+      expect(await addition).toBeNull();
+      expect(widget.activeChart().getAllStudies()).toEqual([]);
+      expect(state._getCurrentSettings().indicators).toEqual([]);
+      expect(state._studyInstanceMap.size).toBe(0);
+      widget.remove();
+    });
+
+    it('keeps raw script creation outside the persisted picker path', async () => {
+      const datafeed = createMockDatafeed();
+      const worker = new TealscriptTestWorker();
+      const widget = createWidget(datafeed, { createTealscriptWorker: () => worker as unknown as Worker });
+      completeInit(datafeed);
+      const addition = widget.activeChart().createStudy('indicator("Managed script")\nplot(close)');
+      worker.emit({ type: 'ready' });
+      expect(await addition).toBeTruthy();
+      const state = widget as unknown as { _getCurrentSettings: () => ChartSettings };
+      expect(state._getCurrentSettings().indicators).toEqual([]);
       widget.remove();
     });
 

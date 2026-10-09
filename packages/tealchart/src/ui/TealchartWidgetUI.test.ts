@@ -356,3 +356,30 @@ it("keeps Data Window opt-in while retaining default legend values", () => {
     ui.dispose();
   }
 });
+
+it('keeps analysis controls opt-in and revokes callback ownership without recreating the chart', () => {
+  stubCanvasContext();
+  const container = document.createElement('div');
+  document.body.append(container);
+  const ui = new TealchartWidgetUI({ container, chartKey: 'analysis-controls', symbol: 'TEST', interval: '60', showTopBar: false, getAnalysisIdentity: () => 'TEST:60:1' });
+  const handler = vi.fn();
+  ui.setBars([{ time: 1000, open: 1, high: 2, low: 1, close: 2, volume: 1 }]);
+  ui.setViewport({ startTime: 0, endTime: 2000, priceMin: 0, priceMax: 3 });
+  expect(container.querySelector('button[aria-label="Analyze chart"]')).toBeNull();
+  expect(ui.startAnalysisSelection()).toBe(false);
+  ui.setAnalysisRequestHandler(handler);
+  const analyze = container.querySelector<HTMLButtonElement>('button[aria-label="Analyze chart"]')!;
+  analyze.click();
+  expect(handler).toHaveBeenLastCalledWith({ action: 'describe' });
+  expect(ui.startAnalysisSelection()).toBe(true);
+  ui.setAnalysisRequestHandler(undefined);
+  const calls = handler.mock.calls.length;
+  analyze.click();
+  expect(handler).toHaveBeenCalledTimes(calls);
+  expect(ui.startAnalysisSelection()).toBe(false);
+  ui.setAnalysisRequestHandler(handler);
+  ui.dispose();
+  analyze.click();
+  expect(handler).toHaveBeenCalledTimes(calls);
+  clearChartStoreCache();
+});

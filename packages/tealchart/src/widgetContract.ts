@@ -1,11 +1,8 @@
-/**
- * The TradingView `IChartingLibraryWidget` subset Tealstreet hosts actually consume.
- *
- * Declaring it once lets a single React lifecycle hook drive both the web
- * `TealchartWidget` and the React Native Skia handle. Anything added here must be
- * implementable on both, so DOM types stay in `ITealchartWebWidget`.
+/** Shared web/native widget contract: consumed TradingView methods plus Tealchart analysis.
+ * DOM-dependent additions belong in `ITealchartWebWidget`.
  */
 
+import type { AnalysisRequestIntent } from './analysis/analysisSelection';
 import type { TealchartApi } from './TealchartApi';
 import type { ChartOverrides, ContextMenuCallback, WidgetEvent, WidgetEventCallback } from './types';
 
@@ -31,6 +28,9 @@ export interface ITealchartWidget {
   headerReady(): Promise<void>;
   onChartReady(callback: () => void): void;
   onContextMenu(callback: ContextMenuCallback): void;
+  setAnalysisRequestHandler(handler: ((intent: AnalysisRequestIntent) => void) | undefined): void;
+  startAnalysisSelection(): boolean;
+  cancelAnalysisSelection(): void;
   remove(): void;
   /**
    * @stub Accepted and dropped — reports failure through `onFail`. Hosts that
