@@ -986,6 +986,15 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         { id: 'lookbackBars', name: 'Lookback Bars', type: 'int', defval: 500, min: 10, max: 2000, step: 10 },
         { id: 'rowSizeMode', name: 'Row Size Mode', type: 'string', defval: 'Auto', options: ['Auto', 'Ticks'] },
         { id: 'rowSizeTicks', name: 'Row Size (ticks)', type: 'int', defval: 1, min: 1, max: 500, step: 1 },
+        {
+          id: 'maxSignalsPerCandle',
+          name: 'Max Signals per Candle (0 = all)',
+          type: 'int',
+          defval: 3,
+          min: 0,
+          max: 50,
+          step: 1,
+        },
       ],
       defaults: {
         minCandleSizeTicks: 2,
@@ -1002,6 +1011,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         lookbackBars: 500,
         rowSizeMode: 'Auto',
         rowSizeTicks: 1,
+        maxSignalsPerCandle: 3,
       },
       palette: {
         buyAbsorption: { name: 'Absorbed Buying (bearish)', defaultColor: 'rgba(239, 83, 80, 1)' },
