@@ -1215,9 +1215,10 @@ function NativeLiveIndicatorPlotPath({
   style: PlotStyle;
   dash: number[] | null;
 }) {
+  // One tail-applied copy shared by every path below, made only when the tail moves.
+  const points = useDerivedValue(() => applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket));
   const linePath = useDerivedValue(() => {
     const overrides = paneRangeOverrides?.value;
-    const points = applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket);
     return isHistogram
       ? getNativeIndicatorHistogramPath({
           frame,
@@ -1226,7 +1227,7 @@ function NativeLiveIndicatorPlotPath({
           linewidth: strokeWidth,
           pane,
           paneRangeOverrides: overrides,
-          points,
+          points: points.value,
           sharedViewport,
           style,
         })
@@ -1235,7 +1236,7 @@ function NativeLiveIndicatorPlotPath({
           frame,
           pane,
           paneRangeOverrides: overrides,
-          points,
+          points: points.value,
           sharedViewport,
           style: isPointMarker ? 'linebr' : style,
         });
@@ -1247,7 +1248,7 @@ function NativeLiveIndicatorPlotPath({
       histbase,
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
+      points: points.value,
       sharedViewport,
       style,
     }),
@@ -1259,7 +1260,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
+      points: points.value,
       sharedViewport,
       style,
     }),
@@ -1271,7 +1272,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
+      points: points.value,
       sharedViewport,
     }),
   );

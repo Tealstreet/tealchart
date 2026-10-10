@@ -7,6 +7,7 @@ import {
   areNativeDrawingOutputsEqual,
   diffNativeIndicatorPlotTail,
   getNativeIndicatorPlotKey,
+  hasNativeMarkerOnLastBar,
   mergeNativeIndicatorTail,
 } from './nativeIndicatorTail';
 
@@ -95,5 +96,20 @@ describe('areNativeDrawingOutputsEqual', () => {
     expect(areNativeDrawingOutputsEqual([drawing], [JSON.parse(JSON.stringify(drawing))])).toBe(true);
     expect(areNativeDrawingOutputsEqual([drawing], [{ ...drawing, points: [{ x: 1, y: 3 }] }])).toBe(false);
     expect(areNativeDrawingOutputsEqual([drawing], [])).toBe(false);
+  });
+});
+
+describe('hasNativeMarkerOnLastBar', () => {
+  it('finds markers that ride the last bar high or low, and only those', () => {
+    const marker = (overrides: Partial<PlotOutput>) =>
+      line({ id: 'm', type: 'plotshape', values: [0, 0, 1], ...overrides });
+
+    expect(hasNativeMarkerOnLastBar([marker({})], 2)).toBe(true);
+    expect(hasNativeMarkerOnLastBar([marker({ location: 'belowbar' })], 2)).toBe(true);
+    expect(hasNativeMarkerOnLastBar([marker({ type: 'plotarrow', values: [0, 0, -1] })], 2)).toBe(true);
+    expect(hasNativeMarkerOnLastBar([marker({ location: 'top' })], 2)).toBe(false);
+    expect(hasNativeMarkerOnLastBar([marker({ values: [1, 1, 0] })], 2)).toBe(false);
+    expect(hasNativeMarkerOnLastBar([marker({ values: [1, 1, null] })], 2)).toBe(false);
+    expect(hasNativeMarkerOnLastBar([line()], 2)).toBe(false);
   });
 });

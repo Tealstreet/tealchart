@@ -78,7 +78,7 @@ export function NativeChartTradeLinesLayerImpl({
           bracketDragState={bracketDragState}
           frame={frame}
           line={line}
-          liveLastTrade={liveLastTrade}
+          liveLastTrade={line.nativeLive ? liveLastTrade : undefined}
           pricePrecision={pricePrecision}
           nowMs={nowMs}
           resolvedPriceAxisTags={resolvedPriceAxisTags}

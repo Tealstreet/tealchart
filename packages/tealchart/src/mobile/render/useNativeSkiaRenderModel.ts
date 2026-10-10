@@ -358,11 +358,10 @@ export function useNativeSkiaRenderModel({
     setLiveTailFormat?.({
       axisFont,
       downColor: options.downColor,
-      interval,
       pricePrecision: priceTickSize,
       upColor: options.upColor,
     });
-  }, [axisFont, interval, options.downColor, options.upColor, priceTickSize, setLiveTailFormat]);
+  }, [axisFont, options.downColor, options.upColor, priceTickSize, setLiveTailFormat]);
   const extraPriceLines = useMemo(() => priceLines ?? EMPTY_NATIVE_PRICE_LINES, [priceLines]);
   const bracketPriceLines = useMemo(
     () => [

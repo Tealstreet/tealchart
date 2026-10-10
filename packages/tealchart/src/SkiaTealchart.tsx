@@ -128,12 +128,12 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
-import { getNativeIndicatorPlotKey, mergeNativeIndicatorTail } from './mobile/render/nativeIndicatorTail';
-import { resolveNativeIndicatorTail } from './mobile/render/nativeIndicatorTailResolver';
 import {
-  createNativeIndicatorOutputTagSources,
-  replaceNativeIndicatorOutputTagSources,
-} from './mobile/utils/priceAxisTagSources';
+  getNativeIndicatorPlotKey,
+  hasNativeMarkerOnLastBar,
+  mergeNativeIndicatorTail,
+} from './mobile/render/nativeIndicatorTail';
+import { resolveNativeIndicatorPlotsTailUpdate } from './mobile/render/nativeIndicatorTailResolver';
 import {
   canPaintNativeLiveTail,
   getNativeLiveTailFittedRange,
@@ -715,51 +715,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeSharedPriceAxisTagSourcesRef = useRef<SharedValue<NativePriceAxisTagSource[]> | null>(null);
   const handleNativeIndicatorPlotsTail = useCallback(
     (styledPlots: readonly PlotOutput[], diff: NativeIndicatorPlotTailDiff | null) => {
-      const commit = nativeIndicatorTailCommitRef.current;
-      const resolved = resolveNativeIndicatorTail({ commit, diff, styledPlots });
-      const { tail } = resolved;
-      // Readouts move with their plots: the layer that lays them out re-resolves them, and
-      // the main-pane ones restack through the shared tag sources.
-      const registration = nativeIndicatorOutputLabelRegistryRef.current;
-      const liveLabels = tail && registration ? registration.resolve(styledPlots) : null;
-      // Readout sources only exist while readouts are drawn; with none committed there
-      // is nothing in the shared stack for this result to move.
-      const hasReadoutSources = commit?.priceAxisTagSources.some((source) => source.sourceType === 'indicatorOutput');
-      const tagSources =
-        commit && hasReadoutSources
-          ? replaceNativeIndicatorOutputTagSources(
-              commit.priceAxisTagSources,
-              createNativeIndicatorOutputTagSources({
-                indicatorPaneInfo: commit.indicatorPaneInfo,
-                panes: commit.panes,
-                plots: styledPlots,
-                totalBarCount: commit.bars.length,
-              }),
-            )
-          : null;
-      const painted =
-        resolved.painted && (!registration || liveLabels !== null) && (!hasReadoutSources || tagSources !== null);
-      const labels =
-        tail && registration && liveLabels
-          ? { generation: registration.generation, labels: liveLabels, market: tail.market, time: tail.time }
-          : null;
-
-      if (painted && tail) {
-        nativeIndicatorTailRef.current = mergeNativeIndicatorTail(nativeIndicatorTailRef.current, tail);
+      const update = resolveNativeIndicatorPlotsTailUpdate({
+        commit: nativeIndicatorTailCommitRef.current,
+        diff,
+        registration: nativeIndicatorOutputLabelRegistryRef.current,
+        styledPlots,
+      });
+      if (update.painted && update.tail) {
+        nativeIndicatorTailRef.current = mergeNativeIndicatorTail(nativeIndicatorTailRef.current, update.tail);
         nativeIndicatorTail.value = nativeIndicatorTailRef.current;
-        nativeIndicatorOutputLabels.value = labels;
-        if (tagSources && nativeSharedPriceAxisTagSourcesRef.current) {
-          nativeSharedPriceAxisTagSourcesRef.current.value = tagSources;
+        nativeIndicatorOutputLabels.value = update.labels;
+        if (update.tagSources && nativeSharedPriceAxisTagSourcesRef.current) {
+          nativeSharedPriceAxisTagSourcesRef.current.value = update.tagSources;
         }
       } else if (!diff) {
         // A result that renders anyway replaces what was published outright, so nothing
         // from an earlier result of this bar can override what React is about to commit.
-        nativeIndicatorTailRef.current = tail;
-        nativeIndicatorTail.value = tail;
-        nativeIndicatorOutputLabels.value = labels;
+        nativeIndicatorTailRef.current = update.tail;
+        nativeIndicatorTail.value = update.tail;
+        nativeIndicatorOutputLabels.value = update.labels;
       }
-      if (painted) nativeIndicatorTailListenersRef.current.forEach((listener) => listener(styledPlots));
-      return painted;
+      if (update.painted) nativeIndicatorTailListenersRef.current.forEach((listener) => listener(styledPlots));
+      return update.painted;
     },
     [nativeIndicatorOutputLabels, nativeIndicatorTail],
   );
@@ -1973,6 +1950,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         nativeRenderHasDataViewport &&
         !hasPendingRestorePriceFit(),
       fittedRange: getNativeLiveTailFittedRange(nativeRenderBars, nativeRenderProjection?.viewport),
+      markerOnLastBar: hasNativeMarkerOnLastBar(nativeIndicatorPlots, nativeRenderBars.length - 1),
       lastTradeMatch: nativeLastTradeLine?.nativeLive,
       market: nativeRenderLiveMarket,
       time: nativeRenderBars[nativeRenderBars.length - 1]?.time,
@@ -1987,9 +1965,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       priceAxisTagSources,
     };
     nativeSharedPriceAxisTagSourcesRef.current = sharedPriceAxisTagSources;
-    // The readout layer registers while it renders; when it is not mounted, nothing may stand in for it.
-    if (!nativeRenderHasDataViewport || options.showIndicatorOutputAxisLabels === false) {
+    // The readout layer registers while it renders; when it is not mounted, nothing may
+    // stand in for it, and nothing it published may outlive it.
+    const readoutLayerMounted =
+      Boolean(!resizeLayoutFrozen && frame && nativeRenderProjection) &&
+      nativeRenderHasDataViewport &&
+      options.showIndicatorOutputAxisLabels !== false;
+    if (!readoutLayerMounted && nativeIndicatorOutputLabelRegistryRef.current) {
       nativeIndicatorOutputLabelRegistryRef.current = null;
+      nativeIndicatorOutputLabels.value = null;
     }
   });
   useLayoutEffect(() => {
@@ -2560,8 +2544,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
           liveMarket={nativeRenderLiveMarket}
-          liveTail={nativeLiveTail.tail}
           subscribeLivePlots={subscribeNativeIndicatorTail}
+          subscribeLiveTail={nativeLiveTail.subscribe}
           plots={nativeIndicatorPlots}
           crosshair={crosshair}
           sharedViewport={sharedViewport}

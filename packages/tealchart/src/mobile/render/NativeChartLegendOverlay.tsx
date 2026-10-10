@@ -7,7 +7,7 @@ import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair
 import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
-import type { NativeLiveTailBar, NativeLiveTailSharedValue } from './nativeLiveTail';
+import type { NativeLiveTailBar } from './nativeLiveTail';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import React from 'react';
@@ -73,9 +73,9 @@ export interface NativeChartLegendOverlayProps {
   bars: readonly Bar[];
   /** Market of `bars`; the live tail only replaces their last bar from the same one. */
   liveMarket?: string;
-  liveTail?: NativeLiveTailSharedValue;
-  /** The live tail as the view reads it, mirrored from `liveTail` by the runtime. */
+  /** The live tail as the view reads it, mirrored from `subscribeLiveTail` by the runtime. */
   liveTailBar?: NativeLiveTailBar | null;
+  subscribeLiveTail?: (listener: (bar: NativeLiveTailBar | null) => void) => () => void;
   /** Indicator results painted without a chart render; the readouts follow them. */
   subscribeLivePlots?: (listener: (plots: readonly PlotOutput[]) => void) => () => void;
   plots?: readonly PlotOutput[];
@@ -694,7 +694,8 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
     base: readonly PlotOutput[] | undefined;
     plots: readonly PlotOutput[];
   } | null>(null);
-  const { subscribeLivePlots } = props;
+  const { subscribeLivePlots, subscribeLiveTail } = props;
+  React.useEffect(() => subscribeLiveTail?.(setLiveTailBar), [subscribeLiveTail]);
   React.useEffect(
     () => subscribeLivePlots?.((plots) => setLivePlots({ base: committedPlotsRef.current, plots })),
     [subscribeLivePlots],
@@ -717,13 +718,6 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
       if (next !== previous) runOnJS(setSourceIndex)(next);
     },
     [barTimes, props.crosshair, props.sharedViewport, props.frame],
-  );
-  useAnimatedReaction(
-    () => props.liveTail?.value ?? null,
-    (next, previous) => {
-      if (next !== previous) runOnJS(setLiveTailBar)(next);
-    },
-    [props.liveTail],
   );
   const [rowLayouts, setRowLayouts] = React.useState<Record<string, LayoutRectangle>>({});
   const [actionLayouts, setActionLayouts] = React.useState<Record<string, NativeLegendActionLayout>>({});
