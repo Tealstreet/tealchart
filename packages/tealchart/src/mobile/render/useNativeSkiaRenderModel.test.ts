@@ -15,6 +15,9 @@ vi.mock('react', async (importOriginal) => {
     ...actual,
     useMemo: <T>(factory: () => T) => factory(),
     useRef: <T>(initialValue: T) => ({ current: initialValue }),
+    useLayoutEffect: (effect: () => void) => {
+      effect();
+    },
   };
 });
 

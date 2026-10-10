@@ -471,6 +471,44 @@ describe('native trade-line hit testing', () => {
     expect(resolveWith('order-1').map((tag) => tag.id)).toEqual(['order:order-2']);
   });
 
+  it('places the last-trade tag at a live price from its own market and bar', () => {
+    const source: NativePriceAxisTagSource = {
+      sourceType: 'priceLine',
+      tagId: 'priceLine:last-trade',
+      objectId: 'last-trade',
+      price: 25,
+      height: 18,
+      fixed: true,
+      live: { market: 'BTCUSDT\n1', time: 1000, maxTextWidth: 40 },
+    };
+    const centerFor = (liveLastTrade: Parameters<typeof resolveNativePriceAxisTagCenters>[0]['liveLastTrade']) =>
+      resolveNativePriceAxisTagCenters({
+        priceAxisTagSources: [source],
+        sharedViewport,
+        frame,
+        orderDragState: orderDragState(),
+        bracketDragState: bracketDragState(),
+        liveLastTrade,
+        priceAxisTagHeight: 22,
+      })[0];
+    const live = { market: 'BTCUSDT\n1', time: 1000, price: 75, color: '#fff', text: '75', textWidth: 10 };
+    const atPrice = (price: number) =>
+      resolveNativePriceAxisTagCenters({
+        priceAxisTagSources: [{ ...source, price }],
+        sharedViewport,
+        frame,
+        orderDragState: orderDragState(),
+        bracketDragState: bracketDragState(),
+        priceAxisTagHeight: 22,
+      })[0];
+
+    expect(centerFor(live)).toEqual(atPrice(75));
+    expect(centerFor({ ...live, market: 'ETHUSDT\n1' })).toEqual(atPrice(25));
+    expect(centerFor({ ...live, time: 999 })).toEqual(atPrice(25));
+    expect(centerFor({ ...live, textWidth: 60 })).toEqual(atPrice(25));
+    expect(centerFor(null)).toEqual(atPrice(25));
+  });
+
   // Native resolved indicator readouts in a second stack that never saw this
   // one, so a Bollinger tag and an order tag at the same price simply overlapped.
   // Web has shared the pass since 0f25f98a.

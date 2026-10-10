@@ -24,9 +24,9 @@ export interface NativePriceAxisTagBoxProps {
 export interface NativePriceAxisTagStaticTextProps {
   x: number | SharedValue<number>;
   y: number | SharedValue<number>;
-  text: string;
+  text: string | SharedValue<string>;
   font: ReturnType<typeof Skia.Font>;
-  color: string;
+  color: NativeSkiaColor;
 }
 
 export interface NativePriceAxisTagAnimatedTextProps {
@@ -36,7 +36,7 @@ export interface NativePriceAxisTagAnimatedTextProps {
   maxCharacters: number;
   characterWidth: number;
   font: ReturnType<typeof Skia.Font>;
-  color: string;
+  color: NativeSkiaColor;
   characterSet?: string;
 }
 

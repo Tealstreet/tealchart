@@ -7,6 +7,7 @@ import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair
 import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveTailBar, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import React from 'react';
@@ -70,6 +71,11 @@ export type NativeLegendActionHitTarget = NativeOverlayActionHitTarget<NativeLeg
 export interface NativeChartLegendOverlayProps {
   activeIndicators?: readonly NativeLegendIndicator[];
   bars: readonly Bar[];
+  /** Market of `bars`; the live tail only replaces their last bar from the same one. */
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
+  /** The live tail as the view reads it, mirrored from `liveTail` by the runtime. */
+  liveTailBar?: NativeLiveTailBar | null;
   plots?: readonly PlotOutput[];
   sourceIndex?: number;
   crosshair?: NativeCrosshairSharedValues;
@@ -466,6 +472,8 @@ interface NativeChartLegendOverlayViewProps extends NativeChartLegendOverlayProp
 function NativeChartLegendOverlayView({
   activeIndicators = [],
   bars,
+  liveMarket,
+  liveTailBar,
   plots = [],
   sourceIndex,
   dataWindowIndicatorId,
@@ -498,7 +506,16 @@ function NativeChartLegendOverlayView({
     indicatorPaneInfo,
     pricePrecision,
   });
-  const latestBar = bars[selectedIndex] ?? null;
+  const selectedBar = bars[selectedIndex] ?? null;
+  const latestBar =
+    selectedBar &&
+    selectedIndex === bars.length - 1 &&
+    liveTailBar &&
+    liveMarket &&
+    liveTailBar.market === liveMarket &&
+    liveTailBar.time === selectedBar.time
+      ? { ...selectedBar, ...liveTailBar }
+      : selectedBar;
   const previousBar = bars[selectedIndex - 1] ?? null;
   const change = latestBar && previousBar ? latestBar.close - previousBar.close : 0;
   const valueColor = change < 0 ? downColor : upColor;
@@ -668,6 +685,14 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
   const closeStyle = React.useCallback(() => setStyleIndicatorId(undefined), []);
   const [dataWindowIndicatorId, setDataWindowIndicatorId] = React.useState<string>();
   const [sourceIndex, setSourceIndex] = React.useState<number>();
+  const [liveTailBar, setLiveTailBar] = React.useState<NativeLiveTailBar | null>(null);
+  useAnimatedReaction(
+    () => props.liveTail?.value ?? null,
+    (next, previous) => {
+      if (next !== previous) runOnJS(setLiveTailBar)(next);
+    },
+    [props.liveTail],
+  );
   const openDataWindow = React.useCallback((id: string) => setDataWindowIndicatorId(id), []);
   const closeDataWindow = React.useCallback(() => setDataWindowIndicatorId(undefined), []);
   const barTimes = React.useMemo(() => props.bars.map((bar) => ({ time: bar.time })), [props.bars]);
@@ -813,6 +838,7 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
       ) : null}
       <NativeChartLegendOverlayView
         {...props}
+        liveTailBar={liveTailBar}
         sourceIndex={sourceIndex}
         dataWindowIndicatorId={dataWindowIndicatorId}
         onOpenDataWindow={openDataWindow}

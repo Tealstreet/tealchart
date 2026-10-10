@@ -8,6 +8,7 @@ import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveLastTradeSharedValue, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
@@ -50,6 +51,10 @@ export interface NativeChartCanvasLayersProps {
   indicatorDrawings?: readonly DrawingOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
+  liveLastTrade?: NativeLiveLastTradeSharedValue;
+  /** Market of `visibleBars`; the live tail only replaces a bar from the same one. */
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   /** The price scale, which the main pane's own frame does not carry. */
   mainPaneRange?: NativePaneRange | null;
@@ -99,6 +104,9 @@ export function NativeChartCanvasLayersImpl({
   indicatorDrawings = [],
   paneRangeOverrides,
   indicatorTotalBarCount,
+  liveLastTrade,
+  liveMarket,
+  liveTail,
   lineSnapshot,
   mainPaneRange,
   onDragPriceLabelWidth,
@@ -164,6 +172,8 @@ export function NativeChartCanvasLayersImpl({
             totalBarCount={indicatorTotalBarCount}
             barColorPlots={indicatorPlots.filter((plot) => plot.type === 'barcolor')}
             frame={frame}
+            liveMarket={liveMarket}
+            liveTail={liveTail}
             options={options}
             sharedViewport={sharedViewport}
             staticProjection={staticProjection}
@@ -253,6 +263,7 @@ export function NativeChartCanvasLayersImpl({
             getOrderObjectId={getOrderObjectId}
             getPositionObjectId={getPositionObjectId}
             lineSnapshot={lineSnapshot}
+            liveLastTrade={liveLastTrade}
             onDragPriceLabelWidth={onDragPriceLabelWidth}
             orderDragState={orderDragState}
             pricePrecision={pricePrecision}

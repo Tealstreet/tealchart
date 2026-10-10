@@ -11,9 +11,18 @@ export interface NativeBracketPriceLineRef {
   bracketType: 'tp' | 'sl';
 }
 
+/** The market and bar a live last trade must belong to before it may replace this line's values. */
+export interface NativeLivePriceLineMatch {
+  market: string;
+  time: number;
+  /** Widest live text the committed tag holds; a wider one waits for React to grow the tag. */
+  maxTextWidth?: number;
+}
+
 export type NativeRenderablePriceLine = PriceLine & {
   nativeBracketRef?: NativeBracketPriceLineRef;
   nativeAxisTagWidth?: number;
+  nativeLive?: NativeLivePriceLineMatch;
 };
 
 export function isNativeBracketPriceLineRefActive(

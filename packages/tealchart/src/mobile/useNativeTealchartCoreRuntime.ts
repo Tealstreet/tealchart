@@ -5,9 +5,9 @@ import type {
   TealscriptRuntimeOptions,
   WorkerError,
 } from '@tealstreet/tealscript';
-import type { IIndicatorManager } from '../core/ChartWidgetCore';
+import type { ChartWidgetBarsChangedContext, IIndicatorManager } from '../core/ChartWidgetCore';
 import type { ChartThemeInput } from '../theme';
-import type { IBasicDataFeed } from '../types';
+import type { Bar, IBasicDataFeed } from '../types';
 
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 
@@ -19,6 +19,7 @@ import { MobileIndicatorManager } from './MobileIndicatorManager';
 export interface NativeTealchartCoreRuntimeInput {
   datafeed?: IBasicDataFeed;
   onLayoutDirty?: () => void;
+  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => void;
   onIntervalChange?: (interval: string) => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
@@ -35,6 +36,7 @@ export interface NativeTealchartCoreRuntimeInput {
 export function useNativeTealchartCoreRuntime({
   datafeed,
   onLayoutDirty,
+  onLatestBar,
   onIntervalChange,
   onSymbolChange,
   onTealscriptError,
@@ -75,6 +77,7 @@ export function useNativeTealchartCoreRuntime({
     realtimeUpdateThrottleMs,
     onSymbolChange,
     onIntervalChange,
+    onLatestBar,
   });
   const { bars, barsContext, symbol, interval, isLoading, isLoadingMoreBars, requestMoreBars } = coreResult;
 

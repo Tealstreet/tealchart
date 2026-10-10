@@ -30,6 +30,8 @@ export interface UseTealchartCoreOptions {
   realtimeUpdateThrottleMs?: number;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
+  /** Called with the newest bar on every emit, before React hears of it. */
+  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => void;
 }
 
 export interface TealchartCoreState {
@@ -179,6 +181,8 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
   const coreRef = useRef<ChartWidgetCore | null>(null);
   const lastIntervalPropRef = useRef(options.interval);
   const lastSymbolPropRef = useRef(options.symbol);
+  const onLatestBarRef = useRef(options.onLatestBar);
+  onLatestBarRef.current = options.onLatestBar;
 
   // Whether the hook is enabled (datafeed provided)
   const enabled = !!options.datafeed;
@@ -211,6 +215,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       realtimeUpdateThrottleMs: options.realtimeUpdateThrottleMs,
       scheduleRender: () => {},
       onBarsChanged: (newBars, context) => {
+        onLatestBarRef.current?.(newBars[newBars.length - 1] ?? null, context);
         dispatchCoreState({ type: 'barsChanged', bars: newBars, context });
       },
       onLoadingChanged: (loading, context) => {

@@ -3,6 +3,7 @@ import type { IndicatorOutputPane, IndicatorOutputPaneInfo } from '../../renderi
 import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../../types';
 import type {
   NativeBracketPriceLineRef,
+  NativeLivePriceLineMatch,
   NativeRenderablePriceLine,
 } from './nativeBracketPriceLines';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './tradeLineLayout';
@@ -26,12 +27,13 @@ export interface NativePriceAxisTagSource {
   priority?: number;
   fixed?: boolean;
   bracketRef?: NativeBracketPriceLineRef;
+  live?: NativeLivePriceLineMatch;
 }
 
 export interface NativePriceAxisTagSourcesInput {
   extraPriceLines: readonly PriceLine[];
   bracketPriceLines: readonly NativeRenderablePriceLine[];
-  lastTradeLine?: PriceLine | null;
+  lastTradeLine?: NativeRenderablePriceLine | null;
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
   priceLineTagHeight?: number;
@@ -86,6 +88,7 @@ function createNativePriceLineTagSource(
     priority: line.priority,
     ...(options?.fixed === true ? { fixed: true } : {}),
     ...(line.nativeBracketRef ? { bracketRef: line.nativeBracketRef } : {}),
+    ...(line.nativeLive ? { live: line.nativeLive } : {}),
   };
 }
 

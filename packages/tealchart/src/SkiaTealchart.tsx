@@ -117,6 +117,7 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
+import { getNativeLiveTailMarket, useNativeLiveTailChannel } from './mobile/render/nativeLiveTail';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
@@ -452,6 +453,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (leftToolRailCollapsed) setNativeOpenDrawingCategoryId(null);
   }, [leftToolRailCollapsed]);
 
+  const nativeLiveTail = useNativeLiveTailChannel();
   const {
     bars,
     barsContext,
@@ -468,6 +470,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol,
   } = useNativeTealchartCoreRuntime({
     datafeed,
+    onLatestBar: nativeLiveTail.onLatestBar,
     onIntervalChange: handleNativeIntervalChangeForLayout,
     onLayoutDirty: markNativeLayoutDirtyIfReady,
     onSymbolChange: handleNativeSymbolChangeForLayout,
@@ -1166,11 +1169,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       bars,
       hasDataViewport,
       interval: loadedBarsInterval,
+      liveMarket: getNativeLiveTailMarket(barsContext),
       priceLines: priceLines ?? EMPTY_NATIVE_PRICE_LINES,
       projection,
       viewport,
     }),
-    [bars, hasDataViewport, loadedBarsInterval, priceLines, projection, viewport],
+    [bars, barsContext, hasDataViewport, loadedBarsInterval, priceLines, projection, viewport],
   );
   const nativeRenderSnapshotRef = useRef(liveNativeRenderSnapshot);
   const nativeRenderTransitionPending = shouldDimNativeRenderForTransition({
@@ -1203,6 +1207,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeRenderBars = nativeRenderSnapshot.bars;
   const nativeRenderHasDataViewport = nativeRenderSnapshot.hasDataViewport;
   const nativeRenderInterval = nativeRenderSnapshot.interval;
+  const nativeRenderLiveMarket = nativeRenderSnapshot.liveMarket;
   const nativeRenderPriceLines = nativeRenderSnapshot.priceLines;
   const nativeRenderProjection = nativeRenderSnapshot.projection;
   // The main pane's frame carries the unified layout's placeholder range; the
@@ -1828,6 +1833,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     layoutName: nativeCurrentLayout.layoutName,
     layoutSelectorEnabled: nativeLayoutSelectorEnabled,
     leftToolRailCollapsed,
+    liveMarket: nativeRenderLiveMarket,
+    liveTail: nativeLiveTail,
     lineSnapshot,
     marginsBottom: margins.bottom,
     options,
@@ -1858,6 +1865,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bracketDragState: bracketDragInteractionState,
     frame,
     hasDataViewport: nativeRenderHasDataViewport,
+    liveLastTrade: nativeLiveTail.lastTrade,
     orderDragState,
     orderDragZones,
     priceAxisTagHeight: PRICE_AXIS_TAG_HEIGHT,
@@ -2338,6 +2346,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
+                liveLastTrade={nativeLiveTail.lastTrade}
+                liveMarket={nativeRenderLiveMarket}
+                liveTail={nativeLiveTail.tail}
                 mainPaneRange={nativeRenderMainPaneRange}
                 onDragPriceLabelWidth={growTradeLineDragPriceLabelWidth}
                 options={options}
@@ -2408,6 +2419,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {frame && !hideLegend && (
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
+          liveMarket={nativeRenderLiveMarket}
+          liveTail={nativeLiveTail.tail}
           plots={nativeIndicatorPlots}
           crosshair={crosshair}
           sharedViewport={sharedViewport}
