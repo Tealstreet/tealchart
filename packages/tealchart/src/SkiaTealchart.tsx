@@ -66,7 +66,6 @@ import React, {
 
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
 import { StyleSheet, View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
@@ -99,6 +98,7 @@ import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nati
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
 import { useNativeCrossHairEvents } from './mobile/interaction/useNativeCrossHairEvents';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
+import { NativeStableGestureDetector } from './mobile/interaction/NativeStableGestureDetector';
 import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
 import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
@@ -2316,7 +2316,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'}
           style={styles.liveChartLayer}
         >
-          <GestureDetector gesture={nativeChartGesture}>
+          <NativeStableGestureDetector gesture={nativeChartGesture}>
             <Canvas ref={canvasRef} style={styles.canvas}>
               <NativeChartCanvasLayers
                 axisFont={axisFont}
@@ -2375,7 +2375,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 />
               ) : null}
             </Canvas>
-          </GestureDetector>
+          </NativeStableGestureDetector>
         </View>
       ) : null}
       <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">

@@ -1362,6 +1362,14 @@ Anything else that moves faster than layout belongs in a shared value the
 worklets read, never in `controlZones`. `drawingEditDragZonesShared` is the
 other instance of the same shape.
 
+A stable gesture identity is not enough on its own. RNGH's `GestureDetector`
+re-applies every attached handler in an effect keyed on **all** of its props,
+children included, and the chart canvas is its child — so every bar tick
+re-sent fifteen handler configs to native (6.4% of the JS thread under a
+4-ticks/s load). `NativeStableGestureDetector` hands the canvas through context
+to a memoized detector whose only prop is the gesture. Do not put the canvas
+back as a direct child of a plain `GestureDetector`.
+
 ## Gotchas
 
 - `TealchartRenderer` is pure canvas — no React; test it independently
