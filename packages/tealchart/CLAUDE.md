@@ -1580,3 +1580,14 @@ widget. Analysis readers and imperative handlers share this liveness predicate.
 
 Replacing a native `ChartWidgetCore` rebinds its analysis reader and advances the
 public analysis revision even when market and per-core request counters repeat.
+
+## `intervalToMs`: uppercase `M` is months
+
+`utils/intervalMs.ts` reads TradingView resolutions. An UPPERCASE `M` (`1M`,
+`3M`, `M`) is MONTHS and a lowercase `m` is minutes, so the month check runs on
+the raw string before the case-insensitive unit switch. It used to read `1M` as
+one minute, so a monthly chart's first fetch (`now - INITIAL_BAR_COUNT *
+intervalToMs(interval)`) reached back a few hours and loaded empty. The month
+is a nominal 30 days for DURATION math only (fetch ranges, viewport, gap
+timeouts); `normalizeDatafeedBars` never re-buckets bars of a day or longer, so
+calendar-month bar times are kept as the venue sends them.
