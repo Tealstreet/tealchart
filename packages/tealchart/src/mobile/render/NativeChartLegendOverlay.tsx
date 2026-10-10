@@ -76,6 +76,8 @@ export interface NativeChartLegendOverlayProps {
   liveTail?: NativeLiveTailSharedValue;
   /** The live tail as the view reads it, mirrored from `liveTail` by the runtime. */
   liveTailBar?: NativeLiveTailBar | null;
+  /** Indicator results painted without a chart render; the readouts follow them. */
+  subscribeLivePlots?: (listener: (plots: readonly PlotOutput[]) => void) => () => void;
   plots?: readonly PlotOutput[];
   sourceIndex?: number;
   crosshair?: NativeCrosshairSharedValues;
@@ -686,6 +688,19 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
   const [dataWindowIndicatorId, setDataWindowIndicatorId] = React.useState<string>();
   const [sourceIndex, setSourceIndex] = React.useState<number>();
   const [liveTailBar, setLiveTailBar] = React.useState<NativeLiveTailBar | null>(null);
+  const committedPlotsRef = React.useRef(props.plots);
+  committedPlotsRef.current = props.plots;
+  const [livePlots, setLivePlots] = React.useState<{
+    base: readonly PlotOutput[] | undefined;
+    plots: readonly PlotOutput[];
+  } | null>(null);
+  const { subscribeLivePlots } = props;
+  React.useEffect(
+    () => subscribeLivePlots?.((plots) => setLivePlots({ base: committedPlotsRef.current, plots })),
+    [subscribeLivePlots],
+  );
+  // Live plots only stand in for the commit they were painted over; a new commit wins.
+  const plots = livePlots && livePlots.base === props.plots ? livePlots.plots : props.plots;
   useAnimatedReaction(
     () => props.liveTail?.value ?? null,
     (next, previous) => {
@@ -838,6 +853,7 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
       ) : null}
       <NativeChartLegendOverlayView
         {...props}
+        plots={plots}
         liveTailBar={liveTailBar}
         sourceIndex={sourceIndex}
         dataWindowIndicatorId={dataWindowIndicatorId}

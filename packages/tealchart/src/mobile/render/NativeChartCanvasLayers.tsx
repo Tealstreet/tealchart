@@ -8,6 +8,7 @@ import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeIndicatorTailSharedValue } from './nativeIndicatorTail';
 import type { NativeLiveLastTradeSharedValue, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
@@ -51,6 +52,7 @@ export interface NativeChartCanvasLayersProps {
   indicatorDrawings?: readonly DrawingOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
+  liveIndicatorTail?: NativeIndicatorTailSharedValue;
   liveLastTrade?: NativeLiveLastTradeSharedValue;
   /** Market of `visibleBars`; the live tail only replaces a bar from the same one. */
   liveMarket?: string;
@@ -104,6 +106,7 @@ export function NativeChartCanvasLayersImpl({
   indicatorDrawings = [],
   paneRangeOverrides,
   indicatorTotalBarCount,
+  liveIndicatorTail,
   liveLastTrade,
   liveMarket,
   liveTail,
@@ -185,6 +188,8 @@ export function NativeChartCanvasLayersImpl({
             bars={bars}
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
+            liveMarket={liveMarket}
+            liveTail={liveIndicatorTail}
             paneRangeOverrides={paneRangeOverrides}
             plots={indicatorPlots}
             sharedViewport={sharedViewport}

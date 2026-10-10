@@ -32,6 +32,8 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeIndicatorPlotTailDiff, NativeIndicatorTail } from './mobile/render/nativeIndicatorTail';
+import type { NativeIndicatorTailCommit } from './mobile/render/nativeIndicatorTailResolver';
 import type { NativeLiveTailCommit } from './mobile/render/nativeLiveTail';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
@@ -120,6 +122,8 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
+import { getNativeIndicatorPlotKey, mergeNativeIndicatorTail } from './mobile/render/nativeIndicatorTail';
+import { resolveNativeIndicatorTail } from './mobile/render/nativeIndicatorTailResolver';
 import {
   canPaintNativeLiveTail,
   getNativeLiveTailFittedRange,
@@ -688,6 +692,47 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => indicatorManager?.getPlots() ?? EMPTY_NATIVE_INDICATOR_PLOTS,
     [indicatorManager, nativeIndicatorPlotsRevision],
   );
+  const nativeIndicatorPlotsByKey = useMemo(
+    () => new Map(nativeIndicatorPlots.map((plot) => [getNativeIndicatorPlotKey(plot), plot])),
+    [nativeIndicatorPlots],
+  );
+  const nativeIndicatorTail = useSharedValue<NativeIndicatorTail | null>(null);
+  const nativeIndicatorTailRef = useRef<NativeIndicatorTail | null>(null);
+  const nativeIndicatorTailCommitRef = useRef<NativeIndicatorTailCommit | null>(null);
+  const nativeIndicatorTailListenersRef = useRef(new Set<(plots: readonly PlotOutput[]) => void>());
+  const handleNativeIndicatorPlotsTail = useCallback(
+    (styledPlots: readonly PlotOutput[], diff: NativeIndicatorPlotTailDiff | null) => {
+      const { painted, tail } = resolveNativeIndicatorTail({
+        commit: nativeIndicatorTailCommitRef.current,
+        diff,
+        styledPlots,
+      });
+      if (painted && tail) {
+        nativeIndicatorTailRef.current = mergeNativeIndicatorTail(nativeIndicatorTailRef.current, tail);
+        nativeIndicatorTail.value = nativeIndicatorTailRef.current;
+      } else if (!diff) {
+        // A result that renders anyway replaces the tail outright, so nothing published
+        // for an earlier result of this bar can override what React is about to commit.
+        nativeIndicatorTailRef.current = tail;
+        nativeIndicatorTail.value = tail;
+      }
+      if (painted) nativeIndicatorTailListenersRef.current.forEach((listener) => listener(styledPlots));
+      return painted;
+    },
+    [nativeIndicatorTail],
+  );
+  const subscribeNativeIndicatorTail = useCallback((listener: (plots: readonly PlotOutput[]) => void) => {
+    const listeners = nativeIndicatorTailListenersRef.current;
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+  useLayoutEffect(() => {
+    if (!indicatorManager) return;
+    indicatorManager.setOnPlotsTail(handleNativeIndicatorPlotsTail);
+    return () => indicatorManager.setOnPlotsTail(null);
+  }, [handleNativeIndicatorPlotsTail, indicatorManager]);
   const nativeIndicatorDrawings = useMemo<readonly DrawingOutput[]>(
     () => indicatorManager?.getDrawings() ?? [],
     [indicatorManager, nativeIndicatorPlotsRevision],
@@ -1890,6 +1935,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       market: nativeRenderLiveMarket,
       time: nativeRenderBars[nativeRenderBars.length - 1]?.time,
     };
+    nativeIndicatorTailCommitRef.current = {
+      bars: nativeRenderBars,
+      drawingLive: nativeLiveTailCommitRef.current.drawingLive,
+      market: nativeRenderLiveMarket,
+      plotsByKey: nativeIndicatorPlotsByKey,
+      readoutsShown: options.showIndicatorOutputAxisLabels !== false && nativeIndicatorPlots.length > 0,
+    };
   });
   useLayoutEffect(() => {
     const nextWidth = Math.ceil(measuredPriceAxisWidth);
@@ -2382,6 +2434,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
+                liveIndicatorTail={nativeIndicatorTail}
                 liveLastTrade={nativeLiveTail.lastTrade}
                 liveMarket={nativeRenderLiveMarket}
                 liveTail={nativeLiveTail.tail}
@@ -2457,6 +2510,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           bars={nativeRenderBars}
           liveMarket={nativeRenderLiveMarket}
           liveTail={nativeLiveTail.tail}
+          subscribeLivePlots={subscribeNativeIndicatorTail}
           plots={nativeIndicatorPlots}
           crosshair={crosshair}
           sharedViewport={sharedViewport}
