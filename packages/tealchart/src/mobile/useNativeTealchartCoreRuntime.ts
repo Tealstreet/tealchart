@@ -19,7 +19,8 @@ import { MobileIndicatorManager } from './MobileIndicatorManager';
 export interface NativeTealchartCoreRuntimeInput {
   datafeed?: IBasicDataFeed;
   onLayoutDirty?: () => void;
-  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => void;
+  /** Returning true says the bar was painted live, which lets React skip a same-bar tick. */
+  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => boolean | void;
   onIntervalChange?: (interval: string) => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
