@@ -77,7 +77,6 @@ node signature, so updates rebuild text and hit geometry together.
 state. A private font cache becomes stale after save/restore or canvas resizing,
 making repeated Hosted axis-tag paints fall back to the default 10px font.
 
-
 `ui/LayoutSelector` is the shared saved-layout list and action modal. Hosts can
 open/close it through a native header without adding a second menu. Optional
 `requestName`, `confirmDelete` and `onClose` callbacks connect Electron's
@@ -543,7 +542,6 @@ count read inside the draw pass, not a lifecycle hook, and the `setTimeout`s
 beside it are a disposal delay and a freeze ceiling - neither is the release
 path. Do not read it as licence for the next one.
 
-
 ## State Management
 
 Uses Nanostores-backed, chart-keyed stores for chart state and UI preference persistence:
@@ -762,7 +760,7 @@ the second reconnect, only after a venue hiccup.
 So the error callback re-subscribes — **only for the reset callers**, via
 `_loadBars(resubscribeOnError)`. There are TWO of them, and missing the second
 made the first useless: the host's reconnect calls `forceResetCacheCallbacks()`
-*and then* `resetData()`, so `resetData` -> `_handleResetData` ->
+_and then_ `resetData()`, so `resetData` -> `_handleResetData` ->
 `_startDataLoad({reason:'reset'})` begins a second transition behind the reset
 callback's own load. `_startDataLoad` therefore passes the flag for
 `reason === 'reset'` too — and it is that request which actually survives a
@@ -866,6 +864,37 @@ descriptor through save, import and resave, and feed it back to the existing
 runtime resolver. Stable builtin/catalog studies keep their identifiers; no
 schema migration or native executable source is added. Current parent study
 state owns removal and replacement of inline source metadata.
+
+**Indicator (study) templates are TradingView study-template JSON.**
+`transformer/studyTemplate.ts` writes `{ panes, version: 3, symbol?, interval? }`
+through the same `toTvFormat`/`fromTvFormat` projection layouts use, so a
+template saved here applies natively on a TradingView chart and vice versa. Two
+TradingView requirements are load-bearing: a `MainSeries` source must be present
+(its `applyStudyTemplate` asserts one, then discards its state), and every
+`rightAxisesState[].state` needs `m_priceRange` and `m_isAutoScale` or its
+`PriceScale.restoreState` throws. Volume (a Tealchart setting, not a study) and
+drawings never enter a template; inline TealScript source never does either.
+The only extra key is the `tealstreet` envelope whose shared fields the web app
+validates (`apps/web/src/components/chart/indicatorTemplates/templateDocument.ts`);
+Tealchart adds the engine-private `tealchartIndicators`, authoritative on read.
+A TealScript instance there points at `tealscriptStudies` **by index**, never by
+its own sourceId, so rewriting that one list (a marketplace install) remaps every
+instance. On read a study this user does not have is left out and reported in
+`missingTealscriptStudies`; TradingView studies Tealchart cannot render become
+`preservedTradingViewStudies` and are re-emitted on the next save.
+
+`TealchartApi.createStudyTemplate(options)` / `applyStudyTemplate(template)` are
+the TradingView method names and shapes; the widget installs their handler.
+Applying REPLACES every indicator (one store write plus `_replaceRuntimeIndicators`,
+the layout-load path — indicators have no undo stack), switches to a saved
+interval but never a saved symbol (the host owns the market). The web top bar's
+templates button (`ui/IndicatorTemplateSelector`, icon-only beside Indicators)
+exists only when the host `save_load_adapter` implements all four TradingView
+study-template methods (`supportsStudyTemplates`); a rejecting `getAllStudyTemplates`
+is how a host says "unavailable" — the menu shows its message and offers no save.
+Names are typed in the modal, not `prompt()`, which Electron lacks. **Native has
+no templates menu yet**: `index.native` exports the same reader/writer, but the
+mobile UI is an open parity gap.
 
 ## Commands
 
@@ -1001,7 +1030,6 @@ gaps. Callers own the canvas DPR transform. This above-candle pass does not make
 behind-candle output or candle recoloring available; hosts must gate those until
 they have native draw-order capabilities.
 
-
 ## Line identity (OEMS)
 
 **A line is the adapter it was drawn from.** `createOrderLine()` mints `order_1`,
@@ -1045,7 +1073,7 @@ comparison would never match.
 **A bracket the user drags into existence has no order yet.** The optimistic
 TP/SL is merged into `brackets` even when the line has none
 (`applyOemsBracketActionState`), or it would have nowhere to live. Bracket
-*creation* settles on the callback rather than the echo (`settleOnCallback`),
+_creation_ settles on the callback rather than the echo (`settleOnCallback`),
 which is deliberate — see `3c84ee37` — because the echo may arrive as its own
 order line and never as a bracket on the parent.
 
@@ -1155,7 +1183,7 @@ animation frame collapses them. Skia commits per notification and draws them.
 **Removals are deferred, additions are not.** A host reconciling its feed removes
 a stale line in one store update and creates the replacement in the next — real
 time apart. Painting between them draws a frame with no line. Deferring the
-*notification* does not work: any unrelated line ticking triggers one, and with
+_notification_ does not work: any unrelated line ticking triggers one, and with
 live orders that is constant. The **deletion** is deferred instead
 (`LINE_REMOVAL_COALESCE_MS`), and creating a line flushes pending removals, so
 remove-then-create collapses into a single paint.
@@ -1165,7 +1193,7 @@ shared value and falls back to `line.price` from its closure. Writing a shared
 value re-evaluates the worklet on the UI thread at once, but a new closure
 reaches it only on Reanimated's next propagation. Releasing the drag the moment
 the snapshot went pending handed the line to a closure still holding the
-*original* price — one frame at the old position, ~23ms. The hand-off waits a
+_original_ price — one frame at the old position, ~23ms. The hand-off waits a
 frame.
 
 **Any worklet mixing a shared value with a captured one has this hazard, and it
@@ -1173,10 +1201,10 @@ has bitten three times.** The shape to look for is a value that a gesture drives
 through a shared value and React commits through a prop, where JS clears the
 shared value to hand back over:
 
-| shared (immediate) | closure (a frame later) |
-| --- | --- |
-| `orderDragState.activePrice` | `line.price` |
-| `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
+| shared (immediate)                | closure (a frame later)          |
+| --------------------------------- | -------------------------------- |
+| `orderDragState.activePrice`      | `line.price`                     |
+| `paneRangeOverrides[paneId]`      | `pane.yMin` / `pane.yMax`        |
 | `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
 
 These retire through `mobile/interaction/nativeReleaseHold.ts`, never inline and
@@ -1184,7 +1212,7 @@ never through a private `requestAnimationFrame` gate.
 
 **Indicator pane range is the exception, and the reason is worth reading before
 you route the next one through the hold controller.** A hold cannot fix it,
-because the flap is not the hold releasing early — it is the *write* that
+because the flap is not the hold releasing early — it is the _write_ that
 releasing performs. Clearing `paneRangeOverrides[paneId]` from JS marks every
 plot worklet that reads it dirty, and those worklets still hold the pre-drag
 `pane.yMin`/`yMax` in their closures until Reanimated restarts them, so the run
@@ -1231,17 +1259,17 @@ data load, where the static branches are on screen.)
 
 Two attempts to hide the seam failed first, and both are worth knowing about.
 
-A covering bitmap could never have worked *as a sibling `<Canvas>`* - its own
+A covering bitmap could never have worked _as a sibling `<Canvas>`_ - its own
 reconciler root, its own `CAMetalLayer`, its own drawable present - with its
 visibility an `opacity` toggle on a React Native view, a third pipeline again.
-Nothing ordered the three. At the *release* both orderings look identical, which
-is why two fixes aimed there changed nothing; at the *start* both orderings expose
+Nothing ordered the three. At the _release_ both orderings look identical, which
+is why two fixes aimed there changed nothing; at the _start_ both orderings expose
 the live chart underneath. It also cost a `makeImageSnapshot` per tap, which is a
 full offscreen GPU render run synchronously on the JS thread.
 
 The pane divider still uses one, because that drag cannot re-lay-out per frame -
 that is what made it crawl. It is not the reverted shape: the bands are a child of
-the *same* `<Canvas>` as the plot paths, so there is one reconciler root and one
+the _same_ `<Canvas>` as the plot paths, so there is one reconciler root and one
 present, and no view opacity in the picture. The snapshot is paid once per divider
 grab rather than per tap. Do not move it back out to a sibling canvas, and do not
 reach for a covering bitmap for anything that could instead ride the derived
@@ -1263,7 +1291,7 @@ the seam being one paint wide there and many here. Four attempts to name the
 moment the repaint lands each got closer and none was right: an extra animation
 frame, a single-commit clear, a JS echo of the committed geometry, then comparing
 the committed signature inside the draw pass. They all reduce to JS or a mapper
-trying to observe a repaint neither can see. Reanimated *could* order it, since
+trying to observe a repaint neither can see. Reanimated _could_ order it, since
 mappers are sorted topologically on declared shared-value outputs - but the plot
 paths declare only themselves, and `useDerivedValue` cannot declare another
 output.
@@ -1317,21 +1345,21 @@ it**. So during an ordinary maximize `staticProjection` is null and the live
 branches are the ones drawing. The static branches belong to data loads, where
 being all-plain makes them internally consistent on their own.
 
-The gap that leaves: a maximize tapped *while a data load is holding* puts the
+The gap that leaves: a maximize tapped _while a data load is holding_ puts the
 plot and candle layers on the commit channel and the grid on the derived one, so
 that combination can still shear for a frame. Rare, and not worth a bitmap.
 
 Shared-value props are free here. The Skia container restarts one mapper over
 every shared value in the tree and it fires once per frame, so a clip that only
 changes when `frame` changes adds no repaint that the sibling path was not
-already causing. Identity also stabilises, which *reduces* memo pressure.
+already causing. Identity also stabilises, which _reduces_ memo pressure.
 
 **Geometry must not decide what exists.** Mount and unmount happen on the React
 commit, full stop, so a layer that filters panes by `height > 0` or sizes a tick
 array from `pane.height` adds and removes nodes a frame before the canvas follows.
 Pooling ticks at the full plot height and hiding the spares was measured and
 rejected - it triples the node count and scales with pane count. What works is
-collapsing the whole layer into one node whose *contents* carry the geometry:
+collapsing the whole layer into one node whose _contents_ carry the geometry:
 the pane separators and both axis grid lines are a single derived `SkPath` each,
 and both axis label sets are a single `Glyphs` node each, laid out in a worklet
 from a char-to-glyph map resolved once on the JS thread. Three panes went from 136
@@ -1383,7 +1411,7 @@ first; until then `diffNativeIndicatorPlotTail` must keep refusing it.
 ## Gesture rebuilds on native
 
 The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a
-new identity for *any* of them rebuilds the composition and makes the
+new identity for _any_ of them rebuilds the composition and makes the
 `GestureDetector` re-attach. Nearly all of them take `controlZones`, which React
 derives from layout — so anything that reaches that array at UI speed rebuilds
 the entire gesture tree.

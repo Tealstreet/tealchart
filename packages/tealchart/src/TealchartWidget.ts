@@ -129,7 +129,16 @@ import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi'
 import { TealscriptManager } from './tealscript/TealscriptManager';
 import { createTealscriptTimeframeInfo } from './tealscript/timeframeInfo';
 import { chartThemeToRenderOptions, mergeChartThemeRenderOptions } from './theme';
+import { supportsStudyTemplates, type StudyTemplateSaveLoadAdapter } from './transformer/saveLoadIntegration';
 import { createLocalStorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
+import {
+  buildTvStudyTemplate,
+  readTvStudyTemplate,
+  type CreateStudyTemplateOptions,
+  type ReadStudyTemplateResult,
+  type TvStudyTemplate,
+} from './transformer/studyTemplate';
+import type { IndicatorTemplateCallbacks } from './ui/IndicatorTemplateSelector';
 import {
   Bar,
   ChartOverrides,
@@ -464,6 +473,12 @@ export class TealchartWidget implements ITealchartWebWidget {
       const indicator = getIndicatorById(indicatorId);
       if (!indicator || isJailbreakIndicator(indicator)) throw new Error('Unsupported built-in Tealscript indicator.');
       return this._handleAddIndicator(indicator);
+    });
+    this._chartApi.setStudyTemplateHandler({
+      create: (templateOptions) => this._createStudyTemplate(templateOptions),
+      apply: (template) => {
+        this._applyStudyTemplate(template);
+      },
     });
 
     // Subscribe to order/position line changes to trigger re-renders
@@ -1632,6 +1647,9 @@ export class TealchartWidget implements ITealchartWebWidget {
               this._handleRenameLayout(id, newName);
             },
           }
+        : undefined,
+      indicatorTemplateCallbacks: supportsStudyTemplates(this._options.save_load_adapter)
+        ? this._createIndicatorTemplateCallbacks(this._options.save_load_adapter)
         : undefined,
     });
 
@@ -4758,6 +4776,60 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._scheduler.markDirty(DIRTY.FULL);
       }, 500);
     }, 500);
+  }
+
+  // ============================================================================
+  // Study (indicator) templates
+  // ============================================================================
+
+  /** TradingView-format template of the chart's current indicators. */
+  private _createStudyTemplate(options: CreateStudyTemplateOptions): TvStudyTemplate {
+    return buildTvStudyTemplate(this._getCurrentSettings(), options);
+  }
+
+  /**
+   * Replace every indicator with the template's, as TradingView does. The price
+   * series and drawings stay. Indicators have no undo stack here, so this is one
+   * store write followed by one runtime rebuild — the same path a layout load
+   * takes for indicators.
+   */
+  private _applyStudyTemplate(template: unknown): ReadStudyTemplateResult {
+    const result = readTvStudyTemplate(template, this._customTealscriptIndicators);
+    if (!result) throw new Error('This is not an indicator template.');
+
+    // A template saved with its interval switches to it, like TradingView. The
+    // symbol is not applied: the host owns which market a chart shows.
+    if (result.interval && result.interval !== this._interval) {
+      this._chartApi.setResolution(result.interval as ResolutionString);
+    }
+    if (this._chartStore) {
+      this._chartStore.settings.setKey('indicators', result.indicators);
+      this._chartStore.settings.setKey(
+        'preservedTradingViewStudies',
+        result.preservedTradingViewStudies.length > 0 ? result.preservedTradingViewStudies : undefined,
+      );
+    }
+    this._replaceRuntimeIndicators(result.indicators);
+    this._markDirty();
+    return result;
+  }
+
+  /** The host save/load adapter's four study-template methods, behind the toolbar menu. */
+  private _createIndicatorTemplateCallbacks(adapter: StudyTemplateSaveLoadAdapter): IndicatorTemplateCallbacks {
+    return {
+      getAll: () => adapter.getAllStudyTemplates().then((templates) => templates.map((template) => template.name)),
+      save: (name) => adapter.saveStudyTemplate({ name, content: JSON.stringify(this._createStudyTemplate({})) }),
+      apply: (name) =>
+        adapter.getStudyTemplateContent({ name }).then((content) => {
+          if (this._disposed) return { missingStudies: [], unsupportedStudies: [] };
+          const result = this._applyStudyTemplate(content);
+          return {
+            missingStudies: result.missingTealscriptStudies.map((study) => study.name),
+            unsupportedStudies: result.unsupportedStudies,
+          };
+        }),
+      remove: (name) => adapter.removeStudyTemplate({ name }),
+    };
   }
 
   /**

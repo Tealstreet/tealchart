@@ -20,12 +20,7 @@ export type {
   Migration,
 } from './types';
 
-export {
-  TRANSFORMER_VERSION,
-  TV_CHART_STYLES,
-  CHART_TYPE_TO_TV_STYLE,
-  TV_STYLE_TO_CHART_TYPE,
-} from './types';
+export { TRANSFORMER_VERSION, TV_CHART_STYLES, CHART_TYPE_TO_TV_STYLE, TV_STYLE_TO_CHART_TYPE } from './types';
 
 // Indicator Mapping
 export {
@@ -54,8 +49,15 @@ export {
 } from './migrations';
 
 // SaveLoad Integration
-export type { ISaveLoadAdapter, LayoutMetadata } from './saveLoadIntegration';
+export type {
+  ISaveLoadAdapter,
+  LayoutMetadata,
+  StudyTemplateData,
+  StudyTemplateMetaInfo,
+  StudyTemplateSaveLoadAdapter,
+} from './saveLoadIntegration';
 export {
+  supportsStudyTemplates,
   saveTealchartLayout,
   updateTealchartLayout,
   loadAsTealchart,
@@ -64,6 +66,25 @@ export {
   deleteLayout,
   migrateFromLocalStorage,
 } from './saveLoadIntegration';
+
+// Study (indicator) templates in TradingView's format
+export type {
+  CreateStudyTemplateOptions,
+  ReadStudyTemplateResult,
+  StudyTemplateCustomStudy,
+  StudyTemplateIndicator,
+  StudyTemplateTealscriptStudy,
+  TealchartStudyTemplateMeta,
+  TvStudyTemplate,
+  TvStudyTemplatePane,
+} from './studyTemplate';
+export {
+  buildTvStudyTemplate,
+  parseStudyTemplateContent,
+  readTvStudyTemplate,
+  STUDY_TEMPLATE_META_KEY,
+  STUDY_TEMPLATE_META_VERSION,
+} from './studyTemplate';
 
 // Storage-backed SaveLoad adapter (default localStorage / AsyncStorage persistence)
 export type {

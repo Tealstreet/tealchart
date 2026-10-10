@@ -44,6 +44,7 @@ import type {
 import type { IndicatorPaneInfo } from './ChartCore';
 import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
+import type { IndicatorTemplateCallbacks } from './IndicatorTemplateSelector';
 import type { WebOverlayHostFactory } from './OverlayHost';
 
 import {
@@ -297,6 +298,8 @@ export interface TealchartWidgetUIOptions {
   onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Layout selector callbacks — if provided, layout selector is shown in the top bar */
   layoutCallbacks?: LayoutSelectorCallbacks;
+  /** Indicator template callbacks — if provided, the templates menu sits beside Indicators */
+  indicatorTemplateCallbacks?: IndicatorTemplateCallbacks;
 }
 
 // ============================================================================
@@ -443,6 +446,7 @@ export class TealchartWidgetUI {
         renderOptions: options.renderOptions,
         drawingOverlayParent: this.overlayRoot,
         layoutCallbacks: options.layoutCallbacks,
+        indicatorTemplateCallbacks: options.indicatorTemplateCallbacks,
       });
       this.topBar.mount(topBarWrapper);
       this.rootEl.appendChild(topBarWrapper);
@@ -527,6 +531,8 @@ export class TealchartWidgetUI {
     // Mount layout selector modal to rootEl (if layout callbacks are provided)
     this.topBar?.getLayoutSelector()?.setOverlayHost(options.overlayHost);
     this.topBar?.getLayoutSelector()?.mount(this.rootEl);
+    this.topBar?.getIndicatorTemplateSelector()?.setOverlayHost(options.overlayHost);
+    this.topBar?.getIndicatorTemplateSelector()?.mount(this.rootEl);
 
     // No loading overlay — empty canvas grid renders while bars load
   }

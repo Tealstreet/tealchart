@@ -10,6 +10,7 @@ import type {
   SimilarPatternsRequest,
   SimilarPatternsResult,
 } from './analysis/types';
+import type { CreateStudyTemplateOptions } from './transformer/studyTemplate';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { getLoadedAnalysisSnapshot } from './analysis/loadedBars';
@@ -129,6 +130,10 @@ export interface StudyCreateRequest {
 
 export type StudyCreateCallback = (request: StudyCreateRequest) => Promise<boolean>;
 export type StudyVisibilityCallback = (studyId: string, isVisible: boolean) => void;
+export interface StudyTemplateHandler {
+  create(options: CreateStudyTemplateOptions): object;
+  apply(template: object): void;
+}
 
 export interface TealchartApiLineRenderSnapshot {
   orderLines: OrderLineRenderData[];
@@ -552,6 +557,7 @@ export class TealchartApi {
   private _onStudyRemove?: (studyId: string) => void;
   private _onStudyVisibilityChange?: StudyVisibilityCallback;
   private _onStudyInputsChange?: (studyId: string, inputs: Record<string, unknown>) => void;
+  private _studyTemplateHandler?: StudyTemplateHandler;
 
   // Callback for when symbol/interval changes need to propagate to widget
   private _onSymbolChange?: (symbol: string) => void;
@@ -1960,7 +1966,8 @@ export class TealchartApi {
   /** Add a built-in through the owner's saved indicator path. */
   async addBuiltinIndicator(indicatorId: string): Promise<IStudyApi | null> {
     if (this._analysisDisposed) throw new Error('The chart is no longer available.');
-    if (!this._onBuiltinIndicatorAdd) throw new Error('This chart does not support saved built-in indicator additions.');
+    if (!this._onBuiltinIndicatorAdd)
+      throw new Error('This chart does not support saved built-in indicator additions.');
     return this._onBuiltinIndicatorAdd(indicatorId);
   }
 
@@ -2056,6 +2063,29 @@ export class TealchartApi {
       this._studies.delete(studyId);
       this._onStudyRemove?.(studyId);
     }
+  }
+
+  /**
+   * Save the chart's current indicators as a study template — TradingView's
+   * `createStudyTemplate`, returning TradingView study-template JSON.
+   */
+  createStudyTemplate(options: CreateStudyTemplateOptions): object {
+    if (!this._studyTemplateHandler) throw new Error('Study templates are not available on this chart.');
+    return this._studyTemplateHandler.create(options);
+  }
+
+  /**
+   * Apply a study template — TradingView's `applyStudyTemplate`. Replaces every
+   * indicator on the chart; the price series and drawings are untouched.
+   */
+  applyStudyTemplate(template: object): void {
+    if (!this._studyTemplateHandler) throw new Error('Study templates are not available on this chart.');
+    this._studyTemplateHandler.apply(template);
+  }
+
+  /** @internal The widget owns the indicator store templates read and replace. */
+  setStudyTemplateHandler(handler: StudyTemplateHandler | undefined): void {
+    this._studyTemplateHandler = handler;
   }
 
   /**

@@ -25,6 +25,45 @@ export interface ISaveLoadAdapter {
   getChartContent(chartId: string | number): Promise<string>;
   getAllCharts(): Promise<Array<{ id: string | number; name: string; symbol: string }>>;
   removeChart(id: string | number): Promise<void>;
+  // TradingView's study-template methods, unchanged. Optional: an adapter
+  // without all four simply has no indicator templates.
+  getAllStudyTemplates?(): Promise<StudyTemplateMetaInfo[]>;
+  saveStudyTemplate?(studyTemplateData: StudyTemplateData): Promise<void>;
+  removeStudyTemplate?(studyTemplateInfo: StudyTemplateMetaInfo): Promise<void>;
+  /** TradingView types this as a string; a jsonb-backed host may hand back the parsed object. */
+  getStudyTemplateContent?(studyTemplateInfo: StudyTemplateMetaInfo): Promise<string | Record<string, unknown>>;
+}
+
+/** Mirrors TradingView's `StudyTemplateMetaInfo`. */
+export interface StudyTemplateMetaInfo {
+  name: string;
+}
+
+/** Mirrors TradingView's `StudyTemplateData`: `content` is the JSON-encoded template. */
+export interface StudyTemplateData {
+  name: string;
+  content: string;
+}
+
+export type StudyTemplateSaveLoadAdapter = ISaveLoadAdapter &
+  Required<
+    Pick<
+      ISaveLoadAdapter,
+      'getAllStudyTemplates' | 'saveStudyTemplate' | 'removeStudyTemplate' | 'getStudyTemplateContent'
+    >
+  >;
+
+/** True when the adapter implements all four study-template methods. */
+export function supportsStudyTemplates(
+  adapter: ISaveLoadAdapter | null | undefined,
+): adapter is StudyTemplateSaveLoadAdapter {
+  return Boolean(
+    adapter &&
+    typeof adapter.getAllStudyTemplates === 'function' &&
+    typeof adapter.saveStudyTemplate === 'function' &&
+    typeof adapter.removeStudyTemplate === 'function' &&
+    typeof adapter.getStudyTemplateContent === 'function',
+  );
 }
 
 /**

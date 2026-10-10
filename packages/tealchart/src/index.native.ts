@@ -88,7 +88,16 @@ export {
   stringifyTealscriptWebViewBridgeMessage,
 } from './mobile/tealscriptWebViewBridgeCodec';
 export { createAsyncStorageKeyValueStorage, StorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
-export type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
+export type {
+  ISaveLoadAdapter,
+  LayoutMetadata,
+  StudyTemplateData,
+  StudyTemplateMetaInfo,
+} from './transformer/saveLoadIntegration';
+export { supportsStudyTemplates } from './transformer/saveLoadIntegration';
+// Indicator templates share the web's TradingView-format reader and writer.
+export { buildTvStudyTemplate, readTvStudyTemplate } from './transformer/studyTemplate';
+export type { CreateStudyTemplateOptions, ReadStudyTemplateResult, TvStudyTemplate } from './transformer/studyTemplate';
 export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 
 // Native passive chart exports.

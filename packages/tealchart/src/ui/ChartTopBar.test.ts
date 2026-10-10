@@ -126,6 +126,33 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.unmount();
   });
 
+  it('puts the indicator templates button right after Indicators only when templates are wired', () => {
+    const plainTopBar = new ChartTopBar({ chartKey: 'topbar-templates-off', symbol: 'BTCUSDT' });
+    plainTopBar.mount(document.body);
+    expect(document.querySelector('button[aria-label="Indicator templates"]')).toBeNull();
+    expect(plainTopBar.getIndicatorTemplateSelector()).toBeNull();
+    plainTopBar.unmount();
+    document.body.innerHTML = '';
+
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-templates-on',
+      symbol: 'BTCUSDT',
+      indicatorTemplateCallbacks: {
+        getAll: vi.fn().mockResolvedValue([]),
+        save: vi.fn(),
+        apply: vi.fn(),
+        remove: vi.fn(),
+      },
+    });
+    topBar.mount(document.body);
+    const templatesButton = document.querySelector<HTMLButtonElement>('button[aria-label="Indicator templates"]');
+    expect(templatesButton).not.toBeNull();
+    expect(templatesButton?.previousElementSibling?.textContent).toContain('Indicators');
+    expect(templatesButton?.style.flexShrink).toBe('0');
+
+    topBar.unmount();
+  });
+
   it('renders pinned TradingView intervals and selects from the grouped dropdown', () => {
     const onIntervalChange = vi.fn();
     const topBar = new ChartTopBar({

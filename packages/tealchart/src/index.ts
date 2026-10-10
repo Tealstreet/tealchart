@@ -752,7 +752,12 @@ export {
   getIndicatorById,
   searchIndicators,
 } from './indicators';
-export type { BuiltinIndicator, BuiltinIndicatorCategoryId, IndicatorCategory, IndicatorCategoryId } from './indicators';
+export type {
+  BuiltinIndicator,
+  BuiltinIndicatorCategoryId,
+  IndicatorCategory,
+  IndicatorCategoryId,
+} from './indicators';
 export type { CustomIndicatorEditorActions } from './ui/IndicatorsModal';
 
 // Pane management (for multi-pane indicator rendering)
@@ -805,6 +810,12 @@ export {
   getAllLayouts,
   deleteLayout,
   migrateFromLocalStorage,
+  supportsStudyTemplates,
+  // Study (indicator) templates
+  buildTvStudyTemplate,
+  readTvStudyTemplate,
+  parseStudyTemplateContent,
+  STUDY_TEMPLATE_META_KEY,
   // Storage-backed SaveLoad adapter
   StorageSaveLoadAdapter,
   DEFAULT_LAYOUT_STORAGE_NAMESPACE,
@@ -829,6 +840,11 @@ export type {
   IndicatorMapping,
   ISaveLoadAdapter,
   LayoutMetadata,
+  StudyTemplateData,
+  StudyTemplateMetaInfo,
+  CreateStudyTemplateOptions,
+  ReadStudyTemplateResult,
+  TvStudyTemplate,
   TealchartKeyValueStorage,
   AsyncStorageLike,
   StorageSaveLoadAdapterOptions,

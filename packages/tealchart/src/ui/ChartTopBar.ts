@@ -61,6 +61,7 @@ import { renderDrawingIcon } from './dom';
 import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
 import { showWebOverlayError, type WebOverlayHost, type WebOverlayHostFactory, type WebOverlayEnvironment } from './OverlayHost';
 import { LayoutSelector } from './LayoutSelector';
+import { IndicatorTemplateSelector, type IndicatorTemplateCallbacks } from './IndicatorTemplateSelector';
 
 /**
  * ChartTopBar - Vanilla DOM toolbar for the chart
@@ -98,6 +99,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onIndicatorsClick?: () => void;
   /** Layout selector callbacks (if provided, layout selector is shown) */
   layoutCallbacks?: LayoutSelectorCallbacks;
+  /** Indicator template callbacks (if provided, the templates menu sits beside Indicators) */
+  indicatorTemplateCallbacks?: IndicatorTemplateCallbacks;
   /** Current user drawing state for toolbar highlighting and action availability */
   userDrawingState?: UserDrawingState;
   /** Current drawing command history availability for undo/redo toolbar actions */
@@ -846,6 +849,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private timeframeButtons: Map<string, HTMLButtonElement> = new Map();
   private indicatorsBtn: HTMLButtonElement | null = null;
   private layoutSelector: LayoutSelector | null = null;
+  private indicatorTemplateSelector: IndicatorTemplateSelector | null = null;
   private drawingToolRailEl: HTMLElement | null = null;
   private drawingToolRailCleanup: Array<() => void> = [];
   private drawingToolRailAnimationFrame: number | null = null;
@@ -912,6 +916,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeSelectedActionSurface();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
+    this.indicatorTemplateSelector?.dispose();
+    this.indicatorTemplateSelector = null;
   }
 
   // ============================================================================
@@ -1072,6 +1078,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.indicatorsBtn.appendChild(labelSpan);
 
     this.el.appendChild(this.indicatorsBtn);
+
+    if (this.options.indicatorTemplateCallbacks) {
+      this.indicatorTemplateSelector ??= new IndicatorTemplateSelector(this.options.indicatorTemplateCallbacks);
+      this.el.appendChild(this.indicatorTemplateSelector.getElement());
+    }
 
     if (this.options.userDrawingState) {
       this.el.appendChild(this.createElement('div', { style: styles.divider }));
@@ -2551,6 +2562,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
    */
   getLayoutSelector(): LayoutSelector | null {
     return this.layoutSelector;
+  }
+
+  /** The indicator-template selector, for mounting its modal to the chart root. */
+  getIndicatorTemplateSelector(): IndicatorTemplateSelector | null {
+    return this.indicatorTemplateSelector;
   }
 
   /**

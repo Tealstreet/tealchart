@@ -9,10 +9,10 @@
  */
 
 import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
+import type { WebOverlayHostFactory } from './OverlayHost';
 
 import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
 import { Modal } from './Modal';
-import type { WebOverlayHostFactory } from './OverlayHost';
 
 // ============================================================================
 // Types
@@ -152,6 +152,9 @@ const selectorStyles = {
     textAlign: 'center',
   } as Partial<CSSStyleDeclaration>,
 };
+
+/** Shared with the indicator-template selector, which reuses this list chrome. */
+export { selectorStyles as layoutSelectorStyles };
 
 // ============================================================================
 // LayoutModal - extends Modal base class
@@ -420,7 +423,9 @@ export class LayoutSelector {
     this.modal.mount(container);
   }
 
-  setOverlayHost(factory?: WebOverlayHostFactory): void { this.modal.setOverlayHost(factory); }
+  setOverlayHost(factory?: WebOverlayHostFactory): void {
+    this.modal.setOverlayHost(factory);
+  }
 
   getElement(): HTMLButtonElement {
     return this.buttonEl;
