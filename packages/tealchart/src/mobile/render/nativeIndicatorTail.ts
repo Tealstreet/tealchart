@@ -153,7 +153,8 @@ export function hasNativeMarkerOnLastBar(plots: readonly PlotOutput[], lastIndex
         !NATIVE_FREE_MARKER_LOCATIONS.has(plot.location ?? 'abovebar'));
     // A marker rides its SOURCE bar's high or low wherever its offset draws it; a positive
     // offset never draws the last source bar at all.
-    if (!anchored || (plot.offset ?? 0) > 0) return false;
+    // show_last of zero or less hides every marker; any positive window includes the last bar.
+    if (!anchored || (plot.offset ?? 0) > 0 || (plot.showLast !== undefined && plot.showLast <= 0)) return false;
     const value = plot.values[lastIndex];
     return value !== null && value !== undefined && value !== 0 && !Number.isNaN(value);
   });
