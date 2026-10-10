@@ -701,13 +701,6 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
   );
   // Live plots only stand in for the commit they were painted over; a new commit wins.
   const plots = livePlots && livePlots.base === props.plots ? livePlots.plots : props.plots;
-  useAnimatedReaction(
-    () => props.liveTail?.value ?? null,
-    (next, previous) => {
-      if (next !== previous) runOnJS(setLiveTailBar)(next);
-    },
-    [props.liveTail],
-  );
   const openDataWindow = React.useCallback((id: string) => setDataWindowIndicatorId(id), []);
   const closeDataWindow = React.useCallback(() => setDataWindowIndicatorId(undefined), []);
   const barTimes = React.useMemo(() => props.bars.map((bar) => ({ time: bar.time })), [props.bars]);
@@ -724,6 +717,13 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
       if (next !== previous) runOnJS(setSourceIndex)(next);
     },
     [barTimes, props.crosshair, props.sharedViewport, props.frame],
+  );
+  useAnimatedReaction(
+    () => props.liveTail?.value ?? null,
+    (next, previous) => {
+      if (next !== previous) runOnJS(setLiveTailBar)(next);
+    },
+    [props.liveTail],
   );
   const [rowLayouts, setRowLayouts] = React.useState<Record<string, LayoutRectangle>>({});
   const [actionLayouts, setActionLayouts] = React.useState<Record<string, NativeLegendActionLayout>>({});
