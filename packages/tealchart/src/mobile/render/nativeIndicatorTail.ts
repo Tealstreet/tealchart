@@ -108,12 +108,9 @@ export function mergeNativeIndicatorTail(
   return { ...next, points: { ...current.points, ...next.points } };
 }
 
-export function applyNativeIndicatorTailToPoints<T extends { color: string | null; time: number; value: number | null }>(
-  points: readonly T[],
-  tail: NativeIndicatorTail | null,
-  key: string,
-  market: string,
-): readonly T[] {
+export function applyNativeIndicatorTailToPoints<
+  T extends { color: string | null; time: number; value: number | null },
+>(points: readonly T[], tail: NativeIndicatorTail | null, key: string, market: string): readonly T[] {
   'worklet';
   if (!tail || !market || tail.market !== market) return points;
   const point = tail.points[key];
@@ -137,5 +134,8 @@ function areNativeStructurallyEqual(previous: unknown, next: unknown): boolean {
 
 /** Drawings compared by content: the worker re-sends unchanged ones as new objects. */
 export function areNativeDrawingOutputsEqual(previous: readonly unknown[], next: readonly unknown[]): boolean {
-  return previous.length === next.length && previous.every((drawing, index) => areNativeStructurallyEqual(drawing, next[index]));
+  return (
+    previous.length === next.length &&
+    previous.every((drawing, index) => areNativeStructurallyEqual(drawing, next[index]))
+  );
 }

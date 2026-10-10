@@ -9,14 +9,23 @@ const bars = [
   { time: 60_000, open: 1, high: 2, low: 0, close: 1, volume: 1 },
   { time: 120_000, open: 1, high: 2, low: 0, close: 1, volume: 1 },
 ];
-const committed: PlotOutput = { id: 'ma', scriptId: 's', type: 'plot', title: 'MA', values: [1, 2], color: ['#0f0', '#f00'] };
+const committed: PlotOutput = {
+  id: 'ma',
+  scriptId: 's',
+  type: 'plot',
+  title: 'MA',
+  values: [1, 2],
+  color: ['#0f0', '#f00'],
+};
 const key = getNativeIndicatorPlotKey(committed);
 const commit = {
   bars,
   drawingLive: true,
   market: 'BTC\n1',
+  indicatorPaneInfo: {},
+  panes: [],
   plotsByKey: new Map([[key, committed]]),
-  readoutsShown: false,
+  priceAxisTagSources: [],
 };
 
 describe('resolveNativeIndicatorTail', () => {
@@ -30,16 +39,18 @@ describe('resolveNativeIndicatorTail', () => {
     });
   });
 
-  it('hands to React a colour no committed path draws, a stale bar, readouts, or a held chart', () => {
+  it('hands to React a colour no committed path draws, a stale bar, or a held chart', () => {
     const next = { ...committed, values: [1, 5] };
     const painted = (overrides: object, plot: PlotOutput = next, index = 1) =>
-      resolveNativeIndicatorTail({ commit: { ...commit, ...overrides }, diff: { index, keys: [key] }, styledPlots: [plot] })
-        .painted;
+      resolveNativeIndicatorTail({
+        commit: { ...commit, ...overrides },
+        diff: { index, keys: [key] },
+        styledPlots: [plot],
+      }).painted;
 
     expect(painted({})).toBe(true);
     expect(painted({}, { ...next, color: ['#0f0', '#00f'] })).toBe(false);
     expect(painted({}, next, 0)).toBe(false);
-    expect(painted({ readoutsShown: true })).toBe(false);
     expect(painted({ drawingLive: false })).toBe(false);
   });
 

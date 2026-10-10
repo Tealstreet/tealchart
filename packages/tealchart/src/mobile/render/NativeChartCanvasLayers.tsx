@@ -1,3 +1,4 @@
+import type { MutableRefObject } from 'react';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
@@ -9,6 +10,10 @@ import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeIndicatorTailSharedValue } from './nativeIndicatorTail';
+import type {
+  NativeIndicatorOutputLiveLabelRegistration,
+  NativeIndicatorOutputLiveLabelsSharedValue,
+} from './NativeIndicatorOutputAxisLabelLayer';
 import type { NativeLiveLastTradeSharedValue, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
@@ -53,6 +58,8 @@ export interface NativeChartCanvasLayersProps {
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
   liveIndicatorTail?: NativeIndicatorTailSharedValue;
+  liveIndicatorOutputLabelRegistry?: MutableRefObject<NativeIndicatorOutputLiveLabelRegistration | null>;
+  liveIndicatorOutputLabels?: NativeIndicatorOutputLiveLabelsSharedValue;
   liveLastTrade?: NativeLiveLastTradeSharedValue;
   /** Market of `visibleBars`; the live tail only replaces a bar from the same one. */
   liveMarket?: string;
@@ -107,6 +114,8 @@ export function NativeChartCanvasLayersImpl({
   paneRangeOverrides,
   indicatorTotalBarCount,
   liveIndicatorTail,
+  liveIndicatorOutputLabelRegistry,
+  liveIndicatorOutputLabels,
   liveLastTrade,
   liveMarket,
   liveTail,
@@ -239,6 +248,9 @@ export function NativeChartCanvasLayersImpl({
               bars={bars}
               frame={frame}
               indicatorPaneInfo={indicatorPaneInfo}
+              liveLabelRegistry={liveIndicatorOutputLabelRegistry}
+              liveLabels={liveIndicatorOutputLabels}
+              liveMarket={liveMarket}
               mainPaneRange={mainPaneRange}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}

@@ -8,8 +8,8 @@ import { useCallback, useRef } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
-import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { getNativeVisibleBarsBoundingBox } from '../interaction/nativeAutoScale';
+import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { getNativeViewportMaxVolume } from './nativeVisibleBars';
 
 /**

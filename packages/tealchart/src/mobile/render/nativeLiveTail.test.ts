@@ -6,8 +6,8 @@ import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import {
   applyNativeLiveTailBar,
   canPaintNativeLiveTail,
-  getNativeLiveTailFittedRange,
   createNativeLiveLastTrade,
+  getNativeLiveTailFittedRange,
   getNativeLiveTailMarket,
   getNativeLiveTailVisibleBar,
   getNativeLiveViewportMaxVolume,
@@ -49,8 +49,9 @@ describe('nativeLiveTail', () => {
     const tail = toNativeLiveTailBar({ ...visible[0], close: 50 }, market);
 
     expect(getNativeLiveTailVisibleBar(visible, 0, tail, market)).toBe(visible[0]);
-    expect(getNativeLiveTailVisibleBar(visible, 1, toNativeLiveTailBar({ ...visible[1], close: 99 }, market), market))
-      .toMatchObject({ close: 99 });
+    expect(
+      getNativeLiveTailVisibleBar(visible, 1, toNativeLiveTailBar({ ...visible[1], close: 99 }, market), market),
+    ).toMatchObject({ close: 99 });
   });
 
   it('scales volume to a live tail that outgrows the window', () => {
@@ -120,7 +121,10 @@ describe('canPaintNativeLiveTail', () => {
       { time: 120_000, open: 100, high: 110, low: 90, close: 104, volume: 1 },
     ];
 
-    expect(getNativeLiveTailFittedRange(bars, { startTime: 100_000, endTime: 130_000 })).toEqual({ high: 110, low: 90 });
+    expect(getNativeLiveTailFittedRange(bars, { startTime: 100_000, endTime: 130_000 })).toEqual({
+      high: 110,
+      low: 90,
+    });
     expect(getNativeLiveTailFittedRange(bars, { startTime: 0, endTime: 100_000 })).toBe('offscreen');
     expect(getNativeLiveTailFittedRange(bars, null)).toBeNull();
   });

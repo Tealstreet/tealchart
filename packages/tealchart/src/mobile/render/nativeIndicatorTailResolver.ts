@@ -1,19 +1,24 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar } from '../../types';
+import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
+import type { NativePaneFrame } from './nativeChartFrame';
+import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativeIndicatorPlotTailDiff, NativeIndicatorTail, NativeIndicatorTailPoint } from './nativeIndicatorTail';
 
-import { getNativeIndicatorPlotKey } from './nativeIndicatorTail';
 import { canDrawNativeIndicatorTailColor, getNativeIndicatorTailPoint } from './NativeIndicatorPlotLayer';
+import { getNativeIndicatorPlotKey } from './nativeIndicatorTail';
 
 /** What the chart last committed, against which an indicator result decides whether it can skip React. */
 export interface NativeIndicatorTailCommit {
   bars: readonly Bar[];
   /** Live branches are on screen and the bar tail is live for the same market. */
   drawingLive: boolean;
+  indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   market: string;
+  panes: readonly NativePaneFrame[];
   plotsByKey: ReadonlyMap<string, PlotOutput>;
-  /** Readouts the live channel cannot redraw yet; any visible one sends the result through React. */
-  readoutsShown: boolean;
+  /** The tag sources the shared stack last resolved, whose readout prices a tick may move. */
+  priceAxisTagSources: readonly NativePriceAxisTagSource[];
 }
 
 function isNativeTailSeries(plot: PlotOutput): boolean {
@@ -57,7 +62,7 @@ export function resolveNativeIndicatorTail({
       points[key] = point;
     }
     const tail = { market: commit.market, time: bar.time, points };
-    return { painted: drawable && commit.drawingLive && !commit.readoutsShown, tail };
+    return { painted: drawable && commit.drawingLive, tail };
   }
 
   // Every series, drawable by the outgoing paths or not: a key left out would keep an

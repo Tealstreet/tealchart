@@ -46,7 +46,9 @@ describe('diffNativeIndicatorPlotTail', () => {
     expect(diff(line({ values: [1, 2, 9], offset: 2 }))).toBeNull();
     expect(diff(line({ values: [1, 2, 9], trackprice: true }))).toBeNull();
     expect(diff(line({ values: [1, 2, 9] }), [line({ id: 'band', type: 'fill', values: [] })])).toBeNull();
-    expect(diffNativeIndicatorPlotTail([line({ type: 'bgcolor' })], [line({ type: 'bgcolor', values: [1, 2, 9] })])).toBeNull();
+    expect(
+      diffNativeIndicatorPlotTail([line({ type: 'bgcolor' })], [line({ type: 'bgcolor', values: [1, 2, 9] })]),
+    ).toBeNull();
     expect(diffNativeIndicatorPlotTail([line({ id: 'a' })], [line({ id: 'b', values: [1, 2, 9] })])).toBeNull();
   });
 
@@ -68,7 +70,11 @@ describe('the live indicator tail', () => {
   const tail = { market: 'BTC\n1', time: 2, points: { [key]: { value: 9, color: '#0f0' } } };
 
   it('replaces the last point of its own plot, market and bar', () => {
-    expect(applyNativeIndicatorTailToPoints(points, tail, key, 'BTC\n1')[1]).toEqual({ time: 2, value: 9, color: '#0f0' });
+    expect(applyNativeIndicatorTailToPoints(points, tail, key, 'BTC\n1')[1]).toEqual({
+      time: 2,
+      value: 9,
+      color: '#0f0',
+    });
     expect(applyNativeIndicatorTailToPoints(points, tail, key, 'ETH\n1')).toBe(points);
     expect(applyNativeIndicatorTailToPoints(points, tail, 'other\nplot', 'BTC\n1')).toBe(points);
     expect(applyNativeIndicatorTailToPoints(points, { ...tail, time: 3 }, key, 'BTC\n1')).toBe(points);

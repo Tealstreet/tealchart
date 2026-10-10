@@ -1369,6 +1369,17 @@ Rules that keep it correct:
   committed bar until the next dispatch. React state `bars` is no longer updated
   per tick; only the core's own array is.
 
+Indicator results take the same route. `MobileIndicatorManager` diffs each
+worker result against the committed plots (`nativeIndicatorTail.ts`): identical
+re-sends are dropped, and a result that moved only the last bar of plain `plot`
+series — no offset, trackprice or fill, pane ranges unchanged — is offered to
+the chart, which publishes the moved points (plot paths, legend), the re-resolved
+readouts (`NativeIndicatorOutputAxisLabelLayer`, matched by layout generation)
+and the readouts' tag-stack prices. Anything else renders, and a result that
+renders replaces the published tail so an older one cannot override the commit.
+Extending the tail to another plot type means making its worklets read the tail
+first; until then `diffNativeIndicatorPlotTail` must keep refusing it.
+
 ## Gesture rebuilds on native
 
 The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a
