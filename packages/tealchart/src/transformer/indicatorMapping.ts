@@ -419,6 +419,14 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
     isOverlay: true,
   },
 
+  fractalsNoWick: {
+    customId: 'fractalsNoWick',
+    tvStudyId: 'Tealstreet-FractalsNoWick@tv-basicstudies-1',
+    inputMappings: {},
+    defaultInputs: {},
+    isOverlay: true,
+  },
+
   pnlCard: {
     customId: 'pnlCard',
     tvStudyId: 'Tealstreet-PnlCard@tv-basicstudies-1',

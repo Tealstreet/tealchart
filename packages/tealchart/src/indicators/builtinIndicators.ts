@@ -225,6 +225,37 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
     },
   },
   {
+    id: 'fractalsNoWick',
+    name: '3/5 Candle Fractals + No-Wick Finder',
+    category: 'tealstreet',
+    description: '3- and 5-candle fractal highs/lows plus candles with no wick on their opening side',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [
+        { id: 'show3', name: 'Show 3-Candle Fractals', type: 'bool', defval: true },
+        { id: 'show5', name: 'Show 5-Candle Fractals', type: 'bool', defval: true },
+        { id: 'showNoWick', name: 'Show No-Wick Candles', type: 'bool', defval: true },
+        { id: 'toleranceTicks', name: 'No-Wick Tolerance (ticks)', type: 'int', defval: 0, min: 0, max: 1000 },
+      ],
+      defaults: {
+        show3: true,
+        show5: true,
+        showNoWick: true,
+        toleranceTicks: 0,
+      },
+      palette: {
+        fractal3High: { name: '3-Candle Fractal High', defaultColor: '#ef5350' },
+        fractal3Low: { name: '3-Candle Fractal Low', defaultColor: '#26a69a' },
+        fractal5High: { name: '5-Candle Fractal High', defaultColor: '#ff9800' },
+        fractal5Low: { name: '5-Candle Fractal Low', defaultColor: '#2962ff' },
+        noWickBull: { name: 'No Lower Wick (Bullish)', defaultColor: '#26a69a' },
+        noWickBear: { name: 'No Upper Wick (Bearish)', defaultColor: '#ef5350' },
+      },
+      behindCandles: false,
+    },
+  },
+  {
     id: 'pnlCard',
     name: 'PnL Card',
     category: 'tealstreet',
