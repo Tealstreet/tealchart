@@ -5,6 +5,18 @@ need access to the upstream Tealstreet monorepo.
 
 ## Quick Start
 
+Clone the public mirror with file contents fetched on demand:
+
+```bash
+git clone --filter=blob:none --branch master https://github.com/Tealstreet/tealchart.git
+cd tealchart
+```
+
+Keep the full commit graph for development; do not add `--depth`. Historical
+checkouts, diffs and file reads may fetch old blobs and need network access
+when they are not cached. Existing full clones retain their downloaded object
+packs; changing a fetch filter does not reclaim that space.
+
 Install the small workflow tools once:
 
 ```bash
@@ -21,6 +33,8 @@ just start feat/my-change
 Run checks before opening a PR:
 
 ```bash
+yarn install
+yarn workspace @tealstreet/tealscript oracle:fetch
 just check
 ```
 

@@ -21,6 +21,10 @@ packages/tealscript   Indicator / scripting engine used by tealchart
 
 ## Develop
 
+Use the [partial-clone instructions](CONTRIBUTING.md#quick-start) before the
+development commands below. Prepare native oracle fixtures as described in
+[`ORACLE.md`](packages/tealscript/ORACLE.md) before running tests.
+
 ```bash
 yarn install
 yarn typecheck
