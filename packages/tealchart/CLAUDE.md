@@ -1468,7 +1468,7 @@ back as a direct child of a plain `GestureDetector`.
   pushes the movable labels clear instead, past the band edge if that is what it
   takes, where the caller's off-screen filter drops them.
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
-- Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`.
+- Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`. Left-edge jailbreak indicator tooltips (absorption etc.) follow the same bound: `ChartCore` passes `getChartLabelMinX()` as `leftMinX` to `drawJailbreakTooltipGroups`; a fixed 20px put them behind the rail.
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
 - TP/SL empty-button drags create external bracket orders; only existing numeric TP/SL bracket lines should enter the OEMS optimistic bracket-mutation lifecycle. Otherwise the chart invents a bracket state that consumers cannot confirm and leaves stale TP/SL lines behind.
 - Cursor writes are centralized through `ChartCore.applyCursor`; active Konva line drags must keep `grabbing`, and Konva hit targets set `tealchartCursor` (`pointer` for order-label drag handles and buttons) so EventManager hover processing cannot overwrite the intended cursor.

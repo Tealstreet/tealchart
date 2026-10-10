@@ -70,4 +70,26 @@ describe('shared existing jailbreak tooltips', () => {
     expect(ctx.measureText).not.toHaveBeenCalled();
     expect(ctx.roundRect).not.toHaveBeenCalled();
   });
+
+  it('starts left tooltips clear of the drawing rail when the host gives a left bound', () => {
+    const { canvas, ctx, text } = context();
+    // The web rail ends at inset 8 + width 50; trade labels start at 58.
+    drawJailbreakTooltipGroups(canvas, [[{ text: 'Absorption bearish' }]], { ...options, leftMinX: 58 });
+    expect(ctx.roundRect.mock.calls[0][0]).toBe(66);
+    expect(text[0].x).toBe(71);
+  });
+
+  it('keeps the original 20px when there is no rail or the bound is left of it', () => {
+    for (const leftMinX of [undefined, 0, 5]) {
+      const { canvas, ctx } = context();
+      drawJailbreakTooltipGroups(canvas, [[{ text: 'A' }]], { ...options, leftMinX });
+      expect(ctx.roundRect.mock.calls[0][0]).toBe(20);
+    }
+  });
+
+  it('never moves hover tooltips for the rail bound', () => {
+    const { canvas, ctx } = context();
+    drawJailbreakTooltipGroups(canvas, [[{ text: 'DE', position: 'hover' as const }]], { ...options, leftMinX: 58 });
+    expect(ctx.roundRect.mock.calls[0][0]).toBe(165);
+  });
 });

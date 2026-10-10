@@ -2582,6 +2582,7 @@ export class ChartCore {
       cursorY,
       chartWidth: width,
       rightMargin: this.margins.right,
+      leftMinX: this.getChartLabelMinX(),
       font: this.renderer.getFont(),
       backgroundColor: this.options.renderOptions?.backgroundColor,
       textColor: this.options.renderOptions?.crosshairColor,

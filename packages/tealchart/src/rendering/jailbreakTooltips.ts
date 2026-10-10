@@ -6,10 +6,21 @@ export interface JailbreakTooltipRenderOptions {
   cursorY: number;
   chartWidth: number;
   rightMargin: number;
+  /**
+   * Leftmost x a left-edge tooltip may start at — the right edge of whatever
+   * chrome overlays the plot's left side. On Tealchart that is the drawing
+   * rail (`getChartLabelMinX`, the same bound trading-line labels use);
+   * omitted, tooltips keep the original fixed 20px, which is right for hosts
+   * whose canvas starts at the plot edge.
+   */
+  leftMinX?: number;
   font: string;
   backgroundColor?: string;
   textColor?: string;
 }
+
+const LEFT_TOOLTIP_X = 20;
+const LEFT_TOOLTIP_GAP = 8;
 
 /** Existing Tealchart jailbreak tooltip grouping, style and placement, shared with external hosts. */
 export function drawJailbreakTooltipGroups(
@@ -39,7 +50,7 @@ function drawTooltipGroups(
   defaultTextColor: string,
   alignment: 'left' | 'hover',
 ): void {
-  const { cursorX, cursorY, chartWidth, rightMargin, font } = options;
+  const { cursorX, cursorY, chartWidth, rightMargin, leftMinX, font } = options;
   const flat = groups.flat();
   if (flat.length === 0) return;
 
@@ -65,7 +76,9 @@ function drawTooltipGroups(
   // Position the tooltip
   let rectX: number;
   if (alignment === 'left') {
-    rectX = 20;
+    // Never under the left drawing rail: a fixed 20px put absorption and
+    // other left-edge tooltips behind it on Tealchart.
+    rectX = Math.max(LEFT_TOOLTIP_X, (leftMinX ?? 0) + LEFT_TOOLTIP_GAP);
   } else {
     // hover: position near cursor, flip side if too close to edge
     const fitsRight = cursorX + 15 + tooltipWidth < chartWidth - rightMargin;
