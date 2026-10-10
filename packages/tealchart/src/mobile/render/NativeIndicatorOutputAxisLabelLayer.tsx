@@ -141,6 +141,14 @@ export function resolveNativeIndicatorOutputLiveLabels({
   return live;
 }
 
+// Module-wide, so a remounted layer can never reuse a generation an older one published;
+// seeded from the clock so a Fast Refresh re-evaluation cannot restart it either.
+let nativeIndicatorOutputLabelGeneration = Date.now();
+function nextNativeIndicatorOutputLabelGeneration(): number {
+  nativeIndicatorOutputLabelGeneration += 1;
+  return nativeIndicatorOutputLabelGeneration;
+}
+
 export function NativeIndicatorOutputAxisLabelLayerImpl({
   backgroundColor,
   bars,
@@ -217,9 +225,8 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
     widthCache: axisTagWidthCache,
   });
   const groupWidths = labelGroups.map((group) => `${group.paneId}:${group.width}`).join('|');
-  const generationRef = useRef(0);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- a new layout is exactly a new labels set or group width
-  const generation = useMemo(() => (generationRef.current += 1), [labels, groupWidths]);
+  const generation = useMemo(() => nextNativeIndicatorOutputLabelGeneration(), [labels, groupWidths]);
   // Offered from render: this layer stays free of lifecycle hooks, and the chart clears
   // the registration itself whenever it is not mounting the layer.
   if (liveLabelRegistry) {

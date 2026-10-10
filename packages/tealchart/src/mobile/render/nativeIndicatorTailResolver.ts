@@ -2,9 +2,17 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Bar } from '../../types';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
 import type { NativePaneFrame } from './nativeChartFrame';
+import type {
+  NativeIndicatorOutputLiveLabelRegistration,
+  NativeIndicatorOutputLiveLabels,
+} from './NativeIndicatorOutputAxisLabelLayer';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativeIndicatorPlotTailDiff, NativeIndicatorTail, NativeIndicatorTailPoint } from './nativeIndicatorTail';
 
+import {
+  createNativeIndicatorOutputTagSources,
+  replaceNativeIndicatorOutputTagSources,
+} from '../utils/priceAxisTagSources';
 import { canDrawNativeIndicatorTailColor, getNativeIndicatorTailPoint } from './NativeIndicatorPlotLayer';
 import { getNativeIndicatorPlotKey } from './nativeIndicatorTail';
 
@@ -26,11 +34,8 @@ function isNativeTailSeries(plot: PlotOutput): boolean {
 }
 
 /**
- * The live points a worker result publishes, and whether they painted it completely.
- *
- * With a diff, only the moved plots are published and the result skips React when every
- * one can be drawn by its committed paths. Without one the result renders anyway, and the
- * newest points are published so no earlier tail for this bar outlives it.
+ * The points a result publishes: with a diff, the moved ones, painted when the committed
+ * paths can draw them; without one, every series' newest point, so no older tail outlives it.
  */
 export function resolveNativeIndicatorTail({
   commit,
@@ -72,4 +77,54 @@ export function resolveNativeIndicatorTail({
     points[key] = getNativeIndicatorTailPoint(plot, lastIndex);
   }
   return { painted: false, tail: { market: commit.market, time: bar.time, points } };
+}
+
+export interface NativeIndicatorPlotsTailUpdate {
+  /** Live readouts to publish, or null to clear what an earlier result published. */
+  labels: NativeIndicatorOutputLiveLabels | null;
+  painted: boolean;
+  tail: NativeIndicatorTail | null;
+  /** The shared tag stack with the readouts' prices moved; only set when painted. */
+  tagSources: NativePriceAxisTagSource[] | null;
+}
+
+/**
+ * Everything one worker result publishes. It is painted when its plots, its readouts and
+ * the readouts' places in the shared tag stack can all move without a layout.
+ */
+export function resolveNativeIndicatorPlotsTailUpdate({
+  commit,
+  diff,
+  registration,
+  styledPlots,
+}: {
+  commit: NativeIndicatorTailCommit | null;
+  diff: NativeIndicatorPlotTailDiff | null;
+  registration: NativeIndicatorOutputLiveLabelRegistration | null;
+  styledPlots: readonly PlotOutput[];
+}): NativeIndicatorPlotsTailUpdate {
+  const { painted: plotsPainted, tail } = resolveNativeIndicatorTail({ commit, diff, styledPlots });
+  const liveLabels = tail && registration ? registration.resolve(styledPlots) : null;
+  const labels =
+    tail && registration && liveLabels
+      ? { generation: registration.generation, labels: liveLabels, market: tail.market, time: tail.time }
+      : null;
+  if (!diff || !commit || !plotsPainted || (registration && !liveLabels)) {
+    return { labels, painted: false, tail, tagSources: null };
+  }
+
+  // Readout sources exist only while readouts are drawn; with none there is nothing to move.
+  if (!commit.priceAxisTagSources.some((source) => source.sourceType === 'indicatorOutput')) {
+    return { labels, painted: true, tail, tagSources: null };
+  }
+  const tagSources = replaceNativeIndicatorOutputTagSources(
+    commit.priceAxisTagSources,
+    createNativeIndicatorOutputTagSources({
+      indicatorPaneInfo: commit.indicatorPaneInfo,
+      panes: commit.panes,
+      plots: styledPlots,
+      totalBarCount: commit.bars.length,
+    }),
+  );
+  return { labels, painted: tagSources !== null, tail, tagSources };
 }

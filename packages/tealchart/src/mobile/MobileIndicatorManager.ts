@@ -127,17 +127,17 @@ export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError
 const MOBILE_INDICATOR_ERROR_EVENT = 'indicator:error';
 type RequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
 
+export type NativeIndicatorPlotsTailCallback = (
+  styledPlots: readonly PlotOutput[],
+  diff: NativeIndicatorPlotTailDiff | null,
+) => boolean;
+
 /**
  * MobileIndicatorManager - React-agnostic class for managing indicators
  *
  * Mobile TealScript execution is intentionally unavailable until the compiled
  * WebView host lands. Inline execution was removed.
  */
-export type NativeIndicatorPlotsTailCallback = (
-  styledPlots: readonly PlotOutput[],
-  diff: NativeIndicatorPlotTailDiff | null,
-) => boolean;
-
 export class MobileIndicatorManager {
   private _paneManager: PaneManager;
   private _indicators: ActiveIndicator[] = [];

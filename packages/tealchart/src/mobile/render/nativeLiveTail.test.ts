@@ -82,7 +82,6 @@ describe('nativeLiveTail', () => {
     const live = createNativeLiveLastTrade({
       axisFont,
       bar: latest,
-      interval: '1',
       market,
       pricePrecision: 0.1,
       upColor: '#0f0',
@@ -99,6 +98,7 @@ describe('canPaintNativeLiveTail', () => {
   const commit = {
     drawingLive: true,
     fittedRange: { high: 110, low: 90 } as const,
+    markerOnLastBar: false,
     lastTradeMatch: { market, time: 120_000, maxTextWidth: 30 },
     market,
     time: 120_000,
@@ -139,6 +139,7 @@ describe('canPaintNativeLiveTail', () => {
     expect(paint({ market: 'ETHUSDT\n1' })).toBe(false);
     expect(paint({ commit: { ...commit, drawingLive: false } })).toBe(false);
     expect(paint({ commit: null })).toBe(false);
+    expect(paint({ commit: { ...commit, markerOnLastBar: true } })).toBe(false);
     expect(paint({ commit: { ...commit, fittedRange: null } })).toBe(false);
     expect(paint({ bar: null })).toBe(false);
   });

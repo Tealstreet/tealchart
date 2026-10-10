@@ -61,10 +61,8 @@ function isNativePlotTailOnlyChange(previous: PlotOutput, next: PlotOutput): { m
 }
 
 /**
- * The plots a worker result moved, when all it moved was their last bar and every one is
- * a plain `plot` series the live channel can redraw: no offset, no trackprice, and no
- * fill in its script, since a fill reads its boundaries' values. `unchanged` when the
- * result re-sent identical content; null for anything that needs a render.
+ * The plain `plot` series a result moved, when it moved only their last bar (no offset,
+ * trackprice or fill reading them). `unchanged` for an identical re-send; null otherwise.
  */
 export function diffNativeIndicatorPlotTail(
   previous: readonly PlotOutput[],
@@ -138,4 +136,26 @@ export function areNativeDrawingOutputsEqual(previous: readonly unknown[], next:
     previous.length === next.length &&
     previous.every((drawing, index) => areNativeStructurallyEqual(drawing, next[index]))
   );
+}
+
+const NATIVE_FREE_MARKER_LOCATIONS = new Set(['top', 'bottom', 'absolute']);
+
+/**
+ * Whether a marker sits on the last bar's high or low: a plotshape or plotchar above or
+ * below the bar, or a plotarrow. Those follow the live wick, which only React redraws.
+ */
+export function hasNativeMarkerOnLastBar(plots: readonly PlotOutput[], lastIndex: number): boolean {
+  if (lastIndex < 0) return false;
+  return plots.some((plot) => {
+    const anchored =
+      plot.type === 'plotarrow' ||
+      ((plot.type === 'plotshape' || plot.type === 'plotchar') &&
+        !NATIVE_FREE_MARKER_LOCATIONS.has(plot.location ?? 'abovebar'));
+    // A marker rides its SOURCE bar's high or low wherever its offset draws it; a positive
+    // offset never draws the last source bar at all.
+    // show_last of zero or less hides every marker; any positive window includes the last bar.
+    if (!anchored || (plot.offset ?? 0) > 0 || (plot.showLast !== undefined && plot.showLast <= 0)) return false;
+    const value = plot.values[lastIndex];
+    return value !== null && value !== undefined && value !== 0 && !Number.isNaN(value);
+  });
 }

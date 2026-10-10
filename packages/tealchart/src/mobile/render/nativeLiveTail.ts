@@ -113,7 +113,6 @@ export function createNativeLiveLastTrade({
   axisFont,
   bar,
   downColor,
-  interval,
   market,
   pricePrecision,
   upColor,
@@ -121,13 +120,13 @@ export function createNativeLiveLastTrade({
   axisFont: ReturnType<typeof Skia.Font>;
   bar: Bar | null | undefined;
   downColor?: string;
-  interval: string;
   market: string;
   pricePrecision: number;
   upColor?: string;
 }): NativeLiveLastTrade | null {
   if (!market) return null;
-  const line = buildLastTradePriceLine({ latestBar: bar, interval, pricePrecision, upColor, downColor });
+  // The interval only feeds the countdown, which the live channel does not carry.
+  const line = buildLastTradePriceLine({ latestBar: bar, interval: '1', pricePrecision, upColor, downColor });
   if (!line || !bar) return null;
   const text = line.label?.primaryText ?? '';
   return {
@@ -151,6 +150,8 @@ export interface NativeLiveTailCommit {
   /** Live branches are on screen: no snapshot hold, no static projection. */
   drawingLive: boolean;
   fittedRange: NativeLiveTailFittedRange;
+  /** An indicator marker rides the committed bar's high or low, which only React moves. */
+  markerOnLastBar: boolean;
   lastTradeMatch: { market: string; time: number; maxTextWidth?: number } | undefined;
   market: string;
   time: number | undefined;
@@ -171,7 +172,9 @@ export function canPaintNativeLiveTail({
   lastTrade: NativeLiveLastTrade | null;
   market: string;
 }): boolean {
-  if (!bar || !commit || !commit.drawingLive || !market || market !== commit.market) return false;
+  if (!bar || !commit || !commit.drawingLive || commit.markerOnLastBar || !market || market !== commit.market) {
+    return false;
+  }
   const fittedRange = commit.fittedRange;
   if (commit.time === undefined || bar.time !== commit.time || !fittedRange) return false;
   if (fittedRange !== 'offscreen' && (!(bar.high <= fittedRange.high) || !(bar.low >= fittedRange.low))) return false;
@@ -182,7 +185,6 @@ export function canPaintNativeLiveTail({
 export interface NativeLiveTailFormat {
   axisFont: ReturnType<typeof Skia.Font>;
   downColor?: string;
-  interval: string;
   pricePrecision: number;
   upColor?: string;
 }
@@ -192,6 +194,8 @@ export interface NativeLiveTailChannel {
   /** Publishes the newest bar and returns the last trade it published with it. */
   onLatestBar: (bar: Bar | null, context: { symbol: string; interval: string }) => NativeLiveLastTrade | null;
   setFormat: (format: NativeLiveTailFormat) => void;
+  /** JS-side consumers (the legend) hear each published bar without a UI round trip. */
+  subscribe: (listener: (bar: NativeLiveTailBar | null) => void) => () => void;
   tail: NativeLiveTailSharedValue;
 }
 
@@ -204,14 +208,19 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   const lastTrade = useSharedValue<NativeLiveLastTrade | null>(null);
   const latestRef = useRef<{ bar: Bar | null; market: string } | null>(null);
   const formatRef = useRef<NativeLiveTailFormat | null>(null);
+  const listenersRef = useRef(new Set<(bar: NativeLiveTailBar | null) => void>());
+  const lastPublishedRef = useRef<NativeLiveTailBar | null>(null);
 
   const publish = useCallback((): NativeLiveLastTrade | null => {
     const latest = latestRef.current;
     const format = formatRef.current;
     const nextLastTrade =
       latest && format ? createNativeLiveLastTrade({ ...format, bar: latest.bar, market: latest.market }) : null;
-    tail.value = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
+    const nextTail = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
+    tail.value = nextTail;
     lastTrade.value = nextLastTrade;
+    lastPublishedRef.current = nextTail;
+    listenersRef.current.forEach((listener) => listener(nextTail));
     return nextLastTrade;
   }, [lastTrade, tail]);
 
@@ -231,7 +240,17 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
     [publish],
   );
 
-  return { lastTrade, onLatestBar, setFormat, tail };
+  const subscribe = useCallback((listener: (bar: NativeLiveTailBar | null) => void) => {
+    const listeners = listenersRef.current;
+    listeners.add(listener);
+    // A late subscriber starts from the bar on screen, not the one React last committed.
+    listener(lastPublishedRef.current);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
+  return { lastTrade, onLatestBar, setFormat, subscribe, tail };
 }
 
 /**
