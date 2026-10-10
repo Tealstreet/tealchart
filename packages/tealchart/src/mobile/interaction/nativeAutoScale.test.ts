@@ -54,6 +54,18 @@ describe('native price auto-scale', () => {
     });
   });
 
+  it('folds the live last bar into the fit so a gesture never clips its wick', () => {
+    const bars = createNativeAutoScaleBars(makeBars());
+    const last = bars[bars.length - 1];
+    const viewport: Viewport = { startTime: 0, endTime: last.time, priceMin: 0, priceMax: 1 };
+    const committed = applyNativePriceAutoScale(viewport, bars);
+    const live = applyNativePriceAutoScale(viewport, bars, undefined, { ...last, high: last.high + 50 });
+    const otherBar = applyNativePriceAutoScale(viewport, bars, undefined, { ...last, time: last.time + 1, high: 999 });
+
+    expect(live.priceMax).toBeGreaterThan(committed.priceMax);
+    expect(otherBar).toEqual(committed);
+  });
+
   it('returns the original viewport when no bars are visible', () => {
     const bars = createNativeAutoScaleBars(makeBars());
     const viewport: Viewport = {

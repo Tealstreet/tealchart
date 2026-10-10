@@ -368,7 +368,7 @@ describe('native trade and price line layers', () => {
     const animatedTexts = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
     const axisTag = collectElementsByType(layer, NativePriceAxisTagBox)[0];
 
-    expect(staticTexts.map((element) => element.props.text)).toEqual(['63,777.0']);
+    expect(staticTexts.map((element) => sharedValueOf<string>(element.props.text))).toEqual(['63,777.0']);
     expect(animatedTexts).toHaveLength(1);
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:10');
     expect(sharedValueOf<number>(animatedTexts[0].props.x)).toBe(
@@ -383,6 +383,68 @@ describe('native trade and price line layers', () => {
 
     nowMs.value = 5_000;
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');
+  });
+
+  it('draws the last trade from a live value of its own market and bar', () => {
+    const axisFont = matchFont({ fontSize: 11 });
+    const line = {
+      id: 'last-trade',
+      price: 63777,
+      lineStyle: 'dotted' as const,
+      color: '#12c48b',
+      label: { primaryText: '63,777.0' },
+      renderLineOnCanvas: true,
+      showAxisTag: true,
+      nativeLive: { market: 'BTCUSDT\n1', time: 1000 },
+    };
+    const liveLastTrade = shared<{
+      market: string;
+      time: number;
+      price: number;
+      color: string;
+      text: string;
+      textWidth: number;
+    } | null>({ market: 'BTCUSDT\n1', time: 1000, price: 63600, color: '#f04465', text: '63,600.0', textWidth: 30 });
+    const render = () =>
+      AnimatedPriceLine({
+        axisFont,
+        bracketDragState: {
+          activeObjectId: shared(null),
+          activeObjectType: shared(null),
+          activeActionType: shared(null),
+          activePrice: shared(0),
+          startPrice: shared(0),
+          startY: shared(0),
+        },
+        frame,
+        line,
+        liveLastTrade: liveLastTrade as never,
+        nowMs: shared(0),
+        pricePrecision: 0.1,
+        resolvedPriceAxisTags: shared([]),
+        sharedViewport,
+      });
+    const read = () => {
+      const layer = render();
+      const text = collectElementsByType(layer, NativePriceAxisTagStaticText)[0];
+      const box = collectElementsByType(layer, NativePriceAxisTagBox)[0];
+      const priceLine = collectElementsByType(layer, SkiaLine)[0];
+      return {
+        text: sharedValueOf<string>(text.props.text),
+        textColor: sharedValueOf<string>(text.props.color),
+        border: sharedValueOf<string>(box.props.borderColor),
+        lineColor: sharedValueOf<string>(priceLine.props.color),
+        y: sharedValueOf<{ y: number }>(priceLine.props.p1).y,
+      };
+    };
+
+    const live = read();
+    expect(live).toMatchObject({ text: '63,600.0', textColor: '#f04465', border: '#f04465', lineColor: '#f04465' });
+
+    liveLastTrade.value = { ...liveLastTrade.value!, market: 'ETHUSDT\n1' };
+    const committed = read();
+    expect(committed).toMatchObject({ text: '63,777.0', textColor: '#12c48b', border: '#12c48b', lineColor: '#12c48b' });
+    expect(committed.y).not.toBe(live.y);
   });
 
   it('renders native price-line tags with cached grow-only width', () => {
@@ -464,7 +526,7 @@ describe('native trade and price line layers', () => {
     )[0];
 
     expect(outline.props.backgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(outline.props.borderColor).toBe('#12c48b');
+    expect(sharedValueOf<string>(outline.props.borderColor)).toBe('#12c48b');
     expect(solid.props.backgroundColor).toBe('rgba(18, 196, 139, 0.88)');
   });
 
@@ -606,7 +668,7 @@ describe('native trade and price line layers', () => {
     const animatedTexts = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
 
     expect(staticTexts).toHaveLength(2);
-    expect(staticTexts.map((element) => element.props.text)).toEqual(['63,777.0', 'Oracle']);
+    expect(staticTexts.map((element) => sharedValueOf<string>(element.props.text))).toEqual(['63,777.0', 'Oracle']);
     expect(sharedValueOf<number>(staticTexts[1].props.y)).toBeGreaterThan(
       sharedValueOf<number>(staticTexts[0].props.y),
     );

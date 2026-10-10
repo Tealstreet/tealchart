@@ -5,6 +5,7 @@ import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveLastTradeSharedValue } from './nativeLiveTail';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
@@ -25,6 +26,7 @@ export function NativeChartTradeLinesLayerImpl({
   getOrderObjectId,
   getPositionObjectId,
   lineSnapshot,
+  liveLastTrade,
   onDragPriceLabelWidth,
   orderDragState,
   pricePrecision,
@@ -49,6 +51,7 @@ export function NativeChartTradeLinesLayerImpl({
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
   };
+  liveLastTrade?: NativeLiveLastTradeSharedValue;
   onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   orderDragState: NativeOrderDragSharedValues;
   pricePrecision: number;
@@ -75,6 +78,7 @@ export function NativeChartTradeLinesLayerImpl({
           bracketDragState={bracketDragState}
           frame={frame}
           line={line}
+          liveLastTrade={liveLastTrade}
           pricePrecision={pricePrecision}
           nowMs={nowMs}
           resolvedPriceAxisTags={resolvedPriceAxisTags}

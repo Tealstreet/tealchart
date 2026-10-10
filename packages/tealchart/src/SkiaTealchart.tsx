@@ -9,6 +9,7 @@ import type {
 } from '@tealstreet/tealscript';
 import type { ReactNode } from 'react';
 import type { LayoutRectangle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import type { AnalysisRequestIntent, AnalysisSelectionFrame } from './analysis/analysisSelection';
 import type {
   UserDrawingCommandEventListener,
@@ -17,6 +18,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from './drawings';
+import type { ChartWidgetBarsChangedContext } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativePaneDividerBand } from './mobile/interaction/nativePaneDivider';
@@ -31,6 +33,14 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeIndicatorPlotTailDiff, NativeIndicatorTail } from './mobile/render/nativeIndicatorTail';
+import type {
+  NativeIndicatorOutputLiveLabelRegistration,
+  NativeIndicatorOutputLiveLabels,
+} from './mobile/render/NativeIndicatorOutputAxisLabelLayer';
+import type { NativeIndicatorTailCommit } from './mobile/render/nativeIndicatorTailResolver';
+import type { NativePriceAxisTagSource } from './mobile/utils/priceAxisTagSources';
+import type { NativeLiveTailCommit } from './mobile/render/nativeLiveTail';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
@@ -40,6 +50,7 @@ import type { ChartThemeInput } from './theme';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
+  Bar,
   ContextMenuCallback,
   ContextMenuCloseOptions,
   ContextMenuRenderContext,
@@ -66,7 +77,6 @@ import React, {
 
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
 import { StyleSheet, View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
@@ -99,6 +109,7 @@ import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nati
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
 import { useNativeCrossHairEvents } from './mobile/interaction/useNativeCrossHairEvents';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
+import { NativeStableGestureDetector } from './mobile/interaction/NativeStableGestureDetector';
 import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
 import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
@@ -117,6 +128,18 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
+import { getNativeIndicatorPlotKey, mergeNativeIndicatorTail } from './mobile/render/nativeIndicatorTail';
+import { resolveNativeIndicatorTail } from './mobile/render/nativeIndicatorTailResolver';
+import {
+  createNativeIndicatorOutputTagSources,
+  replaceNativeIndicatorOutputTagSources,
+} from './mobile/utils/priceAxisTagSources';
+import {
+  canPaintNativeLiveTail,
+  getNativeLiveTailFittedRange,
+  getNativeLiveTailMarket,
+  useNativeLiveTailChannel,
+} from './mobile/render/nativeLiveTail';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
@@ -452,6 +475,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (leftToolRailCollapsed) setNativeOpenDrawingCategoryId(null);
   }, [leftToolRailCollapsed]);
 
+  const nativeLiveTail = useNativeLiveTailChannel();
+  const nativeLiveTailCommitRef = useRef<NativeLiveTailCommit | null>(null);
+  const publishNativeLatestBar = nativeLiveTail.onLatestBar;
+  const handleNativeLatestBar = useCallback(
+    (bar: Bar | null, context: ChartWidgetBarsChangedContext) =>
+      canPaintNativeLiveTail({
+        bar,
+        commit: nativeLiveTailCommitRef.current,
+        lastTrade: publishNativeLatestBar(bar, context),
+        market: getNativeLiveTailMarket(context),
+      }),
+    [publishNativeLatestBar],
+  );
   const {
     bars,
     barsContext,
@@ -468,6 +504,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol,
   } = useNativeTealchartCoreRuntime({
     datafeed,
+    onLatestBar: handleNativeLatestBar,
     onIntervalChange: handleNativeIntervalChangeForLayout,
     onLayoutDirty: markNativeLayoutDirtyIfReady,
     onSymbolChange: handleNativeSymbolChangeForLayout,
@@ -665,6 +702,79 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => indicatorManager?.getPlots() ?? EMPTY_NATIVE_INDICATOR_PLOTS,
     [indicatorManager, nativeIndicatorPlotsRevision],
   );
+  const nativeIndicatorPlotsByKey = useMemo(
+    () => new Map(nativeIndicatorPlots.map((plot) => [getNativeIndicatorPlotKey(plot), plot])),
+    [nativeIndicatorPlots],
+  );
+  const nativeIndicatorTail = useSharedValue<NativeIndicatorTail | null>(null);
+  const nativeIndicatorTailRef = useRef<NativeIndicatorTail | null>(null);
+  const nativeIndicatorTailCommitRef = useRef<NativeIndicatorTailCommit | null>(null);
+  const nativeIndicatorTailListenersRef = useRef(new Set<(plots: readonly PlotOutput[]) => void>());
+  const nativeIndicatorOutputLabels = useSharedValue<NativeIndicatorOutputLiveLabels | null>(null);
+  const nativeIndicatorOutputLabelRegistryRef = useRef<NativeIndicatorOutputLiveLabelRegistration | null>(null);
+  const nativeSharedPriceAxisTagSourcesRef = useRef<SharedValue<NativePriceAxisTagSource[]> | null>(null);
+  const handleNativeIndicatorPlotsTail = useCallback(
+    (styledPlots: readonly PlotOutput[], diff: NativeIndicatorPlotTailDiff | null) => {
+      const commit = nativeIndicatorTailCommitRef.current;
+      const resolved = resolveNativeIndicatorTail({ commit, diff, styledPlots });
+      const { tail } = resolved;
+      // Readouts move with their plots: the layer that lays them out re-resolves them, and
+      // the main-pane ones restack through the shared tag sources.
+      const registration = nativeIndicatorOutputLabelRegistryRef.current;
+      const liveLabels = tail && registration ? registration.resolve(styledPlots) : null;
+      // Readout sources only exist while readouts are drawn; with none committed there
+      // is nothing in the shared stack for this result to move.
+      const hasReadoutSources = commit?.priceAxisTagSources.some((source) => source.sourceType === 'indicatorOutput');
+      const tagSources =
+        commit && hasReadoutSources
+          ? replaceNativeIndicatorOutputTagSources(
+              commit.priceAxisTagSources,
+              createNativeIndicatorOutputTagSources({
+                indicatorPaneInfo: commit.indicatorPaneInfo,
+                panes: commit.panes,
+                plots: styledPlots,
+                totalBarCount: commit.bars.length,
+              }),
+            )
+          : null;
+      const painted =
+        resolved.painted && (!registration || liveLabels !== null) && (!hasReadoutSources || tagSources !== null);
+      const labels =
+        tail && registration && liveLabels
+          ? { generation: registration.generation, labels: liveLabels, market: tail.market, time: tail.time }
+          : null;
+
+      if (painted && tail) {
+        nativeIndicatorTailRef.current = mergeNativeIndicatorTail(nativeIndicatorTailRef.current, tail);
+        nativeIndicatorTail.value = nativeIndicatorTailRef.current;
+        nativeIndicatorOutputLabels.value = labels;
+        if (tagSources && nativeSharedPriceAxisTagSourcesRef.current) {
+          nativeSharedPriceAxisTagSourcesRef.current.value = tagSources;
+        }
+      } else if (!diff) {
+        // A result that renders anyway replaces what was published outright, so nothing
+        // from an earlier result of this bar can override what React is about to commit.
+        nativeIndicatorTailRef.current = tail;
+        nativeIndicatorTail.value = tail;
+        nativeIndicatorOutputLabels.value = labels;
+      }
+      if (painted) nativeIndicatorTailListenersRef.current.forEach((listener) => listener(styledPlots));
+      return painted;
+    },
+    [nativeIndicatorOutputLabels, nativeIndicatorTail],
+  );
+  const subscribeNativeIndicatorTail = useCallback((listener: (plots: readonly PlotOutput[]) => void) => {
+    const listeners = nativeIndicatorTailListenersRef.current;
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+  useLayoutEffect(() => {
+    if (!indicatorManager) return;
+    indicatorManager.setOnPlotsTail(handleNativeIndicatorPlotsTail);
+    return () => indicatorManager.setOnPlotsTail(null);
+  }, [handleNativeIndicatorPlotsTail, indicatorManager]);
   const nativeIndicatorDrawings = useMemo<readonly DrawingOutput[]>(
     () => indicatorManager?.getDrawings() ?? [],
     [indicatorManager, nativeIndicatorPlotsRevision],
@@ -782,7 +892,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineRows,
     viewportGestureOwner,
     viewportSyncEpoch,
-  } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled });
+  } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled, liveTail: nativeLiveTail.tail });
 
   // One bitmap per pane, captured when a divider drag starts. The drag stretches
   // these instead of re-laying-out the chart every frame; committing the real
@@ -1135,6 +1245,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     applyNativeViewport,
     dataLoadRenderBlocked,
     hasDataViewport,
+    hasPendingRestorePriceFit,
     projection,
     resetNativeViewport,
     viewport,
@@ -1142,6 +1253,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   } = useNativeViewportRuntime({
     autoScaleEnabled: nativeAutoScaleEnabled,
     bars,
+    barsMarket: getNativeLiveTailMarket(barsContext),
     barsMatchRequestedData: nativeBarsReadyForRequestedData,
     frame,
     interval,
@@ -1166,11 +1278,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       bars,
       hasDataViewport,
       interval: loadedBarsInterval,
+      liveMarket: getNativeLiveTailMarket(barsContext),
       priceLines: priceLines ?? EMPTY_NATIVE_PRICE_LINES,
       projection,
       viewport,
     }),
-    [bars, hasDataViewport, loadedBarsInterval, priceLines, projection, viewport],
+    [bars, barsContext, hasDataViewport, loadedBarsInterval, priceLines, projection, viewport],
   );
   const nativeRenderSnapshotRef = useRef(liveNativeRenderSnapshot);
   const nativeRenderTransitionPending = shouldDimNativeRenderForTransition({
@@ -1203,6 +1316,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeRenderBars = nativeRenderSnapshot.bars;
   const nativeRenderHasDataViewport = nativeRenderSnapshot.hasDataViewport;
   const nativeRenderInterval = nativeRenderSnapshot.interval;
+  const nativeRenderLiveMarket = nativeRenderSnapshot.liveMarket;
   const nativeRenderPriceLines = nativeRenderSnapshot.priceLines;
   const nativeRenderProjection = nativeRenderSnapshot.projection;
   // The main pane's frame carries the unified layout's placeholder range; the
@@ -1806,6 +1920,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
+    nativeLastTradeLine,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,
@@ -1828,6 +1943,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     layoutName: nativeCurrentLayout.layoutName,
     layoutSelectorEnabled: nativeLayoutSelectorEnabled,
     leftToolRailCollapsed,
+    liveMarket: nativeRenderLiveMarket,
+    liveTail: nativeLiveTail,
     lineSnapshot,
     marginsBottom: margins.bottom,
     options,
@@ -1849,6 +1966,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     volumeHeightRatio: VOLUME_HEIGHT_RATIO,
   });
   useLayoutEffect(() => {
+    nativeLiveTailCommitRef.current = {
+      drawingLive:
+        !staticNativeRenderProjection &&
+        !shouldHoldNativeRenderSnapshot &&
+        nativeRenderHasDataViewport &&
+        !hasPendingRestorePriceFit(),
+      fittedRange: getNativeLiveTailFittedRange(nativeRenderBars, nativeRenderProjection?.viewport),
+      lastTradeMatch: nativeLastTradeLine?.nativeLive,
+      market: nativeRenderLiveMarket,
+      time: nativeRenderBars[nativeRenderBars.length - 1]?.time,
+    };
+    nativeIndicatorTailCommitRef.current = {
+      bars: nativeRenderBars,
+      drawingLive: nativeLiveTailCommitRef.current.drawingLive,
+      market: nativeRenderLiveMarket,
+      indicatorPaneInfo: nativeIndicatorPaneInfo,
+      panes: frame?.panes ?? [],
+      plotsByKey: nativeIndicatorPlotsByKey,
+      priceAxisTagSources,
+    };
+    nativeSharedPriceAxisTagSourcesRef.current = sharedPriceAxisTagSources;
+    // The readout layer registers while it renders; when it is not mounted, nothing may stand in for it.
+    if (!nativeRenderHasDataViewport || options.showIndicatorOutputAxisLabels === false) {
+      nativeIndicatorOutputLabelRegistryRef.current = null;
+    }
+  });
+  useLayoutEffect(() => {
     const nextWidth = Math.ceil(measuredPriceAxisWidth);
     if (!Number.isFinite(nextWidth) || nextWidth <= nativePriceAxisWidth) return;
     setNativePriceAxisWidth(nextWidth);
@@ -1858,6 +2002,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bracketDragState: bracketDragInteractionState,
     frame,
     hasDataViewport: nativeRenderHasDataViewport,
+    liveLastTrade: nativeLiveTail.lastTrade,
     orderDragState,
     orderDragZones,
     priceAxisTagHeight: PRICE_AXIS_TAG_HEIGHT,
@@ -2316,7 +2461,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'}
           style={styles.liveChartLayer}
         >
-          <GestureDetector gesture={nativeChartGesture}>
+          <NativeStableGestureDetector gesture={nativeChartGesture}>
             <Canvas ref={canvasRef} style={styles.canvas}>
               <NativeChartCanvasLayers
                 axisFont={axisFont}
@@ -2338,6 +2483,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
+                liveIndicatorOutputLabelRegistry={nativeIndicatorOutputLabelRegistryRef}
+                liveIndicatorOutputLabels={nativeIndicatorOutputLabels}
+                liveIndicatorTail={nativeIndicatorTail}
+                liveLastTrade={nativeLiveTail.lastTrade}
+                liveMarket={nativeRenderLiveMarket}
+                liveTail={nativeLiveTail.tail}
                 mainPaneRange={nativeRenderMainPaneRange}
                 onDragPriceLabelWidth={growTradeLineDragPriceLabelWidth}
                 options={options}
@@ -2375,7 +2526,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 />
               ) : null}
             </Canvas>
-          </GestureDetector>
+          </NativeStableGestureDetector>
         </View>
       ) : null}
       <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
@@ -2408,6 +2559,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {frame && !hideLegend && (
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
+          liveMarket={nativeRenderLiveMarket}
+          liveTail={nativeLiveTail.tail}
+          subscribeLivePlots={subscribeNativeIndicatorTail}
           plots={nativeIndicatorPlots}
           crosshair={crosshair}
           sharedViewport={sharedViewport}

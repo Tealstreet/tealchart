@@ -47,6 +47,8 @@ import {
 export interface NativeViewportRuntimeInput {
   autoScaleEnabled: boolean;
   bars: readonly Bar[];
+  /** Market of `bars`, published beside them so a gesture fit only takes a matching live tail. */
+  barsMarket?: string;
   barsMatchRequestedData: boolean;
   frame: NativeChartFrame | null;
   interval: string;
@@ -83,6 +85,8 @@ export interface NativeViewportRuntime {
   commitPanViewport: (nextViewport: Viewport) => void;
   dataLoadRenderBlocked: boolean;
   hasDataViewport: boolean;
+  /** A restored layout's price fit is waiting on bars; only a bars change can settle it. */
+  hasPendingRestorePriceFit: () => boolean;
   projection: NativeChartProjection | null;
   resetNativeViewport: () => void;
   viewport: Viewport;
@@ -257,6 +261,7 @@ export function resolveNativeSharedViewportSyncTarget({
 export function useNativeViewportRuntime({
   autoScaleEnabled,
   bars,
+  barsMarket = '',
   barsMatchRequestedData,
   frame,
   interval,
@@ -341,7 +346,8 @@ export function useNativeViewportRuntime({
 
   useEffect(() => {
     priceAutoScale.bars.value = autoScaleBars;
-  }, [autoScaleBars, priceAutoScale]);
+    if (priceAutoScale.market) priceAutoScale.market.value = barsMarket;
+  }, [autoScaleBars, barsMarket, priceAutoScale]);
 
   useEffect(() => {
     priceAutoScale.active.value = autoScaleEnabled;
@@ -834,9 +840,9 @@ export function useNativeViewportRuntime({
   useEffect(() => {
     const pending = pendingRestorePriceFitRef.current;
     if (!pending || autoScaleBars.length === 0) return;
-    // `bars` is a fresh array on every emit, so this effect runs on every
-    // realtime tick. Re-applying then would re-commit ownership and reset the
-    // gesture flags each tick — which cancels an in-flight pan. Wait for the
+    // While this is pending every realtime tick dispatches (`hasPendingRestorePriceFit`),
+    // so this effect still runs per tick. Re-applying then would re-commit ownership and
+    // reset the gesture flags each tick — which cancels an in-flight pan. Wait for the
     // page to actually grow LEFT, which is the only thing that can give the
     // deferred fit something to measure.
     //
@@ -863,9 +869,11 @@ export function useNativeViewportRuntime({
       neverDeferPriceFit: gaveUpWaiting,
     });
   }, [applyNativeViewport, autoScaleBars]);
+  const hasPendingRestorePriceFit = useCallback(() => pendingRestorePriceFitRef.current !== null, []);
 
   return {
     applyNativeViewport,
+    hasPendingRestorePriceFit,
     beginNativeViewportInteraction,
     cancelNativeViewportInteraction,
     commitPanViewport,

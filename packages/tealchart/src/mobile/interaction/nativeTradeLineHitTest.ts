@@ -1,4 +1,5 @@
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativeLiveLastTrade } from '../render/nativeLiveTail';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativePriceAxisTagCollisionSource } from '../utils/priceAxisTagLayout';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
@@ -20,6 +21,7 @@ import {
   isNativeYInMainPane,
   sharedPriceToNativeY,
 } from '../render/nativeSharedViewport';
+import { isNativeLiveLastTradeCurrent } from '../render/nativeLiveTail';
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import { resolveNativePriceAxisTagStack } from '../utils/priceAxisTagLayout';
 import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
@@ -38,11 +40,14 @@ export function sharedPriceToNativeLineY(
 export function getNativePriceAxisSourcePrice(
   source: NativePriceAxisTagSource,
   orderDragState: NativeOrderDragSharedValues,
+  liveLastTrade?: NativeLiveLastTrade | null,
 ): number {
   'worklet';
   if (source.sourceType === 'order' && orderDragState.activeObjectId.value === source.objectId) {
     return orderDragState.activePrice.value;
   }
+  const live = liveLastTrade ?? null;
+  if (isNativeLiveLastTradeCurrent(live, source.live)) return live.price;
   return source.price;
 }
 
@@ -74,15 +79,21 @@ export function getNativePriceAxisSourceCenterY({
   source,
   sharedViewport,
   frame,
+  liveLastTrade,
   orderDragState,
 }: {
   source: NativePriceAxisTagSource;
   sharedViewport: NativeViewportSharedValues;
   frame: NativeChartFrame;
+  liveLastTrade?: NativeLiveLastTrade | null;
   orderDragState: NativeOrderDragSharedValues;
 }): number {
   'worklet';
-  return sharedPriceToNativeLineY(getNativePriceAxisSourcePrice(source, orderDragState), sharedViewport, frame);
+  return sharedPriceToNativeLineY(
+    getNativePriceAxisSourcePrice(source, orderDragState, liveLastTrade),
+    sharedViewport,
+    frame,
+  );
 }
 
 function clampNativePriceAxisSourceY(source: NativePriceAxisTagSource, y: number, frame: NativeChartFrame): number {
@@ -97,6 +108,7 @@ export function resolveNativePriceAxisTagCenters({
   frame,
   orderDragState,
   bracketDragState,
+  liveLastTrade,
   priceAxisTagHeight,
 }: {
   priceAxisTagSources: readonly NativePriceAxisTagSource[];
@@ -104,6 +116,7 @@ export function resolveNativePriceAxisTagCenters({
   frame: NativeChartFrame;
   orderDragState: NativeOrderDragSharedValues;
   bracketDragState: NativeBracketDragSharedValues;
+  liveLastTrade?: NativeLiveLastTrade | null;
   priceAxisTagHeight: number;
 }) {
   'worklet';
@@ -118,7 +131,7 @@ export function resolveNativePriceAxisTagCenters({
     if (isNativePriceAxisTagSourceSuppressedByBracketDrag(source, bracketDragState)) continue;
     if (isNativePriceAxisTagSourceSuppressedByOrderDrag(source, orderDragState)) continue;
     const priceY = sharedPriceToNativeLineY(
-      getNativePriceAxisSourcePrice(source, orderDragState),
+      getNativePriceAxisSourcePrice(source, orderDragState, liveLastTrade),
       sharedViewport,
       frame,
     );
@@ -131,6 +144,7 @@ export function resolveNativePriceAxisTagCenters({
           source,
           sharedViewport,
           frame,
+          liveLastTrade,
           orderDragState,
         }),
         frame,

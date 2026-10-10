@@ -1,3 +1,4 @@
+import type { MutableRefObject } from 'react';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
@@ -8,6 +9,12 @@ import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeIndicatorTailSharedValue } from './nativeIndicatorTail';
+import type {
+  NativeIndicatorOutputLiveLabelRegistration,
+  NativeIndicatorOutputLiveLabelsSharedValue,
+} from './NativeIndicatorOutputAxisLabelLayer';
+import type { NativeLiveLastTradeSharedValue, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
@@ -50,6 +57,13 @@ export interface NativeChartCanvasLayersProps {
   indicatorDrawings?: readonly DrawingOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
+  liveIndicatorTail?: NativeIndicatorTailSharedValue;
+  liveIndicatorOutputLabelRegistry?: MutableRefObject<NativeIndicatorOutputLiveLabelRegistration | null>;
+  liveIndicatorOutputLabels?: NativeIndicatorOutputLiveLabelsSharedValue;
+  liveLastTrade?: NativeLiveLastTradeSharedValue;
+  /** Market of `visibleBars`; the live tail only replaces a bar from the same one. */
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   /** The price scale, which the main pane's own frame does not carry. */
   mainPaneRange?: NativePaneRange | null;
@@ -99,6 +113,12 @@ export function NativeChartCanvasLayersImpl({
   indicatorDrawings = [],
   paneRangeOverrides,
   indicatorTotalBarCount,
+  liveIndicatorTail,
+  liveIndicatorOutputLabelRegistry,
+  liveIndicatorOutputLabels,
+  liveLastTrade,
+  liveMarket,
+  liveTail,
   lineSnapshot,
   mainPaneRange,
   onDragPriceLabelWidth,
@@ -164,6 +184,8 @@ export function NativeChartCanvasLayersImpl({
             totalBarCount={indicatorTotalBarCount}
             barColorPlots={indicatorPlots.filter((plot) => plot.type === 'barcolor')}
             frame={frame}
+            liveMarket={liveMarket}
+            liveTail={liveTail}
             options={options}
             sharedViewport={sharedViewport}
             staticProjection={staticProjection}
@@ -175,6 +197,8 @@ export function NativeChartCanvasLayersImpl({
             bars={bars}
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
+            liveMarket={liveMarket}
+            liveTail={liveIndicatorTail}
             paneRangeOverrides={paneRangeOverrides}
             plots={indicatorPlots}
             sharedViewport={sharedViewport}
@@ -224,6 +248,9 @@ export function NativeChartCanvasLayersImpl({
               bars={bars}
               frame={frame}
               indicatorPaneInfo={indicatorPaneInfo}
+              liveLabelRegistry={liveIndicatorOutputLabelRegistry}
+              liveLabels={liveIndicatorOutputLabels}
+              liveMarket={liveMarket}
               mainPaneRange={mainPaneRange}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}
@@ -253,6 +280,7 @@ export function NativeChartCanvasLayersImpl({
             getOrderObjectId={getOrderObjectId}
             getPositionObjectId={getPositionObjectId}
             lineSnapshot={lineSnapshot}
+            liveLastTrade={liveLastTrade}
             onDragPriceLabelWidth={onDragPriceLabelWidth}
             orderDragState={orderDragState}
             pricePrecision={pricePrecision}

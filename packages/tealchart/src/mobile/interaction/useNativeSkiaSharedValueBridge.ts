@@ -1,6 +1,7 @@
 import type { DerivedValue, SharedValue } from 'react-native-reanimated';
 import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativeLiveLastTradeSharedValue } from '../render/nativeLiveTail';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
@@ -28,6 +29,7 @@ export interface NativeSkiaSharedValueBridgeInput {
   bracketDragState: NativeBracketDragInteractionState;
   frame: NativeChartFrame | null;
   hasDataViewport: boolean;
+  liveLastTrade?: NativeLiveLastTradeSharedValue;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   priceAxisTagHeight: number;
@@ -48,6 +50,7 @@ export function useNativeSkiaSharedValueBridge({
   bracketDragState,
   frame,
   hasDataViewport,
+  liveLastTrade,
   orderDragState,
   orderDragZones,
   priceAxisTagHeight,
@@ -67,6 +70,7 @@ export function useNativeSkiaSharedValueBridge({
           frame,
           orderDragState,
           bracketDragState,
+          liveLastTrade: liveLastTrade?.value,
           priceAxisTagHeight,
         })
       : [],

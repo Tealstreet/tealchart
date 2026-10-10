@@ -3,6 +3,7 @@ import type { IndicatorOutputPane, IndicatorOutputPaneInfo } from '../../renderi
 import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../../types';
 import type {
   NativeBracketPriceLineRef,
+  NativeLivePriceLineMatch,
   NativeRenderablePriceLine,
 } from './nativeBracketPriceLines';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './tradeLineLayout';
@@ -26,12 +27,13 @@ export interface NativePriceAxisTagSource {
   priority?: number;
   fixed?: boolean;
   bracketRef?: NativeBracketPriceLineRef;
+  live?: NativeLivePriceLineMatch;
 }
 
 export interface NativePriceAxisTagSourcesInput {
   extraPriceLines: readonly PriceLine[];
   bracketPriceLines: readonly NativeRenderablePriceLine[];
-  lastTradeLine?: PriceLine | null;
+  lastTradeLine?: NativeRenderablePriceLine | null;
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
   priceLineTagHeight?: number;
@@ -86,6 +88,7 @@ function createNativePriceLineTagSource(
     priority: line.priority,
     ...(options?.fixed === true ? { fixed: true } : {}),
     ...(line.nativeBracketRef ? { bracketRef: line.nativeBracketRef } : {}),
+    ...(line.nativeLive ? { live: line.nativeLive } : {}),
   };
 }
 
@@ -172,4 +175,30 @@ export function createNativePriceAxisTagSources(input: NativePriceAxisTagSources
   });
 
   return [...priceLineSources, ...orderLineSources, ...positionLineSources];
+}
+
+/**
+ * The committed tag sources with the indicator readouts' prices moved to `next`, or null
+ * when `next` is not the same readouts in the same order; then React has to restack them.
+ */
+export function replaceNativeIndicatorOutputTagSources(
+  committed: readonly NativePriceAxisTagSource[],
+  next: readonly NativePriceAxisTagSource[],
+): NativePriceAxisTagSource[] | null {
+  const committedReadouts = committed.filter((source) => source.sourceType === 'indicatorOutput');
+  if (committedReadouts.length === 0) return next.length === 0 ? [...committed] : null;
+  if (committedReadouts.length !== next.length) return null;
+  let index = 0;
+  const replaced: NativePriceAxisTagSource[] = [];
+  for (const source of committed) {
+    if (source.sourceType !== 'indicatorOutput') {
+      replaced.push(source);
+      continue;
+    }
+    const readout = next[index];
+    index += 1;
+    if (!readout || readout.tagId !== source.tagId) return null;
+    replaced.push({ ...source, price: readout.price });
+  }
+  return replaced;
 }

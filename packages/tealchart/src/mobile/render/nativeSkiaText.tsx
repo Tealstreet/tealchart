@@ -19,7 +19,7 @@ export interface NativeAnimatedSkiaTextProps {
   y: number | SharedValue<number>;
   text: string | SharedValue<string>;
   font: ReturnType<typeof Skia.Font>;
-  color: string;
+  color: string | SharedValue<string>;
 }
 
 export interface NativeAnimatedMonospaceTextProps {
@@ -29,7 +29,7 @@ export interface NativeAnimatedMonospaceTextProps {
   maxCharacters: number;
   characterWidth: number;
   font: ReturnType<typeof Skia.Font>;
-  color: string;
+  color: string | SharedValue<string>;
   characterSet?: string;
 }
 

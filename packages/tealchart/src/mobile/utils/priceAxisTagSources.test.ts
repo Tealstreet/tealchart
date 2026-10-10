@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
-
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../../types';
+
+import { describe, expect, it } from 'vitest';
 
 import {
   createNativeIndicatorOutputTagSources,
@@ -13,6 +13,7 @@ import {
   getNativePriceLineTagId,
   getNativeTradeLineTagId,
   NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY,
+  replaceNativeIndicatorOutputTagSources,
 } from './priceAxisTagSources';
 
 function priceLine(overrides: Partial<PriceLine>): PriceLine {
@@ -38,7 +39,9 @@ describe('native price axis tag sources', () => {
   });
 
   it('uses taller tags for price lines with secondary labels', () => {
-    expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100' } }))).toBe(DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT);
+    expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100' } }))).toBe(
+      DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT,
+    );
     expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100', secondaryText: '09:59' } }))).toBe(
       DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
     );
@@ -60,7 +63,12 @@ describe('native price axis tag sources', () => {
           },
         },
       ],
-      lastTradeLine: priceLine({ id: 'last', price: 103, priority: 100, label: { primaryText: '103', secondaryText: '09:59' } }),
+      lastTradeLine: priceLine({
+        id: 'last',
+        price: 103,
+        priority: 100,
+        label: { primaryText: '103', secondaryText: '09:59' },
+      }),
       orderLines: [{ id: 'order-1', orderId: 'venue-order-1', price: 99 } as OrderLineRenderData],
       positionLines: [{ id: 'position-1', positionId: 'venue-position-1', price: 98 } as PositionLineRenderData],
       priceLineTagHeight: 22,
@@ -219,7 +227,11 @@ describe('native indicator output tag sources', () => {
       totalBarCount: 1,
     });
     expect(sources).toHaveLength(1);
-    expect(sources[0]).toMatchObject({ sourceType: 'indicatorOutput', price: 63_500, objectId: 'main:indicator-output:bb:basis' });
+    expect(sources[0]).toMatchObject({
+      sourceType: 'indicatorOutput',
+      price: 63_500,
+      objectId: 'main:indicator-output:bb:basis',
+    });
   });
 
   it('emits nothing without a main pane', () => {
@@ -231,5 +243,35 @@ describe('native indicator output tag sources', () => {
         totalBarCount: 1,
       }),
     ).toEqual([]);
+  });
+});
+
+describe('replaceNativeIndicatorOutputTagSources', () => {
+  const order = { sourceType: 'order' as const, tagId: 'order:1', objectId: '1', price: 10, height: 18 };
+  const readout = (id: string, price: number) => ({
+    sourceType: 'indicatorOutput' as const,
+    tagId: id,
+    objectId: id,
+    price,
+    height: 11,
+  });
+
+  it('moves the readouts and leaves every other tag alone', () => {
+    const committed = [order, readout('main:a', 5), readout('main:b', 6)];
+
+    expect(replaceNativeIndicatorOutputTagSources(committed, [readout('main:a', 7), readout('main:b', 6)])).toEqual([
+      order,
+      readout('main:a', 7),
+      readout('main:b', 6),
+    ]);
+  });
+
+  it('needs the same readouts in the same order', () => {
+    const committed = [order, readout('main:a', 5)];
+
+    expect(replaceNativeIndicatorOutputTagSources(committed, [readout('main:b', 7)])).toBeNull();
+    expect(replaceNativeIndicatorOutputTagSources(committed, [])).toBeNull();
+    expect(replaceNativeIndicatorOutputTagSources([order], [readout('main:a', 7)])).toBeNull();
+    expect(replaceNativeIndicatorOutputTagSources([order], [])).toEqual([order]);
   });
 });

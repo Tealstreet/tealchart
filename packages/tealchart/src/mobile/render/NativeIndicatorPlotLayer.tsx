@@ -4,6 +4,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeFillPaint } from './nativeFillPaints';
+import type { NativeIndicatorTailPoint, NativeIndicatorTailSharedValue } from './nativeIndicatorTail';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
@@ -20,6 +21,7 @@ import { appendPlotAreaBaseline } from '../../rendering/plotGeometry';
 import { plotArrowHeight, plotMarkerSize, plotMarkerTextLineOffset } from '../../rendering/plotMarkerGeometry';
 import { getNativeFillPaints } from './nativeFillPaints';
 import { getNativeFillTargetBars } from './nativeFillTargetBars';
+import { applyNativeIndicatorTailToPoints, getNativeIndicatorPlotKey } from './nativeIndicatorTail';
 import { getNativeOffsetPlotBars } from './nativeOffsetPlotBars';
 import { appendNativePlotMarker } from './nativePlotMarkerGeometry';
 import { sharedTimeToNativeX } from './nativeSharedViewport';
@@ -1116,6 +1118,21 @@ function getNativeIndicatorColoredPlotPoints({
   return points;
 }
 
+/** The point a `plot` series draws at `sourceIndex`, resolved exactly as its coloured points are. */
+export function getNativeIndicatorTailPoint(plot: PlotOutput, sourceIndex: number): NativeIndicatorTailPoint {
+  const value = plot.values[sourceIndex];
+  return {
+    color: getNativeIndicatorColorAt(plot.color, sourceIndex, getNativeIndicatorColor(plot.color)),
+    value: typeof value === 'number' && Number.isFinite(value) ? value : null,
+  };
+}
+
+/** A live point can only be drawn in a colour the committed plot already has a path for. */
+export function canDrawNativeIndicatorTailColor(plot: PlotOutput, color: string | null): boolean {
+  if (color === null) return false;
+  return getNativeIndicatorColorSet(plot.color, getNativeIndicatorColor(plot.color)).includes(color);
+}
+
 function getNativeIndicatorMarkerTextColor(plot: PlotOutput, sourceIndex: number): string {
   const fallback = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
   if (Array.isArray(plot.textColor)) return plot.textColor[sourceIndex] || fallback;
@@ -1165,10 +1182,13 @@ function NativeLiveIndicatorPlotPath({
   isHistogram,
   isPointMarker,
   join,
+  liveKey,
+  liveMarket = '',
+  liveTail,
   opacity,
   pane,
   paneRangeOverrides,
-  points,
+  points: committedPoints,
   sharedViewport,
   strokeWidth,
   style,
@@ -1183,6 +1203,9 @@ function NativeLiveIndicatorPlotPath({
   isHistogram: boolean;
   isPointMarker: boolean;
   join: boolean;
+  liveKey: string;
+  liveMarket?: string;
+  liveTail?: NativeIndicatorTailSharedValue;
   opacity: number;
   pane: NativePaneFrame;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
@@ -1194,6 +1217,7 @@ function NativeLiveIndicatorPlotPath({
 }) {
   const linePath = useDerivedValue(() => {
     const overrides = paneRangeOverrides?.value;
+    const points = applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket);
     return isHistogram
       ? getNativeIndicatorHistogramPath({
           frame,
@@ -1223,7 +1247,7 @@ function NativeLiveIndicatorPlotPath({
       histbase,
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points,
+      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
       sharedViewport,
       style,
     }),
@@ -1235,7 +1259,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points,
+      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
       sharedViewport,
       style,
     }),
@@ -1247,7 +1271,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points,
+      points: applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket),
       sharedViewport,
     }),
   );
@@ -2353,6 +2377,8 @@ function NativeIndicatorPlotArrowColorPath({
 function NativeIndicatorPlotPath({
   frame,
   indicatorPaneInfo,
+  liveMarket,
+  liveTail,
   paneRangeOverrides,
   plot,
   projection,
@@ -2362,6 +2388,8 @@ function NativeIndicatorPlotPath({
 }: {
   frame: NativeChartFrame;
   indicatorPaneInfo?: NativeIndicatorPaneInfo;
+  liveMarket?: string;
+  liveTail?: NativeIndicatorTailSharedValue;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plot: PlotOutput;
   projection?: NativeChartProjection | null;
@@ -2437,6 +2465,9 @@ function NativeIndicatorPlotPath({
           isHistogram={isHistogram}
           isPointMarker={isPointMarker}
           join={plot.join === true}
+          liveKey={getNativeIndicatorPlotKey(plot)}
+          liveMarket={liveMarket}
+          liveTail={liveTail}
           opacity={1}
           pane={pane}
           paneRangeOverrides={paneRangeOverrides}
@@ -2525,6 +2556,8 @@ export function NativeIndicatorPlotLayerImpl({
   bars,
   frame,
   indicatorPaneInfo,
+  liveMarket,
+  liveTail,
   paneRangeOverrides,
   plots,
   sharedViewport,
@@ -2535,6 +2568,9 @@ export function NativeIndicatorPlotLayerImpl({
   bars?: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  /** Market of `visibleBars`; a live indicator tail only applies to the same one. */
+  liveMarket?: string;
+  liveTail?: NativeIndicatorTailSharedValue;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
   sharedViewport: NativeViewportSharedValues;
@@ -2691,6 +2727,8 @@ export function NativeIndicatorPlotLayerImpl({
             <NativeIndicatorPlotPath
               frame={frame}
               indicatorPaneInfo={info}
+              liveMarket={liveMarket}
+              liveTail={liveTail}
               paneRangeOverrides={paneRangeOverrides}
               plot={plot}
               projection={staticProjection}

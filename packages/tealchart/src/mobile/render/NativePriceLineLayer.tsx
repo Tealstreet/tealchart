@@ -4,6 +4,7 @@ import type { NativeBracketDragSharedValues } from '../interaction/nativeOemsDra
 import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines';
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveLastTradeSharedValue } from './nativeLiveTail';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
@@ -12,6 +13,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
+import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
@@ -35,6 +37,7 @@ import {
   NativePriceAxisTagBox,
   NativePriceAxisTagStaticText,
 } from './NativePriceAxisTag';
+import { isNativeLiveLastTradeCurrent } from './nativeLiveTail';
 import { getNativePriceAxisTagFloor, isNativeMainPaneVisible, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
@@ -62,6 +65,7 @@ export function AnimatedPriceLine({
   bracketDragState,
   frame,
   line,
+  liveLastTrade,
   nowMs,
   pricePrecision,
   resolvedPriceAxisTags,
@@ -72,6 +76,8 @@ export function AnimatedPriceLine({
   bracketDragState: NativeBracketDragSharedValues;
   frame: NativeChartFrame;
   line: NativeRenderablePriceLine;
+  /** Read only by the line whose `nativeLive` it matches: the last trade. */
+  liveLastTrade?: NativeLiveLastTradeSharedValue;
   nowMs: SharedValue<number>;
   pricePrecision: number;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
@@ -127,7 +133,24 @@ export function AnimatedPriceLine({
   const bracketSuppressed = useDerivedValue(() =>
     isNativeBracketPriceLineRefActive(line.nativeBracketRef, bracketDragState),
   );
-  const y = useDerivedValue(() => sharedPriceToNativeY(line.price, sharedViewport, frame));
+  const liveMatch = line.nativeLive;
+  const availableTextWidth = Math.max(0, axisTag.width - NATIVE_PRICE_AXIS_TAG_PADDING_X * 2);
+  const live = useDerivedValue(() => {
+    const value = liveLastTrade?.value ?? null;
+    return isNativeLiveLastTradeCurrent(value, liveMatch) ? value : null;
+  });
+  const linePrice = useDerivedValue(() => live.value?.price ?? line.price);
+  const lineColor = useDerivedValue(() => live.value?.color ?? line.color);
+  const primaryTextValue = useDerivedValue(() => live.value?.text ?? primaryText.text);
+  const primaryTextX = useDerivedValue(() => {
+    const value = live.value;
+    if (!value) return primaryText.x;
+    return axisTag.x + Math.max(0, (axisTag.width - Math.min(availableTextWidth, value.textWidth)) / 2);
+  });
+  // An outline tag draws its text in the line colour, so that text follows the live colour too.
+  const tagTextFollowsLineColor = !tagFilled && !line.label?.textColor;
+  const liveTagColor = useDerivedValue(() => (tagTextFollowsLineColor ? lineColor.value : tagColor));
+  const y = useDerivedValue(() => sharedPriceToNativeY(linePrice.value, sharedViewport, frame));
   const labelCenterY = useDerivedValue(() =>
     resolveNativePriceLineAxisTagCenterY(resolvedPriceAxisTags.value, line.id, y.value),
   );
@@ -222,7 +245,7 @@ export function AnimatedPriceLine({
   return (
     <>
       <Group opacity={lineOpacity}>
-        <SkiaLine p1={lineStart} p2={lineEnd} color={line.color} strokeWidth={line.lineWidth ?? 1}>
+        <SkiaLine p1={lineStart} p2={lineEnd} color={lineColor} strokeWidth={line.lineWidth ?? 1}>
           {dash && <DashPathEffect intervals={dash} />}
         </SkiaLine>
       </Group>
@@ -234,14 +257,14 @@ export function AnimatedPriceLine({
             width={axisTag.width}
             height={tagHeight}
             backgroundColor={tagBackgroundColor}
-            borderColor={line.color}
+            borderColor={lineColor}
           />
           <NativePriceAxisTagStaticText
-            x={primaryText.x}
+            x={primaryTextX}
             y={primaryTextY}
-            text={primaryText.text}
+            text={primaryTextValue}
             font={axisFont}
-            color={tagColor}
+            color={liveTagColor}
           />
           {secondaryText && (
             <NativePriceAxisTagStaticText
@@ -249,7 +272,7 @@ export function AnimatedPriceLine({
               y={secondaryTextY}
               text={secondaryText.text}
               font={axisFont}
-              color={tagColor}
+              color={liveTagColor}
             />
           )}
           {hasCountdown && (
@@ -260,7 +283,7 @@ export function AnimatedPriceLine({
               maxCharacters={8}
               characterWidth={countdownCharacterWidth}
               font={axisFont}
-              color={tagColor}
+              color={liveTagColor}
               characterSet="0123456789:"
             />
           )}

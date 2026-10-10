@@ -48,6 +48,11 @@ import { PaneManager } from '../rendering/PaneManager';
 import { getPlotOhlcGeometry } from '../rendering/plotOhlcGeometry';
 import { TealscriptManager } from '../tealscript/TealscriptManager';
 import { applyNativeIndicatorStyle, filterNativeIndicatorStyles } from './nativeIndicatorStyles';
+import {
+  areNativeDrawingOutputsEqual,
+  diffNativeIndicatorPlotTail,
+  type NativeIndicatorPlotTailDiff,
+} from './render/nativeIndicatorTail';
 
 const DISPLAY_PANE = 1;
 
@@ -128,6 +133,11 @@ type RequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
  * Mobile TealScript execution is intentionally unavailable until the compiled
  * WebView host lands. Inline execution was removed.
  */
+export type NativeIndicatorPlotsTailCallback = (
+  styledPlots: readonly PlotOutput[],
+  diff: NativeIndicatorPlotTailDiff | null,
+) => boolean;
+
 export class MobileIndicatorManager {
   private _paneManager: PaneManager;
   private _indicators: ActiveIndicator[] = [];
@@ -140,6 +150,7 @@ export class MobileIndicatorManager {
   private _declarationCache: Map<string, IndicatorDeclarationMetadata> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
+  private _onPlotsTail: NativeIndicatorPlotsTailCallback | null = null;
   private _events = new EventEmitter();
   private _logger = new TealchartLogger({
     consoleOutput: false,
@@ -215,6 +226,15 @@ export class MobileIndicatorManager {
     this._onUpdate = callback;
   }
 
+  /**
+   * Offered every worker result's styled plots before the chart hears of them. `diff` is set
+   * when the result moved only the last bar of some `plot` series; returning true then says
+   * it was painted live and the chart is not re-rendered. Without a diff it is informational.
+   */
+  setOnPlotsTail(callback: NativeIndicatorPlotsTailCallback | null): void {
+    this._onPlotsTail = callback;
+  }
+
   onErrorSubscribe(callback: MobileIndicatorErrorCallback): void {
     this._events.subscribe(MOBILE_INDICATOR_ERROR_EVENT, callback as EventCallback);
   }
@@ -244,7 +264,12 @@ export class MobileIndicatorManager {
    * made indicators flicker on device.
    */
   updateBar(bar: Bar, silent = false): void {
-    this._tealscriptManager?.updateBar(bar);
+    if (this._tealscriptManager) {
+      // Nothing has changed until the worker answers, and its result notifies then. A
+      // notification here re-rendered the whole native chart on every tick for nothing.
+      this._tealscriptManager.updateBar(bar);
+      return;
+    }
     this._recomputePlots(silent);
   }
 
@@ -490,17 +515,21 @@ export class MobileIndicatorManager {
    */
   getPlots(): PlotOutput[] {
     if (this._styledPlotsRevision === this._plotsRevision) return this._styledPlots;
+    this._styledPlots = this._stylePlots(this._plots);
+    this._styledPlotsRevision = this._plotsRevision;
+    return this._styledPlots;
+  }
+
+  private _stylePlots(plots: PlotOutput[]): PlotOutput[] {
     let changed = false;
-    const styled = this._plots.map((plot) => {
+    const styled = plots.map((plot) => {
       const indicator = this._indicators.find((ind) => ind.instanceId === plot.scriptId);
       const override = indicator?.styleOverrides?.find((value) => value.plotId === plot.id);
       const result = applyNativeIndicatorStyle(plot, override);
       if (result !== plot) changed = true;
       return result;
     });
-    this._styledPlots = changed ? styled : this._plots;
-    this._styledPlotsRevision = this._plotsRevision;
-    return this._styledPlots;
+    return changed ? styled : plots;
   }
 
   /**
@@ -656,14 +685,33 @@ export class MobileIndicatorManager {
 
   private _handlePlotsUpdated = (plots: PlotOutput[]): void => {
     if (this._plotsMatchCurrent(plots)) return;
+    // Every result re-sends every script's plots as fresh objects, moved or not.
+    const diff = diffNativeIndicatorPlotTail(this._plots, plots);
+    if (diff === 'unchanged') return;
+    if (diff && this._paintPlotsTail(plots, diff)) return;
     this._plots = plots;
     this._plotsRevision += 1;
     this._updateAutoPaneRanges(plots);
+    this._onPlotsTail?.(this.getPlots(), null);
     this._onUpdate?.();
   };
 
+  /** A tail the chart painted live: current for the next render, but no render now. */
+  private _paintPlotsTail(plots: PlotOutput[], diff: NativeIndicatorPlotTailDiff): boolean {
+    if (!this._onPlotsTail || !this._autoPaneRangesUnchanged(plots)) return false;
+    const styled = this._stylePlots(plots);
+    if (!this._onPlotsTail(styled, diff)) return false;
+    this._plots = plots;
+    this._plotsRevision += 1;
+    this._styledPlots = styled;
+    this._styledPlotsRevision = this._plotsRevision;
+    return true;
+  }
+
   private _handleDrawingsUpdated = (drawings: DrawingOutput[]): void => {
-    if (this._drawingsMatchCurrent(drawings)) return;
+    // Every worker result re-sends its drawings as fresh objects, so identity alone would
+    // re-render the chart on each one even when no drawing moved.
+    if (this._drawingsMatchCurrent(drawings) || areNativeDrawingOutputsEqual(this._drawings, drawings)) return;
     this._drawings = drawings;
     this._plotsRevision += 1;
     this._onUpdate?.();
@@ -854,8 +902,23 @@ export class MobileIndicatorManager {
   }
 
   private _updateAutoPaneRanges(plots: readonly PlotOutput[]): void {
+    for (const range of this._computeAutoPaneRanges(plots)) {
+      this._paneManager.updatePaneRange(range.id, range.yMin, range.yMax);
+    }
+  }
+
+  private _autoPaneRangesUnchanged(plots: readonly PlotOutput[]): boolean {
+    const panes = new Map(this._paneManager.getIndicatorPanes().map((pane) => [pane.id, pane]));
+    return this._computeAutoPaneRanges(plots).every((range) => {
+      const pane = panes.get(range.id);
+      return pane !== undefined && pane.yMin === range.yMin && pane.yMax === range.yMax;
+    });
+  }
+
+  private _computeAutoPaneRanges(plots: readonly PlotOutput[]): { id: string; yMin: number; yMax: number }[] {
+    const ranges: { id: string; yMin: number; yMax: number }[] = [];
     const panes = this._paneManager.getIndicatorPanes();
-    if (panes.length === 0) return;
+    if (panes.length === 0) return ranges;
 
     for (const pane of panes) {
       if (pane.fixedRange) continue;
@@ -921,8 +984,9 @@ export class MobileIndicatorManager {
       if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
       const range = max - min;
       const padding = range === 0 ? Math.max(Math.abs(max) * 0.05, 1) : range * 0.1;
-      this._paneManager.updatePaneRange(pane.id, min - padding, max + padding);
+      ranges.push({ id: pane.id, yMin: min - padding, yMax: max + padding });
     }
+    return ranges;
   }
 }
 

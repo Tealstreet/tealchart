@@ -18,11 +18,12 @@ import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
 import type { NativeTopBarLayout } from '../utils/topBarLayout';
 import type { NativeSelectedTradeLine, NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveTailChannel } from './nativeLiveTail';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 
 import { useDerivedValue } from 'react-native-reanimated';
 
@@ -34,6 +35,7 @@ import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
 import {
   createNativePriceAxisLane,
+  NATIVE_PRICE_AXIS_TAG_PADDING_X,
   createNativePriceAxisLaneWidth,
   measureNativePriceAxisTagWidth,
 } from '../utils/nativePriceAxisLane';
@@ -112,6 +114,9 @@ export interface NativeSkiaRenderModelInput {
   frame: NativeChartFrame | null;
   interval: string;
   leftToolRailCollapsed?: boolean;
+  /** Market of `bars`, which a live tail must match before it replaces their last bar. */
+  liveMarket?: string;
+  liveTail?: NativeLiveTailChannel;
   lineSnapshot: {
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
@@ -150,6 +155,8 @@ export interface NativeSkiaRenderModel {
   gridColor: string;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   measuredPriceAxisWidth: number;
+  /** The last-trade line as drawn, carrying the live match its tag was sized for. */
+  nativeLastTradeLine: NativeRenderablePriceLine | null;
   growTradeLineDragPriceLabelWidth: (objectId: string, width: number) => void;
   nativeMutedTextColor: string;
   nativePriceLines: readonly NativeRenderablePriceLine[];
@@ -175,6 +182,8 @@ export function useNativeSkiaRenderModel({
   leftToolRailCollapsed,
   layoutName,
   layoutSelectorEnabled,
+  liveMarket,
+  liveTail,
   lineSnapshot,
   marginsBottom,
   options,
@@ -332,19 +341,28 @@ export function useNativeSkiaRenderModel({
       : { x: 0, y: 0, width: 0, height: 0 },
   );
   const lastBar = bars[bars.length - 1] ?? null;
-  const lastTradeLine = useMemo(
-    () =>
-      buildLastTradePriceLine({
-        latestBar: lastBar,
-        interval,
-        pricePrecision: priceTickSize,
-        upColor: options.upColor,
-        downColor: options.downColor,
-        renderLineOnCanvas: true,
-        showAxisTag: true,
-      }),
-    [interval, lastBar, options.downColor, options.upColor, priceTickSize],
-  );
+  const lastTradeLine = useMemo((): NativeRenderablePriceLine | null => {
+    const line = buildLastTradePriceLine({
+      latestBar: lastBar,
+      interval,
+      pricePrecision: priceTickSize,
+      upColor: options.upColor,
+      downColor: options.downColor,
+      renderLineOnCanvas: true,
+      showAxisTag: true,
+    });
+    return line && lastBar && liveMarket ? { ...line, nativeLive: { market: liveMarket, time: lastBar.time } } : line;
+  }, [interval, lastBar, liveMarket, options.downColor, options.upColor, priceTickSize]);
+  const setLiveTailFormat = liveTail?.setFormat;
+  useLayoutEffect(() => {
+    setLiveTailFormat?.({
+      axisFont,
+      downColor: options.downColor,
+      interval,
+      pricePrecision: priceTickSize,
+      upColor: options.upColor,
+    });
+  }, [axisFont, interval, options.downColor, options.upColor, priceTickSize, setLiveTailFormat]);
   const extraPriceLines = useMemo(() => priceLines ?? EMPTY_NATIVE_PRICE_LINES, [priceLines]);
   const bracketPriceLines = useMemo(
     () => [
@@ -373,14 +391,32 @@ export function useNativeSkiaRenderModel({
   );
   const nativePriceLines = useMemo(
     () =>
-      [...extraPriceLines, ...bracketPriceLines, ...(lastTradeLine ? [lastTradeLine] : [])].map((line) => ({
-        ...line,
-        nativeAxisTagWidth: priceLineAxisTagWidthCache.resolve(
-          getNativePriceLineTagId(line.id),
-          measureNativePriceLineAxisTagWidth(line, axisFont),
-        ),
-      })),
+      [...extraPriceLines, ...bracketPriceLines, ...(lastTradeLine ? [lastTradeLine] : [])].map(
+        (line: NativeRenderablePriceLine): NativeRenderablePriceLine => {
+          const nativeAxisTagWidth = priceLineAxisTagWidthCache.resolve(
+            getNativePriceLineTagId(line.id),
+            measureNativePriceLineAxisTagWidth(line, axisFont),
+          );
+          const nativeLive = line.nativeLive;
+          return {
+            ...line,
+            nativeAxisTagWidth,
+            ...(nativeLive
+              ? {
+                  nativeLive: {
+                    ...nativeLive,
+                    maxTextWidth: Math.max(0, nativeAxisTagWidth - NATIVE_PRICE_AXIS_TAG_PADDING_X * 2),
+                  },
+                }
+              : {}),
+          };
+        },
+      ),
     [axisFont, bracketPriceLines, extraPriceLines, lastTradeLine, priceLineAxisTagWidthCache],
+  );
+  const nativeLastTradeLine = useMemo(
+    () => nativePriceLines.find((line) => line.nativeLive) ?? lastTradeLine,
+    [lastTradeLine, nativePriceLines],
   );
   const showIndicatorOutputAxisLabels = options.showIndicatorOutputAxisLabels;
   const priceAxisTagSources = useMemo<NativePriceAxisTagSource[]>(
@@ -388,7 +424,7 @@ export function useNativeSkiaRenderModel({
       ...createNativePriceAxisTagSources({
         extraPriceLines,
         bracketPriceLines,
-        lastTradeLine,
+        lastTradeLine: nativeLastTradeLine,
         orderLines: lineSnapshot.orderLines,
         positionLines: lineSnapshot.positionLines,
         priceLineTagHeight: priceAxisTagHeight,
@@ -414,7 +450,7 @@ export function useNativeSkiaRenderModel({
       frame,
       indicatorPaneInfo,
       indicatorPlots,
-      lastTradeLine,
+      nativeLastTradeLine,
       lineSnapshot.orderLines,
       lineSnapshot.positionLines,
       priceAxisTagHeight,
@@ -456,6 +492,7 @@ export function useNativeSkiaRenderModel({
     growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
+    nativeLastTradeLine,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,

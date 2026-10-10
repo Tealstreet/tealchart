@@ -2,6 +2,7 @@ import type { SkPath } from '@shopify/react-native-skia';
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { RenderOptions } from '../../types';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeLiveTailBar, NativeLiveTailSharedValue } from './nativeLiveTail';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import type { NativeVisibleBar } from './nativeVisibleBars';
@@ -11,6 +12,7 @@ import { memo } from 'react';
 import { Group, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { getNativeLiveTailVisibleBar, getNativeLiveViewportMaxVolume } from './nativeLiveTail';
 import { createNativeOhlcvPrimitiveClip } from './nativePrimitiveClip';
 import { isNativeMainPaneVisible, sharedPriceToNativeY, sharedTimeToNativeX } from './nativeSharedViewport';
 import { getNativeCandleWidth, getNativeViewportMaxVolume, getNativeVisibleCandleGeometry } from './nativeVisibleBars';
@@ -315,11 +317,15 @@ export function getNativeProjectedVolumeGeometry({
 export function getNativeLiveCandlesPath({
   bars,
   frame,
+  liveMarket = '',
+  liveTail = null,
   sharedViewport,
   side,
 }: {
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
+  liveMarket?: string;
+  liveTail?: NativeLiveTailBar | null;
   sharedViewport: NativeViewportSharedValues;
   side: NativeOhlcvPathSide;
 }): SkPath {
@@ -328,7 +334,7 @@ export function getNativeLiveCandlesPath({
   if (!isNativeMainPaneVisible(frame)) return path;
 
   for (let index = 0; index < bars.length; index += 1) {
-    const bar = bars[index];
+    const bar = getNativeLiveTailVisibleBar(bars, index, liveTail, liveMarket);
     if (!isNativeBarOnPathSide(bar, side)) continue;
     appendNativeCandlePath(path, getNativeLiveCandleGeometry({ bar, frame, sharedViewport }));
   }
@@ -361,12 +367,16 @@ export function getNativeProjectedCandlesPath({
 export function getNativeLiveVolumePath({
   bars,
   frame,
+  liveMarket = '',
+  liveTail = null,
   sharedViewport,
   side,
   volumeHeight,
 }: {
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
+  liveMarket?: string;
+  liveTail?: NativeLiveTailBar | null;
   sharedViewport: NativeViewportSharedValues;
   side: NativeOhlcvPathSide;
   volumeHeight: number;
@@ -377,10 +387,10 @@ export function getNativeLiveVolumePath({
 
   const startTime = sharedViewport.startTime.value;
   const endTime = sharedViewport.endTime.value;
-  const maxVolume = getNativeViewportMaxVolume(bars, startTime, endTime);
+  const maxVolume = getNativeLiveViewportMaxVolume(bars, liveTail, liveMarket, startTime, endTime);
 
   for (let index = 0; index < bars.length; index += 1) {
-    const bar = bars[index];
+    const bar = getNativeLiveTailVisibleBar(bars, index, liveTail, liveMarket);
     if (!isNativeBarOnPathSide(bar, side)) continue;
 
     const geometry = getNativeLiveVolumeGeometry({
@@ -432,6 +442,8 @@ function NativeLiveCandlePath({
   totalBarCount,
   bars,
   frame,
+  liveMarket,
+  liveTail,
   options,
   sharedViewport,
   side,
@@ -440,6 +452,8 @@ function NativeLiveCandlePath({
   totalBarCount?: number;
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
   side: NativeOhlcvPathSide;
@@ -449,6 +463,8 @@ function NativeLiveCandlePath({
     getNativeLiveCandlesPath({
       bars,
       frame,
+      liveMarket,
+      liveTail: liveTail?.value ?? null,
       sharedViewport,
       side,
     }),
@@ -466,6 +482,8 @@ function NativeLiveCandlePath({
           barColorPlots={barColorPlots}
           bars={bars}
           frame={frame}
+          liveMarket={liveMarket}
+          liveTail={liveTail}
           sharedViewport={sharedViewport}
           side={side}
         />
@@ -491,6 +509,8 @@ function NativeLiveBarcolorCandlePath({
   totalBarCount,
   bars,
   frame,
+  liveMarket = '',
+  liveTail,
   sharedViewport,
   side,
 }: {
@@ -499,12 +519,16 @@ function NativeLiveBarcolorCandlePath({
   totalBarCount?: number;
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   sharedViewport: NativeViewportSharedValues;
   side: NativeOhlcvPathSide;
 }) {
   const path = useDerivedValue(() => {
     const built = Skia.Path.Make();
-    for (const bar of bars) {
+    const tail = liveTail?.value ?? null;
+    for (let index = 0; index < bars.length; index += 1) {
+      const bar = getNativeLiveTailVisibleBar(bars, index, tail, liveMarket);
       if (!isNativeBarOnPathSide(bar, side)) continue;
       const color = resolveNativeBarColorOverride(barColorPlots, bar.sourceIndex, totalBarCount ?? bars.length);
       if (color !== barColor) continue;
@@ -558,6 +582,8 @@ function NativeProjectedCandlePath({
 function NativeLiveVolumePath({
   bars,
   frame,
+  liveMarket,
+  liveTail,
   options,
   sharedViewport,
   side,
@@ -565,6 +591,8 @@ function NativeLiveVolumePath({
 }: {
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
   side: NativeOhlcvPathSide;
@@ -575,6 +603,8 @@ function NativeLiveVolumePath({
     getNativeLiveVolumePath({
       bars,
       frame,
+      liveMarket,
+      liveTail: liveTail?.value ?? null,
       sharedViewport,
       side,
       volumeHeight,
@@ -609,6 +639,8 @@ export function NativeCandleVolumeLayerImpl({
   barColorPlots,
   totalBarCount,
   frame,
+  liveMarket,
+  liveTail,
   options,
   sharedViewport,
   staticProjection,
@@ -618,6 +650,9 @@ export function NativeCandleVolumeLayerImpl({
   barColorPlots?: readonly PlotOutput[];
   totalBarCount?: number;
   frame: NativeChartFrame;
+  /** Market of `visibleBars`; the live tail only replaces a bar from the same one. */
+  liveMarket?: string;
+  liveTail?: NativeLiveTailSharedValue;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
   staticProjection?: NativeChartProjection | null;
@@ -682,6 +717,8 @@ export function NativeCandleVolumeLayerImpl({
         barColorPlots={barColorPlots}
         bars={visibleBars}
         frame={frame}
+        liveMarket={liveMarket}
+        liveTail={liveTail}
         options={options}
         sharedViewport={sharedViewport}
         side="up"
@@ -691,6 +728,8 @@ export function NativeCandleVolumeLayerImpl({
         barColorPlots={barColorPlots}
         bars={visibleBars}
         frame={frame}
+        liveMarket={liveMarket}
+        liveTail={liveTail}
         options={options}
         sharedViewport={sharedViewport}
         side="down"
@@ -700,6 +739,8 @@ export function NativeCandleVolumeLayerImpl({
           <NativeLiveVolumePath
             bars={visibleBars}
             frame={frame}
+            liveMarket={liveMarket}
+            liveTail={liveTail}
             options={options}
             sharedViewport={sharedViewport}
             side="up"
@@ -708,6 +749,8 @@ export function NativeCandleVolumeLayerImpl({
           <NativeLiveVolumePath
             bars={visibleBars}
             frame={frame}
+            liveMarket={liveMarket}
+            liveTail={liveTail}
             options={options}
             sharedViewport={sharedViewport}
             side="down"

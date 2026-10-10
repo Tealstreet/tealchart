@@ -299,6 +299,22 @@ describe('NativeCandleVolumeLayer', () => {
     expect(vi.mocked(downPath.close).mock.calls).toHaveLength(2);
   });
 
+  it('draws the last bar from a live tail of the same market without a new closure', () => {
+    const market = 'BTCUSDT\n15S';
+    const liveTail = { market, time: 30_000, open: 63600, high: 63800, low: 63350, close: 63750, volume: 900 };
+    const closes = (tail: typeof liveTail | null, liveMarket: string) =>
+      (['up', 'down'] as const).map(
+        (side) =>
+          vi.mocked(getNativeLiveCandlesPath({ bars, frame, liveMarket, liveTail: tail, sharedViewport, side }).close)
+            .mock.calls.length,
+      );
+
+    expect(closes(null, market)).toEqual([2, 2]);
+    expect(closes(liveTail, market)).toEqual([4, 0]);
+    expect(closes(liveTail, 'ETHUSDT\n15S')).toEqual([2, 2]);
+    expect(closes({ ...liveTail, time: 45_000 }, market)).toEqual([2, 2]);
+  });
+
   it('builds empty OHLCV paths when another pane has maximized the main pane away', () => {
     const projection = createNativeChartProjection({
       frame: collapsedMainFrame,
