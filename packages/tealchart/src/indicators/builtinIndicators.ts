@@ -805,6 +805,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
           max: 10,
           step: 0.5,
         },
+        { id: 'estimateMissingOrderFlow', name: 'Estimate Missing Order Flow', type: 'bool', defval: true },
       ],
       defaults: {
         globalOpacity: 1,
@@ -824,6 +825,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         autoRowSizeGranularity: 140,
         fixedRowSize: 1,
         imbalanceThreshold: 3,
+        estimateMissingOrderFlow: true,
       },
       palette: {
         bid: { name: 'Bid Volume', defaultColor: 'rgba(239, 83, 80, 1)' },
@@ -857,6 +859,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         { id: 'showLabels', name: 'Show Delta Labels', type: 'bool', defval: false },
         { id: 'showActivityLevel', name: 'Show Max Activity Level', type: 'bool', defval: false },
         { id: 'hideCandles', name: 'Hide Candles', type: 'bool', defval: true },
+        { id: 'estimateMissingOrderFlow', name: 'Estimate Missing Order Flow', type: 'bool', defval: true },
       ],
       defaults: {
         ltf: 'auto',
@@ -864,6 +867,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         showLabels: false,
         showActivityLevel: false,
         hideCandles: true,
+        estimateMissingOrderFlow: true,
       },
       palette: {
         bullBody: { name: 'Bullish Body', defaultColor: 'rgba(38, 166, 154, 1)' },
