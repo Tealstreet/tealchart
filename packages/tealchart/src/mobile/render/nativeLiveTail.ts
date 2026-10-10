@@ -209,6 +209,7 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   const latestRef = useRef<{ bar: Bar | null; market: string } | null>(null);
   const formatRef = useRef<NativeLiveTailFormat | null>(null);
   const listenersRef = useRef(new Set<(bar: NativeLiveTailBar | null) => void>());
+  const lastPublishedRef = useRef<NativeLiveTailBar | null>(null);
 
   const publish = useCallback((): NativeLiveLastTrade | null => {
     const latest = latestRef.current;
@@ -218,6 +219,7 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
     const nextTail = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
     tail.value = nextTail;
     lastTrade.value = nextLastTrade;
+    lastPublishedRef.current = nextTail;
     listenersRef.current.forEach((listener) => listener(nextTail));
     return nextLastTrade;
   }, [lastTrade, tail]);
@@ -241,6 +243,8 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   const subscribe = useCallback((listener: (bar: NativeLiveTailBar | null) => void) => {
     const listeners = listenersRef.current;
     listeners.add(listener);
+    // A late subscriber starts from the bar on screen, not the one React last committed.
+    listener(lastPublishedRef.current);
     return () => {
       listeners.delete(listener);
     };

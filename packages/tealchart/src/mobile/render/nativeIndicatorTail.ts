@@ -151,8 +151,10 @@ export function hasNativeMarkerOnLastBar(plots: readonly PlotOutput[], lastIndex
       plot.type === 'plotarrow' ||
       ((plot.type === 'plotshape' || plot.type === 'plotchar') &&
         !NATIVE_FREE_MARKER_LOCATIONS.has(plot.location ?? 'abovebar'));
-    if (!anchored) return false;
-    const value = plot.values[lastIndex - (plot.offset ?? 0)];
+    // A marker rides its SOURCE bar's high or low wherever its offset draws it; a positive
+    // offset never draws the last source bar at all.
+    if (!anchored || (plot.offset ?? 0) > 0) return false;
+    const value = plot.values[lastIndex];
     return value !== null && value !== undefined && value !== 0 && !Number.isNaN(value);
   });
 }

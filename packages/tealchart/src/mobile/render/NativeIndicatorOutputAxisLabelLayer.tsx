@@ -141,8 +141,9 @@ export function resolveNativeIndicatorOutputLiveLabels({
   return live;
 }
 
-// Module-wide, so a remounted layer can never reuse a generation an older one published.
-let nativeIndicatorOutputLabelGeneration = 0;
+// Module-wide, so a remounted layer can never reuse a generation an older one published;
+// seeded from the clock so a Fast Refresh re-evaluation cannot restart it either.
+let nativeIndicatorOutputLabelGeneration = Date.now();
 function nextNativeIndicatorOutputLabelGeneration(): number {
   nativeIndicatorOutputLabelGeneration += 1;
   return nativeIndicatorOutputLabelGeneration;

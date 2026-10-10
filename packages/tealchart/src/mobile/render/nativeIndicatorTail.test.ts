@@ -108,6 +108,8 @@ describe('hasNativeMarkerOnLastBar', () => {
     expect(hasNativeMarkerOnLastBar([marker({ location: 'belowbar' })], 2)).toBe(true);
     expect(hasNativeMarkerOnLastBar([marker({ type: 'plotarrow', values: [0, 0, -1] })], 2)).toBe(true);
     expect(hasNativeMarkerOnLastBar([marker({ location: 'top' })], 2)).toBe(false);
+    expect(hasNativeMarkerOnLastBar([marker({ offset: -2 })], 2)).toBe(true);
+    expect(hasNativeMarkerOnLastBar([marker({ offset: 1 })], 2)).toBe(false);
     expect(hasNativeMarkerOnLastBar([marker({ values: [1, 1, 0] })], 2)).toBe(false);
     expect(hasNativeMarkerOnLastBar([marker({ values: [1, 1, null] })], 2)).toBe(false);
     expect(hasNativeMarkerOnLastBar([line()], 2)).toBe(false);

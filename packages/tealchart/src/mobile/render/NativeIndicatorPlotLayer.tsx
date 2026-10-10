@@ -1215,7 +1215,8 @@ function NativeLiveIndicatorPlotPath({
   style: PlotStyle;
   dash: number[] | null;
 }) {
-  // One tail-applied copy shared by every path below, made only when the tail moves.
+  // One tail-applied copy shared by every path below, made only when the tail moves. Their
+  // first evaluation runs on JS, where reading it would be a blocking copy back from UI.
   const points = useDerivedValue(() => applyNativeIndicatorTailToPoints(committedPoints, liveTail?.value ?? null, liveKey, liveMarket));
   const linePath = useDerivedValue(() => {
     const overrides = paneRangeOverrides?.value;
@@ -1227,7 +1228,7 @@ function NativeLiveIndicatorPlotPath({
           linewidth: strokeWidth,
           pane,
           paneRangeOverrides: overrides,
-          points: points.value,
+          points: globalThis._WORKLET ? points.value : committedPoints,
           sharedViewport,
           style,
         })
@@ -1236,7 +1237,7 @@ function NativeLiveIndicatorPlotPath({
           frame,
           pane,
           paneRangeOverrides: overrides,
-          points: points.value,
+          points: globalThis._WORKLET ? points.value : committedPoints,
           sharedViewport,
           style: isPointMarker ? 'linebr' : style,
         });
@@ -1248,7 +1249,7 @@ function NativeLiveIndicatorPlotPath({
       histbase,
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: points.value,
+      points: globalThis._WORKLET ? points.value : committedPoints,
       sharedViewport,
       style,
     }),
@@ -1260,7 +1261,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: points.value,
+      points: globalThis._WORKLET ? points.value : committedPoints,
       sharedViewport,
       style,
     }),
@@ -1272,7 +1273,7 @@ function NativeLiveIndicatorPlotPath({
       markerSize: Math.max(3, strokeWidth * 2),
       pane,
       paneRangeOverrides: paneRangeOverrides?.value,
-      points: points.value,
+      points: globalThis._WORKLET ? points.value : committedPoints,
       sharedViewport,
     }),
   );
