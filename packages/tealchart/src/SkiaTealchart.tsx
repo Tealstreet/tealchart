@@ -17,6 +17,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from './drawings';
+import type { ChartWidgetBarsChangedContext } from './core/ChartWidgetCore';
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativePaneDividerBand } from './mobile/interaction/nativePaneDivider';
@@ -31,6 +32,7 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeLiveTailCommit } from './mobile/render/nativeLiveTail';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
@@ -40,6 +42,7 @@ import type { ChartThemeInput } from './theme';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
+  Bar,
   ContextMenuCallback,
   ContextMenuCloseOptions,
   ContextMenuRenderContext,
@@ -117,7 +120,12 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
-import { getNativeLiveTailMarket, useNativeLiveTailChannel } from './mobile/render/nativeLiveTail';
+import {
+  canPaintNativeLiveTail,
+  getNativeLiveTailFittedRange,
+  getNativeLiveTailMarket,
+  useNativeLiveTailChannel,
+} from './mobile/render/nativeLiveTail';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
@@ -454,6 +462,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, [leftToolRailCollapsed]);
 
   const nativeLiveTail = useNativeLiveTailChannel();
+  const nativeLiveTailCommitRef = useRef<NativeLiveTailCommit | null>(null);
+  const publishNativeLatestBar = nativeLiveTail.onLatestBar;
+  const handleNativeLatestBar = useCallback(
+    (bar: Bar | null, context: ChartWidgetBarsChangedContext) =>
+      canPaintNativeLiveTail({
+        bar,
+        commit: nativeLiveTailCommitRef.current,
+        lastTrade: publishNativeLatestBar(bar, context),
+        market: getNativeLiveTailMarket(context),
+      }),
+    [publishNativeLatestBar],
+  );
   const {
     bars,
     barsContext,
@@ -470,7 +490,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol,
   } = useNativeTealchartCoreRuntime({
     datafeed,
-    onLatestBar: nativeLiveTail.onLatestBar,
+    onLatestBar: handleNativeLatestBar,
     onIntervalChange: handleNativeIntervalChangeForLayout,
     onLayoutDirty: markNativeLayoutDirtyIfReady,
     onSymbolChange: handleNativeSymbolChangeForLayout,
@@ -785,7 +805,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineRows,
     viewportGestureOwner,
     viewportSyncEpoch,
-  } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled });
+  } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled, liveTail: nativeLiveTail.tail });
 
   // One bitmap per pane, captured when a divider drag starts. The drag stretches
   // these instead of re-laying-out the chart every frame; committing the real
@@ -1138,6 +1158,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     applyNativeViewport,
     dataLoadRenderBlocked,
     hasDataViewport,
+    hasPendingRestorePriceFit,
     projection,
     resetNativeViewport,
     viewport,
@@ -1145,6 +1166,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   } = useNativeViewportRuntime({
     autoScaleEnabled: nativeAutoScaleEnabled,
     bars,
+    barsMarket: getNativeLiveTailMarket(barsContext),
     barsMatchRequestedData: nativeBarsReadyForRequestedData,
     frame,
     interval,
@@ -1811,6 +1833,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
+    nativeLastTradeLine,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,
@@ -1854,6 +1877,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
     volumeHeightRatio: VOLUME_HEIGHT_RATIO,
+  });
+  useLayoutEffect(() => {
+    nativeLiveTailCommitRef.current = {
+      drawingLive:
+        !staticNativeRenderProjection &&
+        !shouldHoldNativeRenderSnapshot &&
+        nativeRenderHasDataViewport &&
+        !hasPendingRestorePriceFit(),
+      fittedRange: getNativeLiveTailFittedRange(nativeRenderBars, nativeRenderProjection?.viewport),
+      lastTradeMatch: nativeLastTradeLine?.nativeLive,
+      market: nativeRenderLiveMarket,
+      time: nativeRenderBars[nativeRenderBars.length - 1]?.time,
+    };
   });
   useLayoutEffect(() => {
     const nextWidth = Math.ceil(measuredPriceAxisWidth);

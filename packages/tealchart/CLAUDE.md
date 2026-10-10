@@ -617,9 +617,10 @@ handoff, pane metadata, parse/runtime diagnostics, imported Pine libraries, and
 request-backed scripts are supported when the native host supplies the relevant
 seams (`getTealscriptLibraries` and `getTealscriptRequestDatafeed`). Request
 scripts without a native provider still emit a visible
-`request-data-unavailable` warning. `ChartWidgetCore` still calls `setBars(...)`
-on realtime ticks; the hidden WebView owns compiled execution off the React
-Native JS thread.
+`request-data-unavailable` warning. On realtime ticks `ChartWidgetCore` calls
+`MobileIndicatorManager.updateBar`, which only posts the bar to the hidden
+WebView that owns compiled execution off the React Native JS thread; the chart
+hears nothing until the worker's result arrives.
 
 Tealscript render routing carries `indicator()` declaration `format`,
 `precision`, and `scale` into the pane-info map. Plot-level format/precision
@@ -1342,6 +1343,31 @@ an advance - so glyph advances must come from `font.getGlyphWidths`, or every
 label loosens around its punctuation. And a character outside the label alphabet
 is dropped rather than drawn, so a new format character truncates labels silently;
 there is a test pinning the alphabet for that reason.
+
+## The live last bar on native
+
+A tick that only moves the last bar does not render React. `useTealchartCore`
+hands every emit to `onLatestBar` before dispatching; the chart publishes the
+bar and the last-trade line's price, colour and text into shared values
+(`mobile/render/nativeLiveTail.ts`), and the candle/volume worklets, the
+last-trade line and tag, the tag stack, the gesture autoscale and the legend
+read them in place of the bar their closures hold. The dispatch is skipped only
+when `canPaintNativeLiveTail` says the live channel painted the tick completely:
+same market and bar as the commit, live branches on screen, high/low inside the
+range autoscale fitted, and text the committed tag can hold. Anything else —
+a new bar, history, a new high, a wider label, a hold — dispatches as before.
+
+Rules that keep it correct:
+
+- **Match on market and time, never time alone.** Bar times repeat across
+  symbols and intervals; every live value carries `symbol\ninterval` and is
+  ignored by a closure from another market.
+- **Never read a shared value's `.value` on the JS thread on the tick path.** In
+  Reanimated 4 that is a synchronous round trip to the UI runtime that copies the
+  value back. Decide from committed JS data (`NativeLiveTailCommit`) instead.
+- **A new last-bar consumer must read the live channel**, or it shows the
+  committed bar until the next dispatch. React state `bars` is no longer updated
+  per tick; only the core's own array is.
 
 ## Gesture rebuilds on native
 

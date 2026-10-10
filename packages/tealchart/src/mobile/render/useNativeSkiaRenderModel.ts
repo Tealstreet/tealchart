@@ -155,6 +155,8 @@ export interface NativeSkiaRenderModel {
   gridColor: string;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   measuredPriceAxisWidth: number;
+  /** The last-trade line as drawn, carrying the live match its tag was sized for. */
+  nativeLastTradeLine: NativeRenderablePriceLine | null;
   growTradeLineDragPriceLabelWidth: (objectId: string, width: number) => void;
   nativeMutedTextColor: string;
   nativePriceLines: readonly NativeRenderablePriceLine[];
@@ -490,6 +492,7 @@ export function useNativeSkiaRenderModel({
     growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
+    nativeLastTradeLine,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,

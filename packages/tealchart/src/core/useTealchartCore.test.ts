@@ -3,7 +3,7 @@ import type { TealchartCoreState } from './useTealchartCore';
 
 import { describe, expect, it } from 'vitest';
 
-import { tealchartCoreStateReducer } from './useTealchartCore';
+import { describeDispatchedCoreBars, shouldSkipCoreBarsDispatch, tealchartCoreStateReducer } from './useTealchartCore';
 
 const emptyLayout: UnifiedPaneLayout = {
   panes: [
@@ -175,5 +175,34 @@ describe('tealchartCoreStateReducer', () => {
     });
 
     expect(result).toBe(currentState);
+  });
+});
+
+describe('shouldSkipCoreBarsDispatch', () => {
+  const bars = makeBars(2_000_000, 5 * 60_000, 3);
+  const context = { interval: '5', requestId: 4, source: 'realtime' as const, symbol: 'BTC' };
+  const lastDispatched = describeDispatchedCoreBars(bars, context);
+  const moved = [...bars.slice(0, -1), { ...bars[2], close: 999 }];
+
+  it('skips a realtime tick that only moved the committed last bar and was painted live', () => {
+    expect(shouldSkipCoreBarsDispatch({ bars: moved, context, lastDispatched, paintedLive: true })).toBe(true);
+  });
+
+  it('dispatches whatever the live channel could not paint', () => {
+    expect(shouldSkipCoreBarsDispatch({ bars: moved, context, lastDispatched, paintedLive: false })).toBe(false);
+  });
+
+  it('dispatches a new bar, history, another request or market, and the first emit', () => {
+    const appended = [...bars, { ...bars[2], time: bars[2].time + 5 * 60_000 }];
+    const skip = (overrides: Partial<Parameters<typeof shouldSkipCoreBarsDispatch>[0]>) =>
+      shouldSkipCoreBarsDispatch({ bars: moved, context, lastDispatched, paintedLive: true, ...overrides });
+
+    expect(skip({ bars: appended })).toBe(false);
+    expect(skip({ context: { ...context, source: 'history' } })).toBe(false);
+    expect(skip({ context: { ...context, requestId: 5 } })).toBe(false);
+    expect(skip({ context: { ...context, symbol: 'ETH' } })).toBe(false);
+    expect(skip({ context: { ...context, interval: '15' } })).toBe(false);
+    expect(skip({ lastDispatched: null })).toBe(false);
+    expect(skip({ bars: [] })).toBe(false);
   });
 });

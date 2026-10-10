@@ -244,7 +244,12 @@ export class MobileIndicatorManager {
    * made indicators flicker on device.
    */
   updateBar(bar: Bar, silent = false): void {
-    this._tealscriptManager?.updateBar(bar);
+    if (this._tealscriptManager) {
+      // Nothing has changed until the worker answers, and its result notifies then. A
+      // notification here re-rendered the whole native chart on every tick for nothing.
+      this._tealscriptManager.updateBar(bar);
+      return;
+    }
     this._recomputePlots(silent);
   }
 

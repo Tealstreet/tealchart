@@ -432,6 +432,44 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getPlots()).toEqual([{ ...plot, scriptId: instanceId }]);
   });
 
+  it('waits for the worker before re-rendering a realtime tick', async () => {
+    const worker = new FakeWorker();
+    const manager = new MobileIndicatorManager({ createWorker: () => worker as unknown as Worker });
+    manager.setBars(makeBars(2));
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-tick-study',
+      code: 'indicator("Tick")\nplot(close)',
+    });
+    worker.emit({ type: 'ready' });
+    await flushWorkerInit();
+    const onUpdate = vi.fn();
+    manager.setOnUpdate(onUpdate);
+
+    manager.updateBar({ ...makeBars(2)[1], close: 150 });
+    expect(onUpdate).not.toHaveBeenCalled();
+
+    worker.emit(createResultMessage(instanceId, {
+      alerts: [],
+      drawings: [],
+      inputs: [],
+      plots: [{ id: 'plot_close', type: 'plot', title: 'Close', values: [101, 150], color: '#ffffff' }],
+      profile: {
+        executionMode: 'compiled',
+        selectedBackend: 'compiled',
+        backendSelectionSource: 'default',
+        elapsedMs: 1,
+        bars: 2,
+        statements: 1,
+        expressions: 1,
+        builtinCalls: 1,
+        requestContexts: 0,
+        maxBarsBack: 0,
+        errors: 0,
+      },
+    }));
+    expect(onUpdate).toHaveBeenCalledTimes(1);
+  });
+
   it('reports WebView worker errors without losing the manager context', async () => {
     const worker = new FakeWorker();
     const onError = vi.fn();

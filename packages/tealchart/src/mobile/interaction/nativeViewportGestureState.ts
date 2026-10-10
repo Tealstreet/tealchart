@@ -1,3 +1,4 @@
+import type { NativeLiveTailBar } from '../render/nativeLiveTail';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { TimeRangeClampAnchor } from '../../viewport/timeRangeConstraints';
@@ -25,6 +26,10 @@ export interface NativeViewportGestureMetrics {
 export interface NativePriceAutoScaleSharedValues {
   active: SharedValue<boolean>;
   bars: SharedValue<NativeAutoScaleBar[]>;
+  /** The live last bar, which skips React; folded into the fit when `market` matches. */
+  liveTail?: SharedValue<NativeLiveTailBar | null>;
+  /** Market of `bars`, in the live tail's own format. */
+  market?: SharedValue<string>;
 }
 
 export type NativeViewportGestureOwner =
@@ -167,7 +172,10 @@ function applyNativeGesturePriceAutoScale(
 ): Viewport {
   'worklet';
   if (!priceAutoScale.active.value) return viewport;
-  return applyNativePriceAutoScale(viewport, priceAutoScale.bars.value);
+  const tail = priceAutoScale.liveTail?.value ?? null;
+  const market = priceAutoScale.market?.value ?? '';
+  const liveTail = tail && market && tail.market === market ? tail : null;
+  return applyNativePriceAutoScale(viewport, priceAutoScale.bars.value, undefined, liveTail);
 }
 
 export function getNativePriceScaleHitGeometry(frame: NativeChartFrame | null): NativePriceScaleHitGeometry {

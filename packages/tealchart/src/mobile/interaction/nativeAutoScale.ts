@@ -70,13 +70,32 @@ export function getNativeVisibleBarsBoundingBox(
   return { highest, lowest };
 }
 
+/**
+ * The bounding box with the live last bar folded in. `tail` replaces the committed last
+ * bar only when it is that same bar; the caller has already matched its market.
+ */
+function getNativeLiveVisibleBarsBoundingBox(
+  bars: readonly NativeAutoScaleBar[],
+  startTime: number,
+  endTime: number,
+  tail: NativeAutoScaleBar | null,
+): { highest: number; lowest: number } | null {
+  'worklet';
+  const bbox = getNativeVisibleBarsBoundingBox(bars, startTime, endTime);
+  const last = bars[bars.length - 1];
+  if (!tail || !last || tail.time !== last.time || tail.time < startTime || tail.time > endTime) return bbox;
+  if (!bbox) return { highest: tail.high, lowest: tail.low };
+  return { highest: Math.max(bbox.highest, tail.high), lowest: Math.min(bbox.lowest, tail.low) };
+}
+
 export function applyNativePriceAutoScale(
   viewport: Viewport,
   bars: readonly NativeAutoScaleBar[],
   padding: number = NATIVE_PRICE_AUTO_SCALE_PADDING,
+  tail: NativeAutoScaleBar | null = null,
 ): Viewport {
   'worklet';
-  const bbox = getNativeVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime);
+  const bbox = getNativeLiveVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime, tail);
   if (!bbox) return viewport;
 
   const dataRange = bbox.highest - bbox.lowest;

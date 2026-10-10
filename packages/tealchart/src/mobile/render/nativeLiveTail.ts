@@ -9,6 +9,7 @@ import { useSharedValue } from 'react-native-reanimated';
 
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
+import { getNativeVisibleBarsBoundingBox } from '../interaction/nativeAutoScale';
 import { getNativeViewportMaxVolume } from './nativeVisibleBars';
 
 /**
@@ -139,6 +140,45 @@ export function createNativeLiveLastTrade({
   };
 }
 
+/**
+ * The price range autoscale fitted around a bar: `offscreen` when the drawn window
+ * does not hold the bar, so the fit cannot depend on it; null when it is unknown.
+ */
+export type NativeLiveTailFittedRange = { high: number; low: number } | 'offscreen' | null;
+
+/** What the chart last committed, against which a tick decides whether it can skip React. */
+export interface NativeLiveTailCommit {
+  /** Live branches are on screen: no snapshot hold, no static projection. */
+  drawingLive: boolean;
+  fittedRange: NativeLiveTailFittedRange;
+  lastTradeMatch: { market: string; time: number; maxTextWidth?: number } | undefined;
+  market: string;
+  time: number | undefined;
+}
+
+/**
+ * Whether a tick is fully painted by the live channel: same market and bar as the commit,
+ * inside the range autoscale already fitted, and with a price the committed tag can hold.
+ */
+export function canPaintNativeLiveTail({
+  bar,
+  commit,
+  lastTrade,
+  market,
+}: {
+  bar: Bar | null;
+  commit: NativeLiveTailCommit | null;
+  lastTrade: NativeLiveLastTrade | null;
+  market: string;
+}): boolean {
+  if (!bar || !commit || !commit.drawingLive || !market || market !== commit.market) return false;
+  const fittedRange = commit.fittedRange;
+  if (commit.time === undefined || bar.time !== commit.time || !fittedRange) return false;
+  if (fittedRange !== 'offscreen' && (!(bar.high <= fittedRange.high) || !(bar.low >= fittedRange.low))) return false;
+  // No last-trade line on screen means nothing whose text could outgrow its tag.
+  return commit.lastTradeMatch === undefined || isNativeLiveLastTradeCurrent(lastTrade, commit.lastTradeMatch);
+}
+
 export interface NativeLiveTailFormat {
   axisFont: ReturnType<typeof Skia.Font>;
   downColor?: string;
@@ -149,7 +189,8 @@ export interface NativeLiveTailFormat {
 
 export interface NativeLiveTailChannel {
   lastTrade: NativeLiveLastTradeSharedValue;
-  onLatestBar: (bar: Bar | null, context: { symbol: string; interval: string }) => void;
+  /** Publishes the newest bar and returns the last trade it published with it. */
+  onLatestBar: (bar: Bar | null, context: { symbol: string; interval: string }) => NativeLiveLastTrade | null;
   setFormat: (format: NativeLiveTailFormat) => void;
   tail: NativeLiveTailSharedValue;
 }
@@ -164,18 +205,20 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   const latestRef = useRef<{ bar: Bar | null; market: string } | null>(null);
   const formatRef = useRef<NativeLiveTailFormat | null>(null);
 
-  const publish = useCallback(() => {
+  const publish = useCallback((): NativeLiveLastTrade | null => {
     const latest = latestRef.current;
     const format = formatRef.current;
-    tail.value = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
-    lastTrade.value =
+    const nextLastTrade =
       latest && format ? createNativeLiveLastTrade({ ...format, bar: latest.bar, market: latest.market }) : null;
+    tail.value = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
+    lastTrade.value = nextLastTrade;
+    return nextLastTrade;
   }, [lastTrade, tail]);
 
   const onLatestBar = useCallback(
     (bar: Bar | null, context: { symbol: string; interval: string }) => {
       latestRef.current = { bar, market: getNativeLiveTailMarket(context) };
-      publish();
+      return publish();
     },
     [publish],
   );
@@ -189,4 +232,20 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   );
 
   return { lastTrade, onLatestBar, setFormat, tail };
+}
+
+/**
+ * The fitted range for a committed last bar: `offscreen` when the committed window does
+ * not hold it. Computed on JS from the committed bars and viewport, never from shared
+ * values, whose JS-thread reads are synchronous round trips to the UI runtime.
+ */
+export function getNativeLiveTailFittedRange(
+  bars: readonly Bar[],
+  viewport: { startTime: number; endTime: number } | null | undefined,
+): NativeLiveTailFittedRange {
+  const last = bars[bars.length - 1];
+  if (!last || !viewport) return null;
+  if (last.time < viewport.startTime || last.time > viewport.endTime) return 'offscreen';
+  const fitted = getNativeVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime);
+  return fitted ? { high: fitted.highest, low: fitted.lowest } : null;
 }

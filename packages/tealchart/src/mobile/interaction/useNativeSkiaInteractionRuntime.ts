@@ -1,4 +1,5 @@
 import type { SharedValue } from 'react-native-reanimated';
+import type { NativeLiveTailSharedValue } from '../render/nativeLiveTail';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
@@ -63,10 +64,12 @@ export interface NativeSkiaInteractionRuntime {
 
 export interface NativeSkiaInteractionRuntimeInput {
   autoScaleEnabled?: boolean;
+  liveTail?: NativeLiveTailSharedValue;
 }
 
 export function useNativeSkiaInteractionRuntime({
   autoScaleEnabled = true,
+  liveTail,
 }: NativeSkiaInteractionRuntimeInput = {}): NativeSkiaInteractionRuntime {
   const sharedStartTime = useSharedValue(0);
   const sharedEndTime = useSharedValue(1);
@@ -120,6 +123,7 @@ export function useNativeSkiaInteractionRuntime({
   const priceScaleActive = useSharedValue(false);
   const priceAutoScaleActive = useSharedValue(autoScaleEnabled);
   const priceAutoScaleBars = useSharedValue<NativeAutoScaleBar[]>([]);
+  const priceAutoScaleMarket = useSharedValue('');
   const timeScaleActive = useSharedValue(false);
   const viewportGestureOwnerValue = useSharedValue<NativeViewportGestureOwner>('none');
   const viewportSyncEpoch = useSharedValue(0);
@@ -160,8 +164,10 @@ export function useNativeSkiaInteractionRuntime({
     () => ({
       active: priceAutoScaleActive,
       bars: priceAutoScaleBars,
+      liveTail,
+      market: priceAutoScaleMarket,
     }),
-    [priceAutoScaleActive, priceAutoScaleBars],
+    [liveTail, priceAutoScaleActive, priceAutoScaleBars, priceAutoScaleMarket],
   );
   const crosshair = useMemo<NativeCrosshairSharedValues>(
     () => ({

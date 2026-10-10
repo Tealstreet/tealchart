@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import {
   applyNativeLiveTailBar,
+  canPaintNativeLiveTail,
+  getNativeLiveTailFittedRange,
   createNativeLiveLastTrade,
   getNativeLiveTailMarket,
   getNativeLiveTailVisibleBar,
@@ -87,5 +89,53 @@ describe('nativeLiveTail', () => {
 
     expect(live).toMatchObject({ price: line?.price, color: line?.color, text: line?.label?.primaryText });
     expect(live?.textWidth).toBe((line?.label?.primaryText ?? '').length * 6);
+  });
+});
+
+describe('canPaintNativeLiveTail', () => {
+  const tick = { time: 120_000, open: 100, high: 108, low: 92, close: 104, volume: 5 };
+  const lastTrade = { market, time: 120_000, price: 104, color: '#0f0', text: '104.0', textWidth: 20 };
+  const commit = {
+    drawingLive: true,
+    fittedRange: { high: 110, low: 90 } as const,
+    lastTradeMatch: { market, time: 120_000, maxTextWidth: 30 },
+    market,
+    time: 120_000,
+  };
+  const paint = (overrides: Partial<Parameters<typeof canPaintNativeLiveTail>[0]>) =>
+    canPaintNativeLiveTail({ bar: tick, commit, lastTrade, market, ...overrides });
+
+  it('paints a tick inside the fitted range of the committed bar', () => {
+    expect(paint({})).toBe(true);
+    expect(paint({ bar: { ...tick, high: 110, low: 90 } })).toBe(true);
+  });
+
+  it('paints any tick of a bar the drawn window does not hold', () => {
+    expect(paint({ bar: { ...tick, high: 500, low: 1 }, commit: { ...commit, fittedRange: 'offscreen' } })).toBe(true);
+  });
+
+  it('fits the committed window, not the overscan around it', () => {
+    const bars = [
+      { time: 60_000, open: 1, high: 200, low: 1, close: 1, volume: 1 },
+      { time: 120_000, open: 100, high: 110, low: 90, close: 104, volume: 1 },
+    ];
+
+    expect(getNativeLiveTailFittedRange(bars, { startTime: 100_000, endTime: 130_000 })).toEqual({ high: 110, low: 90 });
+    expect(getNativeLiveTailFittedRange(bars, { startTime: 0, endTime: 100_000 })).toBe('offscreen');
+    expect(getNativeLiveTailFittedRange(bars, null)).toBeNull();
+  });
+
+  it('hands to React whatever would move autoscale, the tag, or another bar', () => {
+    expect(paint({ bar: { ...tick, high: 110.5 } })).toBe(false);
+    expect(paint({ bar: { ...tick, low: 89 } })).toBe(false);
+    expect(paint({ bar: { ...tick, time: 180_000 } })).toBe(false);
+    expect(paint({ lastTrade: { ...lastTrade, textWidth: 31 } })).toBe(false);
+    expect(paint({ lastTrade: null })).toBe(false);
+    expect(paint({ lastTrade: null, commit: { ...commit, lastTradeMatch: undefined } })).toBe(true);
+    expect(paint({ market: 'ETHUSDT\n1' })).toBe(false);
+    expect(paint({ commit: { ...commit, drawingLive: false } })).toBe(false);
+    expect(paint({ commit: null })).toBe(false);
+    expect(paint({ commit: { ...commit, fittedRange: null } })).toBe(false);
+    expect(paint({ bar: null })).toBe(false);
   });
 });

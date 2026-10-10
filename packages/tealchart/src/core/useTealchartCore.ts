@@ -30,8 +30,11 @@ export interface UseTealchartCoreOptions {
   realtimeUpdateThrottleMs?: number;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
-  /** Called with the newest bar on every emit, before React hears of it. */
-  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => void;
+  /**
+   * Called with the newest bar on every emit, before React hears of it. Returning true
+   * says the caller painted it live, which lets a tick that only moved that bar skip React.
+   */
+  onLatestBar?: (bar: Bar | null, context: ChartWidgetBarsChangedContext) => boolean | void;
 }
 
 export interface TealchartCoreState {
@@ -105,6 +108,51 @@ type TealchartCoreStateAction =
 
 export function dataContextMatches(state: TealchartCoreState, context: ChartWidgetDataContext): boolean {
   return state.symbol === context.symbol && state.interval === context.interval;
+}
+
+export interface DispatchedCoreBars {
+  interval: string;
+  lastTime: number | undefined;
+  length: number;
+  requestId: number;
+  symbol: string;
+}
+
+export function describeDispatchedCoreBars(
+  bars: readonly Bar[],
+  context: ChartWidgetBarsChangedContext,
+): DispatchedCoreBars {
+  return {
+    interval: context.interval,
+    lastTime: bars[bars.length - 1]?.time,
+    length: bars.length,
+    requestId: context.requestId,
+    symbol: context.symbol,
+  };
+}
+
+/** Only a realtime tick that moved the already-committed last bar, and was painted live, skips React. */
+export function shouldSkipCoreBarsDispatch({
+  bars,
+  context,
+  lastDispatched,
+  paintedLive,
+}: {
+  bars: readonly Bar[];
+  context: ChartWidgetBarsChangedContext;
+  lastDispatched: DispatchedCoreBars | null;
+  paintedLive: boolean;
+}): boolean {
+  if (!paintedLive || context.source !== 'realtime' || !lastDispatched) return false;
+  const next = describeDispatchedCoreBars(bars, context);
+  return (
+    next.lastTime !== undefined &&
+    next.lastTime === lastDispatched.lastTime &&
+    next.length === lastDispatched.length &&
+    next.requestId === lastDispatched.requestId &&
+    next.symbol === lastDispatched.symbol &&
+    next.interval === lastDispatched.interval
+  );
 }
 
 export function tealchartCoreStateReducer(
@@ -183,6 +231,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
   const lastSymbolPropRef = useRef(options.symbol);
   const onLatestBarRef = useRef(options.onLatestBar);
   onLatestBarRef.current = options.onLatestBar;
+  const lastDispatchedBarsRef = useRef<DispatchedCoreBars | null>(null);
 
   // Whether the hook is enabled (datafeed provided)
   const enabled = !!options.datafeed;
@@ -207,6 +256,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     lastIntervalPropRef.current = options.interval;
     dispatchCoreState({ type: 'controlledDataContextChanged', symbol: options.symbol, interval });
 
+    lastDispatchedBarsRef.current = null;
     const instance = new ChartWidgetCore({
       datafeed: options.datafeed,
       symbol: options.symbol,
@@ -215,7 +265,13 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       realtimeUpdateThrottleMs: options.realtimeUpdateThrottleMs,
       scheduleRender: () => {},
       onBarsChanged: (newBars, context) => {
-        onLatestBarRef.current?.(newBars[newBars.length - 1] ?? null, context);
+        const paintedLive = onLatestBarRef.current?.(newBars[newBars.length - 1] ?? null, context) === true;
+        if (
+          shouldSkipCoreBarsDispatch({ bars: newBars, context, lastDispatched: lastDispatchedBarsRef.current, paintedLive })
+        ) {
+          return;
+        }
+        lastDispatchedBarsRef.current = describeDispatchedCoreBars(newBars, context);
         dispatchCoreState({ type: 'barsChanged', bars: newBars, context });
       },
       onLoadingChanged: (loading, context) => {
