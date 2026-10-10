@@ -49,6 +49,7 @@ describe('RenderScheduler', () => {
         DIRTY.OPTIONS,
         DIRTY.DATA_LOAD,
         DIRTY.USER_DRAWINGS,
+        DIRTY.REPAINT,
       ];
 
       // Each flag should be unique
@@ -76,6 +77,13 @@ describe('RenderScheduler', () => {
         expect(DIRTY.FULL & flag).toBe(flag);
       }
       expect(DIRTY.FULL & DIRTY.DATA_LOAD).toBe(0);
+    });
+
+    // REPAINT is a canvas-only repaint for jailbreak indicator data. Inside
+    // FULL it would match every `dirty & (... | FULL)` test in ChartCore and
+    // rebuild interactive lines on each order-flow frame.
+    it('REPAINT is outside FULL', () => {
+      expect(DIRTY.FULL & DIRTY.REPAINT).toBe(0);
     });
   });
 

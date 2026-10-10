@@ -52,6 +52,15 @@ export interface IndicatorDrawArgs {
   priceToCoord: (price: number) => number;
   /** Convert a Y coordinate to a price */
   coordToPrice: (coord: number) => number;
+  /**
+   * Ask the host engine to repaint the chart soon, for data that arrived
+   * OUTSIDE a draw pass (a websocket frame on a quiet market, where nothing
+   * else would repaint). Absent when the host cannot (an engine build without
+   * the hook): the indicator then shows new data on the next natural repaint.
+   * Engines coalesce calls to one paint per frame; indicators should still
+   * throttle (`RepaintRequester` in the web app).
+   */
+  requestRepaint?: () => void;
 }
 
 /**

@@ -21,6 +21,7 @@ export class JailbreakIndicatorManager {
   private indicators = new Map<string, RegisteredIndicator>();
   private _tooltipContext: Record<string, unknown> = {};
   private loggedDrawIds = new Set<string>();
+  private repaintHandler: (() => void) | null = null;
 
   /**
    * Set extra context that will be merged into tooltip args for all indicators.
@@ -28,6 +29,15 @@ export class JailbreakIndicatorManager {
    */
   setTooltipContext(context: Record<string, unknown>): void {
     this._tooltipContext = context;
+  }
+
+  /**
+   * How the host repaints the chart, handed to every indicator's draw args as
+   * `requestRepaint`. `null` (the default, and after the host is destroyed)
+   * leaves it out, so indicators fall back to the next natural repaint.
+   */
+  setRepaintHandler(handler: (() => void) | null): void {
+    this.repaintHandler = handler;
   }
 
   /**
@@ -69,7 +79,7 @@ export class JailbreakIndicatorManager {
       if (!entry.behindCandles) continue;
       if (!entry.indicator.isVisible()) continue;
       try {
-        const drawArgs: IndicatorDrawArgs = { ...args, settings: entry.settings };
+        const drawArgs = this.drawArgsFor(args, entry);
         this.logFirstDraw('behind', entry, args);
         entry.indicator.drawBehind(drawArgs);
         entry.indicator.draw(drawArgs);
@@ -87,7 +97,7 @@ export class JailbreakIndicatorManager {
       if (entry.behindCandles) continue;
       if (!entry.indicator.isVisible()) continue;
       try {
-        const drawArgs: IndicatorDrawArgs = { ...args, settings: entry.settings };
+        const drawArgs = this.drawArgsFor(args, entry);
         this.logFirstDraw('after', entry, args);
         entry.indicator.draw(drawArgs);
         entry.indicator.drawInFront(drawArgs);
@@ -95,6 +105,12 @@ export class JailbreakIndicatorManager {
         console.error(`[JailbreakIndicatorManager] Error drawing after candles for ${entry.id}:`, err);
       }
     }
+  }
+
+  private drawArgsFor(args: Omit<IndicatorDrawArgs, 'settings'>, entry: RegisteredIndicator): IndicatorDrawArgs {
+    const drawArgs: IndicatorDrawArgs = { ...args, settings: entry.settings };
+    if (this.repaintHandler && !drawArgs.requestRepaint) drawArgs.requestRepaint = this.repaintHandler;
+    return drawArgs;
   }
 
   /**

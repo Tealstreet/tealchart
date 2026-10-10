@@ -1526,6 +1526,16 @@ batch is validated before any draw operation. Replayers own DPR/clip placement a
 finite commands for the current native projection revision. Business indicator classes remain
 with the app's original `JailbreakIndicatorManager` and factories.
 
+**Jailbreak repaint requests.** `IndicatorDrawArgs.requestRepaint` lets an
+indicator whose data arrives between frames (order-flow websocket frames) ask
+for a repaint. `JailbreakIndicatorManager.setRepaintHandler` injects it into
+every draw; `TealchartWidget` sets it to `markDirty(DIRTY.REPAINT)` and clears it
+on destroy. `DIRTY.REPAINT` repaints the main canvas and crosshair overlay only,
+and is deliberately OUTSIDE `FULL`: `ChartCore.paint` gates on
+`dirty & (... | DIRTY.FULL)`, so any bit inside `FULL` also rebuilds interactive
+lines. The TradingView path supplies the same field from the patched bundle; see
+`apps/web/src/components/chart/CLAUDE.md`.
+
 External hosts and ChartCore share `rendering/jailbreakTooltips.ts` for the
 original grouped hover/left tooltip placement and styling. Tooltip bar callbacks
 consume seconds, as do existing jailbreak drawing factories; internal renderer

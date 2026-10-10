@@ -305,6 +305,22 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('REPAINT repaints the main canvas without rebuilding interactive lines', async () => {
+    const core = await createChartCore();
+    const renderer = (core as unknown as { renderer: TealchartRenderer }).renderer;
+    const renderSpy = vi.spyOn(renderer, 'renderWithLayout');
+    const linesSpy = vi.spyOn(core as unknown as { updateInteractiveLines: () => void }, 'updateInteractiveLines');
+    core.setBars(makeBars(2));
+    renderSpy.mockClear();
+    linesSpy.mockClear();
+
+    core.paint(DIRTY.REPAINT);
+
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+    expect(linesSpy).not.toHaveBeenCalled();
+    core.dispose();
+  });
+
   it('setBars auto-calculates viewport on first bar load', async () => {
     const core = await createChartCore();
     expect(core.getViewport()).toBeNull();

@@ -22,6 +22,11 @@ export const DIRTY = {
   OPTIONS: 1 << 7, // Render options (colors, font) changed
   DATA_LOAD: 1 << 8, // Atomic data transition (symbol/interval/reset)
   USER_DRAWINGS: 1 << 9, // User-created drawing state changed
+  // Main canvas + crosshair overlay repaint and nothing else: a jailbreak
+  // indicator's data arrived between frames (`IndicatorDrawArgs.requestRepaint`).
+  // Deliberately OUTSIDE `FULL`: ChartCore tests `dirty & (... | FULL)`, so a
+  // bit inside FULL would also rebuild interactive lines on every data frame.
+  REPAINT: 1 << 10,
   // Everything EXCEPT DATA_LOAD. DATA_LOAD clears stale indicator outputs unless
   // a fresh PLOTS/DRAWINGS update is coalesced into the same RAF snapshot (see
   // TealchartWidget._render), and must only be set explicitly by a real

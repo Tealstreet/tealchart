@@ -2082,6 +2082,7 @@ export class ChartCore {
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
         DIRTY.LINES |
+        DIRTY.REPAINT |
         DIRTY.FULL);
 
     if (needsCanvasRepaint) {
@@ -2101,6 +2102,7 @@ export class ChartCore {
         DIRTY.OPTIONS |
         DIRTY.DATA_LOAD |
         DIRTY.LINES |
+        DIRTY.REPAINT |
         DIRTY.FULL)
     ) {
       this.renderCrosshairOverlay();

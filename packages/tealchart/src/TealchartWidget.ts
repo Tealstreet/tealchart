@@ -639,6 +639,11 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Initialize JailbreakIndicatorManager if factories are provided
     if (options.jailbreakIndicatorFactories && Object.keys(options.jailbreakIndicatorFactories).length > 0) {
       this._jailbreakManager = new JailbreakIndicatorManager();
+      // Indicator data that arrives between frames (order-flow websocket
+      // frames on a quiet market) repaints the main canvas only.
+      this._jailbreakManager.setRepaintHandler(() => {
+        if (!this._disposed) this._scheduler.markDirty(DIRTY.REPAINT);
+      });
     }
 
     // Set up keyboard event listeners
@@ -3007,6 +3012,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     }
 
     // Clean up jailbreak indicator state
+    this._jailbreakManager?.setRepaintHandler(null);
     this._jailbreakManager = null;
     this._jailbreakInstanceIds.clear();
 
