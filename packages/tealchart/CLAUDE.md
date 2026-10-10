@@ -1591,3 +1591,7 @@ intervalToMs(interval)`) reached back a few hours and loaded empty. The month
 is a nominal 30 days for DURATION math only (fetch ranges, viewport, gap
 timeouts); `normalizeDatafeedBars` never re-buckets bars of a day or longer, so
 calendar-month bar times are kept as the venue sends them.
+Anything that needs when a month bar CLOSES uses `barCloseTimeMs`, which adds
+whole calendar months (the last-trade countdown counted 30 days, so it ran out
+on October 31st and three days into March). Weekly and shorter bars are a
+fixed duration there.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { normalizeDatafeedBar } from './normalizeDatafeedBars';
-import { intervalToMs, MONTH_MS } from './intervalMs';
+import { barCloseTimeMs, intervalToMs, MONTH_MS } from './intervalMs';
 
 const MINUTE = 60_000;
 const DAY = 24 * 60 * MINUTE;
@@ -38,5 +38,31 @@ describe('intervalToMs', () => {
   it('never re-buckets a monthly bar to a fixed grid', () => {
     const octFirst = Date.UTC(2026, 9, 1);
     expect(normalizeDatafeedBar({ time: octFirst, open: 1, high: 1, low: 1, close: 1 }, '1M').time).toBe(octFirst);
+  });
+});
+
+describe('barCloseTimeMs', () => {
+  it.each([
+    // [year, month (1-based), days]: 28, 29, 30 and 31-day months and a year rollover.
+    [2026, 2, 28],
+    [2024, 2, 29],
+    [2026, 4, 30],
+    [2026, 10, 31],
+    [2026, 12, 31],
+  ])('closes the %d-%d month bar on the 1st of the next month, %d days later', (year, month, days) => {
+    const open = Date.UTC(year, month - 1, 1);
+    expect(barCloseTimeMs('1M', open)).toBe(Date.UTC(year, month, 1));
+    expect((barCloseTimeMs('M', open) - open) / DAY).toBe(days);
+  });
+
+  it('adds whole calendar months for multi-month resolutions', () => {
+    expect(barCloseTimeMs('3M', Date.UTC(2026, 10, 1))).toBe(Date.UTC(2027, 1, 1));
+  });
+
+  it('is a fixed duration for every other resolution', () => {
+    const open = Date.UTC(2026, 9, 5);
+    expect(barCloseTimeMs('1W', open)).toBe(open + 7 * DAY);
+    expect(barCloseTimeMs('1m', open)).toBe(open + MINUTE);
+    expect(barCloseTimeMs('60', open)).toBe(open + 60 * MINUTE);
   });
 });

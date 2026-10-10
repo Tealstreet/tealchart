@@ -3,7 +3,7 @@ import type { Bar, PriceLine } from '../types';
 import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from '../constants';
 import { formatPriceWithPrecision } from '../state/chartState';
 import { formatPriceByMagnitude } from './priceFormatters';
-import { intervalToMs } from '../viewport/viewScale';
+import { barCloseTimeMs } from './intervalMs';
 
 interface BuildLastTradePriceLineOptions {
   latestBar: Bar | null | undefined;
@@ -36,9 +36,8 @@ export function buildLastTradePriceLine({
     return null;
   }
 
-  const intervalMs = intervalToMs(interval);
   const barTimeMs = latestBar.time < 1e12 ? latestBar.time * 1000 : latestBar.time;
-  const barCloseTime = barTimeMs + intervalMs;
+  const barCloseTime = barCloseTimeMs(interval, barTimeMs);
 
   return {
     id: 'last-trade',

@@ -48,6 +48,13 @@ describe('buildLastTradePriceLine', () => {
     expect(line?.label.primaryText).toBe('12,345.7');
   });
 
+  it('counts a monthly bar down to the 1st of the next month, not 30 days', () => {
+    const october = Date.UTC(2026, 9, 1);
+    const line = buildLastTradePriceLine({ latestBar: { ...latestBar, time: october }, interval: '1M' });
+
+    expect(line?.countdownToTime).toBe(Date.UTC(2026, 10, 1));
+  });
+
   it('returns null when there is no bar data', () => {
     expect(
       buildLastTradePriceLine({
