@@ -967,6 +967,13 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
     jailbreak: {
       inputs: [
         {
+          id: 'detection',
+          name: 'Detection',
+          type: 'string',
+          defval: 'Candle',
+          options: ['Candle', 'Sub-bars (15m)'],
+        },
+        {
           id: 'minCandleSizeTicks',
           name: 'Min Candle Size (ticks)',
           type: 'int',
@@ -1023,7 +1030,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         { id: 'rowSizeTicks', name: 'Row Size (ticks)', type: 'int', defval: 1, min: 1, max: 500, step: 1 },
         {
           id: 'maxSignalsPerCandle',
-          name: 'Max Signals per Candle (0 = all)',
+          name: 'Max Signals per Candle (sub-bars only, 0 = all)',
           type: 'int',
           defval: 3,
           min: 0,
@@ -1032,6 +1039,7 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
         },
       ],
       defaults: {
+        detection: 'Candle',
         minCandleSizeTicks: 2,
         minDeltaThreshold: 0,
         priceMovePercent: 0.15,
