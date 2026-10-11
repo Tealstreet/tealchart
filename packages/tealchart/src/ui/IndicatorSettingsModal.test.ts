@@ -12,6 +12,83 @@ describe('IndicatorSettingsModal', () => {
     clearChartStoreCache();
   });
 
+  it('themes the native Defaults control and retains its translated options', () => {
+    const modal = new IndicatorSettingsModal({
+      translations: { defaults: 'Standardwerte', resetSettings: 'Einstellungen zurücksetzen' },
+    });
+    modal.mount(document.body);
+    modal.openWith({ id: 'study', name: 'Study', inputs: {} }, [], [], undefined, () => {});
+
+    const defaults = screen.getByRole('combobox', { name: 'Standardwerte' }) as HTMLSelectElement;
+    expect(defaults.style.backgroundColor).toBe('var(--tc-input-bg, var(--tc-canvas-bg, #131722))');
+    expect(defaults.style.color).toBe('var(--tc-text, #d1d4dc)');
+    expect(defaults.style.padding).toBe('6px 10px');
+    expect(defaults.selectedOptions[0].textContent).toBe('Standardwerte');
+    expect(Array.from(defaults.options, (option) => option.value)).toEqual(['', 'reset']);
+
+    fireEvent.change(defaults, { target: { value: 'reset' } });
+    expect(defaults.selectedOptions[0].textContent).toBe('Standardwerte');
+    modal.unmount();
+  });
+
+  it('keeps palette swatches and opacity in shared columns with wrapping labels', () => {
+    const modal = new IndicatorSettingsModal();
+    modal.mount(document.body);
+    modal.openWith(
+      { id: 'tpo', name: 'TPO', inputs: {} },
+      [{ id: 'length', type: 'int', title: 'Length', defval: 20 }],
+      [],
+      undefined,
+      () => {},
+      [],
+      [
+        { id: 'short', type: 'color', title: 'Solid', defval: '#22ab94' },
+        {
+          id: 'long', type: 'color', title: 'Single Print Extension With A Long Label',
+          tooltip: 'A long explanation that should wrap within the label column', defval: '#501b8080',
+        },
+      ],
+    );
+    const numericRow = document.querySelector('input[type="number"]')!.parentElement!;
+    fireEvent.click(screen.getByText('Style'));
+
+    for (const title of ['Solid', 'Single Print Extension With A Long Label']) {
+      const swatch = screen.getByLabelText(title) as HTMLInputElement;
+      const opacity = screen.getByLabelText(`${title} opacity`) as HTMLInputElement;
+      const controls = swatch.parentElement!;
+      const row = controls.parentElement!;
+      expect(opacity.parentElement).toBe(controls);
+      expect(row.children).toHaveLength(2);
+      expect(row.style.display).toBe('grid');
+      expect(row.style.gridTemplateColumns).toBe(numericRow.style.gridTemplateColumns);
+      expect((row.firstElementChild as HTMLElement).style.overflowWrap).toBe('anywhere');
+      expect(controls.style.display).toBe('flex');
+      expect(controls.style.flexWrap).toBe('wrap');
+      expect(swatch.style.boxSizing).toBe('border-box');
+      expect(swatch.style.maxWidth).toBe('100%');
+      expect(opacity.style.flex).toBe('1 1 40px');
+      expect(opacity.style.minWidth).toBe('0px');
+    }
+    modal.unmount();
+  });
+
+  it('keeps scroll content shrinkable when a narrow chart wraps the settings footer', () => {
+    const chart = document.createElement('div');
+    Object.assign(chart.style, { width: '250px', height: '320px' });
+    document.body.append(chart);
+    const modal = new IndicatorSettingsModal();
+    modal.mount(chart);
+    modal.openWith({ id: 'study', name: 'Study', inputs: {} },
+      [{ id: 'length', type: 'int', title: 'Length', defval: 20 }], [], undefined, () => {});
+    const content = modal.getContentElement();
+    const footer = screen.getByRole('button', { name: 'Apply' }).parentElement!;
+    expect(footer.style.flexWrap).toBe('wrap');
+    expect(footer.style.flexShrink).toBe('0');
+    expect(content.style.minHeight).toBe('0px');
+    expect(content.style.overflowY).toBe('auto');
+    modal.unmount();
+  });
+
   it('renders Pine input metadata controls and saves typed values', () => {
     const modal = new IndicatorSettingsModal();
     modal.mount(document.body);

@@ -11,6 +11,8 @@ export interface AnalysisSelectorOptions {
   container: HTMLElement;
   getFrame: () => AnalysisSelectionFrame | null;
   canStart: () => boolean;
+  getControlsLeft?: () => number;
+  controlsLeftTransition?: string;
   onAnalysisRequest?: (intent: AnalysisRequestIntent) => void;
   acceptsEvent?: (event: Event) => boolean;
   onActiveChange?: (active: boolean) => void;
@@ -80,9 +82,14 @@ export class AnalysisSelector {
   private pointerId?: number;
   private disposed = false;
   private focusingSelection = false;
+  private controlsVisible = false;
+  private controlsFocused = false;
+  private hideTimer?: ReturnType<typeof setTimeout>;
 
   constructor(private readonly options: AnalysisSelectorOptions) {
     this.handler = options.onAnalysisRequest;
+    for (const controls of [this.toolbar, this.actions, this.message])
+      controls.style.transition = options.controlsLeftTransition ?? '';
     const select = this.control('Select pattern', () => this.start());
     select.prepend(icons.analysisWand(14));
     Object.assign(select.style, { display: 'flex', alignItems: 'center', gap: '4px' });
@@ -93,7 +100,7 @@ export class AnalysisSelector {
     this.actions.append(
       this.control('Describe this TA pattern', () => this.request('describe', true)),
       this.control('Find similar TA', () => this.request('similar', true)),
-      this.control('Cancel', () => this.cancel()),
+      this.control('Cancel', () => this.dismiss()),
     );
     this.root.append(this.surface, this.highlight, this.toolbar, this.actions, this.message);
     this.root.dataset.tealchartAnalysisSelector = '';
@@ -122,13 +129,19 @@ export class AnalysisSelector {
     document.addEventListener('keydown', this.keyDown, true);
     document.addEventListener('pointerdown', this.outsideInput, true);
     document.addEventListener('focusin', this.outsideInput, true);
+    document.addEventListener('focusout', this.focusOut, true);
+    document.addEventListener('pointerout', this.pointerOut, true);
     this.update();
   }
 
   setHandler(handler: ((intent: AnalysisRequestIntent) => void) | undefined): void {
     if (this.disposed) return;
     this.handler = handler;
-    if (!handler) this.cancel();
+    if (!handler) {
+      this.clearHideTimer();
+      this.controlsVisible = false;
+      this.cancel();
+    }
     this.update();
   }
 
@@ -172,11 +185,17 @@ export class AnalysisSelector {
     this.selection.cancel(message);
   }
 
+  leave(message?: string): void {
+    if (this.isActive()) this.cancel(message);
+    this.scheduleHide();
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
     this.handler = undefined;
     this.cancel();
+    this.clearHideTimer();
     window.removeEventListener('pointermove', this.pointerMove, true);
     window.removeEventListener('pointerup', this.pointerUp, true);
     window.removeEventListener('pointercancel', this.pointerCancel, true);
@@ -184,6 +203,8 @@ export class AnalysisSelector {
     document.removeEventListener('keydown', this.keyDown, true);
     document.removeEventListener('pointerdown', this.outsideInput, true);
     document.removeEventListener('focusin', this.outsideInput, true);
+    document.removeEventListener('focusout', this.focusOut, true);
+    document.removeEventListener('pointerout', this.pointerOut, true);
     this.root.remove();
   }
 
@@ -228,21 +249,24 @@ export class AnalysisSelector {
     if (!state.active) this.pointerId = undefined;
     const frame = this.selection.getFrame();
     this.root.style.display = this.handler ? 'block' : 'none';
-    this.toolbar.style.display = state.active ? 'none' : 'flex';
-    this.toolbar.style.left = `${(frame?.plot.left ?? 0) + 6}px`;
+    this.toolbar.style.display = !state.active && this.controlsVisible ? 'flex' : 'none';
+    this.actions.style.display = state.active ? 'flex' : 'none';
+    const controlsLeft = Math.max((frame?.plot.left ?? 0) + 32, this.options.getControlsLeft?.() ?? 0);
+    this.toolbar.style.left = `${controlsLeft}px`;
     if (frame)
-      for (const controls of [this.toolbar, this.actions])
+      for (const controls of [this.toolbar, this.actions, this.message])
         Object.assign(controls.style, {
-          maxWidth: `${Math.max(0, frame.plot.width - 12)}px`,
+          maxWidth: `${Math.max(0, frame.plot.left + frame.plot.width - controlsLeft - 6)}px`,
           maxHeight: `${Math.max(0, frame.plot.height - 12)}px`,
         });
     const activeControls = state.active ? this.actions : this.toolbar;
+    this.controlsFocused = this.handler !== undefined && document.activeElement instanceof Node &&
+      activeControls.contains(document.activeElement);
     const controlsTop = frame
       ? Math.max(frame.plot.top + 6, frame.plot.top + frame.plot.height - (activeControls.offsetHeight || 30) - 6)
       : 6;
     this.toolbar.style.top = `${controlsTop}px`;
     this.surface.style.display = state.active && frame ? 'block' : 'none';
-    this.actions.style.display = state.active ? 'flex' : 'none';
     this.message.textContent =
       state.message ?? (state.active && !state.range ? 'Drag across a pattern on the main chart.' : '');
     this.message.style.display = this.message.textContent ? 'block' : 'none';
@@ -254,9 +278,9 @@ export class AnalysisSelector {
       width: `${frame.plot.width}px`,
       height: `${frame.plot.height}px`,
     });
-    this.actions.style.left = `${frame.plot.left + 6}px`;
+    this.actions.style.left = `${controlsLeft}px`;
     this.actions.style.top = `${controlsTop}px`;
-    this.message.style.left = `${frame.plot.left + 6}px`;
+    this.message.style.left = `${controlsLeft}px`;
     this.message.style.top = `${Math.max(frame.plot.top + 6, controlsTop - 38)}px`;
     for (const control of this.actions.querySelectorAll<HTMLButtonElement>('button'))
       control.disabled = control.textContent !== 'Cancel' && !state.range;
@@ -300,7 +324,20 @@ export class AnalysisSelector {
     if (this.selection.begin(point.x, point.y)) this.pointerId = event.pointerId;
   };
   private readonly pointerMove = (event: PointerEvent): void => {
-    if (!this.acceptsEvent(event) || this.pointerId !== event.pointerId) return;
+    if (!this.acceptsEvent(event)) return;
+    const frame = this.selection.getFrame();
+    const point = this.localPoint(event);
+    const rect = this.options.container.getBoundingClientRect();
+    const plot = frame?.plot ?? {
+      left: 0, top: 0,
+      width: this.options.container.clientWidth || rect.width,
+      height: this.options.container.clientHeight || rect.height,
+    };
+    const inside = point.x >= plot.left && point.x <= plot.left + plot.width &&
+      point.y >= plot.top && point.y <= plot.top + plot.height;
+    if (inside || (event.target instanceof Node && this.root.contains(event.target))) this.showControls();
+    else this.scheduleHide();
+    if (this.pointerId === undefined || this.pointerId !== event.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
     this.update();
@@ -319,17 +356,20 @@ export class AnalysisSelector {
     if (this.pointerId === event.pointerId) this.cancel('Pattern selection was interrupted. Select the pattern again.');
   };
   private readonly blur = (event: Event): void => {
-    if (
-      this.acceptsEvent(event) &&
-      !this.focusingSelection &&
-      !(event.target instanceof Element) &&
-      this.selection.getState().active
-    )
-      this.cancel('Selection cancelled because the chart lost focus.');
+    if (!this.acceptsEvent(event) || this.focusingSelection || event.target instanceof Element) return;
+    this.controlsFocused = false;
+    this.scheduleHide();
+    if (this.selection.getState().active) this.cancel('Selection cancelled because the chart lost focus.');
   };
   private readonly outsideInput = (event: Event): void => {
+    if (!this.acceptsEvent(event)) return;
+    if (event.type === 'focusin') {
+      this.controlsFocused = event.target instanceof Node &&
+        (this.toolbar.contains(event.target) || this.actions.contains(event.target));
+      if (this.controlsFocused) this.showControls();
+      else this.scheduleHide();
+    }
     if (
-      this.acceptsEvent(event) &&
       this.selection.getState().active &&
       event.target instanceof Node &&
       !this.root.contains(event.target)
@@ -337,7 +377,17 @@ export class AnalysisSelector {
       this.cancel('Selection cancelled because the chart lost focus.');
   };
   private readonly keyDown = (event: KeyboardEvent): void => {
-    if (!this.acceptsEvent(event) || !this.selection.getState().active) return;
+    if (!this.acceptsEvent(event)) return;
+    const state = this.selection.getState();
+    if (event.key === 'Escape' && (state.active || state.range)) {
+      if (state.active) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      this.dismiss();
+      return;
+    }
+    if (!state.active) return;
     if (
       event.target instanceof Element &&
       !this.root.contains(event.target) &&
@@ -347,11 +397,6 @@ export class AnalysisSelector {
       return;
     }
     event.stopPropagation();
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.cancel();
-      return;
-    }
     const buttonKey =
       event.target instanceof HTMLButtonElement &&
       this.root.contains(event.target) &&
@@ -362,4 +407,41 @@ export class AnalysisSelector {
   private acceptsEvent(event: Event): boolean {
     return !this.disposed && (this.options.acceptsEvent?.(event) ?? true);
   }
+
+  private dismiss(): void {
+    this.cancel();
+    this.handler?.({ action: 'cancel' });
+  }
+
+  private showControls(): void {
+    this.clearHideTimer();
+    if (this.controlsVisible || !this.handler) return;
+    this.controlsVisible = true;
+    this.render(this.selection.getState());
+  }
+
+  private scheduleHide(): void {
+    if (!this.controlsVisible || this.controlsFocused || this.hideTimer !== undefined) return;
+    this.hideTimer = setTimeout(() => {
+      this.hideTimer = undefined;
+      this.controlsVisible = false;
+      this.render(this.selection.getState());
+    }, 750);
+  }
+
+  private clearHideTimer(): void {
+    if (this.hideTimer !== undefined) clearTimeout(this.hideTimer);
+    this.hideTimer = undefined;
+  }
+
+  private readonly focusOut = (event: FocusEvent): void => {
+    if (!this.acceptsEvent(event)) return;
+    this.controlsFocused = event.relatedTarget instanceof Node &&
+      (this.toolbar.contains(event.relatedTarget) || this.actions.contains(event.relatedTarget));
+    if (!this.controlsFocused) this.scheduleHide();
+  };
+
+  private readonly pointerOut = (event: PointerEvent): void => {
+    if (this.acceptsEvent(event) && !event.relatedTarget) this.scheduleHide();
+  };
 }

@@ -293,16 +293,24 @@ describe('original chart UI adopted overlays', () => {
     modal.setOverlayHost(f.factory);
     modal.mount(f.source);
     modal.openWith({ id: 'study-1', name: 'Study', inputs: { length: 14 } },
-      [{ id: 'length', title: 'Length', type: 'int', defval: 14 }], [], undefined, saved);
+      [{ id: 'length', title: 'Length', type: 'int', defval: 14 }], [], undefined, saved, [],
+      [{ id: 'background', title: 'Background', type: 'color', defval: '#abcdef80' }]);
     const element = modal.getElement();
     f.admit();
     await f.host.ready;
     const input = f.target.document.querySelector<HTMLInputElement>('input[type="number"]')!;
     fireEvent.input(input, { target: { value: '21' } });
     fireEvent.change(input, { target: { value: '21' } });
+    const style = [...f.target.document.querySelectorAll('button')].find((button) => button.textContent === 'Style')!;
+    fireEvent.click(style);
+    const swatch = f.target.document.querySelector<HTMLInputElement>('[aria-label="Background"]')!;
+    const opacity = f.target.document.querySelector<HTMLInputElement>('[aria-label="Background opacity"]')!;
+    expect(opacity.parentElement).toBe(swatch.parentElement);
+    expect(swatch.parentElement!.parentElement!.style.display).toBe('grid');
+    fireEvent.input(opacity, { target: { value: '20' } });
     const apply = [...f.target.document.querySelectorAll('button')].find((button) => button.textContent === 'Apply')!;
     fireEvent.click(apply);
-    expect(saved).toHaveBeenCalledWith({ length: 21 }, []);
+    expect(saved).toHaveBeenCalledWith({ length: 21, background: '#abcdef14' }, []);
     expect(modal.getElement()).toBe(element);
     modal.close();
     modal.openWith({ id: 'study-1', name: 'Study', inputs: { length: 34 } },

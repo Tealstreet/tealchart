@@ -88,17 +88,21 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   formRow: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: '12px',
     gap: '12px',
+  } as Partial<CSSStyleDeclaration>,
+
+  labelContainer: {
+    minWidth: '0',
+    overflowWrap: 'anywhere',
   } as Partial<CSSStyleDeclaration>,
 
   label: {
     color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
-    flex: '1',
   } as Partial<CSSStyleDeclaration>,
 
   tooltip: {
@@ -115,6 +119,9 @@ const contentStyles = {
     color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     width: '120px',
+    maxWidth: '100%',
+    minWidth: '0',
+    boxSizing: 'border-box',
     outline: 'none',
   } as Partial<CSSStyleDeclaration>,
 
@@ -126,6 +133,9 @@ const contentStyles = {
     color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     width: '140px',
+    maxWidth: '100%',
+    minWidth: '0',
+    boxSizing: 'border-box',
     outline: 'none',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
@@ -143,12 +153,28 @@ const contentStyles = {
 
   colorInput: {
     width: '60px',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
     height: '28px',
     padding: '2px',
     border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     backgroundColor: 'var(--tc-input-bg, var(--tc-canvas-bg, #131722))',
     cursor: 'pointer',
+  } as Partial<CSSStyleDeclaration>,
+
+  colorControls: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '12px',
+    minWidth: '0',
+  } as Partial<CSSStyleDeclaration>,
+
+  opacityInput: {
+    flex: '1 1 40px',
+    minWidth: '0',
+    margin: '0',
   } as Partial<CSSStyleDeclaration>,
 
   // Style tab
@@ -307,7 +333,11 @@ export class IndicatorSettingsModal extends Modal {
     this.settingsOptions = options;
     const defaults = document.createElement('select');
     defaults.setAttribute('aria-label', options.translations?.defaults || 'Defaults');
-    defaults.style.marginRight = 'auto';
+    Object.assign(defaults.style, contentStyles.select, {
+      width: 'auto',
+      marginRight: 'auto',
+      outline: 'revert',
+    });
     defaults.add(new Option(options.translations?.defaults || 'Defaults', ''));
     defaults.add(new Option(options.translations?.resetSettings || 'Reset settings', 'reset'));
     defaults.addEventListener('change', () => {
@@ -326,13 +356,14 @@ export class IndicatorSettingsModal extends Modal {
     this.footerEl?.prepend(defaults);
 
     // Set modal width constraints
-    this.modalEl.style.minWidth = '320px';
+    this.modalEl.style.width = 'calc(100% - 32px)';
+    this.modalEl.style.minWidth = '0';
     this.modalEl.style.maxWidth = '480px';
+    if (this.footerEl) this.footerEl.style.flexWrap = 'wrap';
 
     // Content area styling
     this.contentEl.style.padding = '16px';
     this.contentEl.style.overflowY = 'auto';
-    this.contentEl.style.minHeight = '120px';
   }
 
   // ============================================================================
@@ -556,7 +587,7 @@ export class IndicatorSettingsModal extends Modal {
     const active = this.isInputActive(def);
 
     // Label
-    const labelContainer = document.createElement('div');
+    const labelContainer = this.createElement('div', { style: contentStyles.labelContainer });
     const label = this.createElement('div', {
       style: contentStyles.label,
       textContent: def.title,
@@ -714,6 +745,7 @@ export class IndicatorSettingsModal extends Modal {
       }
 
       case 'color': {
+        const controls = this.createElement('div', { style: contentStyles.colorControls });
         const colorInput = document.createElement('input');
         colorInput.type = 'color';
         Object.assign(colorInput.style, contentStyles.colorInput);
@@ -732,9 +764,10 @@ export class IndicatorSettingsModal extends Modal {
               (alpha < 1 || /^#[0-9a-f]{8}$/i.test(previous) ? hex(Math.round(alpha * 255)) : ''),
           );
         });
-        row.appendChild(colorInput);
+        controls.appendChild(colorInput);
         const opacity = document.createElement('input');
         opacity.type = 'range';
+        Object.assign(opacity.style, contentStyles.opacityInput);
         opacity.min = '0';
         opacity.max = '255';
         opacity.value = String(Math.round((channels?.alpha ?? 1) * 255));
@@ -744,7 +777,8 @@ export class IndicatorSettingsModal extends Modal {
         opacity.addEventListener('input', () => {
           this.updateValue(def.id, colorInput.value + Number(opacity.value).toString(16).padStart(2, '0'));
         });
-        row.appendChild(opacity);
+        controls.appendChild(opacity);
+        row.appendChild(controls);
         break;
       }
 

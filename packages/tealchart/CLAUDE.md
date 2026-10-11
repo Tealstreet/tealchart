@@ -2,6 +2,8 @@ Pine Style controls on web retain coded plots separately from display overrides.
 Reselecting a plot sets all display locations; Defaults resets coded inputs and
 clears Style overrides. Omitted percent precision uses two decimal places in the
 shared output formatter; explicit script precision still wins.
+The native Defaults select uses the modal's theme colors and padding, retaining
+native keyboard focus and reset behavior when adopted into a desktop overlay.
 
 # CLAUDE.md — @tealstreet/tealchart
 
@@ -955,6 +957,12 @@ supply ordered millisecond/CSS-pixel candle anchors for native index-based time
 scales; affine first-party projections retain their existing path. Hosts can admit
 trusted DOM events and synchronously block financial input while selection is
 active. Geometry or ownership changes cancel the frozen selection visibly.
+Idle controls reveal on plot hover and hide 750 ms after leaving or losing focus;
+keyboard-focused controls and active selection actions stay available. Hosts supply
+the drawing-rail boundary; controls also clear native toggle overhangs. Escape
+clears active and retained selections and emits a cancel intent without analysis.
+Controls are displayed before measuring wrapped height so their first placement
+stays above the time axis on narrow main plots.
 
 `TealchartApi.addBuiltinIndicator(id)` is the awaitable saved-indicator capability.
 The web owner uses the picker path, including instance mapping, layout dirtiness,
@@ -1573,6 +1581,11 @@ tests retain the mounted picture before changing shared viewport values.
 `IndicatorSettingsModal.openWith` accepts optional Style input definitions for
 canvas indicators without plot outputs. Colors preserve hex alpha and expose
 opacity; Defaults resets both Inputs and Style input values.
+Input and palette rows share two equal, shrinkable label/control columns; each
+palette control groups its swatch and opacity slider, wrapping on narrow panes. Labels
+wrap, and the modal and footer stay within the chart surface on narrow layouts.
+Settings content retains the base modal's zero minimum height so a wrapped footer
+stays visible while Inputs and Style scroll on short chart surfaces.
 
 Analysis controls are package-owned and model-neutral on web and Skia. The host
 opts in with `onAnalysisRequest` and may toggle it without remounting through

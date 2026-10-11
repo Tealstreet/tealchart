@@ -65,6 +65,8 @@ import {
 } from '../drawings';
 import {
   computeTradingLineLabelMinX,
+  LEFT_TOOL_RAIL_ANIMATION_DURATION_MS,
+  LEFT_TOOL_RAIL_ANIMATION_EASING,
   resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
@@ -670,6 +672,7 @@ export class TealchartWidgetUI {
 
   private updateUiPreferenceGeometry(): void {
     const railMetrics = this.getLeftToolRailMetrics();
+    this.analysisSelector?.update();
     this.chartCore?.setChartLabelMinX(this.getChartLabelMinX());
     this.legend?.setChromeMetrics(railMetrics);
     for (const legend of this.indicatorPaneLegends.values()) {
@@ -1148,6 +1151,11 @@ export class TealchartWidgetUI {
     if (this.analysisSelector) return;
     this.analysisSelector = new AnalysisSelector({
       container: this.overlayRoot,
+      controlsLeftTransition: `left ${LEFT_TOOL_RAIL_ANIMATION_DURATION_MS}ms ${LEFT_TOOL_RAIL_ANIMATION_EASING}`,
+      getControlsLeft: () => {
+        const rail = this.getLeftToolRailMetrics();
+        return rail.leftToolRailInset + rail.leftToolRailWidth + 20;
+      },
       getFrame: () => this.chartCore?.getAnalysisSelectionFrame(this.options.getAnalysisIdentity?.() ?? null) ?? null,
       canStart: () =>
         Boolean(this.chartCore?.canStartAnalysisSelection()) &&

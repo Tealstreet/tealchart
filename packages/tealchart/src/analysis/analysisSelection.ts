@@ -1,7 +1,7 @@
 import type { AnalysisTimeRange } from './types';
 
 export interface AnalysisRequestIntent {
-  action: 'describe' | 'similar';
+  action: 'describe' | 'similar' | 'cancel';
   range?: AnalysisTimeRange;
 }
 

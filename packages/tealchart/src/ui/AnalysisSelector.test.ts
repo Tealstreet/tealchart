@@ -18,6 +18,7 @@ afterEach(() => {
   selector?.dispose();
   selector = undefined;
   document.body.replaceChildren();
+  vi.useRealTimers();
 });
 
 function fixture(options: Partial<AnalysisSelectorOptions> = {}) {
@@ -319,12 +320,153 @@ describe('web analysis controls', () => {
     });
     control('Select pattern').click();
     const actions = control('Cancel').parentElement!;
-    expect(actions.style.maxWidth).toBe('88px');
+    expect(actions.style.maxWidth).toBe('62px');
     expect(actions.style.maxHeight).toBe('48px');
     expect(Number.parseFloat(actions.style.top)).toBeGreaterThanOrEqual(42);
     const input = document.createElement('input');
     document.body.append(input);
     input.focus();
     expect(root.querySelector('[role="status"]')!.textContent).toContain('lost focus');
+  });
+
+  it('measures displayed wrapped actions before placing them above the time axis', () => {
+    const { control } = fixture();
+    const actions = control('Cancel').parentElement!;
+    Object.defineProperty(actions, 'offsetHeight', {
+      get: () => actions.style.display === 'none' ? 0 : 84,
+    });
+    selector!.start();
+    expect(actions.style.display).toBe('flex');
+    expect(Number.parseFloat(actions.style.top) + actions.offsetHeight)
+      .toBeLessThanOrEqual(frame.plot.top + frame.plot.height - 6);
+  });
+
+  it('reveals on chart hover without consuming chart input, delays hiding, and cancels hiding on reentry', () => {
+    vi.useFakeTimers();
+    const { control, pointer } = fixture();
+    const toolbar = control('Analyze chart').parentElement!;
+    const chart = document.createElement('canvas');
+    document.body.append(chart);
+    const move = vi.fn();
+    chart.addEventListener('pointermove', move);
+    expect(toolbar.style.display).toBe('none');
+    pointer(chart, 'pointermove', 120);
+    expect(toolbar.style.display).toBe('flex');
+    expect(move).toHaveBeenCalledOnce();
+    expect(move.mock.calls[0]![0].defaultPrevented).toBe(false);
+    pointer(window, 'pointermove', 1100);
+    vi.advanceTimersByTime(749);
+    expect(toolbar.style.display).toBe('flex');
+    pointer(chart, 'pointermove', 120);
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('flex');
+    document.dispatchEvent(new MouseEvent('pointerout', { bubbles: true }));
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('none');
+  });
+
+  it('keeps keyboard focused controls and active selection actions visible, then hides on blur', () => {
+    vi.useFakeTimers();
+    const { control, pointer } = fixture();
+    const toolbar = control('Analyze chart').parentElement!;
+    pointer(window, 'pointermove', 120);
+    control('Analyze chart').focus();
+    pointer(window, 'pointermove', 1100);
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('flex');
+    window.dispatchEvent(new Event('blur'));
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('none');
+    selector!.start();
+    const actions = control('Cancel').parentElement!;
+    pointer(window, 'pointermove', 1100);
+    vi.advanceTimersByTime(750);
+    expect(actions.style.display).toBe('flex');
+    expect(selector!.isActive()).toBe(true);
+  });
+
+  it('honors changing drawing rail geometry and keeps controls beyond the toggle overhang', () => {
+    let railEnd = 100;
+    const { control, pointer } = fixture({ getControlsLeft: () => railEnd });
+    const toolbar = control('Analyze chart').parentElement!;
+    pointer(window, 'pointermove', 120);
+    expect(toolbar.style.left).toBe('100px');
+    expect(toolbar.style.maxWidth).toBe('854px');
+    railEnd = 10;
+    selector!.update();
+    expect(toolbar.style.left).toBe('52px');
+  });
+
+  it('does not pin idle controls to an action that was hidden after analysis', () => {
+    vi.useFakeTimers();
+    const { root, control, pointer } = fixture();
+    selector!.start();
+    const surface = root.querySelector('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointerup', 520);
+    control('Describe this TA pattern').focus();
+    control('Describe this TA pattern').click();
+    const toolbar = control('Analyze chart').parentElement!;
+    expect(toolbar.style.display).toBe('flex');
+    pointer(window, 'pointermove', 1100);
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('none');
+  });
+
+  it('starts the leave delay after cancelling a keyboard focused active action', () => {
+    vi.useFakeTimers();
+    const { control, pointer } = fixture();
+    pointer(window, 'pointermove', 120);
+    selector!.start();
+    control('Cancel').focus();
+    selector!.leave('Selection cancelled because the chart lost focus.');
+    const toolbar = control('Analyze chart').parentElement!;
+    expect(selector!.isActive()).toBe(false);
+    expect(toolbar.style.display).toBe('flex');
+    vi.advanceTimersByTime(750);
+    expect(toolbar.style.display).toBe('none');
+  });
+
+  it('clears the tool and retained selection on Escape even after focus moves to chat', () => {
+    const { root, control, handler, pointer } = fixture();
+    selector!.start();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(selector!.isActive()).toBe(false);
+    expect(handler).toHaveBeenLastCalledWith({ action: 'cancel' });
+    selector!.start();
+    const surface = root.querySelector<HTMLElement>('[aria-label="Select chart pattern"]')!;
+    pointer(surface, 'pointerdown', 120);
+    pointer(window, 'pointerup', 520);
+    control('Describe this TA pattern').click();
+    const highlight = surface.nextElementSibling as HTMLElement;
+    expect(highlight.style.display).toBe('block');
+    const prompt = document.createElement('input');
+    document.body.append(prompt);
+    prompt.focus();
+    handler.mockClear();
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    prompt.dispatchEvent(escape);
+    expect(escape.defaultPrevented).toBe(false);
+    expect(highlight.style.display).toBe('none');
+    expect(surface.style.display).toBe('none');
+    expect(handler).toHaveBeenCalledExactlyOnceWith({ action: 'cancel' });
+    prompt.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('does not reveal from unadmitted hover or leave pending timers after disabling', () => {
+    vi.useFakeTimers();
+    let admitted = false;
+    const { control, pointer } = fixture({ acceptsEvent: () => admitted });
+    const toolbar = control('Analyze chart').parentElement!;
+    pointer(window, 'pointermove', 120);
+    expect(toolbar.style.display).toBe('none');
+    admitted = true;
+    pointer(window, 'pointermove', 120);
+    pointer(window, 'pointermove', 1100);
+    selector!.setHandler(undefined);
+    selector!.setHandler(vi.fn());
+    expect(vi.getTimerCount()).toBe(0);
+    expect(toolbar.style.display).toBe('none');
   });
 });

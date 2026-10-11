@@ -6,7 +6,7 @@ import type { PaneLayout } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { clearChartStoreCache, DEFAULT_CHART_SETTINGS } from '../state/chartState';
+import { clearChartStoreCache, DEFAULT_CHART_SETTINGS, getChartStore } from '../state/chartState';
 import { DEFAULT_MARGINS } from '../types';
 import { TealchartWidgetUI } from './TealchartWidgetUI';
 
@@ -369,6 +369,12 @@ it('keeps analysis controls opt-in and revokes callback ownership without recrea
   expect(ui.startAnalysisSelection()).toBe(false);
   ui.setAnalysisRequestHandler(handler);
   const analyze = container.querySelector<HTMLButtonElement>('button[aria-label="Analyze chart"]')!;
+  const toolbar = analyze.parentElement!;
+  expect(toolbar.style.left).toBe('78px');
+  getChartStore('analysis-controls').uiPreferences.setKey('leftToolRailCollapsed', true);
+  expect(toolbar.style.left).toBe('37px');
+  getChartStore('analysis-controls').uiPreferences.setKey('leftToolRailCollapsed', false);
+  expect(toolbar.style.left).toBe('78px');
   analyze.click();
   expect(handler).toHaveBeenLastCalledWith({ action: 'describe' });
   expect(ui.startAnalysisSelection()).toBe(true);
