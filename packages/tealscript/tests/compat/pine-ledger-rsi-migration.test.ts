@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -8,8 +9,8 @@ import { compatibilityBars, getPlot } from './fixtures';
 // Version-rules-v1#123/#124, ledger ranks448/449.
 describe('RSI legacy parameter names', () => {
   it('accepts v4 RSI x/y and v5 source/length named bindings (rows448/449)', () => {
-    expect(checkProgram(parse('//@version=4\nstudy("RSI slots")\nx = rsi(y=3, x=close)')).diagnostics).toEqual([]);
-    expect(checkProgram(parse('//@version=5\nindicator("RSI slots")\nx = ta.rsi(length=3, source=close)')).diagnostics).toEqual([]);
+    expect(checkProgram(parse('//@version=4\nstudy("RSI slots")\nx = rsi(y=3, x=close)')).diagnostics).toEqual(withVersionAdvisory([], 4));
+    expect(checkProgram(parse('//@version=5\nindicator("RSI slots")\nx = ta.rsi(length=3, source=close)')).diagnostics).toEqual(withVersionAdvisory([], 5));
     for (const call of ['ta.rsi(x=close, length=3)', 'ta.rsi(source=close, y=3)']) {
       expect(checkProgram(parse(`//@version=5\nindicator("Old slots")\nx = ${call}`)).diagnostics.some((d) => d.code === 'unknown-argument')).toBe(true);
     }
@@ -35,7 +36,7 @@ plot(rsi(x=close, y=n), "Input")`;
 study("Shadow RSI")
 rsi(x, y) => x + y
 plot(rsi(y=4, x=close), "Local")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], 4));
     const result = executeScript(parse(source), compatibilityBars.slice(0, 3));
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Local').values).toEqual([106, 109, 111]);

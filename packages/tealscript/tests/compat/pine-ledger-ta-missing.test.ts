@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -41,7 +42,7 @@ indicator("Boolean change holes")
 bool src = bar_index == 2 ? na : bar_index == 1 or bar_index == 4
 bool changed = ta.change(src)
 plot(na(changed) ? -1 : changed ? 1 : 0, "Change")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], 5));
     const result = executeScript(parse(source), compatibilityBars.slice(0, 6));
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Change').values).toEqual([-1, 1, -1, -1, 1, 1]);

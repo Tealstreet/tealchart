@@ -9,7 +9,9 @@ indicator("Constructor receiver identity")
 type Holder
     string name
     string detail
-method new(Holder this, string prefix, string symbol) => "method"`;
+method new(Holder this, string prefix, string symbol) =>
+    this.name := this.name
+    "method"`;
 
 describe('UDT constructors and ticker receiver identity', () => {
   it('keeps a UDT constructor distinct from a same-named receiver method', () => {

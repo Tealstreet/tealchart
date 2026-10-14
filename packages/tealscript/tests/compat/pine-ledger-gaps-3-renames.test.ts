@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -18,7 +19,7 @@ describe('ledger gaps 106/108/111: documented builtin renames', () => {
       [4, 'bar_index'],
     ] as const) {
       const script = source(version, expression);
-      expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(script);
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'value').values).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
@@ -39,7 +40,7 @@ describe('ledger gaps 106/108/111: documented builtin renames', () => {
 study("Color rename")
 plot(close, "value", color=${color})
 `;
-      expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(script);
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'value').color).toEqual(Array(12).fill('#FF5252'));
@@ -60,7 +61,7 @@ study("Declared color")
 red = #123456
 plot(close, "value", color=red)
 `;
-    expect(checkProgram(parse(shadowed)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(shadowed)).diagnostics).toEqual(withVersionAdvisory([], 4));
     const result = runCompatScript(shadowed);
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'value').color).toEqual(Array(12).fill('#123456'));
@@ -72,7 +73,7 @@ plot(close, "value", color=red)
       [5, 'math.max(number2 = 7, number0 = 1, number1 = -3)'],
     ] as const) {
       const script = source(version, expression);
-      expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(script);
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'value').values).toEqual(Array(12).fill(7));

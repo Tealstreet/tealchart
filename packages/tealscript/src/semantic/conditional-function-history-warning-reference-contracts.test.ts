@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -44,7 +45,7 @@ plot(bar_index % 5 == 0 ? hoisted : previous(open))`)).toEqual([
     const body = `rising(float src) => src > src[1]
 plot(bar_index % 5 == 0 and rising(close) ? 1 : 0)`;
     expect(check(body)).toEqual([expect.objectContaining({ code: 'inconsistent-function-history', severity: 'warning' })]);
-    expect(check(body, 5)).toEqual([]);
+    expect(check(body, 5)).toEqual(withVersionAdvisory([], 5));
   });
 
   it.each([

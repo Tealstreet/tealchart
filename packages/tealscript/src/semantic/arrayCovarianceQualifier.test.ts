@@ -49,7 +49,9 @@ describe('array covariance result qualifiers', () => {
 
     it(`v${version} preserves the selected custom method's scalar result`, () => {
       const checked = check(
-        `method covariance(array<float> self, array<float> other) => "custom"
+        `method covariance(array<float> self, array<float> other) =>
+    na(self)
+    "custom"
 values = array.from(-8.5, 5.25, 17.75)
 other = array.from(1.0, 4.0, 9.0)
 const string result = values.covariance(other)`,
@@ -61,7 +63,9 @@ const string result = values.covariance(other)`,
 
     it(`v${version} keeps namespace calls builtin when a receiver method overrides covariance`, () => {
       const checked = check(
-        `method covariance(array<float> self, array<float> other) => "custom"
+        `method covariance(array<float> self, array<float> other) =>
+    na(self)
+    "custom"
 values = array.from(-8.5, 5.25, 17.75)
 other = array.from(1.0, 4.0, 9.0)
 result = array.covariance(values, other)`,

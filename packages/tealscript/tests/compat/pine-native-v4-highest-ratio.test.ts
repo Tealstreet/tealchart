@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from '../../src/parser';
@@ -16,7 +17,7 @@ const runtime = { timeframe: { period: '2', multiplier: 2, isminutes: true, isin
 describe('native v4 highest ratio', () => {
   it.each(['ta.highest(length)', 'ta.highest(length=length)', 'ta.highest(high, length)', 'ta.highest(length=length, source=high)'])('accepts and truncates captured v5 ratio: %s', (call) => {
     const ast = parse(`//@version=5\nindicator("ratio")\nlength = ${ratio}\nplot(${call}, "OUTCOME")\nplot(ta.highest(7), "CONTROL")`);
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 5));
     const result = executeScript(ast, bars, undefined, { runtime });
     expect(result.errors).toEqual([]);
     expect(result.plots).toHaveLength(2);
@@ -27,7 +28,7 @@ describe('native v4 highest ratio', () => {
 
   it.each(['7.5', 'float(7)', 'timeframe.in_seconds("15") / 120.0'])('keeps actual float refusal: %s', (value) => {
     const result = checkProgram(parse(`//@version=5\nindicator("float")\nlength = ${value}\nplot(ta.highest(length=length))`));
-    expect(result.diagnostics).toEqual([expect.objectContaining({ code: 'type-mismatch', severity: 'error' })]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'type-mismatch', severity: 'error' })], 5));
   });
   it.each(['highest', 'ema', 'sma'])('retains native original float refusal: %s', (name) => {
     const source = readFileSync(new URL(`../../oracle-probes/v4/v5-float-length-${name}-v1.pine`, import.meta.url), 'utf8');

@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -11,7 +12,7 @@ const source = (version: number, body: string) => `//@version=${version}\n${vers
 describe('ledger gaps 48: legacy numeric and modern unique style boundaries', () => {
   it('infers the documented v4 Columns constant and its arithmetic as integers', () => {
     const result = checkProgram(parse(source(4, 'columns = plot.style_columns\ndoubled = 2 * columns\nplot(doubled)')));
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 4));
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
     expect(types.get('columns')).toMatchObject({ kind: 'int', qualifier: 'const' });
     expect(types.get('doubled')).toMatchObject({ kind: 'int' });
@@ -42,7 +43,7 @@ describe('ledger gaps 48: legacy numeric and modern unique style boundaries', ()
 
     it('preserves the Columns unique type', () => {
       const result = checkProgram(parse(source(version, 'columns = plot.style_columns\nplot(close, style=columns)')));
-      expect(result.diagnostics).toEqual([]);
+      expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
       expect(result.symbols.find((symbol) => symbol.name === 'columns')?.type).toMatchObject({
         kind: 'unique', name: 'plot_style', qualifier: 'const',
       });
@@ -61,7 +62,7 @@ describe('ledger gaps 48: legacy numeric and modern unique style boundaries', ()
 
     it('preserves a local callable with the same name as plot', () => {
       const result = checkProgram(parse(source(version, 'plot(int style) => style\nresult = plot(style=5)')));
-      expect(result.diagnostics).toEqual([]);
+      expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
     });
   });
 });

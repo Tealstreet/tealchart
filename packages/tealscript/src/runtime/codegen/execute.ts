@@ -10,6 +10,7 @@ import type { Bar, PlotOutput, InputDefinition, SessionClassificationInfo, Sessi
 import { ExecutionContext, mergeChartInfo } from '../context';
 import { CALCULATED_BARS_INPUT_ID, projectCalculatedBarOutputs } from '../calculatedBars';
 import { TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS } from '../types';
+import { RUNTIME_HELPERS } from './emitter';
 import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import { nativeMathLog } from '../mathPrecision';
 import type { ExecutionError, ExecutionResult, IndicatorDeclarationMetadata, RuntimeApproximationSummary, RuntimeProfile, RuntimeSwallowedErrorSummary, TealscriptRuntimeOptions } from '../types';
@@ -147,7 +148,7 @@ class CompiledRuntimeErrorException extends Error {
   readonly line?: number;
   readonly column?: number;
 
-  constructor(message: string, line?: number, column?: number) {
+  constructor(message: string, line?: number, column?: number, readonly includeBarContext = false) {
     super(message);
     this.name = 'CompiledRuntimeErrorException';
     this.line = line;
@@ -159,28 +160,56 @@ function throwCompiledRuntimeError(message: string): never {
   throw new CompiledRuntimeErrorException(message);
 }
 
+function attachBoxRuntimeSource(error: PineRuntimeArgumentError, compiled: CompiledScript): void {
+  const code = compiled.generatedCode;
+  if (!code || !error.stack) return;
+  const helperLines = RUNTIME_HELPERS.split('\n').length;
+  const lines = code.split('\n');
+  const frames: { n: string; p: number }[] = [];
+  for (const frame of error.stack.split('\n')) {
+    const match = /<anonymous>:(\d+):(\d+)\)?$/.exec(frame);
+    if (!match) continue;
+    const row = Number(match[1]) - helperLines - 3;
+    if (row < 0 || row >= lines.length) continue;
+    const offset = lines.slice(0, row).reduce((sum, line) => sum + line.length + 1, 0) + Number(match[2]) - 1;
+    const site = compiled.runtimeSourceLocations?.filter((location) => offset >= location.start && offset < location.end)
+      .sort((a, b) => a.end - a.start - (b.end - b.start))[0];
+    if (!site) continue;
+    if (!frames.length) { error.line = site.line; error.column = site.column; }
+    frames.push({ n: site.name, p: site.line });
+  }
+  if (frames.length) error.stackTrace = frames;
+}
+
 function createCompiledExecutionError(error: unknown, barIndex?: number): ExecutionError {
   if (error instanceof PineRuntimeArgumentError) {
+    barIndex ??= error.barIndex;
     const message = barIndex === undefined ? error.message : `Error on bar ${barIndex}: ${error.message}`;
     return {
       message,
       code: error.runtimeErrorCode,
       barIndex,
-      runtimeError: { message, code: error.runtimeErrorCode, barIndex },
+      ...(error.line === undefined ? {} : { line: error.line, column: error.column }),
+      runtimeError: { message, code: error.runtimeErrorCode, barIndex,
+        ...(error.line === undefined ? {} : { line: error.line, column: error.column, stackTrace: error.stackTrace }),
+      },
     };
   }
-  const message = error instanceof Error ? error.message : String(error);
+  let message = error instanceof Error ? error.message : String(error);
   if (error instanceof CompiledRuntimeErrorException) {
+    if (error.includeBarContext && barIndex !== undefined) message = `Error on bar ${barIndex}: ${message}`;
     return {
       message,
       code: 'runtime.error',
       line: error.line,
       column: error.column,
+      ...(error.includeBarContext ? { barIndex } : {}),
       runtimeError: {
         code: 'runtime.error',
         message,
         line: error.line,
         column: error.column,
+        ...(error.includeBarContext ? { barIndex } : {}),
       },
     };
   }
@@ -813,7 +842,7 @@ function addRuntimeThousandsSeparators(value: string): string {
   return `${sign}${groupedInteger}${decimalPart === undefined ? '' : `.${decimalPart}`}`;
 }
 
-function formatRuntimeStringPlaceholder(value: unknown, modifier?: string, format?: string): string {
+function formatRuntimeStringPlaceholder(value: unknown, modifier?: string, format?: string, includeBarContext = false, line?: number): string {
   const normalizedModifier = modifier?.trim().toLowerCase();
   const normalizedFormat = format?.trim();
 
@@ -824,13 +853,13 @@ function formatRuntimeStringPlaceholder(value: unknown, modifier?: string, forma
   }
   if (normalizedModifier === 'number') {
     if (isRuntimeNa(value)) return toRuntimeString(value);
-    if (isPineArray(value)) throwCompiledRuntimeError('Cannot format given Object as a Number');
+    if (isPineArray(value)) throw new CompiledRuntimeErrorException('Cannot format given Object as a Number', line, undefined, includeBarContext);
     return typeof value === 'number' ? formatRuntimeNumber(value, normalizedFormat ?? '#,###.###') : toRuntimeString(value);
   }
   return toRuntimeString(value);
 }
 
-function formatRuntimeString(args: unknown[], named?: Record<string, unknown>, requireBalancedRightBraces = false): string {
+function formatRuntimeString(args: unknown[], named?: Record<string, unknown>, requireBalancedRightBraces = false, includeBarContext = false, line?: number): string {
   const hasNamedFormat = !!named && Object.prototype.hasOwnProperty.call(named, 'format');
   const hasNamedFormatString = !!named && Object.prototype.hasOwnProperty.call(named, 'formatString');
   const template = toRuntimeString(hasNamedFormat ? named.format : hasNamedFormatString ? named.formatString : args[0]);
@@ -858,7 +887,9 @@ function formatRuntimeString(args: unknown[], named?: Record<string, unknown>, r
       else if (requireBalancedRightBraces) throwCompiledRuntimeError('Formatting pattern contains unbalanced curly braces');
     }
   }
-  if (depth > 0) throwCompiledRuntimeError('Formatting pattern contains unbalanced curly braces');
+  if (depth > 0) {
+    throw new CompiledRuntimeErrorException(includeBarContext ? 'Unmatched braces in the pattern.' : 'Formatting pattern contains unbalanced curly braces', line, undefined, includeBarContext);
+  }
 
   let result = '';
   quoted = false;
@@ -872,7 +903,7 @@ function formatRuntimeString(args: unknown[], named?: Record<string, unknown>, r
     if (!quoted && char === '{') {
       const match = /^\{(\d+)(?::([^}]+)|\s*,\s*([^,{}]+)\s*(?:,\s*([^{}]+?)\s*)?)?\}/.exec(template.slice(i));
       if (match) {
-        result += formatRuntimeStringPlaceholder(values[Number(match[1])], match[3], match[2] ?? match[4]);
+        result += formatRuntimeStringPlaceholder(values[Number(match[1])], match[3], match[2] ?? match[4], includeBarContext, line);
         i += match[0].length - 1;
         continue;
       }
@@ -3365,7 +3396,7 @@ class DuplicateCheckingBuiltinRegistry extends Map<string, BuiltinFunction> {
   }
 }
 
-function createCompiledBuiltinRegistry(pineVersion = 6): BuiltinRegistry {
+function createCompiledBuiltinRegistry(pineVersion = 6, requestedContext = false): BuiltinRegistry {
   const builtins: BuiltinRegistry = new DuplicateCheckingBuiltinRegistry();
   const runtime = createCompiledDrawingRuntime();
   registerDrawingObjectCastBuiltins(builtins);
@@ -3377,7 +3408,7 @@ function createCompiledBuiltinRegistry(pineVersion = 6): BuiltinRegistry {
   registerPolylineBuiltins(builtins, runtime, pineVersion);
   registerTableBuiltins(builtins, runtime, pineVersion);
   registerDrawingConstants(builtins);
-  registerCompiledTimeframeBuiltins(builtins, pineVersion);
+  registerCompiledTimeframeBuiltins(builtins, pineVersion, requestedContext);
   registerCompiledFootprintBuiltins(builtins);
   registerOfficialTradingViewBuiltins(builtins);
   registerCompiledLegacyBuiltins(builtins);
@@ -4273,7 +4304,7 @@ function registerCompiledLegacyBuiltins(builtins: BuiltinRegistry): void {
   });
 }
 
-function registerCompiledTimeframeBuiltins(builtins: BuiltinRegistry, pineVersion: number): void {
+function registerCompiledTimeframeBuiltins(builtins: BuiltinRegistry, pineVersion: number, requestedContext: boolean): void {
   const timeframeArgs = [['timeframe']] as const;
   const secondsArgs = [['seconds']] as const;
   const timeframeToSeconds = (args: unknown[], named: Map<string, unknown>, ctx: ExecutionContext): number => {
@@ -4295,7 +4326,11 @@ function registerCompiledTimeframeBuiltins(builtins: BuiltinRegistry, pineVersio
     const currentTime = ctx.time.get(0);
     const previousTime = ctx.time.get(1);
     if (duration === null || currentTime === undefined || !Number.isFinite(currentTime)) return false;
-    if (previousTime === undefined || !Number.isFinite(previousTime)) return pineVersion < 6;
+    if (previousTime === undefined || !Number.isFinite(previousTime)) {
+      const firstRequestedDailyBar = requestedContext && ctx.bar_index === 0 && previousTime === undefined
+        && ctx.timeframe.isdaily && ctx.timeframe.multiplier === 1 && duration === 86_400_000;
+      return firstRequestedDailyBar ? false : pineVersion < 6;
+    }
 
     return getRuntimeTimeframeOpenTime(currentTime, timeframe, ctx.syminfo.timezone, ctx.timeframe.period)
       !== getRuntimeTimeframeOpenTime(previousTime, timeframe, ctx.syminfo.timezone, ctx.timeframe.period);
@@ -4939,7 +4974,7 @@ function evaluateSecuritySeriesPass(
       ...requestContext.session,
     },
   };
-  const builtinRegistry = createCompiledBuiltinRegistry(pineVersion);
+  const builtinRegistry = createCompiledBuiltinRegistry(pineVersion, true);
   const lineY1Reader = builtinRegistry.get('line.get_y1')!.positionalSingleArgument!;
   const labelTextReader = builtinRegistry.get('label.get_text')!.positionalSingleArgument!;
   const drawingReaders = Object.fromEntries([...POSITIONAL_DRAWING_GETTERS].map(name => [name, builtinRegistry.get(name)!.positionalSingleArgument!]));
@@ -5306,7 +5341,7 @@ function evaluateSecuritySeriesPass(
     },
     mathLog(value: unknown) { return nativeMathLog(toRuntimeNumber(value)); },
     mathSum() { return NaN; },
-    strFormat(args: unknown[], named?: Record<string, unknown>) { return formatRuntimeString(args, named); },
+    strFormat(args: unknown[], named?: Record<string, unknown>, line?: number) { return formatRuntimeString(args, named, false, pineVersion === 6, line); },
     strFormatTime(args: unknown[], named?: Record<string, unknown>) {
       const timeCtx = { time: { get: () => b.time }, syminfo: { timezone: 'Etc/UTC' } };
       return formatRuntimeTime(args, named, timeCtx);
@@ -7830,7 +7865,14 @@ function executeCompiledPass(
       callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string) {
         const builtin = builtinRegistry.get(name);
         if (!builtin) return NaN;
-        return builtin(args, namedRecordToMap(named), ctx, builtinScope, callId ?? name);
+        try {
+          return builtin(args, namedRecordToMap(named), ctx, builtinScope, callId ?? name);
+        } catch (error) {
+          if (error instanceof PineRuntimeArgumentError && error.runtimeErrorCode === 'RE10026') {
+            attachBoxRuntimeSource(error, compiled);
+          }
+          throw error;
+        }
       },
       hasMethodBuiltin(name: string, receiver: unknown) {
         const builtinName = runtimeMethodBuiltinName(name, receiver, ctx);
@@ -7961,7 +8003,7 @@ function executeCompiledPass(
       },
       mathLog(value: unknown) { return nativeMathLog(toRuntimeNumber(value)); },
       mathSum(..._args: unknown[]) { return NaN; },
-      strFormat(args: unknown[], named?: Record<string, unknown>) { return formatRuntimeString(args, named); },
+      strFormat(args: unknown[], named?: Record<string, unknown>, line?: number) { return formatRuntimeString(args, named, false, compiled.analysis.pineVersion === 6, line); },
       strFormatTime(args: unknown[], named?: Record<string, unknown>) { return formatRuntimeTime(args, named, ctx); },
       tickerNew(args: unknown[], named?: Record<string, unknown>) { return evaluateRuntimeTickerNew(args, named, ctx.syminfo.session); },
       tickerModify(args: unknown[], named?: Record<string, unknown>) { return evaluateRuntimeTickerModify(args, named, ctx.syminfo.session); },

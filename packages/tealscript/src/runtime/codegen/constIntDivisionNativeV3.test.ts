@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../parser';
@@ -26,7 +27,7 @@ describe('native v3 signed constant integer division', () => {
     ])(`returns the captured result of %s in v${version}`, (expression, integer, fractional) => {
       const ast = parse(`${header}result = ${expression}\nplot(result, "OUTCOME")`);
       const checked = checkProgram(ast);
-      expect(checked.diagnostics).toEqual([]);
+      expect(checked.diagnostics).toEqual(withVersionAdvisory([], version));
       expect(checked.symbols.find((symbol) => symbol.name === 'result')?.type).toEqual({
         ...(version >= 5 ? { integerDivision: true } : {}),
         kind: version < 6 ? 'int' : 'float',
@@ -52,7 +53,7 @@ describe('native v3 signed constant integer division', () => {
       const ast = parse(
         `${header}denominator = ${input}\nsimple int simpleDenominator = 2\nseries int seriesDenominator = bar_index - bar_index + 2\nplot((-5) / denominator)\nplot((-5) / simpleDenominator)\nplot((-5) / seriesDenominator)`,
       );
-      expect(checkProgram(ast).diagnostics).toEqual([]);
+      expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = executeScript(ast, bars);
       expect(result.errors).toEqual([]);
       expect(result.plots.map((plot) => plot.values)).toEqual(Array.from({ length: 3 }, () => [-2.5, -2.5, -2.5]));

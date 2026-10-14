@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -15,7 +16,8 @@ describe('HMA length declaration', () => {
   });
 
   it.each([5, 6])('refuses integral float length in v%i', (version) => {
-    expect(diagnostics('ta.hma(close, 3.0)', version)).toMatchObject([{ code: 'type-mismatch' }]);
+    expect(diagnostics('ta.hma(close, 3.0)', version)).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'type-mismatch' })], version));
+    expect(diagnostics('ta.hma(close, 3.0)', version)).toMatchObject([...expectedVersionAdvisories(version), { code: 'type-mismatch' }]);
   });
 
   it.each([

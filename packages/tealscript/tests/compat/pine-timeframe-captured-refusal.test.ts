@@ -12,7 +12,7 @@ const calls = [
   'timeframe.in_seconds(timeframe=timeframe.from_seconds(59))',
   'timeframe.in_seconds(timeframe.from_seconds(seconds=59))',
 ];
-const message = 'TradingView CE10294 refuses timeframe.in_seconds(timeframe.from_seconds(59)): resolution.trim is not a function';
+const message = 'resolution.trim is not a function';
 function source(call: string) {
   return `//@version=6\nindicator("Captured timeframe refusal")\nplot(${call})`;
 }

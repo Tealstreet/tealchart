@@ -39,7 +39,7 @@ ${bands ? 'plot(upper, "Upper")\nplot(lower, "Lower")' : ''}`);
 
 describe('VWAP finite-volume source holes', () => {
   it.each(['ta.vwap(close)', 'ta.vwap(source=close)', 'ta.vwap'])(
-    'preserves the held omitted-anchor behavior of %s',
+    'retains omitted-anchor source poisoning for %s',
     (expression) => {
       const ast = parse(`//@version=6
 indicator("VWAP omitted-anchor preservation")
@@ -57,7 +57,7 @@ plot(${expression})`);
       expect(execution.status).toBe('success');
       if (execution.status !== 'success') throw new Error(execution.reason);
       expect(execution.result.errors).toEqual([]);
-      expect(execution.result.plots[0].values).toEqual([10, 15, 20, null, 27.5, 34, 40, 320 / 7]);
+      expect(execution.result.plots[0].values).toEqual([10, 15, 20, null, null, null, null, null]);
     },
   );
 
@@ -86,7 +86,7 @@ plot(${expression})`);
   });
 
   it('retains a missing source in the period accumulators', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     expect(state.compute(10, true, 2)).toBe(10);
     expect(state.compute(NaN, false, 3)).toBeNaN();
     expect(state.compute(30, false, 5)).toBeNaN();
@@ -97,7 +97,7 @@ plot(${expression})`);
   });
 
   it('undoes a speculative missing source before recomputing the same bar', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     expect(state.compute(10, true, 1)).toBe(10);
     expect(state.compute(NaN, false, 1)).toBeNaN();
     expect(state.recompute(20, false, 1)).toBe(15);
@@ -105,7 +105,7 @@ plot(${expression})`);
   });
 
   it('does not heal a prior poisoned period during a finite recompute', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     state.compute(10, true, 1);
     state.compute(NaN, false, 1);
     expect(state.compute(20, false, 1)).toBeNaN();
@@ -115,7 +115,7 @@ plot(${expression})`);
   });
 
   it('restores independent finite and poisoned public snapshots', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     state.compute(10, true, 1);
     const finite = state.save();
     state.compute(NaN, false, 1);
@@ -131,7 +131,7 @@ plot(${expression})`);
   });
 
   it('preserves the existing interior missing-volume-only skip', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     expect(state.compute(10, true, 1)).toBe(10);
     expect(state.compute(20, false, NaN)).toBeNaN();
     expect(state.compute(30, false, 1)).toBe(20);
@@ -141,7 +141,7 @@ plot(${expression})`);
   });
 
   it('waits for the first explicit anchor even with finite source and volume', () => {
-    const state = new VWAP(false, NaN, true);
+    const state = new VWAP(false, NaN);
     expect(state.compute(10, false, 1)).toBeNaN();
     expect(state.compute(20, false, 1)).toBeNaN();
     expect(state.compute(30, true, 1)).toBe(30);

@@ -89,6 +89,7 @@ export type CompatibilityStageStatus = (typeof compatibilityStageStatuses)[numbe
 
 export interface CompatibilityDiagnostic {
   code: string;
+  nativeCode?: string;
   message: string;
   severity?: 'error' | 'warning' | 'info';
   line?: number;

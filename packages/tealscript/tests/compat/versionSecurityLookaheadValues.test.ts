@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -24,7 +25,7 @@ ${version < 5 ? 'study' : 'indicator'}("Lookahead default")
 plot(${name}("ALT", "2", close), title="Default")
 plot(${name}("ALT", "2", close, lookahead=barmerge.lookahead_off), title="Off")
 plot(${name}("ALT", "2", close, lookahead=barmerge.lookahead_on), title="On")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, {
         bars,
         engineOptions: {

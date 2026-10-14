@@ -39,7 +39,9 @@ describe('TA-C pivot_point_levels type admission', () => {
     expect(
       diagnostics(`type Holder
     int seed
-method pivot_point_levels(Holder self, int type, bool anchor) => type
+method pivot_point_levels(Holder self, int type, bool anchor) =>
+    self.seed := self.seed
+    type
 holder = Holder.new(1)
 plot(holder.pivot_point_levels(3, true))`),
     ).toEqual([]);

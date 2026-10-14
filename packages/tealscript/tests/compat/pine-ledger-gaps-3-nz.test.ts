@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -63,7 +64,7 @@ seriesBool = nz(close > open, false)
 plot(seriesBool ? 1 : 0, color=seriesColor)
 `),
     );
-    expect(checked.diagnostics).toEqual([]);
+    expect(checked.diagnostics).toEqual(withVersionAdvisory([], 5));
     const types = new Map(checked.symbols.map((symbol) => [symbol.name, symbol.type]));
     for (const name of ['simpleColor', 'inputColor'])
       expect(types.get(name)).toEqual({ kind: 'color', qualifier: 'simple' });

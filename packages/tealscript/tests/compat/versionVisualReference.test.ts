@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser/parser';
@@ -124,7 +125,7 @@ describe('named visual version defects', () => {
     }));
     const ast = parse(source(5, `int shift = bar_index == 0 ? 4 : bar_index == 1 ? -2 : bar_index == 2 ? 9 : 1
 plot(close, offset=shift)`));
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 5));
     const result = executeScript(ast, bars);
     expect(result.errors).toEqual([]);
     expect(result.plots).toHaveLength(1);

@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -19,7 +20,7 @@ describe('local numeric overload selection', () => {
         if (reverse) declarations.reverse();
         const source = overloadSource(version, declarations, 'plot(choose(1.25))\nplot(choose(7))');
         const semantic = checkProgram(parse(source));
-        expect(semantic.diagnostics).toEqual([]);
+        expect(semantic.diagnostics).toEqual(withVersionAdvisory([], version));
         expect(semantic.userFunctionCallDeclarations.size).toBe(2);
         const result = runCompatScript(source, { bars });
         expect(result.errors).toEqual([]);
@@ -34,7 +35,7 @@ describe('local numeric overload selection', () => {
         if (reverse) declarations.reverse();
         const source = overloadSource(version, declarations, 'plot(choose(array.from(1.25)))\nplot(choose(array.from(7)))');
         const semantic = checkProgram(parse(source));
-        expect(semantic.diagnostics).toEqual([]);
+        expect(semantic.diagnostics).toEqual(withVersionAdvisory([], version));
         expect(semantic.userFunctionCallDeclarations.size).toBe(2);
         const result = runCompatScript(source, { bars });
         expect(result.errors).toEqual([]);
@@ -48,7 +49,7 @@ describe('local numeric overload selection', () => {
         'choose(array<int> values) => 400 + array.get(values, 0)',
         'wrapped(array<int> values) => choose(values=values)',
       ], 'plot(wrapped(array.from(7)))');
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.plots[0]?.values).toEqual([407, 407, 407]);
@@ -88,7 +89,7 @@ describe('local numeric overload selection', () => {
         'choose(int first, float second) => 300 + first + second',
         'choose(float first, int second) => 400 + first + second',
       ], 'plot(choose(1, 2.5))\nplot(choose(1.5, 2))');
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.plots.map((plot) => plot.values)).toEqual([[303.5, 303.5, 303.5], [403.5, 403.5, 403.5]]);

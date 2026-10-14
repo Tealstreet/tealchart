@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
@@ -55,21 +56,21 @@ function capturedSource(name: string): string {
 describe('native v4 TA length kind refusals', () => {
   it.each(capturedCases)(
     'refuses captured %s float length before execution',
-    (name, callee, parameter, _float, _integer, column, sha) => {
+    (name, callee, parameter, float, _integer, column, sha) => {
       const source = capturedSource(name);
       expect(createHash('sha256').update(source).digest('hex')).toBe(sha);
-      expect(checkProgram(parse(source)).diagnostics).toEqual([
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({
           code: 'type-mismatch',
-          message: `${callee} ${parameter} must be an integer, got float`,
+          message: `Cannot call '${callee}' with argument '${parameter}'='${float}'. An argument of 'literal float' type was used but a '${callee === 'ta.macd' ? 'simple' : 'series'} int' is expected.`,
           line: 3,
           column,
         }),
-      ]);
+      ], 5));
     },
   );
 
   it.each(capturedCases)('retains captured %s integer controls', (name, _callee, _parameter, float, integer) => {
-    expect(checkProgram(parse(capturedSource(name).replace(float, integer))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(capturedSource(name).replace(float, integer))).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 });

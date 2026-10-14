@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -37,7 +38,7 @@ describe('v4 to v5 declaration and VWAP migration', () => {
     const ast = parse(
       '//@version=4\nstudy("locals")\ninterval = close\nisintraday = false\nplot(interval)\nplot(interval[1])\nplot(isintraday ? 1 : 0)',
     );
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 4));
     const result = executeCompiledScript(
       ast,
       [10, 20].map((close, index) => ({
@@ -61,8 +62,8 @@ describe('v4 to v5 declaration and VWAP migration', () => {
   it('accepts legacy study resolution and resolution_gaps with matching modern fields', () => {
     const legacy = parse('//@version=4\nstudy("legacy", resolution="1D", resolution_gaps=false)\nplot(close)');
     const modern = parse('//@version=5\nindicator("modern", timeframe="1D", timeframe_gaps=false)\nplot(close)');
-    expect(checkProgram(legacy).diagnostics).toEqual([]);
-    expect(checkProgram(modern).diagnostics).toEqual([]);
+    expect(checkProgram(legacy).diagnostics).toEqual(withVersionAdvisory([], 4));
+    expect(checkProgram(modern).diagnostics).toEqual(withVersionAdvisory([], 5));
     const oldDeclaration = legacy.body[0];
     const newDeclaration = modern.body[0];
     expect(oldDeclaration).toMatchObject({ timeframe: { value: '1D' }, timeframe_gaps: { value: false } });

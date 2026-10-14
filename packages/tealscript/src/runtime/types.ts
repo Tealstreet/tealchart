@@ -1,7 +1,6 @@
 import type { Program } from '../parser/ast';
 import type {
   AlertOutput,
-  Bar,
   ChartInfo,
   DrawingOutput,
   InputDefinition,
@@ -128,12 +127,13 @@ export interface ExecutionError {
   runtimeError?: RuntimeErrorPayload;
 }
 
-export type RuntimeErrorCode = 'runtime.error' | 'RE10127' | 'RE10039' | 'RE10001' | 'RE10002' | 'RE10045' | 'RE10073' | 'RE10029' | 'RE10145';
+export type RuntimeErrorCode = 'runtime.error' | 'RE10026' | 'RE10127' | 'RE10039' | 'RE10001' | 'RE10002' | 'RE10045' | 'RE10073' | 'RE10029' | 'RE10145' | 'RE10007' | 'RE10090';
 export type RuntimeInfrastructureErrorCode =
   | 'mobile-tealscript-webview-required'
   | 'request-data-unavailable';
 
 export interface RuntimeErrorPayload {
+  stackTrace?: { n: string; p: number }[];
   barIndex?: number;
   code: RuntimeErrorCode;
   message: string;

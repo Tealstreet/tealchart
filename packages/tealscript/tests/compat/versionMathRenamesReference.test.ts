@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser/parser';
@@ -67,7 +68,7 @@ describe('documented v5 math renames', () => {
       [6, `math.${name}(${named})`],
     ] as const) {
       const ast = parse(script(version, setup, expression));
-      expect(checkProgram(ast).diagnostics).toEqual([]);
+      expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = executeScript(ast, bars);
       expect(result.errors).toEqual([]);
       expect(result.plots).toHaveLength(1);

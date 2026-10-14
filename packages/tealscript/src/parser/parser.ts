@@ -6,14 +6,44 @@
 
 import type { AnyNode, Expression, Program, SourceLocation, Statement } from './ast';
 import * as generatedParser from './generated';
+import { witnessedNativeDiagnosticCode } from '../nativeDiagnosticCode';
+import { indicatorShortTitleWarning, type PineShortTitleWarning } from './declarationWarnings';
 
 const DEFAULT_MAX_SOURCE_LENGTH = 1_000_000;
 const DEFAULT_MAX_AST_DEPTH = 1000;
 
+export interface PineVersionAdvisory {
+  code: 'PINE_VERSION_OUTDATED';
+  message: string;
+  severity: 'warning';
+  line: number;
+  column: number;
+}
+
+const pineVersionAdvisories = new WeakMap<object, PineVersionAdvisory>();
+
+export function getPineVersionAdvisory(parsed: Program | Error): PineVersionAdvisory | undefined {
+  return pineVersionAdvisories.get(parsed);
+}
+
+
 /**
  * Parse error with location information
  */
+export type TealscriptParseDiagnostic = PineVersionAdvisory | PineShortTitleWarning | {
+  code: 'parse.error';
+  message: string;
+  severity: 'error';
+  line: number;
+  column: number;
+  nativeCode?: string;
+};
+
+const advisoryParseErrors = new WeakSet<TealscriptParseError>();
+
 export class TealscriptParseError extends Error {
+  declare readonly nativeCode?: string;
+  declare diagnostics?: TealscriptParseDiagnostic[];
   location: SourceLocation;
   found: string | null;
   expected: Array<{ type: string; description: string }>;
@@ -22,13 +52,19 @@ export class TealscriptParseError extends Error {
     message: string,
     location: SourceLocation,
     found: string | null,
-    expected: Array<{ type: string; description: string }>
+    expected: Array<{ type: string; description: string }>,
+    nativeCode?: string,
   ) {
     super(message);
     this.name = 'TealscriptParseError';
     this.location = location;
     this.found = found;
     this.expected = expected;
+    if (nativeCode) {
+      this.nativeCode = nativeCode;
+      this.diagnostics = [{ code: 'parse.error', message, severity: 'error',
+        line: location.start.line, column: location.start.column, nativeCode }];
+    }
   }
 }
 
@@ -82,6 +118,26 @@ export function parse(source: string, options: ParseOptions<'Expression'>): Expr
 export function parse(source: string, options: ParseOptions<'Statement'>): Statement;
 export function parse<T extends ParseStartRule>(source: string, options: ParseOptions<T>): ParseResult<T>;
 export function parse(source: string, options: ParseOptions<ParseStartRule> = {}): Program | Expression | Statement {
+  const advisory = createPineVersionAdvisory(source);
+  try {
+    const result = parseSource(source, options);
+    if (advisory && (options.startRule ?? 'Program') === 'Program') pineVersionAdvisories.set(result, advisory);
+    return result;
+  } catch (error) {
+    if (advisory && error instanceof Error && (options.startRule ?? 'Program') === 'Program') {
+      pineVersionAdvisories.set(error, advisory);
+      if (error instanceof TealscriptParseError && advisoryParseErrors.has(error)) {
+        error.diagnostics = [advisory, {
+          code: 'parse.error', message: error.message, severity: 'error',
+          line: error.location.start.line, column: error.location.start.column,
+        }];
+      }
+    }
+    throw error;
+  }
+}
+
+function parseSource(source: string, options: ParseOptions<ParseStartRule>): Program | Expression | Statement {
   // Strip UTF-8 BOM if present so scripts saved with BOM parse correctly.
   source = source.replace(/^﻿/, '');
   source = normalizeLineEndings(source);
@@ -103,10 +159,13 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
 
     if ((options.startRule ?? 'Program') === 'Program' && isProgramNode(result)) {
       assertGlobalStatementIndentation(result, normalized);
-      if (detectedVersion === 6) assertUndelimitedContinuationIndentation(result, normalized);
+      if (detectedVersion === 5 || detectedVersion === 6) {
+        assertUndelimitedContinuationIndentation(result, normalized, detectedVersion);
+      }
       result.version = detectedVersion ?? result.version;
       result.explicitVersion = detectedVersion !== undefined;
     }
+    assertTupleDeclarationSyntax(result as AnyNode, detectedVersion);
     assertAstDepth(result as AnyNode, options.maxAstDepth ?? DEFAULT_MAX_AST_DEPTH);
     return result as Program | Expression | Statement;
   } catch (error) {
@@ -114,12 +173,20 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
       const enhancedError = enhanceParseError(normalized, error);
       if (enhancedError) throw enhancedError;
 
-      throw new TealscriptParseError(
+      const wrappedError = new TealscriptParseError(
         error.message,
         sourceLocationFromPeggy(error),
         error.found,
-        error.expected
+        error.expected,
+        error instanceof TealscriptParseError ? error.nativeCode : undefined,
       );
+      if (error instanceof TealscriptParseError && advisoryParseErrors.has(error)) {
+        advisoryParseErrors.add(wrappedError);
+      }
+      if (error instanceof TealscriptParseError && error.diagnostics) {
+        wrappedError.diagnostics = error.diagnostics;
+      }
+      throw wrappedError;
     }
     throw error;
   }
@@ -541,24 +608,44 @@ function assertGlobalStatementIndentation(program: Program, source: string): voi
   }
 }
 
-function detectPineVersion(source: string): number | undefined {
+function findPineVersionAnnotation(source: string): RegExpMatchArray | undefined {
   const strings = protectedSourceRanges(source).filter(({ kind }) => kind === 'string');
-  const match = [...source.matchAll(/\/\/\s*@version\s*=\s*(\d+)/gi)]
+  return [...source.matchAll(/\/\/\s*@version\s*=\s*(\d+)/gi)]
     .find((candidate) => !strings.some(({ start, end }) => start <= candidate.index && candidate.index < end));
+}
+
+function detectPineVersion(source: string): number | undefined {
+  const match = findPineVersionAnnotation(source);
   return match ? Number(match[1]) : undefined;
 }
 
-function assertUndelimitedContinuationIndentation(program: Program, source: string): void {
+function createPineVersionAdvisory(source: string): PineVersionAdvisory | undefined {
+  const match = /^\/\/@version=([345])\n/.exec(source);
+  if (!match) return undefined;
+  return {
+    code: 'PINE_VERSION_OUTDATED',
+    message: `Version ${match[1]} of Pine Script® is outdated. We recommend using the current version, which is 6.`,
+    severity: 'warning',
+    line: 1,
+    column: 3,
+  };
+}
+
+function assertUndelimitedContinuationIndentation(program: Program, source: string, version: 5 | 6): void {
   const lines = source.split('\n');
   const coverage = new Int32Array(lines.length + 1);
-  const stack: unknown[] = [program];
+  const stack: { value: unknown; inFunction: boolean }[] = [{ value: program, inFunction: false }];
   while (stack.length > 0) {
-    const value = stack.pop();
+    const entry = stack.pop()!;
+    const { value } = entry;
     if (!value || typeof value !== 'object') continue;
     const node = value as AnyNode;
+    const inFunction = entry.inFunction || node.type === 'FunctionDeclaration';
     if (
       (node.type === 'BinaryExpression' || node.type === 'ConditionalExpression') &&
-      node.loc
+      node.loc &&
+      (version === 6 || (inFunction && node.type === 'BinaryExpression' &&
+        node.operator === '+' && node.left.type === 'StringLiteral'))
     ) {
       const { start, end } = node.loc;
       if (end.line > start.line) {
@@ -568,8 +655,8 @@ function assertUndelimitedContinuationIndentation(program: Program, source: stri
     }
     for (const [key, child] of Object.entries(value)) {
       if (key === 'loc') continue;
-      if (Array.isArray(child)) stack.push(...child);
-      else if (child && typeof child === 'object') stack.push(child);
+      if (Array.isArray(child)) stack.push(...child.map(value => ({ value, inFunction })));
+      else if (child && typeof child === 'object') stack.push({ value: child, inFunction });
     }
   }
   const ranges = protectedSourceRanges(source);
@@ -585,13 +672,28 @@ function assertUndelimitedContinuationIndentation(program: Program, source: stri
     const range = ranges[rangeIndex];
     const protectedToken = range && tokenOffset < range.end && (range.kind === 'comment' || range.start < offset);
     const columns = indent.replace(/\t/g, '    ').length;
-    if (active > 0 && depth === 0 && line.trim() && !protectedToken && columns % 4 === 0) {
-      throw new TealscriptParseError(
-        'Syntax error at input "end of line without line continuation"',
+    const invalidIndent = version === 6 ? columns % 4 === 0 : columns === 4;
+    if (active > 0 && depth === 0 && line.trim() && !protectedToken && invalidIndent) {
+      const error = new TealscriptParseError(
+        version === 5 ? "Syntax error at input 'end of line without line continuation'"
+          : 'Syntax error at input "end of line without line continuation"',
         sourceLocationAtOffset(source, offset - 1, offset),
         '\n',
         [],
       );
+      if (version === 5) {
+        const declaration = program.body.find(statement => statement.type === 'IndicatorDeclaration');
+        const warning = declaration?.type === 'IndicatorDeclaration'
+          ? indicatorShortTitleWarning(declaration, version)?.diagnostic : undefined;
+        if (warning) {
+          const advisory = createPineVersionAdvisory(source);
+          error.diagnostics = [warning, ...(advisory ? [advisory] : []), {
+            code: 'parse.error', severity: 'error', message: error.message,
+            line: error.location.start.line, column: error.location.start.column,
+          }];
+        }
+      }
+      throw error;
     }
     for (let cursor = offset; cursor < offset + line.length; cursor++) {
       while (rangeIndex < ranges.length && ranges[rangeIndex].end <= cursor) rangeIndex++;
@@ -768,6 +870,59 @@ function assertSourceLength(source: string, maxSourceLength: number): void {
   const limit = normalizePositiveLimit(maxSourceLength, 'source length');
   if (source.length > limit) {
     throw new TealscriptParseLimitError(`Script source is too large: maximum length is ${limit}`);
+  }
+}
+
+function assertTupleDeclarationSyntax(root: AnyNode, version?: number): void {
+  const stack: unknown[] = [root];
+  while (stack.length > 0) {
+    const value = stack.pop();
+    if (!isObjectLike(value)) continue;
+    if ((version === 5 || version === 6) && isAstNode(value)
+      && value.type === 'VariableDeclaration' && value.names.type === 'TupleDeclarator' && !value.typeAnnotation
+      && (value.kind === 'var' || value.kind === 'varip')) {
+      const token = version === 6 ? `""${value.kind}""` : `'${value.kind}'`;
+      const error = new TealscriptParseError(`${token} cannot be used as a variable or function name.`, value.loc!, value.kind, [],
+        witnessedNativeDiagnosticCode(version, 'tupleModifier', value.names.names.length === 2 && value.init.type === 'CallExpression'));
+      if (version === 5 && value.names.names.length === 2 && value.init.type === 'CallExpression') {
+        advisoryParseErrors.add(error);
+      }
+      throw error;
+    }
+    if (
+      isAstNode(value) && value.type === 'VariableDeclaration'
+      && value.names.type === 'TupleDeclarator' && value.init.type === 'ArrayExpression'
+      && value.init.elements.length > 0 && (
+        value.init.elements.every(element => element.type === 'CallExpression')
+        || (version === 4 && (
+          value.init.elements.every(element => element.type === 'NumericLiteral')
+          || value.init.elements.every(element => element.type === 'BooleanLiteral')
+          || value.init.elements.every(element => element.type === 'StringLiteral')
+          || value.init.elements.every(element => element.type === 'Identifier')
+        ))
+        || ((version === 5 || version === 6) && (
+          value.init.elements.every(element => element.type === 'CallExpression' || element.type === 'NumericLiteral')
+          || value.init.elements.every(element => element.type === 'BooleanLiteral')
+          || value.init.elements.every(element => element.type === 'StringLiteral')
+          || value.init.elements.every(element => element.type === 'Identifier')
+        ))
+      )
+    ) {
+      const capturedV4 = version === 4 && !value.init.elements.every(element => element.type === 'CallExpression');
+      const message = capturedV4 ? "Syntax error at input '['."
+        : version === 6 ? 'Syntax error at input "["' : "Syntax error at input '['";
+      const error = new TealscriptParseError(message, capturedV4 ? value.names.loc! : value.init.loc!, '[', [],
+        witnessedNativeDiagnosticCode(version, 'tupleInitializer', value.names.names.length === 2 && value.init.elements.length === 2));
+      if ((capturedV4 || version === 5) && value.kind === 'none' && !value.typeAnnotation
+        && value.names.names.length === 2 && value.init.elements.length === 2) {
+        advisoryParseErrors.add(error);
+      }
+      throw error;
+    }
+    for (const child of Object.values(value)) {
+      if (Array.isArray(child)) stack.push(...child);
+      else if (isObjectLike(child)) stack.push(child);
+    }
   }
 }
 

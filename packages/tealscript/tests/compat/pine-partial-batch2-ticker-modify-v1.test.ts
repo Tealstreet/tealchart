@@ -55,7 +55,9 @@ simple string result = ticker.modify(id)`), { libraries: new Map([['PineTests/Ti
 indicator("Receiver modify")
 type Holder
     string name
-method modify(Holder this, string id) => "method"
+method modify(Holder this, string id) =>
+    this.name := this.name
+    "method"
 holder = Holder.new("custom")
 series string id = "NASDAQ:AAPL"
 simple string result = holder.modify(id)`));

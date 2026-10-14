@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -24,7 +25,7 @@ method encodeDigits(int receiver, int digit) => receiver * 10 + digit
 int value = 2
 plot(value.encodeDigits(7), "Dot")
 plot(encodeDigits(2, 7), "Explicit")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Dot').values).toEqual([27, 27, 27, 27]);
@@ -37,7 +38,7 @@ indicator("Typed array receiver")
 method headValue(array<float> receiver) => array.get(receiver, 0)
 values = array.new_float(2, 9)
 plot(values.headValue(), "Value")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Value').values).toEqual([9, 9, 9, 9]);

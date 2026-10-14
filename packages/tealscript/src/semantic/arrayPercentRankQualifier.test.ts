@@ -43,7 +43,9 @@ describe('array percentrank result qualifiers', () => {
 
     it(`v${version} preserves the selected custom method's scalar result`, () => {
       const checked = check(
-        `method percentrank(array<float> self, int index) => "custom"
+        `method percentrank(array<float> self, int index) =>
+    na(self)
+    "custom"
 values = array.from(-8.5, 5.25, 17.75)
 const string result = values.percentrank(1)`,
         version,
@@ -54,7 +56,9 @@ const string result = values.percentrank(1)`,
 
     it(`v${version} keeps namespace calls builtin when a receiver method overrides percentrank`, () => {
       const checked = check(
-        `method percentrank(array<float> self, int index) => "custom"
+        `method percentrank(array<float> self, int index) =>
+    na(self)
+    "custom"
 values = array.from(-8.5, 5.25, 17.75)
 result = array.percentrank(values, 1)`,
         version,

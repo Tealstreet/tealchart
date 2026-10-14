@@ -294,9 +294,11 @@ plotarrow, plotbar, and plotcandle.
 `src/mobile/generatedTealscriptWebViewRuntimeHtml.ts` is a checked-in generated
 bundle of the TealScript worker runtime. Regenerate it with
 `yarn workspace @tealstreet/tealchart build:mobile-tealscript-runtime` after
-TealScript runtime/codegen changes that must reach mobile. As of 2026-09-12,
-no CI/test freshness gate was found for this artifact; checking for runtime
-symbols in the committed bundle is manual until a gate is added.
+TealScript runtime/codegen changes that must reach mobile. The mobile runtime test
+uses the same production builder, checks its transitive-source/generator fingerprint
+on every toolchain, and requires byte-identical output with the recorded esbuild
+version. It also executes the committed worker's omitted-anchor VWAP hole case;
+no freshness assertion is skipped because the mirror pins a different esbuild.
 
 **Pine plot widths:** Histogram `linewidth` is its width in pixels, even when
 wider than a bar slot; columns ignore `linewidth`. Cross/circle marker sizes

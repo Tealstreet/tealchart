@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -25,9 +26,9 @@ const source = (version: number, body: string) => `//@version=${version}\nindica
 
 describe('ledger gaps 48: duplicate argument version boundary', () => {
   it.each(cases)('warns for v5 $name', ({ body }) => {
-    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual([
+    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual(withVersionAdvisory([
       expect.objectContaining({ code: 'duplicate-argument', severity: 'warning' }),
-    ]);
+    ], 5));
   });
 
   it.each(cases)('refuses v6 $name', ({ body }) => {

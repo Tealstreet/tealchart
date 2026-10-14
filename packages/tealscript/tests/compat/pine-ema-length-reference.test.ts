@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -44,7 +45,8 @@ indicator("EMA length")
 plot(ta.ema(close, 3.0))
 `),
     );
-    expect(result.diagnostics).toMatchObject([{ code: 'type-mismatch' }]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'type-mismatch' })], 5));
+    expect(result.diagnostics).toMatchObject([...expectedVersionAdvisories(5), { code: 'type-mismatch' }]);
   });
 
   it.each([
@@ -60,6 +62,7 @@ indicator("EMA length")
 plot(${call})
 `),
     );
-    expect(result.diagnostics).toMatchObject([{ code: 'type-mismatch' }]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'type-mismatch' })], 6));
+    expect(result.diagnostics).toMatchObject([{ code: 'type-mismatch' }, ...expectedVersionAdvisories(6)]);
   });
 });

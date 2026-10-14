@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -41,7 +42,7 @@ describe.each([5, 6])('ledger gaps30: splits required arguments in Pine v%i', (v
     'request.dividends("NASDAQ:AAPL", dividends.gross)',
     'request.earnings("NASDAQ:AAPL", earnings.actual)',
   ])('accepts complete requests with optional merge settings: %s', (call) => {
-    expect(check(call, version)).toEqual([]);
+    expect(check(call, version)).toEqual(withVersionAdvisory([], version));
   });
 
   it('preserves the split-field validation', () => {

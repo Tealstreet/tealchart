@@ -1,6 +1,52 @@
+Native v89 daily requests report daily timeframe.change false at requested
+index0 with an absent prior timestamp and counter0. This correction is limited
+to first daily-request evaluations; chart startup, post-NaN and other periods retain their prior policy.
+
+Native v58 map-alias diagnostic order distinguishes declared typed parameters from inferred untyped parameters; preserve that provenance when merging instantiated-body errors.
+
+Native v15 continuation refusal carries its completed indicator shorttitle warning,
+then the version advisory and unchanged syntax marker. Other parser refusal routes
+retain their existing transport.
+
+Native v79 uses an accessible private v5 library to witness receiver and namespace
+private-member refusals. Keep native dot sites and v6 CE10271 metadata; unchecked
+compilation must refuse private namespace functions while exported forwarding runs.
+
+Captured v5/v6 indicator literal shorttitles longer than ten characters emit a
+SHORT_TITLE_TOO_LONG warning at the first character inside the quote. Keep
+admission unchanged; this warning precedes the version advisory, while computed
+titles and earlier version policies stay separate.
+
+Captured v5 generic input range wording is bounded to floating literal defaults with a floating literal step; integer-default and minval/maxval shapes keep their prior diagnostics until captured.
+
+Captured v5/v6 math.asin(number=<literal>) reports the unknown key followed
+by the missing angle marker at that key; legacy x binding remains independent.
+V5 global generic input range keys report one combined error at the first callee;
+typed inputs and other-version diagnostic policies retain their behavior.
+
+<!-- CENSUS-v4 rank 15 native frontier invariant -->
+V5 generic-input range refusal and v6 undeclared-identifier as the first surviving error omit local/UDF-history consistency warnings, per v9 attempts 26/32. Preserve built-in conditional-call warnings and valid-program history warnings; other versions/error classes retain their policy.
+
+<!-- CENSUS-v4 ranks 18/19 fix-forward invariant -->
+The v6 undeclared-value text/code is capture-bound to names with exact validated native marker joins. Other names retain base text and unavailable codes; the witnessed v3 initializer-dependency behavior is separate and unchanged.
+
+Native v59 v5/v6 XY box.new rejects a left coordinate more than 10,000 bars behind
+the executing bar with RE10026 before allocation. Native source frames are resolved
+from emitted-expression metadata on that error path; other drawing routes retain their policy.
+
+Native v4 attempt-1 captures the v5 indicator omitted-dynamic conditional request.security
+refusal text and call site. Explicit options, other versions and wrapper admission
+retain their existing policy; accepted generated programs are unchanged.
+
 Native capture requests and evidence belong in the public `Tealstreet/tealscript-oracle`
 repository. Read [ORACLE.md](ORACLE.md) for pinned sparse test fixtures, capture
 handoffs and promotion. Missing fixtures fail explicitly; tests are never skipped.
+
+Witnessed coded v6 tuple parse refusals carry a structured singleton diagnostic
+through parser errors, worker parseError messages and compatibility stages.
+V84-covered v4/v5 two-slot tuple refusals carry the version advisory first, then
+the unchanged parse error. Other uncoded refusals retain scalar transport; v4/v5
+errors expose no native CE code.
 
 Native v5/v6 missing strings use the empty-string representation for no-match
 if results and explicit string na initializers; na("") is true. Earlier versions
@@ -418,6 +464,22 @@ inference must consider both sets; compiled dispatch evaluates supplied argument
 once and retains each method call site's persistent state. The official
 ValueAtTime library relies on this documented form.
 
+Receiver-syntax numeric methods select the statically inferred Pine int/float type,
+including integral-valued floats. Lifted requested expressions retain the enclosing
+call's method selections; numeric runtime representation does not choose the overload.
+Imported scalar receiver methods use the same static selection, including
+int-to-float widening and typed calls within their library. Bool, string and color
+receivers retain their Pine type through forwarded calls and method returns. Imported line, label and box methods dispatch by their drawing handle type.
+Library-local UDT forwarding accepts the public type identity retained by its objects.
+Collection receivers keep their existing runtime identity checks.
+Importers cannot call non-exported library methods; refuse those calls during checking.
+Check reachable imported callable bodies in their defining library's scope, including transitive imports.
+Internal private calls and unused callable bodies retain their existing availability.
+Private methods remain available inside their defining library.
+Exported library methods support namespace calls with the explicit receiver argument.
+Carry the selected declaration through wrapper call contexts; official-library functions
+retain namespace precedence, and matching local receiver methods retain precedence.
+
 Local UDF overload selection compares collection element types as well as scalar
 types. Equally specific viable UDF calls are refused by checking and compilation;
 they must not fall through to a builtin call with the same name.
@@ -462,9 +524,33 @@ Tuple declarations infer their member types and cannot carry type, qualifier,
 or var/varip keywords. UDT fields require explicit type annotations, as do UDF
 parameters with literal `na` defaults. Function and method overload identity
 uses required parameter count and qualified types, including method receivers;
-parameter names and optional slots do not distinguish v6 overloads; existing
-legacy admission remains unchanged pending native adjudication. Unqualified
+parameter names and optional slots do not distinguish typed v5/v6 functions
+or methods. Native v60/v65 optional-only typed v5 declarations refuse at
+the second declaration even without a call. Native v65 unused untyped v5
+functions remain admitted; untyped signature policies remain independent. Unqualified
 typed UDF parameters infer series unless their body requires simple.
+
+Pine v5/v6 function and method parameter defaults admit literal values and builtin
+variables/constants in the declaration scope. Native v58 CE10133 refuses user
+variables (including constant aliases), calls/constructors/casts, calculations,
+conditionals and history references, even when that parameter is supplied or the
+callable is unused. Signed numeric literals and existing enum field constants
+retain their admission. Bare builtin names bound by users are user variables;
+scalar namespace-name bindings retain builtin members, while imports and UDT
+bindings do not. Earlier-version rules, runtime defaults and UDT field defaults
+are separate.
+
+The default-expression emission/history notes below describe lower-level compiler
+behavior, not checker admission. Historical runtime-only tests of computed or
+user-variable header defaults do not certify legal Pine defaults; the native v58
+checker assertions own that boundary.
+The request-default reachability and bar-field dependency component tests require
+those checker refusals before exercising computed defaults through direct codegen.
+V60 pins volume multiplication defaults to the parameter declaration at 4:3
+(CE10134 in v6), and method helper-call defaults to 4:29 (CE10133 in v6).
+Function and receiver call forms have separate captures; no runtime values execute.
+Qualified typed header defaults retain their qualifier start in the annotation span
+so the checker can point to the declaration without estimating whitespace.
 
 A UDF ending in `once` has no return value. Call it as a statement; reject
 assignment or argument use of its void result. A later expression in the UDF
@@ -850,6 +936,9 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   five leading missing sources. Mature source holes40/41 suppress bars40..42;
   retained smoothing state resumes at43. These captures do not settle the
   zero-momentum denominator rule or every length/hole pattern.
+- Native v54 TSI(2,3) keeps an exact-zero denominator missing on a constant
+  source. Preserve the EMA children and all nonzero ratios; varied-sign
+  binary64 precision remains a separate native residual.
 - Pine v6 `ta.tsi:short_length` and `ta.tsi:long_length` require integer kind, preserving their
   existing simple-or-weaker qualifier ceiling and numeric source slot. Its
   member-specific entries reuse the shared TA integer-parameter map and helper.
@@ -1937,8 +2026,9 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   first loaded bar). Explicit-anchor calls stay `na` until the first true
   anchor. The v54 finite-volume source-hole capture settles explicit-anchor
   calls only: their weighted accumulators stay poisoned until a valid anchor.
-  Omitted-anchor calls and the variable retain their prior interior source-hole
-  skip behavior; the explicit-anchor capture does not settle those calls.
+  The v58 closed physical-bar pair settles omitted-anchor calls: source holes
+  poison the weighted state until the automatic daily reset. This pair gives
+  no live/open-bar credit; missing-volume behavior remains separately bounded.
   Explicit-anchor bands and recomputation use
   the same accumulators. Interior missing-volume behavior remains separately
   held. Snapshot/restore must preserve initialization along
@@ -4298,6 +4388,10 @@ str.match results to be at least simple, and str.format_time results to be serie
 The shared string-result qualifier policy preserves admitted const/simple/series controls
 and leaves v5 behavior unchanged; captured consumer refusals pin each qualifier kind.
 
+Local method calls in function syntax place the semantically selected overload
+before erased collection receiver branches. Provided arguments still evaluate once;
+regular-function fallback and dotted-method dispatch retain their existing paths.
+
 Explicit realtime closing updates retain the preceding varip state and record
 their closing before/after snapshots. Replaying an earlier confirmed bar starts
 from its pre-update snapshot, preserving synthetic worker confirmation counts.
@@ -4333,3 +4427,239 @@ Requested call contexts select callable identities at both root and nested calls
 including typed method wrappers invoked with receiver or function syntax. Pass
 that selected context through each wrapper before selecting its request program;
 JavaScript number-kind dispatch cannot distinguish Pine int and float receivers.
+
+Computed-expression history in omitted local UDF or method defaults belongs to
+the receiving written call, just like supplying that default expression explicitly.
+Imported header ownership and expression-history runtime primitives stay unchanged.
+
+Local function-form method calls retain the selected method identity in the
+method-only per-written-call context. An untyped forwarding UDF can therefore
+call the int and float collection overloads independently in either call order.
+Argument evaluation, fallback and the arithmetic context pass remain separate.
+
+Regular local UDF collection overloads defer definition-time ambiguity only for
+unannotated parameters inherited per written call and competing regular functions.
+Concrete calls retain ambiguity/type refusals; their selected function identity
+travels through the existing call context to regular-UDF dispatch. Mixed method
+namespaces, method selection and arithmetic contexts keep their existing paths.
+
+Method-only per-written-call contexts score function-form collection overloads
+by their element/key/value types. Requested dependency selection therefore retains
+the int overload instead of omitting an erased int/float tie; the requested child
+uses the existing selected-call transport and dispatch. Ordinary checker admission
+and the arithmetic type pass retain their previous specificity policy.
+
+Static request global replay eligibility follows checker-selected callable identities
+and nested call contexts, so an unrelated overload cannot choose capture instead
+of replay. Dynamic-request replay and request-bearing selected calls keep their policy.
+
+Omitted local callable defaults record nested calls in their definition scope under
+the receiving call context. Requested dependency traversal and method descriptors
+carry that context through defaults, preserving selected overloads across wrappers.
+
+Collection overloads with unresolved arguments in unannotated callable bodies wait
+for the concrete types supplied by each written caller. The existing transitive
+body validator resolves those overloads and propagates concrete ambiguity and
+argument-type errors, including invalid alias reassignments and element writes.
+Alias placement, persistence, copies, fields and local control flow do not choose
+an overload; its collection element/key/value type does. Concrete ambiguous calls
+remain errors. Compilation that relies on deferred collection overloads also refuses
+incompatible inherited collection reassignments found by that validation. Dispatch recording continues through the
+existing per-call contexts.
+
+Request helper reachability includes defaults actually omitted at reachable selected
+call sites, following their helper calls in the definition's library scope. Supplied
+arguments, unreachable declarations and unselected overload defaults add no request owners.
+
+Imported methods with the same alias, receiver, name and arity retain distinct declaration IDs. Registration, selected-call lookup and dependency traversal use the same allocation; non-colliding methods retain their existing generated names.
+
+
+### Written-call local body validation
+
+Every root written call to a local UDF or method seeds an independent diagnostics-only checker. It instantiates the selected declaration's parameters from the supplied semantic argument types, preserves explicit annotation precedence and method receiver offsets, and checks the body plus selected local callees transitively. Typed wrappers remain entries because they can reach untyped helper bodies. Scalar, UDT and collection arguments use the same rule, independent of aliases or overloaded consumers.
+
+The validator clones visible lexical symbols with distinct value/function namespaces, preserving block-local arguments and shadowing. Each body is checked in a snapshot of its definition scope, so later global declarations cannot obscure its earlier namespace references. Its active-declaration recursion guard bounds transitive checking. Type-mismatch and concrete overload errors are copied back; code-generation expression/context maps remain untouched, and imported/builtin bodies use their existing checks. Unresolved collection overloads defer until this validation supplies concrete argument types.
+
+Instantiated bodies reject builtin collection member names on concrete int, float,
+bool, string or color receivers. Registered namespace calls and matching local or
+imported custom methods retain their own contracts; unknown receivers defer until
+the written call supplies a concrete type. This validation does not record dispatch
+or change generated code for admitted programs.
+Imported custom-method exemptions require compatible receiver and argument types,
+including primitive receivers absent from the imported dispatch resolver. This
+admission check does not extend imported runtime dispatch support.
+
+Written-call entry discovery resolves identifier calls through the function namespace independently of same-named values, matching normal callable resolution. Such values still retain their own lexical type and ordinary code generation.
+
+Selected-call context inference traverses nonterminal loop and conditional bodies
+when recording method/function dispatch metadata. Untyped single collection aliases
+forwarded from loops retain the selected overload at each written caller; the
+overload checking waits for concrete written-call types without a terminal alias whitelist.
+
+Explicit builtin array mutation, map and drawing namespace calls retain namespace argument
+binding when a non-UDT local value has the same name. Genuine receivers and
+user-defined type method resolution retain their existing checks.
+
+For namespace-named typed UDT parameters, matching UDT methods take precedence, except captured v5/v6 `ta.sma`, `ta.ema`, `ta.crossover`, `ta.rsi`, `ta.stdev`, `ta.valuewhen`, `ta.wma` and `ta.variance` shadowing calls, which are refused at the call site. Captured v5/v6 `ta.change`, `ta.highest`, `ta.lowest`, `ta.cum`, `ta.max` and `ta.min` calls on a receiver named `ta` retain builtin namespace dispatch. Other builtin names and enum receivers retain their existing policy. Otherwise calls retain builtin namespace routing. Persistence call discovery uses the same method/receiver test, and declared UDT fields retain field access.
+
+Builtin namespace calls with non-UDT same-name bindings retain their registered namespace identity.
+Calls absent from that namespace use the concrete receiver; untyped parameter checks wait for instantiation.
+
+Namespace-named collection receivers retain instantiated argument, lower-timeframe tuple
+and v5 iterable element types through checker, TA discovery and collection emission.
+
+Bare user-function calls named `ta` are excluded from TA namespace discovery; genuine `ta.*` member calls still use builtin TA discovery.
+
+V58 refuses unused numeric-array method receivers and unused exported v6 scalar numeric receivers; v60 also refuses unused UDT method receivers in v5/v6 indicators, while compile-only library declarations remain admitted without numeric credit. Other reference receivers retain their existing policy. Overloads cannot read nonconst global variables. Scalar numeric method receivers require matching kinds, while collection receiver compatibility remains unchanged. Native v60 captures establish the element-kind reassignment guard for v6 inferred array/map locals initialized from typed or untyped collection parameters and assigned another collection parameter; other collection assignment shapes retain the batch-51 policy.
+
+### Native direct tuple initializer bracket syntax
+
+Direct tuple declarations with an all-call bracket-literal RHS are refused at the opening bracket, as captured in v58 for v5/v6. Tuple-returning functions, control-flow tuple arms and generic collection constructors retain their admission. For explicitly versioned v5/v6 programs, the v60 captures additionally refuse numeric literals and mixed call/numeric RHS elements, and v61 refuses homogeneous boolean, string and identifier RHS lists. V70 additionally refuses homogeneous v4 numeric/boolean/string/identifier RHS lists at the tuple declaration's opening bracket (5:1), with `Syntax error at input '['.`. Captured v4 function-return controls run with VALUE=1; mixed call/numeric v4 lists remain unchanged. Other element mixtures remain admitted pending native witnesses. The checker repeats this refusal for externally supplied ASTs.
+
+Imported method selection includes plain collection receivers in the existing compatible-candidate search.
+An incompatible same-named local method cannot hide the selected import from emission; local-compatible precedence remains unchanged.
+
+V71 refuses unused indicator method receivers of builtin box in v5/v6 and footprint in v6. Other opaque builtin receiver kinds retain their prior policy; v5 footprint annotations refuse as an unavailable type keyword.
+
+Native v59 admits field-only UDT parameters named after builtin namespaces and
+explicit array/box namespace calls beside same-named parameters or collection locals.
+Custom UDT dot calls on parameters named box/color/label/line/linefill/table are refused
+at the dot in v5/v6; array/map/math/matrix/polyline/str custom calls remain admitted.
+The captured box-local programs have admission credit only (native RE10026 at bar10001).
+
+## Native v62/v66 namespace naming
+
+Local UDT declarations named box/color/label/line/linefill/table match the captured v5/v6 invalid-object-name text at the declaration start (CE10093 in v6). Globals, tuple bindings and other namespaces retain their existing diagnostics.
+A box-handle parameter named `box` cannot supply an implicit ID to `box.get_top()` with no arguments; v62 refuses that call at its start with the missing-ID message (CE10165 in v6). Renamed receivers and explicit-ID calls retain their checks. The v62/v66 regression files authenticate sources, diagnostics and every closed row of renamed controls; no general handle-method namespace policy is inferred.
+
+### Native v73 namespace call boundaries
+
+Custom `set_top` calls on UDT parameters named box/label/line/linefill/table follow the captured v5/v6 refusal text and call site. The namespace-parameter call guard applies only to v5 and later; v4 keeps parent admission as a regression guard pending native captures. The box collision reports builtin shadowing; the other four report invalid dot notation. Other custom calls on these namespace-named parameters are refused only when the captured competing builtin call shape is present. V74 extends the same zero-argument box.get_top ID-argument refusal to inferred box-handle parameters named box; renamed controls retain the captured Value=41. The v75 v4 namespace question remains context-unmet because native rejects type Holder first.
+V60 native v6 private-import refusals use the missing-method message and the member
+access dot position. Non-enumerable parser accessLoc metadata preserves serialized
+AST and code generation. V60 v5 imports of supplied v6 libraries refuse at the import path before the captured secondary missing-method error; matching-version imports retain their checks. This boundary uses explicit host-library source versions; official-library translations and unversioned host source retain their previous checks.
+V61 dependent-library Save refusals name the identifier receiver in v5/v6 and
+point at the member dot; exported forwarding retains the private library scope.
+
+V67 private ordinary-function namespace calls retain compile refusal but use the
+versioned missing-method text and member-dot location. Exported forwarding and
+unknown library names retain their existing behavior.
+
+## v60 direct tuple RHS numeric literals
+
+The four v60 literal/mixed-call tuple declaration sources refuse at the opening bracket (3:7). Parser and external-AST checker extend the v58 all-call rule to call/numeric-literal elements. Function-returned tuples and generic constructors remain valid. The six v61 captures additionally refuse homogeneous identifier/string/bool direct RHS lists (3:7 for literals, 5:7 for identifiers). V70 extends homogeneous numeric/bool/string/identifier refusals to v4 with its captured declaration site and trailing-period text. The v4 mixed-call list and prior-version all-call policy remain unchanged. No other element mixture is credited.
+
+Pine v4 `type` declarations are refused at the declaration keyword with the v75
+native message. V5/v6 type declarations and v4 primitive declarations retain
+their previous checks; masked namespace questions receive no admission credit.
+
+### V77 footprint context boundary
+
+Native v77 refuses the footprint type and request.footprint in v5. In v6, footprint variable declarations cannot use the name footprint; function parameters can. Analyze only relevant syntax and carry these checker refusals into compile results.
+
+## V76 tuple persistence modifiers
+
+Native v5/v6 refuse unannotated var/varip tuple declarations at the modifier token. The parser and external-AST checker retain the captured message, including doubled quotes in v6, and the declaration site. Ordinary tuple declarations from functions and UDT receiver methods remain valid. Type-annotated tuples and earlier versions retain their existing behavior; closed control values do not establish intrabar persistence or rollback.
+
+### Captured default and missing-argument diagnostics
+
+The v58 computed-history defaults report their version-specific literal/builtin-variable diagnostic at the parameter declaration, with v6 native code CE10134. Captured v6 positional omissions in matrix.sum and drawing text-formatting setters report one missing-parameter diagnostic at the callee (the receiver dot for matrix methods), with native code CE10165. Semantic diagnostics keep their internal category in `code` and expose witnessed native codes separately as `nativeCode`; unwitnessed forms retain their previous diagnostics.
+
+V6 captured box/chart.point/polyline/table equality with an identifier left operand,
+and linefill equality through array.get, use the native CE10123 operator diagnostic.
+Unformatted v6 str.tostring(chart.bg_color) keeps its native CE10123 color diagnostic.
+Imported float-only pick on an int(...) receiver uses the captured v5/v6 integer
+method-reference text and member-access site; the exposed v6 code is CE10271.
+Other operand, receiver and version shapes retain their existing diagnostics.
+
+Captured argument refusals retain native text and exposed CE codes for v5/v6
+positional identifier array.every/some arguments and receiver calls, v5 literal-float length slots in the eight
+v4 TA probes, and sole numeric math.asin(number=...) calls. Other diagnostic paths stay independent.
+
+V78 settles named-id array.every/some identifier arguments: use the same captured refusal text as positional calls at the actual operand's own location. V5 numeric namespace calls admit with the captured bool-conversion warning; numeric receiver warnings and other versions retain their prior policy. V5 string and v6 numeric/string refusals retain their native versioned text; unavailable native warning/v5 codes use internal codes without native-code credit.
+
+### Captured callable-default diagnostic precedence
+
+V58 callable defaults that reach overloaded numeric methods take precedence over those methods' unused-receiver and nonconst-global definition errors. Unrelated method errors retain their original order and visibility. V6 records CE10133 as native metadata while preserving the semantic diagnostic category; defaults without this captured conflict keep their previous diagnostics. V58 v6 earlier-float-parameter plus close-method defaults retain CE10134 without the dependent parameter lookup error. Rejected close-method defaults in float function overloads suppress that declaration's duplicate signature and only ambiguities whose two resolved candidate identities include that declaration. A third independently viable overload retains its call marker; unrelated declarations and v5 retain their prior diagnostics.
+
+### Captured compile diagnostic details
+
+Native v3 unavailable bar_index diagnostics preserve column zero. The captured v6 computed input(close*2) error points to input, and the existing 59-second timeframe refusal returns the native body text. The captured v5 optional-float overload conflict reports its declaration error without a redundant call-site ambiguity. Captured local alias shadow warnings expose CW10011/CW10013 separately in nativeCode; semantic code categories remain stable. Other versions and unmatched forms keep their prior diagnostics.
+
+Captured v5/v6 unused numeric-array method receivers use the argument-list
+location. Witnessed v6 numeric-array and exported numeric receivers emit CE10236;
+other versions retain their prior diagnostic location and code.
+
+### Captured runtime diagnostic transport
+
+Census v2 captures pin the v6 nearest-rank percentage code and call line, v5 static invalid `ta.change` length text and line, v5 price-history overflow, and v6 negative integer matrix powers. Generated call-site metadata supplies stack lines without changing values or failure boundaries. V6 `str.format` unmatched-left-brace and array-number formatting failures include the executing bar context; their raw legacy captures expose bar 0 and stack line 17, but no diagnostic code. Other versions retain their previous diagnostic policy.
+
+Witnessed first-line //@version=4 or //@version=5 annotations followed by LF emit exact PINE_VERSION_OUTDATED warnings at 1:3, before later-site diagnostics. V85 repeats also pin advisory presence for first-line //@version=3 LF headers on the two trace refusals; the same helper supplies that warning without a body-context exception or a new ordering claim. The v78 numeric array predicate captures witness the advisory before the bool-conversion warning; the existing diagnostic order otherwise stays intact. The combined-order claim is bounded to those eight captures; unrelated legacy warning channels remain uncertified. Other directive layouts retain their prior advisory behavior. Parser metadata keeps the advisory available on parse errors through getPineVersionAdvisory without changing serialized ASTs or error messages. Implicit versions and v1–v2 remain unchanged.
+
+Witnessed v6 parser/checker CE codes are additive nativeCode metadata routed
+through nativeDiagnosticCode using the reported root program's explicit version,
+including imported-body validators. Preserve shape guards, v5/uncaptured metadata,
+error ordering, text, location and admission.
+
+Captured v6 box, chart.point, polyline, table and array.get(linefill.all, ...)
+equality refusals report both operands in source order. For a right-hand identifier,
+CE10123 uses its own location and expr1 text from the v2/v4 native marker lists.
+Other array.get origins retain their prior single-operand diagnostic.
+
+Rejected method defaults have a captured declaration frontier: v58 records omit the unused-receiver secondary for local v5/v6 array<int> methods with an untyped second parameter returned directly, when its rejected default is ta.cum(close), ta.sma(close,2), (close*2)[1], or (close+high-low)[1]. The checker suppresses that secondary only after the own header default diagnostic exists and only for those shapes with unshadowed builtin sources. Other receiver/default shapes and version-advisory presence/order retain their existing behavior.
+
+Captured v5 local `second` array aliases render the builtin-shadow warning with
+single quotes. Untyped aliases refine that text only when every instantiated
+call context resolves the alias to an array; unresolved/scalar/mixed paths stay generic.
+
+Captured v15 v5 UDF string additions cannot continue at the same four-space body
+indentation without enclosing parentheses. Refuse at the preceding newline with
+the captured syntax text/site; other v5 expression shapes retain their admission.
+
+Captured v58 single-required-receiver numeric method overload pairs report only the first unused receiver: numeric-array int/float pairs in v5/v6, and exported scalar int/float pairs in v6 libraries. Independent method names, additional parameters and other receiver shapes retain their existing diagnostics.
+
+Legacy transp notice parity is bounded to the captured v3/v4 five-call profile: one bgcolor call with identifier color/zero-or-identifier offset/transp=0 followed by four identifier-source, literal-title plot calls with transp=100 on distinct lines. The rejected v3 bar_index frontier has no compatibility notices; admitted v4 sources render five warning messages at1:1 with line-prefixed text in captured lexical order. Other legacy argument shapes and unrelated marker channels retain their existing behavior.
+
+The captured v5 single-bgcolor/four-data-window-plot profile with identifier color and named series-int identifier offset emits the native last-calculated-value warning at the call. Literal/simple offsets, other versions and other visual calls retain their existing diagnostics.
+
+Captured v6 typed map parameter aliases place the local `second` CW10011 warning
+before the adjacent map<string,int>-to-map<string,float> CE10173 reassignment.
+Keep both markers unchanged; other shapes retain source order.
+
+Instantiated collection reassignments keep one primary diagnostic. Preserve compiler
+refusal separately only for array/matrix/map targets transitively aliasing untyped
+collection parameters; unrelated fresh locals retain their existing admission.
+
+The captured v6 cohort of three conditional crossover/crossunder identifier-argument pairs on six distinct lines emits native CW10002 text and call sites. Other cohorts and shadows keep prior diagnostics.
+
+The captured v6 pivot consistency profile emits CW10003 for the resolved single-call pivotHigh/pivotLow wrappers and CW10004 for the paired direct ternary pivot builtins. Other wrappers, call cohorts and shadows keep prior diagnostics.
+
+Captured v6 global str.format calls with the malformed literal `{0,number,#.#)`
+and one positional numeric literal emit CW10023 at the call, without changing
+admission or runtime brace validation. Other patterns, bindings and versions retain their warning policy.
+
+Explicit v6 ordinary unresolved value identifiers use the captured quoted-name
+diagnostic and CE10272 metadata. V5, implicit-version and JavaScript namespace
+help diagnostics keep their prior spelling and unavailable-code policy.
+
+V3 global untyped initializers failing on unavailable bar_index propagate
+diagnostic-only dependent-name failures, deduplicated per name/line with the
+captured terminal separator; symbol types and primary column-zero errors stay intact.
+
+Counted v6 loop declarations inherit CW10013 shadow warnings from typed matrix
+parameter aliases as well as the existing untyped-parameter cases. Preserve the
+warning site at the declaration identifier and all other declaration routes.
+
+Explicit v5/v6 exported library method pairs with identical required float receivers
+match v58 refusals at the second method name end; v6 exposes CE10110.
+Keep unversioned, private/local v6 and other receiver-shape policies unchanged.
+
+V86 repeats pin the v6 mixed undefined-identifier/function marker list: deferred
+undefined-function errors interleave at their source sites before trailing warnings.
+Apply the insertion after rejection-frontier history-warning suppression, keeping
+that decision unchanged. Preserve the collector gate, marker fields and other
+diagnostics' relative order; advisory and shorttitle ordering remain separate.
+
+Array/map mutation validation and matrix set/fill bind argument slots through the shared
+selected namespace/receiver call-form resolver, including collection receivers named
+after namespaces. Explicit namespace calls retain their ID argument.

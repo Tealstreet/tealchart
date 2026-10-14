@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -14,7 +15,7 @@ describe('published v5 ema to ta.ema rename', () => {
     { version: 6, declaration: 'indicator', call: 'ta.ema(length=2, source=close)' },
   ])('accepts and evaluates v$version $call', ({ version, declaration, call }) => {
     const source = `//@version=${version}\n${declaration}("EMA rename")\nplot(${call.replace('close', '102')}, "EMA")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
     const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 3) });
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'EMA').values.slice(1)).toEqual([102, 102]);
@@ -44,11 +45,11 @@ indicator("EMA rename")
 plot(ema(close, 2))
 `),
     );
-    expect(result.diagnostics).toMatchObject([
-      {
-        code: 'version-mismatch',
-        message: `ema() is a legacy Pine v3-v4 global. Use ta.ema() in Pine v${version}.`,
-      },
-    ]);
+    const expected = {
+      code: 'version-mismatch',
+      message: `ema() is a legacy Pine v3-v4 global. Use ta.ema() in Pine v${version}.`,
+    };
+    expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining(expected)], version));
+    expect(result.diagnostics).toMatchObject([...expectedVersionAdvisories(version), expected]);
   });
 });

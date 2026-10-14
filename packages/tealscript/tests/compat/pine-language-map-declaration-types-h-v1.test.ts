@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -31,7 +32,7 @@ displaced = prices.put(${key.value}, -5.5)
 plot(displaced, "Displaced")
 plot(prices.get(${key.value}), "Stored")
 plot(prices.size(), "Size")`);
-        expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = runCompatScript(script, { bars: compatibilityBars.slice(0, 2) });
         expect(result.errors).toEqual([]);
         expect(result.profile.compiledBarErrors?.count ?? 0).toBe(0);

@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -18,7 +19,7 @@ plot(close)
   for (const name of ['iii', 'nvi', 'pvi', 'pvt']) {
     it(`accepts bare ${name} as a series float in v4`, () => {
       const result = check(4, name);
-      expect(result.diagnostics).toEqual([]);
+      expect(result.diagnostics).toEqual(withVersionAdvisory([], 4));
       expect(result.symbols.find((symbol) => symbol.name === 'value')?.type).toEqual({
         kind: 'float',
         qualifier: 'series',
@@ -27,11 +28,11 @@ plot(close)
 
     for (const version of [5, 6]) {
       it(`requires ta.${name} in v${version} and preserves the variable type`, () => {
-        expect(check(version, name).diagnostics).toEqual([
+        expect(check(version, name).diagnostics).toEqual(withVersionAdvisory([
           expect.objectContaining({ code: 'unknown-identifier', message: `Unknown identifier: ${name}` }),
-        ]);
+        ], version));
         const result = check(version, `ta.${name}`);
-        expect(result.diagnostics).toEqual([]);
+        expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
         expect(result.symbols.find((symbol) => symbol.name === 'value')?.type).toEqual({
           kind: 'float',
           qualifier: 'series',

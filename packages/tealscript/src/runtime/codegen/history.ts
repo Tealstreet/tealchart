@@ -1,3 +1,4 @@
+import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import { NumericSeries, ValueSeries } from './runtime';
 
 const HISTORY_DISCOVERY_BARS = 244;
@@ -36,7 +37,7 @@ class GuardedNumericSeries extends NumericSeries {
     );
     this.sizing = sizing;
   }
-  get(offset: number): number {
+  get(offset: number, line?: number): number {
     const sizing = this.sizing;
     const realtime = this.guard.phase.realtime ?? this.guard.realtime();
     if (!realtime && Number.isInteger(offset) && offset >= 0
@@ -44,6 +45,12 @@ class GuardedNumericSeries extends NumericSeries {
       if (offset >= this.size) return NaN;
       const index = this.head + offset;
       return this.buf[index >= this.capacity ? index - this.capacity : index];
+    }
+    if (line !== undefined && sizing.limit === 10000 && offset > 10000) {
+      throw new PineRuntimeArgumentError(
+        'Invalid number of bars back specified in the history-referencing operator. It accepts a value between 0 and 10000.',
+        'RE10007', line,
+      );
     }
     this.guard.checkBuffer(sizing, offset, realtime);
     if (!realtime && offset >= this.capacity) return NaN;

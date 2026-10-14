@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -18,17 +19,17 @@ describe('documented integer input range arguments', () => {
             const tail = parameter === 'minval' ? value : parameter === 'maxval' ? `0, ${value}` : `0, 3, ${value}`;
             const call = binding === 'named' ? `input.int(${defval}, ${parameter}=${value})` : `input.int(${defval}, "Bound", ${tail})`;
             const result = check(version, call);
-            if (accepts) expect(result.diagnostics).toEqual([]);
-            else expect(result.diagnostics).toEqual([expect.objectContaining({ code: 'type-mismatch', message: expect.stringContaining(`${parameter} must be an integer`) })]);
+            if (accepts) expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
+            else expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'type-mismatch', message: expect.stringContaining(`${parameter} must be an integer`) })], version));
           });
         }
       }
       for (const [qualifier, value] of [['input', 'input.int(1)'], ['simple', 'syminfo.minmove'], ['series', 'bar_index']]) {
         it(`v${version} ${parameter} refuses ${qualifier} int`, () => {
           const result = check(version, `input.int(${defval}, ${parameter}=${value})`);
-          expect(result.diagnostics).toEqual([expect.objectContaining({
+          expect(result.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({
             code: 'qualifier-mismatch', message: expect.stringContaining(`Cannot pass ${qualifier} value to const parameter '${parameter}'`),
-          })]);
+          })], version));
         });
       }
     }

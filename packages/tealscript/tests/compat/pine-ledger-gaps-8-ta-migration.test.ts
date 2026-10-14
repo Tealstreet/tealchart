@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -29,17 +30,17 @@ function values(script: string) {
 describe('ledger gaps 8: ATR and highest namespace migration', () => {
   it.each(members)('accepts legacy v4 $name with the documented positional values', ({ name, args, expected }) => {
     const script = source(4, `${name}(${args})`);
-    expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], 4));
     expect(values(script)).toEqual(expected);
   });
 
   for (const version of [5, 6]) {
     it.each(members)(`requires the ta namespace for $name in v${version}`, ({ name, args, expected }) => {
-      expect(checkProgram(parse(source(version, `${name}(${args})`))).diagnostics).toEqual([
+      expect(checkProgram(parse(source(version, `${name}(${args})`))).diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'version-mismatch', message: expect.stringContaining(`Use ta.${name}()`), severity: 'error' }),
-      ]);
+      ], version));
       const script = source(version, `ta.${name}(${args})`);
-      expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
       expect(values(script)).toEqual(expected);
     });
   }

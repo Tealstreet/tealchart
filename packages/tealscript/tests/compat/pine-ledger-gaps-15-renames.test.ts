@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -19,7 +20,7 @@ describe(`ledger gaps15 TA namespace migration [${authority}]`, () => {
       const source = (version: number, expression: string) => `//@version=${version}\n${version === 4 ? 'study' : 'indicator'}("TA migration")\nplot(${expression}, title="value")`;
       for (const [version, expression] of [[4, legacy], [5, modern]] as const) {
         const pine = source(version, expression);
-        expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(pine)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = runCompatScript(pine, { bars: compatibilityBars.slice(0, 2) });
         expect(result.errors).toEqual([]);
         expect(getPlot(result, 'value').values).toEqual(expected);

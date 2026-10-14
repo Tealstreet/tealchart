@@ -1,3 +1,4 @@
+import { BUILTIN_NAMESPACES } from '../../builtinMetadata';
 import { importedInternalName } from './importedNames';
 import { resolveDependencyMember } from './importedDependencies';
 import { isTimeframeSecondsRatio } from '../../compat/legacyHighestTimeframeRatio';
@@ -11,7 +12,6 @@ import type {
   WhileStatement,
   CallExpression,
   CallArgument,
-  MemberExpression,
   TypeDeclaration,
   FunctionDeclaration,
   EnumDeclaration,
@@ -21,7 +21,7 @@ import {
   getOfficialTradingViewLibrary,
 } from '../../officialTradingViewLibraries';
 import { isPineBuiltinGlobalAvailable, pineVersionRules } from '../../pineVersionRules';
-import { checkProgram, type SemanticType } from '../../semantic/checker';
+import { builtinNamespaceCallName, checkProgram, resolvesBuiltinReferenceNameForCoverage, type SemanticType } from '../../semantic/checker';
 import { DERIVED_PRICE_BUILTINS } from '../../builtinMetadata';
 import { canonicalBuiltinArguments } from '../../pineBuiltinParameterRenames';
 
@@ -104,6 +104,18 @@ export interface LocalMethodOverloadInfo {
   internalName: string;
 }
 
+export function udtParameterMethodReceiver(
+  call: CallExpression,
+  owner: FuncInfo | undefined,
+  selectedMethods: WeakMap<CallExpression, FunctionDeclaration | null>,
+): boolean {
+  if (call.callee.type !== 'MemberExpression' || call.callee.object.type !== 'Identifier' || !owner) return false;
+  const receiver = owner.paramTypes[owner.params.indexOf(call.callee.object.name)];
+  if (receiver?.baseType !== 'udt') return false;
+  if (selectedMethods.has(call)) return selectedMethods.get(call) != null;
+  return call.callee.property.name === 'copy' && call.arguments.length === 0;
+}
+
 export interface SecurityCallSite {
   id: number;
   kind: 'security' | 'security_lower_tf' | 'seed';
@@ -138,6 +150,7 @@ export interface RequestSourceSite {
 }
 
 export interface AnalysisContext {
+  runtimeSourceExpressions?: { expression: string; owner: string; name: string; line: number; column: number }[];
   recordedExpressionTypes?: WeakMap<Expression | IfStatement, SemanticType>;
   loopResultTypes?: WeakMap<ForStatement | WhileStatement, SemanticType[]>;
   pineVersion: number;
@@ -168,6 +181,8 @@ export interface AnalysisContext {
   importedDependencyScopes: Map<string, Map<string, string>>;
   userFunctionOverloads: Map<string, string[]>;
   resolvedUserFunctionCalls: Map<CallExpression, string>;
+  resolvedUdtParameterMethods: WeakMap<CallExpression, FunctionDeclaration | null>;
+  deferredUserFunctionCalls: Set<CallExpression>;
   importedMethods: Map<string, string>;
   localMethodOverloads: Map<string, LocalMethodOverloadInfo[]>;
   importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>;
@@ -182,6 +197,7 @@ export interface AnalysisContext {
   importedEnumTitles: Map<string, string>;
   maxStaticHistoryOffset: number;
   maxBarsBackHints: Map<string, number>;
+  staticHistoryHints: Map<string, number>;
 }
 
 export interface SemanticTypeAnalysis {
@@ -479,6 +495,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     importedDependencyScopes: new Map(),
     userFunctionOverloads: new Map(),
     resolvedUserFunctionCalls: new Map(),
+    resolvedUdtParameterMethods: new WeakMap(),
+    deferredUserFunctionCalls: new Set(),
     importedMethods: new Map(),
     localMethodOverloads: new Map(),
     importedMethodOverloads: new Map(),
@@ -493,6 +511,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     importedEnumTitles: new Map(),
     maxStaticHistoryOffset: 0,
     maxBarsBackHints: new Map(),
+    staticHistoryHints: new Map(),
   };
 
   // Retain structural matching for cloned request expressions, but serialize
@@ -665,14 +684,19 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   }
   if ([...userFunctionCounts.values()].some((count) => count > 1)) {
     const semantic = checkProgram(ast, { libraries: options.libraries });
+    ctx.deferredUserFunctionCalls = semantic.deferredUserFunctionCalls;
+    ctx.unsupported.push(...(semantic.inheritedCollectionAssignmentFailures ?? []));
     for (const diagnostic of semantic.diagnostics) {
-      if (diagnostic.code === 'ambiguous-call') ctx.unsupported.push(diagnostic.message);
+      if (diagnostic.code === 'ambiguous-call' || diagnostic.code === 'function-overload-type') ctx.unsupported.push(diagnostic.message);
     }
     for (const [call, declaration] of semantic.userFunctionCallDeclarations) {
       const name = userFunctionNames.get(declaration);
       if (name) ctx.resolvedUserFunctionCalls.set(call, name);
     }
   }
+  let hasFootprintAvailabilitySyntax = false;
+  let namespaceReceiverTypes: WeakMap<Expression, SemanticType> | undefined;
+  let udtNamespaceDiagnostics: ReturnType<typeof checkProgram>['diagnostics'] | undefined;
   let activeFunctionName: string | null = null;
   let activeFunctionParams: Set<string> | null = null;
   let activeFunctionLocals: Set<string> | null = null;
@@ -751,6 +775,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   }
 
   const localMethodSignatures = new Map<string, Map<string, string>>();
+
 
   function localMethodInternalName(receiverType: string | null, methodName: string, declaration: FunctionDeclaration): string {
     const baseName = `${receiverType ?? 'any'}__${methodName}__${declaration.params.length}`;
@@ -1104,36 +1129,43 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       }
     }
 
-    const importedFunctionNames = new Map<FunctionDeclaration, string>();
+    const officialNamespaceNames = new Set(officialLibrary ? [
+      ...officialLibrary.functions.keys(),
+      ...libraryAst.body.filter((node): node is FunctionDeclaration => node.type === 'FunctionDeclaration' && node.exported === true && !node.isMethod).map((node) => node.name.name),
+    ] : []);
+    const importedCallableNames = new Map<FunctionDeclaration, string>();
     const importedFunctionCounts = new Map<string, number>();
+    const importedMethodCounts = new Map<string, number>();
     for (const declaration of libraryAst.body) {
-      if (declaration.type === 'FunctionDeclaration' && !declaration.isMethod) {
+      if (declaration.type !== 'FunctionDeclaration') continue;
+      if (declaration.isMethod) {
+        const base = importedMethodInternalName(stmt.alias.name, receiverTypeName(declaration), declaration.name.name, declaration.params.length);
+        importedMethodCounts.set(base, (importedMethodCounts.get(base) ?? 0) + 1);
+      } else {
         importedFunctionCounts.set(declaration.name.name, (importedFunctionCounts.get(declaration.name.name) ?? 0) + 1);
       }
     }
     const importedFunctionIndices = new Map<string, number>();
+    const importedMethodIndices = new Map<string, number>();
     for (const declaration of libraryAst.body) {
-      if (declaration.type !== 'FunctionDeclaration' || declaration.isMethod) continue;
+      if (declaration.type !== 'FunctionDeclaration') continue;
       const name = declaration.name.name;
-      const ordinal = importedFunctionIndices.get(name) ?? 0;
-      importedFunctionIndices.set(name, ordinal + 1);
-      const base = importedExportName(stmt.alias.name, name);
-      importedFunctionNames.set(
-        declaration,
-        importedFunctionCounts.get(name) === 1 ? base : `${base}$overload${ordinal}`,
-      );
+      const base = declaration.isMethod
+        ? importedMethodInternalName(stmt.alias.name, receiverTypeName(declaration), name, declaration.params.length)
+        : importedExportName(stmt.alias.name, name);
+      const indices = declaration.isMethod ? importedMethodIndices : importedFunctionIndices;
+      const key = declaration.isMethod ? base : name;
+      const ordinal = indices.get(key) ?? 0;
+      indices.set(key, ordinal + 1);
+      const count = declaration.isMethod ? importedMethodCounts.get(base) : importedFunctionCounts.get(name);
+      importedCallableNames.set(declaration, count === 1 ? base : `${base}$overload${ordinal}`);
     }
 
     for (const libraryStmt of libraryAst.body) {
       if (libraryStmt.type === 'FunctionDeclaration') {
         if (libraryStmt.isMethod) {
           const receiverType = receiverTypeName(libraryStmt);
-          const internalName = importedMethodInternalName(
-            stmt.alias.name,
-            receiverType,
-            libraryStmt.name.name,
-            libraryStmt.params.length,
-          );
+          const internalName = importedCallableNames.get(libraryStmt)!;
           const localOverload = {
             receiverType: receiverType ? importedTypeName(stmt.alias.name, receiverType) : null,
             internalName,
@@ -1147,13 +1179,14 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           ctx.importedLocalMethods.set(`${stmt.alias.name}.${libraryStmt.name.name}`, localOverloads);
           if (libraryStmt.exported) {
             ctx.importedMethods.set(libraryStmt.name.name, internalName);
+            if (!officialNamespaceNames.has(libraryStmt.name.name)) ctx.importedFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
             const overloads = ctx.importedMethodOverloads.get(libraryStmt.name.name) ?? [];
             overloads.push(publicOverload);
             ctx.importedMethodOverloads.set(libraryStmt.name.name, overloads);
           }
           registerFunctionInfo(internalName, libraryStmt, stmt.alias.name);
         } else {
-          const internalName = importedFunctionNames.get(libraryStmt)!;
+          const internalName = importedCallableNames.get(libraryStmt)!;
           ctx.importedLocalFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
           if (libraryStmt.exported) {
             ctx.importedFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
@@ -1163,11 +1196,12 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       }
     }
 
-    if ([...importedFunctionCounts.values()].some((count) => count > 1) || dependencyScope.size > 0) {
+    if ([...importedFunctionCounts.values()].some((count) => count > 1) || dependencyScope.size > 0
+      || libraryAst.body.some((node) => node.type === 'FunctionDeclaration' && node.exported && node.isMethod && !officialNamespaceNames.has(node.name.name))) {
       for (const program of [ast, libraryAst]) {
         const declarations = checkProgram(program, { libraries: options.libraries }).userFunctionCallDeclarations;
         for (const [call, declaration] of declarations) {
-          let name = importedFunctionNames.get(declaration);
+          let name = importedCallableNames.get(declaration);
           if (!name && program === libraryAst) {
             const namespace = resolveCallee(call.callee).namespace;
             const dependencyOwner = namespace ? dependencyScope.get(namespace) : undefined;
@@ -1184,9 +1218,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
 
     for (const libraryStmt of libraryAst.body) {
       if (libraryStmt.type === 'FunctionDeclaration') {
-        const internalName = libraryStmt.isMethod
-          ? importedMethodInternalName(stmt.alias.name, receiverTypeName(libraryStmt), libraryStmt.name.name, libraryStmt.params.length)
-          : importedFunctionNames.get(libraryStmt)!;
+        const internalName = importedCallableNames.get(libraryStmt)!;
         const localNames = Array.isArray(libraryStmt.body) ? collectFunctionLocalNames(libraryStmt.body) : new Set<string>();
         for (const parameter of libraryStmt.params) localNames.add(parameter.name);
         ctx.importedDependencyScopes.set(internalName, new Map([...dependencyScope].filter(([alias]) => !localNames.has(alias))));
@@ -1238,14 +1270,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
   }
 
-  function isImportedEnumPrefix(fullName: string): boolean {
-    const prefix = `${fullName}.`;
-    for (const name of ctx.importedEnumValues.keys()) {
-      if (name.startsWith(prefix)) return true;
-    }
-    return false;
-  }
-
   function walkExpr(expr: Expression): void {
     if (expr.type === 'CallExpression') {
       for (const arg of expr.arguments) ctx.requestSourceCaptures.set(arg.value, collectRequestCaptures(arg.value));
@@ -1256,6 +1280,12 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const staticOffset = extractStaticNumber(expr.index);
         if (staticOffset !== null && Number.isFinite(staticOffset) && staticOffset >= 0) {
           ctx.maxStaticHistoryOffset = Math.max(ctx.maxStaticHistoryOffset, Math.trunc(staticOffset));
+          if (expr.object.type === 'Identifier'
+            && !activeFunctionParams?.has(expr.object.name)
+            && !activeFunctionLocals?.has(expr.object.name)) {
+            const name = expr.object.name;
+            ctx.staticHistoryHints.set(name, Math.max(ctx.staticHistoryHints.get(name) ?? 0, Math.trunc(staticOffset)));
+          }
         }
         if (expr.object.type === 'MemberExpression' && expr.object.object.type === 'Identifier') {
           const fullName = `${expr.object.object.name}.${expr.object.property.name}`;
@@ -1284,6 +1314,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const resolved = resolveCallee(expr.callee);
         const fullName = resolveDependencyMember(resolved.fullName, activeFunctionName, ctx.importedDependencyScopes);
         const namespace = fullName.split('.')[0] ?? '';
+        if (ast.version === 5 && fullName === 'request.footprint') hasFootprintAvailabilitySyntax = true;
         if (!hasUserDeclarationName('timeframe')) {
           const refusal = tradingViewTimeframeCompileRefusal(expr, ast.version);
           if (refusal) addUnsupported(refusal);
@@ -1305,7 +1336,39 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const importedFunctionName = ctx.resolvedUserFunctionCalls.get(expr) ?? ctx.importedFunctions.get(fullName);
         const officialRuntimeName = ctx.officialLibraryFunctions.get(fullName);
         const taFullName = isBareUserFunctionCall || importedFunctionName ? fullName : canonicalTACallName(officialRuntimeName ?? fullName);
-        const taNamespace = taFullName.split('.')[0] ?? '';
+        const owner = activeFunctionName ? ctx.funcInfos.get(activeFunctionName) : undefined;
+        const receiver = expr.callee.type === 'MemberExpression' ? expr.callee.object : undefined;
+        const receiverType = receiver?.type === 'Identifier' && owner
+          ? owner.paramTypes[owner.params.indexOf(receiver.name)] : undefined;
+        if (receiverType?.baseType === 'udt' && receiver?.type === 'Identifier' && BUILTIN_NAMESPACES.has(receiver.name)) {
+          udtNamespaceDiagnostics ??= checkProgram(ast, {
+            libraries: options.libraries, resolvedUserMethods: ctx.resolvedUdtParameterMethods,
+          }).diagnostics;
+        }
+        const isUdtReceiver = udtParameterMethodReceiver(expr, owner, ctx.resolvedUdtParameterMethods);
+        let isBuiltinReceiver = false;
+        if (!isUdtReceiver && receiver?.type === 'Identifier' && BUILTIN_NAMESPACES.has(receiver.name)
+          && (!builtinNamespaceCallName(expr)
+            || ['array', 'map', 'matrix', 'line', 'box', 'label', 'table', 'linefill', 'polyline'].some(kind =>
+              !builtinNamespaceCallName(expr, kind)))) {
+          if (!namespaceReceiverTypes) {
+            namespaceReceiverTypes = new WeakMap();
+            checkProgram(ast, { libraries: options.libraries, expressionTypes: namespaceReceiverTypes });
+          }
+          const kind = namespaceReceiverTypes.get(receiver)?.kind;
+          isBuiltinReceiver = !!kind && !builtinNamespaceCallName(expr, kind,
+            expr.arguments[0] ? namespaceReceiverTypes.get(expr.arguments[0].value)?.kind : undefined)
+            && resolvesBuiltinReferenceNameForCoverage(`${kind}.${resolved.funcName}`);
+        }
+        const taNamespace = isBareUserFunctionCall || isUdtReceiver || isBuiltinReceiver ? '' : taFullName.split('.')[0] ?? '';
+        if (receiverType?.baseType === 'udt' && !isUdtReceiver) {
+          for (const diagnostic of udtNamespaceDiagnostics ?? []) {
+            if (diagnostic.code === 'unknown-method' && diagnostic.line === expr.callee.loc?.start.line
+              && diagnostic.column === expr.callee.loc?.start.column) {
+              addUnsupported(diagnostic.message);
+            }
+          }
+        }
 
         if (UNSUPPORTED_REQUEST_FUNCS.has(fullName)) {
           addUnsupported(`${fullName} not yet supported by transpiler`);
@@ -1461,7 +1524,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           addUnsupported(`${taFullName} not yet supported by transpiler`);
         }
 
-        if (Object.prototype.hasOwnProperty.call(TA_CLASS_MAP, taFullName)) {
+        if (!isUdtReceiver && !isBuiltinReceiver && Object.prototype.hasOwnProperty.call(TA_CLASS_MAP, taFullName)) {
           const info = TA_CLASS_MAP[taFullName];
           const canonicalArgs = canonicalBuiltinArguments(expr.arguments, taFullName, ast.version);
           const ctorArgs = extractCtorArgs(taFullName, canonicalArgs);
@@ -1609,7 +1672,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       case 'Identifier':
         {
           if (isUnavailableBuiltinReference(expr.name)) {
-            addUnsupported(`Unknown identifier: ${expr.name}`);
+            addUnsupported(ast.version === 3 && expr.name === 'bar_index'
+              ? 'Undeclared identifier `bar_index`;' : `Unknown identifier: ${expr.name}`);
             break;
           }
           const taVarName = canonicalTAVarName(expr.name, ast.version);
@@ -1668,6 +1732,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       }
       case 'VariableDeclaration': {
+        if ((ast.version === 5 && (stmt.typeAnnotation as { name?: string } | undefined)?.name === 'footprint')
+          || (stmt.names.type === 'VariableDeclarator' && stmt.names.name.name === 'footprint')) hasFootprintAvailabilitySyntax = true;
         const inputSiteStart = ctx.inputSites.length;
         if (!activeFunctionName && stmt.names.type === 'VariableDeclarator') {
           const name = stmt.names.name.name;
@@ -1784,6 +1850,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         }
         break;
       case 'FunctionDeclaration': {
+        if (ast.version === 5 && stmt.params.some(param => (param.typeAnnotation as { name?: string } | undefined)?.name === 'footprint')) hasFootprintAvailabilitySyntax = true;
         if (stmt.isMethod) {
           const receiverType = receiverTypeName(stmt);
           const internalName = localMethodInternalName(receiverType, stmt.name.name, stmt);
@@ -1898,150 +1965,16 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       if (site.integerDivisionLength && !site.dynamicCtorArgExprs) site.ctorArgs[0] = Math.trunc(Number(site.ctorArgs[0]));
     }
   }
+  if (hasFootprintAvailabilitySyntax) {
+    for (const diagnostic of checkProgram(ast, { libraries: options.libraries }).diagnostics) {
+      if ((diagnostic.code === 'invalid-type-annotation' && diagnostic.message === "'footprint' is not a valid type keyword.")
+        || (diagnostic.code === 'unknown-function' && diagnostic.message === "Could not find function or function reference 'request.footprint'")
+        || (diagnostic.code === 'namespace-obscuring' && diagnostic.message === 'Invalid object name: footprint. Namespaces of built-ins cannot be used.')) addUnsupported(diagnostic.message);
+    }
+  }
   return ctx;
 }
 
-function recursiveUserFunctionMessages(statements: Statement[]): string[] {
-  const functions = new Map<string, FunctionDeclaration>();
-  for (const statement of statements) {
-    if (statement.type === 'FunctionDeclaration' && !statement.isMethod) {
-      functions.set(statement.name.name, statement);
-    }
-  }
-
-  const names = new Set(functions.keys());
-  const graph = new Map<string, Set<string>>();
-  for (const [name, fn] of functions) {
-    graph.set(name, userFunctionCallsInNode(fn.body, names));
-  }
-
-  const messages: string[] = [];
-  const reported = new Set<string>();
-  const visit = (name: string, stack: string[]): void => {
-    const stackIndex = stack.indexOf(name);
-    if (stackIndex !== -1) {
-      const cycle = [...stack.slice(stackIndex), name];
-      const cycleKey = [...new Set(cycle)].sort().join('|');
-      if (!reported.has(cycleKey)) {
-        reported.add(cycleKey);
-        messages.push(`Recursive user-defined function calls are not allowed: ${cycle.join(' -> ')}`);
-      }
-      return;
-    }
-
-    for (const next of graph.get(name) ?? []) {
-      visit(next, [...stack, name]);
-    }
-  };
-
-  for (const name of names) {
-    visit(name, []);
-  }
-  return messages;
-}
-
-function userFunctionCallsInNode(node: Expression | IfStatement | Statement[], functionNames: Set<string>): Set<string> {
-  if (Array.isArray(node)) return mergeStringSets(node.map((statement) => userFunctionCallsInStatement(statement, functionNames)));
-  if (node.type === 'IfStatement') return userFunctionCallsInStatement(node, functionNames);
-  return userFunctionCallsInExpression(node, functionNames);
-}
-
-function userFunctionCallsInStatement(statement: Statement, functionNames: Set<string>): Set<string> {
-  if (statement.type === 'VariableDeclaration') return userFunctionCallsInNode(statement.init, functionNames);
-  if (statement.type === 'AssignmentStatement') {
-    return mergeStringSets([
-      userFunctionCallsInExpression(statement.left, functionNames),
-      userFunctionCallsInNode(statement.right, functionNames),
-    ]);
-  }
-  if (statement.type === 'TupleAssignment') return userFunctionCallsInNode(statement.right, functionNames);
-  if (statement.type === 'ExpressionStatement') return userFunctionCallsInExpression(statement.expression, functionNames);
-  if (statement.type === 'IfStatement') {
-    return mergeStringSets([
-      userFunctionCallsInExpression(statement.test, functionNames),
-      ...statement.consequent.map((child) => userFunctionCallsInStatement(child, functionNames)),
-      ...(Array.isArray(statement.alternate)
-        ? statement.alternate.map((child) => userFunctionCallsInStatement(child, functionNames))
-        : statement.alternate
-          ? [userFunctionCallsInStatement(statement.alternate, functionNames)]
-          : []),
-    ]);
-  }
-  if (statement.type === 'OnceStatement') {
-    return mergeStringSets([
-      ...(statement.test ? [userFunctionCallsInExpression(statement.test, functionNames)] : []),
-      ...statement.body.map((child) => userFunctionCallsInStatement(child, functionNames)),
-    ]);
-  }
-  if (statement.type === 'ForStatement') {
-    return mergeStringSets([
-      ...(statement.kind === 'numeric'
-        ? [
-          userFunctionCallsInExpression(statement.start, functionNames),
-          userFunctionCallsInExpression(statement.end, functionNames),
-          ...(statement.step ? [userFunctionCallsInExpression(statement.step, functionNames)] : []),
-        ]
-        : [userFunctionCallsInExpression(statement.iterable, functionNames)]),
-      ...statement.body.map((child) => userFunctionCallsInStatement(child, functionNames)),
-    ]);
-  }
-  if (statement.type === 'WhileStatement') {
-    return mergeStringSets([
-      userFunctionCallsInExpression(statement.test, functionNames),
-      ...statement.body.map((child) => userFunctionCallsInStatement(child, functionNames)),
-    ]);
-  }
-  if (statement.type === 'MultiDeclaration') return mergeStringSets(statement.declarations.map((declaration) => userFunctionCallsInStatement(declaration, functionNames)));
-  if (statement.type === 'MultiAssignment') return mergeStringSets(statement.assignments.map((assignment) => userFunctionCallsInStatement(assignment, functionNames)));
-  if (statement.type === 'MultiExpressionStatement') return mergeStringSets(statement.expressions.map((expression) => userFunctionCallsInExpression(expression, functionNames)));
-  return new Set();
-}
-
-function userFunctionCallsInExpression(expression: Expression, functionNames: Set<string>): Set<string> {
-  if (expression.type === 'CallExpression') {
-    const refs = expression.callee.type === 'Identifier' && functionNames.has(expression.callee.name)
-      ? new Set([expression.callee.name])
-      : userFunctionCallsInExpression(expression.callee, functionNames);
-    for (const argument of expression.arguments) {
-      for (const ref of userFunctionCallsInExpression(argument.value, functionNames)) refs.add(ref);
-    }
-    return refs;
-  }
-  if (expression.type === 'BinaryExpression') return mergeStringSets([userFunctionCallsInExpression(expression.left, functionNames), userFunctionCallsInExpression(expression.right, functionNames)]);
-  if (expression.type === 'UnaryExpression') return userFunctionCallsInExpression(expression.argument, functionNames);
-  if (expression.type === 'ConditionalExpression') {
-    return mergeStringSets([
-      userFunctionCallsInExpression(expression.test, functionNames),
-      userFunctionCallsInExpression(expression.consequent, functionNames),
-      userFunctionCallsInExpression(expression.alternate, functionNames),
-    ]);
-  }
-  if (expression.type === 'SwitchExpression') {
-    return mergeStringSets([
-      ...(expression.discriminant ? [userFunctionCallsInExpression(expression.discriminant, functionNames)] : []),
-      ...expression.cases.flatMap((switchCase) => [
-        ...(switchCase.test ? [userFunctionCallsInExpression(switchCase.test, functionNames)] : []),
-        ...(Array.isArray(switchCase.consequent)
-          ? switchCase.consequent.map((statement) => userFunctionCallsInStatement(statement, functionNames))
-          : [userFunctionCallsInExpression(switchCase.consequent, functionNames)]),
-      ]),
-    ]);
-  }
-  if (expression.type === 'MemberExpression') return userFunctionCallsInExpression(expression.object, functionNames);
-  if (expression.type === 'IndexExpression') return mergeStringSets([userFunctionCallsInExpression(expression.object, functionNames), userFunctionCallsInExpression(expression.index, functionNames)]);
-  if (expression.type === 'ArrayExpression') return mergeStringSets(expression.elements.map((element) => userFunctionCallsInExpression(element, functionNames)));
-  if (expression.type === 'ForStatement' || expression.type === 'WhileStatement') return userFunctionCallsInStatement(expression, functionNames);
-  if (expression.type === 'LambdaExpression') return userFunctionCallsInExpression(expression.body, functionNames);
-  return new Set();
-}
-
-function mergeStringSets(sets: Set<string>[]): Set<string> {
-  const merged = new Set<string>();
-  for (const set of sets) {
-    for (const value of set) merged.add(value);
-  }
-  return merged;
-}
 
 function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
   const positional = args.filter((a) => !a.name).map((a) => a.value);
@@ -2344,10 +2277,8 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
     }
     case 'ta.vwap': {
       const names = ['source', 'anchor', 'stdev_mult'];
-      const hasExplicitAnchor = Boolean(readOrderedArg(args, names, 'anchor', 1));
       const stdevMultArg = readOrderedArg(args, names, 'stdev_mult', 2);
-      const ctorArgs = stdevMultArg ? [true, extractStaticNumber(stdevMultArg) ?? NaN] : [false, NaN];
-      return hasExplicitAnchor ? [...ctorArgs, true] : ctorArgs;
+      return stdevMultArg ? [true, extractStaticNumber(stdevMultArg) ?? NaN] : [false, NaN];
     }
     case 'ta.stoch': {
       const len = extractStaticNumber(args.find((a) => a.name?.name === 'length')?.value ?? positional[3]);
@@ -2480,7 +2411,6 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       return [lengthExpr].filter(isDefinedExpression);
     }
     case 'ta.mfi': {
-      const names = ['source', 'length'];
       const sourceNamed = args.find((a) => a.name?.name === 'source')?.value ?? args.find((a) => a.name?.name === 'series')?.value;
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value
         ?? positional[sourceNamed ? 0 : 1]

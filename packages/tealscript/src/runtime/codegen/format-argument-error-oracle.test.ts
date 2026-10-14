@@ -13,7 +13,12 @@ describe('documented formatting brace errors', () => {
     it.each(['ab {0', "ab {0'}' de", 'ab }{0}{ de', "''{''{0}"])(`${name} rejects unbalanced unquoted left braces: %s`, template => {
       const result = run(`${name}(${JSON.stringify(template)}, close)\nplot(1)`);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].message).toContain('unbalanced');
+      if (name === 'str.format') {
+        expect(result.errors[0].message).toBe('Error on bar 0: Unmatched braces in the pattern.');
+        expect(result.errors[0].line).toBe(3);
+      } else {
+        expect(result.errors[0].message).toContain('unbalanced');
+      }
       expect(result.errors[0].code).not.toBe('RE10001');
       expect(result.profile.swallowedErrors ?? []).toEqual([]);
     });

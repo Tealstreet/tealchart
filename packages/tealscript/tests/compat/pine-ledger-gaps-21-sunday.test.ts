@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -9,7 +10,7 @@ import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 describe('ledger823 Sunday namespace boundary', () => {
   it.each([[3, 'sunday'], [4, 'dayofweek.sunday'], [6, 'dayofweek.sunday']] as const)('accepts Pine%s %s', (version, expression) => {
     const source = `//@version=${version}\n${version < 5 ? 'study' : 'indicator'}("Sunday")\nplot(${expression}, "Sunday")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
     const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 1) });
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Sunday').values).toEqual([1]);

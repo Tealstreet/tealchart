@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -82,6 +83,6 @@ plot(ta.ema(close, length))`);
   });
 
   it('preserves the v5 mutable-constant migration control', () => {
-    expect(check(`${returnedTuple}\nlength := 4\nplot(ta.ema(close, length))`, 5).diagnostics).toEqual([]);
+    expect(check(`${returnedTuple}\nlength := 4\nplot(ta.ema(close, length))`, 5).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 });

@@ -88,7 +88,14 @@ describe('collection ranked batch 19 bounded contracts', () => {
       values(`a = array.from(${zero})\nplot(${call} ? 1 : 0, title="all")`, { all: 0 }, 5);
     });
     it.each(everyCalls)(`native CF003 v6 refuses ${kind} every: %s`, (call) => {
-      refuses(`a = array.from(${zero})\nresult = ${call}`, 'type-mismatch');
+      // v78-v6-every-{int,float}-named-tk-v1 attempt-v1 also witnesses named id=.
+      // v2 conflicts-batch-4-v1 attempt 2: positional CE10123 numeric-array markers.
+      expect(errors(`a = array.from(${zero})\nresult = ${call}`)).toEqual([
+        expect.objectContaining({
+          code: 'CE10123',
+          message: `Cannot call "array.every" with argument "id"="a". An argument of "array<${kind}>" type was used but a "array<bool>"  is expected.`,
+        }),
+      ]);
     });
   }
   it('every requires an array argument', () => refuses('result = array.every()', 'argument-count'));

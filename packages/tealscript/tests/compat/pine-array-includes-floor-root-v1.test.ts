@@ -19,7 +19,7 @@ describe('array scalar qualifier controls v1', () => {
     }
   }
   it('custom includes retains its string result', () => {
-    const source = '//@version=6\nindicator("Custom includes")\nmethod includes(array<int> a, int value) => "custom"\na=array.from(1,2)\nstring result=a.includes(1)\nplot(str.length(result))';
+    const source = '//@version=6\nindicator("Custom includes")\nmethod includes(array<int> a, int value) =>\n    na(a)\n    "custom"\na=array.from(1,2)\nstring result=a.includes(1)\nplot(str.length(result))';
     expect(checkProgram(parse(source)).diagnostics.filter(d => d.severity === 'error')).toEqual([]);
   });
 });

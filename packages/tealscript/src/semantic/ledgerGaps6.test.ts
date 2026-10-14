@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -20,7 +21,7 @@ parameters() => ["ticker", count]
 plot(length)`,
       version,
     );
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
     for (const name of ['ticker', 'length']) {
       expect(result.symbols.find((symbol) => symbol.name === name)?.type?.qualifier).toBe('simple');
     }
@@ -33,7 +34,7 @@ plot(length)`,
 plot(source)`,
       version,
     );
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
     for (const name of ['source', 'length', 'ticker']) {
       expect(result.symbols.find((symbol) => symbol.name === name)?.type?.qualifier).toBe('series');
     }

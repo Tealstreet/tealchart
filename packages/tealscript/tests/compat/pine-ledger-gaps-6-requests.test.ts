@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -16,15 +17,15 @@ describe('ledger gaps 6: request context qualifiers', () => {
   const dynamicContext =
     'symbol = close > open ? "A" : "B"\nvalue = request.security(symbol, "1D", close)\nplot(value)';
   it.each([5, 6])('accepts series context with explicit dynamic requests in v%i (215/221)', (version) => {
-    expect(check(dynamicContext, version, true).diagnostics).toEqual([]);
+    expect(check(dynamicContext, version, true).diagnostics).toEqual(withVersionAdvisory([], version));
   });
   it('accepts series context by default in v6 (221)', () => {
     expect(check(dynamicContext).diagnostics).toEqual([]);
   });
   it('refuses series context by default in v5 (215)', () => {
-    expect(check(dynamicContext, 5).diagnostics).toEqual([
+    expect(check(dynamicContext, 5).diagnostics).toEqual(withVersionAdvisory([
       expect.objectContaining({ code: 'qualifier-mismatch', message: expect.stringContaining("'symbol'") }),
-    ]);
+    ], 5));
   });
   it.each(['request.security', 'request.security_lower_tf'])(
     'checks timeframe and currency for %s while allowing input contexts',
@@ -44,13 +45,13 @@ describe('ledger gaps 6: request context qualifiers', () => {
     },
   );
   it.each([5, 6])('rejects series context with dynamic requests disabled in v%i (215)', (version) => {
-    expect(check(dynamicContext, version, false).diagnostics).toEqual([
+    expect(check(dynamicContext, version, false).diagnostics).toEqual(withVersionAdvisory([
       expect.objectContaining({ severity: 'error', message: expect.stringMatching(/series.*symbol|symbol.*series/) }),
-    ]);
+    ], version));
   });
   it.each([5, 6])('still permits a series expression in a fixed context in v%i (216)', (version) => {
     expect(check('value = request.security("A", "1D", close * 2)\nplot(value)', version, false).diagnostics).toEqual(
-      [],
+      withVersionAdvisory([], version),
     );
   });
 });

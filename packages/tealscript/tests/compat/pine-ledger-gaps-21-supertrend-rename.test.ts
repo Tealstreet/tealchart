@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -9,7 +10,7 @@ import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 describe('ledger817 Supertrend namespace migration', () => {
   it.each([[4, 'supertrend'], [5, 'ta.supertrend']] as const)('runs Pine%s %s', (version, name) => {
     const source = `//@version=${version}\n${version < 5 ? 'study' : 'indicator'}("Supertrend rename")\n[line, direction] = ${name}(2, 3)\nplot(line, "Line")\nplot(direction, "Direction")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
     const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 3) });
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Line').values[2]).toBeCloseTo(114.66666666666667, 8);
@@ -17,6 +18,6 @@ describe('ledger817 Supertrend namespace migration', () => {
   });
   it('refuses the old bare function name in Pine5', () => {
     const checked = checkProgram(parse('//@version=5\nindicator("Old Supertrend")\n[line, direction] = supertrend(2, 3)\nplot(line)'));
-    expect(checked.diagnostics).toEqual([expect.objectContaining({ code: 'version-mismatch' })]);
+    expect(checked.diagnostics).toEqual(withVersionAdvisory([expect.objectContaining({ code: 'version-mismatch' })], 5));
   });
 });

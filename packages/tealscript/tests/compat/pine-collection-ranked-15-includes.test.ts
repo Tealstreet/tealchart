@@ -55,7 +55,7 @@ describe('Collection ranked 15: includes', () => {
   it('custom includes method can accept a different search contract', () => {
     expect(
       errors(
-        'method includes(array<int> a, string value) => value == "two"\na = array.from(1, 2)\nx = a.includes(value="two")',
+        'method includes(array<int> a, string value) =>\n    na(a)\n    value == "two"\na = array.from(1, 2)\nx = a.includes(value="two")',
       ),
     ).toEqual([]);
   });

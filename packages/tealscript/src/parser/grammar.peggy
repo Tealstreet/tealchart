@@ -612,7 +612,9 @@ TypedParameter
   = typeAnnotation:TypeAnnotation _ name:Identifier defaultValue:(__ "=" __ Expression)? {
       return {
         ...name,
-        typeAnnotation,
+        typeAnnotation: defaultValue && typeAnnotation.qualifier
+          ? { ...typeAnnotation, loc: { start: loc().start, end: typeAnnotation.loc.end } }
+          : typeAnnotation,
         ...(defaultValue ? { defaultValue: defaultValue[3] } : {})
       };
     }
@@ -3246,7 +3248,7 @@ PostfixExpression
   = head:PrimaryExpression tail:(
       _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
     / &(_ GenericTypeArguments _ "(") _ typeArguments:GenericTypeArguments { return { type: 'typeArgs', typeArguments }; }
-    / PostfixContinuationSpace "." _ prop:IdentifierName { return { type: 'member', prop }; }
+    / PostfixContinuationSpace dot:MemberAccessDot _ prop:IdentifierName { return { type: 'member', prop, dot }; }
     / PostfixContinuationSpace "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
       let pendingTypeArguments = null;
@@ -3267,12 +3269,14 @@ PostfixExpression
           };
         } else if (op.type === 'member') {
           pendingTypeArguments = null;
-          return {
+          const member = {
             type: 'MemberExpression',
             object: obj,
             property: { type: 'Identifier', name: op.prop, loc: loc() },
             loc: loc()
           };
+          Object.defineProperty(member, 'accessLoc', { value: op.dot });
+          return member;
         } else if (op.type === 'index') {
           pendingTypeArguments = null;
           return {
@@ -3285,6 +3289,9 @@ PostfixExpression
         return obj;
       }, head);
     }
+
+MemberAccessDot
+  = "." { return loc(); }
 
 GenericTypeArguments
   = "<" __ first:TypeReferenceName rest:(__ "," __ TypeReferenceName)* __ ">" {

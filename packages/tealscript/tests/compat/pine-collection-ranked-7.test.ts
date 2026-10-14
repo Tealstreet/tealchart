@@ -126,7 +126,7 @@ describe('collection documented ranks 241-280', () => {
   }
 
   it('numeric helper checker preserves custom max overload admission', () => {
-    expect(check('method max(array<int> id, string selector) => 7\na = array.from(9, 3)\nplot(a.max("custom"), title="result")')).toEqual([]);
+    expect(check('method max(array<int> id, string selector) =>\n    na(id)\n    7\na = array.from(9, 3)\nplot(a.max("custom"), title="result")')).toEqual([]);
   });
 
   for (const method of [false, true]) {
@@ -146,7 +146,7 @@ describe('collection documented ranks 241-280', () => {
   }
 
   it('first and indexof checker preserve user-defined method qualifiers and parameter kinds', () => {
-    expect(check('method first(array<int> id) => 7\nmethod indexof(array<int> id, string value) => 2\na = array.from(9, 3)\nconst int head = a.first()\nconst int index = a.indexof("custom")')).toEqual([]);
+    expect(check('method first(array<int> id) =>\n    na(id)\n    7\nmethod indexof(array<int> id, string value) =>\n    na(id)\n    2\na = array.from(9, 3)\nconst int head = a.first()\nconst int index = a.indexof("custom")')).toEqual([]);
   });
 
   it('array.max and indexof honor named argument positions', () => {

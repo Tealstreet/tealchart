@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -102,7 +103,7 @@ describe('documented value and reference types', () => {
       '    label.new(bar_index, close, size=fontSize)',
       'plot(close)',
     ].join('\n')));
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('keeps explicit const size declarations from accepting input strings', () => {

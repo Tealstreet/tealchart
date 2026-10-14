@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -20,7 +21,7 @@ if barstate.islast
     label.new(${coordinates}, "default")
     label.new(${coordinates}, "explicit", textcolor=#112233)
     label.new(${coordinates}, "missing", textcolor=na)`;
-        expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = runCompatScript(source);
         expect(result.errors).toEqual([]);
         expect(result.drawings).toEqual([

@@ -22,6 +22,7 @@ import type {
   RequestSeriesQuery,
 } from '../runtime/requestDatafeed';
 import type { Program } from '../parser/ast';
+import type { TealscriptParseDiagnostic } from '../parser';
 import type { SemanticDiagnostic } from '../semantic';
 
 /**
@@ -296,5 +297,6 @@ export interface ParseErrorMessage {
   message: string;
   line?: number;
   column?: number;
+  diagnostics?: TealscriptParseDiagnostic[];
   metadata?: WorkerOutputMetadata;
 }

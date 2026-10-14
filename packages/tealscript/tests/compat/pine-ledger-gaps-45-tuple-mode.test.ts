@@ -5,12 +5,9 @@ import { checkProgram } from '../../src/semantic/checker';
 
 describe('ledger gaps 45: regular tuple declarations', () => {
   it.each(['var', 'varip'])('1795 refuses %s tuple declarations', (mode) => {
-    const program = parse(
+    expect(() => parse(
       `//@version=6\nindicator("Tuple mode")\npair() => [1, 2]\n${mode} [left, right] = pair()\nplot(left)`,
-    );
-    expect(checkProgram(program).diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
-      expect.objectContaining({ code: 'invalid-tuple-declaration', severity: 'error' }),
-    ]);
+    )).toThrow(`""${mode}"" cannot be used as a variable or function name.`);
   });
 
   it('1795 accepts a regular tuple and scalar persistent declarations', () => {

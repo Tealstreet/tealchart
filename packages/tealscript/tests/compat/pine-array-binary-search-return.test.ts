@@ -83,7 +83,7 @@ describe('array.binary_search return contracts', () => {
     });
   }
   it('preserves a user method with the same name on a UDT receiver', () => {
-    const body = `type Searchable\n    int seed\nmethod binary_search(Searchable self, int target) => "selected"\na = Searchable.new(1)\nx = a.binary_search(3)`;
+    const body = `type Searchable\n    int seed\nmethod binary_search(Searchable self, int target) =>\n    self.seed := self.seed\n    "selected"\na = Searchable.new(1)\nx = a.binary_search(3)`;
     const result = checked(body);
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
     expect(result.symbols.find((symbol) => symbol.name === 'x')?.type).toMatchObject({ kind: 'string' });

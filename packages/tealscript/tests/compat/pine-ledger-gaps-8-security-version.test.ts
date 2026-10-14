@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -39,18 +40,18 @@ describe('ledger gaps 8: security namespace and resolution migration', () => {
     'symbol="ALT", resolution="2", close, barmerge.gaps_off, barmerge.lookahead_on',
   ])('binds the v4 resolution slot: %s', (argumentsSource) => {
     const source = script(4, `security(${argumentsSource})`);
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], 4));
     expect(values(source)).toEqual([17, 17, 9, 9]);
     expect(values(script(4, 'security("ALT", "2", close, lookahead=barmerge.lookahead_on)'))).toEqual([17, 17, 9, 9]);
   });
 
   for (const version of [5, 6]) {
     it(`rejects the old global name in v${version}`, () => {
-      expect(checkProgram(parse(script(version, 'security("ALT", "2", close)'))).diagnostics).toEqual([
+      expect(checkProgram(parse(script(version, 'security("ALT", "2", close)'))).diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'version-mismatch', message: expect.stringContaining('Use request.security()') }),
-      ]);
+      ], version));
       const source = script(version, 'request.security("ALT", "2", close, lookahead=barmerge.lookahead_on)');
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       expect(values(source)).toEqual([17, 17, 9, 9]);
     });
 
@@ -60,7 +61,7 @@ describe('ledger gaps 8: security namespace and resolution migration', () => {
         expect.objectContaining({ code: 'unknown-argument', message: "Unknown argument 'resolution' for request.security()" }),
       ]));
       const source = script(version, 'request.security(symbol="ALT", timeframe="2", expression=close, lookahead=barmerge.lookahead_on)');
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       expect(values(source)).toEqual([17, 17, 9, 9]);
     });
   }

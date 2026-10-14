@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -26,7 +27,7 @@ describe('ledger47 buffer and numeric bool boundaries', () => {
   it('v5 implicitly converts zero, numeric na and nonzero numbers, rank1868', () => {
     const source =
       '//@version=5\nindicator("Bool")\nfloat missing=na\nplot(0 ? 1 : 0,title="Zero")\nplot(missing ? 1 : 0,title="Missing")\nplot(-2 ? 1 : 0,title="Nonzero")';
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], 5));
     const result = runCompatScript(source);
     expect(result.errors).toEqual([]);
     expect(result.plots.map((plot) => plot.values)).toEqual(
@@ -41,7 +42,7 @@ describe('ledger47 buffer and numeric bool boundaries', () => {
   });
   it.each([5, 6])('v%i preserves explicit bool casts, rank1868 control', (version) => {
     const source = `//@version=${version}\nindicator("Bool")\nplot(bool(0) ? 1 : 0)\nplot(bool(na) ? 1 : 0)\nplot(bool(-2) ? 1 : 0)`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
     const result = runCompatScript(source);
     expect(result.errors).toEqual([]);
     expect(result.plots.map((plot) => plot.values)).toEqual(

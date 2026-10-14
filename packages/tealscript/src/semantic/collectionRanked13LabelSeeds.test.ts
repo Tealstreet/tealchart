@@ -39,7 +39,9 @@ describe('array.new_label supplied initial_value', () => {
     expect(
       errors(`type Holder
     int value
-method new_label(Holder self, int size, string initial_value) => size
+method new_label(Holder self, int size, string initial_value) =>
+    self.value := self.value
+    size
 array = Holder.new(1)
 a = array.new_label(2, "local")`),
     ).toEqual([
@@ -48,7 +50,9 @@ a = array.new_label(2, "local")`),
     expect(
       errors(`type Holder
     int value
-method new_label(Holder self, int size, string initial_value) => size
+method new_label(Holder self, int size, string initial_value) =>
+    self.value := self.value
+    size
 holder = Holder.new(1)
 a = holder.new_label(2, "local")`),
     ).toEqual([]);

@@ -1,6 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 
 import { parse } from '../src/parser/parser.ts';
 import { checkProgram } from '../src/semantic/checker.ts';
@@ -36,12 +34,6 @@ export interface ValueVectorDiscriminationProof {
   assertedLength: 'bar-count';
   mutations: readonly ValueVectorDiscriminationMutation[];
   helperFormulaCitation?: string;
-}
-
-interface ValueVectorDiscriminationExemption {
-  id: string;
-  rank: number;
-  reason: string;
 }
 
 export interface ValueVectorCase {
@@ -2288,25 +2280,9 @@ function vwap(bars: Bar[]): VectorValue[] {
   let weightedTotal = 0;
   let volumeTotal = 0;
   return bars.map((bar) => {
-    if (!Number.isFinite(bar.close)) return null;
     weightedTotal += bar.close * bar.volume;
     volumeTotal += bar.volume;
-    return weightedTotal / volumeTotal;
-  });
-}
-
-function anchoredVwap(bars: Bar[], anchor: (bar: Bar, index: number) => boolean): VectorValue[] {
-  let weightedTotal = 0;
-  let volumeTotal = 0;
-  return bars.map((bar, index) => {
-    if (anchor(bar, index)) {
-      weightedTotal = 0;
-      volumeTotal = 0;
-    }
-    if (!Number.isFinite(bar.close)) return null;
-    weightedTotal += bar.close * bar.volume;
-    volumeTotal += bar.volume;
-    return volumeTotal === 0 ? null : weightedTotal / volumeTotal;
+    return Number.isFinite(weightedTotal) ? weightedTotal / volumeTotal : null;
   });
 }
 
@@ -11810,10 +11786,6 @@ function diagnosticsMatch(actual: readonly string[], expected: readonly string[]
 }
 
 let discriminationExemptionIds: Set<string> | undefined;
-
-function resolvePackagePath(path: string): string {
-  return existsSync(path) ? path : `packages/tealscript/${path}`;
-}
 
 function loadValueVectorDiscriminationExemptionIds(): Set<string> {
   if (discriminationExemptionIds) return discriminationExemptionIds;

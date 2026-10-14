@@ -17,5 +17,5 @@ export function tradingViewTimeframeCompileRefusal(expression: CallExpression, p
     ?? timeframe.arguments.find((argument) => !argument.name)?.value;
   if (seconds?.type !== 'NumericLiteral' || seconds.value !== 59) return undefined;
   // TV coverage-time-2-v1.pine:33, v2 attempts 1/2, CE10294.
-  return 'TradingView CE10294 refuses timeframe.in_seconds(timeframe.from_seconds(59)): resolution.trim is not a function';
+  return 'resolution.trim is not a function';
 }

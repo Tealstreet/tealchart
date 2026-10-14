@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser/parser';
@@ -68,7 +69,7 @@ plot(close[1] ? 7 : -2)`)).toEqual([[-2, 7, 7, -2], [-2, -2, 7, 7]]);
   // Include the v5 positive control, so uniformly rejecting bool cannot pass.
   it.each(['na', 'nz', 'fixnan'])('removes only the modern bool overload of %s', (helper) => {
     const body = `bool value = close > 0\nresult = ${helper}(value)`;
-    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checkProgram(parse(source(6, body))).diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({ severity: 'error', message: expect.stringContaining(`${helper} ${helper === 'na' ? 'x' : 'source'} cannot be a boolean`) }),
     ]));
@@ -79,7 +80,7 @@ plot(close[1] ? 7 : -2)`)).toEqual([[-2, 7, 7, -2], [-2, -2, 7, 7]]);
   it.each([
     ['assignment', 'bool value = false\nvalue := na'],
   ])('forbids bool na only in v6 %s [bool, na]', (_name, body) => {
-    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checkProgram(parse(source(6, body))).diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({ severity: 'error', message: expect.stringContaining('does not allow boolean na') }),
     ]));
@@ -116,7 +117,7 @@ describe('named boolean version defects', () => {
   // Reference bool and na; the v5/v6 pair rejects version-independent enforcement.
   it('V6_BOOL_NA_INITIALIZER_ACCEPTED [bool, na]', () => {
     const body = 'bool value = na';
-    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checkProgram(parse(source(6, body))).diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({ severity: 'error', message: expect.stringContaining('does not allow boolean na') }),
     ]));
@@ -126,7 +127,7 @@ describe('named boolean version defects', () => {
   // Legacy defaults preserve na without discarding explicit false/true calls.
   it('V5_BOOL_NA_UDF_DEFAULT_REFUSED [bool, na]', () => {
     const body = 'f(bool value = na) => value\nresult = f()';
-    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source(5, body))).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checkProgram(parse(source(6, body))).diagnostics).toEqual(expect.arrayContaining([
       expect.objectContaining({ severity: 'error', message: expect.stringContaining('does not allow boolean na') }),
     ]));

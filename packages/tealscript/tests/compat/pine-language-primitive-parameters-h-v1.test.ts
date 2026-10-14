@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -31,7 +32,7 @@ acceptString(string value) => value
 collect(float source, bool when = true, bool since = false, int length = 2) => length
 plot(acceptInt(3) * 100 + acceptFloat(2) * 10 + acceptFloat(1.25), "Value")
 plot(acceptString("Ax") == "Ax" ? 1 : 0, "String")\nplot(na(acceptInt(na)) ? 1 : 0, "IntMissing")\nplot(na(acceptFloat(na)) ? 1 : 0, "FloatMissing")\nplot(collect(2, length = 4), "NamedSlot")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Value').values).toEqual([321.25, 321.25, 321.25, 321.25]);
@@ -63,7 +64,7 @@ seriesValue(series float value) => value
 configured = input.float(2)
 simple float first = 3
 plot(constant(1) + simpleValue(configured) + simpleValue(first) + seriesValue(close), "Value")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Value').values).toEqual([108, 111, 113, 109]);

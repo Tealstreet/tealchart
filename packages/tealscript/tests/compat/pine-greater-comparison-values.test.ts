@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -24,7 +25,7 @@ reverse = 0 ${operator} sample
 plot(forward ? 1 : 0)
 plot(reverse ? 1 : 0)`;
           const checked = checkProgram(parse(source));
-          expect(checked.diagnostics).toEqual([]);
+          expect(checked.diagnostics).toEqual(withVersionAdvisory([], version));
           for (const name of ['forward', 'reverse']) {
             expect(checked.symbols.find((symbol) => symbol.name === name)?.type).toEqual({
               kind: 'bool',

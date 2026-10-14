@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -50,7 +51,7 @@ describe('ledger gaps 6: scalar qualifier and integer length contracts', () => {
   });
 
   it('keeps v5 mutable constant inference for the migration control (214)', () => {
-    expect(check('length = 3\nlength := 4\nplot(ta.ema(close, length))', 5).diagnostics).toEqual([]);
+    expect(check('length = 3\nlength := 4\nplot(ta.ema(close, length))', 5).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('propagates a mutable UDF-local qualifier through return inference (214)', () => {

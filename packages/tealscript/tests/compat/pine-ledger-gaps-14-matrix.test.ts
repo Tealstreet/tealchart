@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -61,7 +62,7 @@ plot(matrix.get(ints, 0, 0) + matrix.get(floats, 0, 0))
 indicator("Legacy bool matrix")
 legacyBools = matrix.new<bool>(1, 1, 1)
 `));
-    expect(legacy.diagnostics).toEqual([]);
+    expect(legacy.diagnostics).toEqual(withVersionAdvisory([], 5));
     const invalid = checkProgram(parse(`//@version=6
 indicator("Matrix incompatible initializer")
 wrong = matrix.new<int>(initial_value="wrong", columns=1, rows=1)

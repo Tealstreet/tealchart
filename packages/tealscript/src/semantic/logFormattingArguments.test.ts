@@ -21,5 +21,5 @@ describe.each(['log.info', 'log.warning', 'log.error'])('%s formatting argument 
 });
 
 it('preserves a local receiver method named info', () => {
-  expect(errors('method info(array<float> self, color value) => 1\nlog = array.new_float()\nx = log.info(color.red)')).toEqual([]);
+  expect(errors('method info(array<float> self, color value) =>\n    na(self)\n    1\nlog = array.new_float()\nx = log.info(color.red)')).toEqual([]);
 });

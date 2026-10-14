@@ -1,3 +1,4 @@
+import { PineRuntimeArgumentError } from './runtimeArgumentError';
 import { decomposeSingularValues } from './singular-value-decomposition';
 import {
   avgArrayValue,
@@ -392,9 +393,15 @@ export function multMatrixValue(matrix: PineMatrix, other: PineMatrix | PineArra
   return mapMatrixArithmetic(matrix, Number(other), (left, right) => left * right);
 }
 
-export function powMatrixValue(matrix: PineMatrix, power: number): PineMatrix<number> {
+export function powMatrixValue(matrix: PineMatrix, power: number, line?: number): PineMatrix<number> {
   assertSquareMatrix(matrix, 'Matrix power');
   const normalizedPower = Math.trunc(Number(power));
+  if (line !== undefined && Number.isInteger(power) && power < 0) {
+    throw new PineRuntimeArgumentError(
+      "In the 'matrix.pow()' function. The 'power' argument must be positive.",
+      'RE10090', line,
+    );
+  }
   if (!Number.isFinite(normalizedPower) || normalizedPower < 0 || normalizedPower !== Number(power)) {
     throw new Error('Matrix power must be a non-negative integer');
   }

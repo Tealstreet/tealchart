@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -20,7 +21,7 @@ plot(array.get(numbers, 1), "Middle")
 plot(array.get(numbers, 2), "Last")
 plot(array.size(numbers), "Size")`);
 
-        expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = runCompatScript(script, { bars: compatibilityBars.slice(0, 3) });
         expect(result.errors).toEqual([]);
         expect(result.profile.compiledBarErrors?.count ?? 0).toBe(0);

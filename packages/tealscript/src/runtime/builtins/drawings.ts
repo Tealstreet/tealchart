@@ -75,6 +75,15 @@ function validateDrawingXCoordinate(ctx: ExecutionContext, xloc: string, x: numb
   return x;
 }
 
+function validateBoxCreationHistory(ctx: ExecutionContext, xloc: string, x: number | null, argument: 'left' | 'right'): void {
+  if (xloc === 'bar_index' && x !== null && x < ctx.bar_index - 10000) {
+    throw new PineRuntimeArgumentError(
+      `Bar index value of the \`${argument}\` argument (${x}) in \`box.new()\` is too far from the current bar index. Try using \`time\` instead.`,
+      'RE10026',
+    );
+  }
+}
+
 function copyPoint(point: ChartPoint): ChartPoint {
   return { ...point };
 }
@@ -834,6 +843,9 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     if (textFormatting !== undefined) drawing.textFormatting = textFormatting;
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
+    if ((pineVersion === 5 || pineVersion === 6) && !usesPointOverload) {
+      validateBoxCreationHistory(ctx, xloc, drawing.left, 'left');
+    }
     validateDrawingXCoordinate(ctx, xloc, drawing.left);
     validateDrawingXCoordinate(ctx, xloc, drawing.right);
     ctx.addDrawing(drawing);

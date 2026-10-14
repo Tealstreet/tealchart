@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { PINE_V6_KNOWN_MISSING_BUILTINS, PINE_V6_REFERENCE_BUILTINS } from '../compat/pineV6BuiltinReference';
@@ -358,7 +359,7 @@ import TradingView/ta/7
 squeeze = ta.change(ta.ao(close, 5, 34)) - ta.change(close, 5)
 plot(squeeze)`;
 
-    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(pine)).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('does not widen official TradingView alias fallback to unavailable members', () => {
@@ -1089,7 +1090,7 @@ float rthClosePrev = close[1]
 bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ? math.abs(rthOpenCurrent - rthClosePrev) : na
 plot(timeChange or gapPoints ? 1 : 0)`));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('accepts timeframe utility functions with named arguments', () => {
@@ -1944,7 +1945,8 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(9).fill('legacy-argument'));
+    expect(result.diagnostics).toEqual(withVersionAdvisory((Array(9).fill('legacy-argument')).map((value) => expect.objectContaining({ code: value })), 4));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([...expectedVersionAdvisories(4).map((diagnostic) => diagnostic.code), ...(Array(9).fill('legacy-argument'))]);
   });
 
   it('accepts v5 deprecated visual transp arguments with info diagnostics', () => {
@@ -1957,11 +1959,16 @@ plotshape(close > open, color=color.green, transp=20)
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+    expect(result.diagnostics).toEqual(withVersionAdvisory(([
       "plot() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
       "fill() accepted legacy argument 'transp' for compatibility",
       "plotshape() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
-    ]);
+    ]).map((value) => expect.objectContaining({ message: value })), 5));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([...expectedVersionAdvisories(5).map((diagnostic) => diagnostic.message), ...([
+      "plot() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
+      "fill() accepted legacy argument 'transp' for compatibility",
+      "plotshape() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
+    ])]);
   });
 
   it('uses modern v5 positional visual argument order when transp is not supplied', () => {
@@ -2027,7 +2034,7 @@ plotchar(close > open, "Char", "C", location.belowbar, color.green, 40, 0, "T", 
 plotarrow(close - open, "Arrow", color.green, color.red, 60, 0, 5, 15, true, 3)
 `));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 4));
   });
 
   it('accepts legacy v2/v3 bare tickerid and n globals', () => {
@@ -2244,7 +2251,7 @@ if close - open
     float value = open
 `));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('keeps v6 positional plot histbase binding distinct from legacy transp', () => {
@@ -3438,7 +3445,8 @@ plot(adjust(close))
     const result = checkProgram(parse(`
 indicator("Duplicate Params")
 bad(left, left) => left
-[a, a] = [1, 2]
+pair() => [1, 2]
+[a, a] = pair()
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -3551,12 +3559,18 @@ rsiB := "bad"
 tickerB := 1
 plot(rsiA)`));
 
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+    expect(result.diagnostics).toEqual(withVersionAdvisory(([
       'Cannot assign string value to float variable rsiA',
       'Cannot assign int value to string variable tickerA',
       'Cannot assign string value to float variable rsiB',
       'Cannot assign int value to string variable tickerB',
-    ]);
+    ]).map((value) => expect.objectContaining({ message: value })), 5));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([...expectedVersionAdvisories(5).map((diagnostic) => diagnostic.message), ...([
+      'Cannot assign string value to float variable rsiA',
+      'Cannot assign int value to string variable tickerA',
+      'Cannot assign string value to float variable rsiB',
+      'Cannot assign int value to string variable tickerB',
+    ])]);
   });
 
   it('infers tuple destructuring element types from compatible user function branch tuple returns', () => {
@@ -4128,7 +4142,8 @@ plot(close)
 indicator("Direct Tuple Initializer Shape Diagnostics")
 triple(float value) => [value, value + 1, "udf"]
 method tripleMethod(float this) => [this, this + 1, "method"]
-[literalValue, literalTitle] = [close]
+single(float value) => [value]
+[literalValue, literalTitle] = single(close)
 [macdLine, signalLine] = ta.macd(close, 12, 26, 9)
 [udfValue, udfTitle] = triple(close)
 [methodValue, methodTitle] = close.tripleMethod()
@@ -4746,7 +4761,7 @@ export method score(Box this, bool flag) => flag ? this.value : 0
 indicator("User Callable Bool NA")
 import TestUser/BoolTools/1 as bt
 enabled(bool flag=na) => flag ? 1 : 0
-okDefault(bool flag=bool(na)) => flag ? 1 : 0
+okDefault(bool flag=false) => flag ? 1 : 0
 method toggled(float this, bool flag=na) => flag ? this : 0
 method keep(float this, bool flag) => flag ? this : 0
 badFunction = enabled(na)
@@ -6551,7 +6566,7 @@ type Anchor
 type Item
     float value
 
-method expose(Anchor receiver, array<Item> values) => values
+method expose(Anchor receiver, array<Item> values) => receiver.tag >= 0 ? values : array.new<Item>()
 
 anchor = Anchor.new(1)
 values = array.from(Item.new(close))
@@ -9784,10 +9799,10 @@ indicator("Method Signature Overloads")
 type Pivot
     float y
 method value(Pivot this, float amount) => amount + this.y
-method value(Pivot this, string label) => label
-method value(Pivot this, bool enabled, float fallback = 1) => fallback
-method rank(Pivot this, float amount) => "float"
-method rank(Pivot this, int amount) => amount
+method value(Pivot this, string label) => na(this.y) ? "" : label
+method value(Pivot this, bool enabled, float fallback = 1) => na(this.y) ? 0.0 : fallback
+method rank(Pivot this, float amount) => na(this.y) ? "missing" : "float"
+method rank(Pivot this, int amount) => na(this.y) ? 0 : amount
 pivot = Pivot.new(close)
 numberValue = pivot.value(1)
 textValue = pivot.value("fast")
@@ -10197,7 +10212,7 @@ plot(validLocal + missingFunction + privateFunction + missingConstructor.value +
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Unknown library function: tools.missing',
-      'Unknown library function: tools.hidden',
+      "Could not find method or method reference 'tools.hidden'",
       'Unknown library constructor: tools.Hidden.new',
       'Unknown function: p.secret',
     ]);
@@ -10562,7 +10577,8 @@ step_input = input(0.5, "Step", minval=0.0, maxval=1.0, step=0.1)
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(5).fill('legacy-argument'));
+    expect(result.diagnostics).toEqual(withVersionAdvisory((Array(5).fill('legacy-argument')).map((value) => expect.objectContaining({ code: value })), 4));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([...expectedVersionAdvisories(4).map((diagnostic) => diagnostic.code), ...(Array(5).fill('legacy-argument'))]);
   });
 
   it('accepts v4 generic input type and options metadata', () => {
@@ -10573,7 +10589,7 @@ length = input(14, "Length", type=input.integer, minval=1, maxval=100, step=1)
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics).toEqual(withVersionAdvisory([], 4));
   });
 
   it('does not report arity errors when a UDF shadows a legacy TA alias', () => {

@@ -32,6 +32,7 @@ const admitted = [
   ['loop iterator', 'value = 0\nfor bar_index = 0 to 2\n    value := value + bar_index\nplot(value, title="Value")', 3],
 ] as const;
 
+// v4 trace-bgcolor-offset-v3 series/zero attempts pin undeclared bar_index text.
 // Native evidence settles v3 builtin unavailability; these additional sources
 // check lexical user-binding exemptions, without claiming fresh TV captures.
 describe('v3 unavailable builtin user-binding scope', () => {
@@ -42,11 +43,12 @@ describe('v3 unavailable builtin user-binding scope', () => {
       const diagnostic =
         name === 'reassignment cannot introduce a declaration'
           ? { code: 'unknown-assignment-target', message: 'Cannot assign to undeclared identifier: bar_index' }
-          : { code: 'unknown-identifier', message: 'Unknown identifier: bar_index' };
+          : { code: 'unknown-identifier', message: 'Undeclared identifier `bar_index`;' };
       expect(errors).toContainEqual(expect.objectContaining(diagnostic));
       const result = compile(parse(source));
       expect(result.success).toBe(false);
-      expect(result.unsupported).toContain('Unknown identifier: bar_index');
+      expect(result.unsupported).toContain(name === 'reassignment cannot introduce a declaration'
+        ? 'Unknown identifier: bar_index' : 'Undeclared identifier `bar_index`;');
     });
   }
 

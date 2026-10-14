@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -21,7 +22,7 @@ plot(integer * 100 + fraction * 4 + str.length(joinedValue), "Combined")
 plot(joinedValue == "AxBy" ? 1 : 0, "Text")
 plot(changing, "Changing")`;
       const semantics = checkProgram(parse(source));
-      expect(semantics.diagnostics).toEqual([]);
+      expect(semantics.diagnostics).toEqual(withVersionAdvisory([], version));
       for (const [name, kind, qualifier] of [
         ['integer', 'int', 'const'],
         ['fraction', 'float', 'const'],
@@ -45,7 +46,7 @@ encode(left, right) => left * 10 - right
 plot(encode(2, 7), "Positional")
 plot(encode(right = 7, left = 2), "Reordered")
 plot(encode(right = 2, left = 7), "Other")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);

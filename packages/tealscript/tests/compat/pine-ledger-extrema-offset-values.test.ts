@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
@@ -13,7 +14,7 @@ describe('documented extrema offset migration and missing sources', () => {
 ${version === 4 ? 'study' : 'indicator'}("offset migration")
 plot(${version === 4 ? '' : 'ta.'}${name}(3))
 `;
-        expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = executeScript(parse(source), bars);
         expect(result.errors).toEqual([]);
         expect(result.plots[0]?.values).toHaveLength(5);

@@ -6309,7 +6309,8 @@ plot(value, "Requested")`;
     const v5Compiled = tryCompile(parse(source(5)));
     const v6Compiled = tryCompile(parse(source(6)));
     expect(v5Compiled.success).toBe(false);
-    expect(v5Compiled.unsupported).toContain('request.* calls in local scopes require dynamic_requests=true: request.security');
+    // Native v4 corpus5-v5-local-request-v1.pine attempt-1 captures the omitted v5 option.
+    expect(v5Compiled.unsupported).toContain('Cannot use `request.*()` call within loops or conditional structures, when `dynamic_requests` is `false` in the `indicator()` function.');
     if (!v6Compiled.success) throw new Error(`Compilation failed: ${v6Compiled.unsupported.join(', ')}`);
 
     const v6Result = executeCompiled(v6Compiled, chartBars, undefined, { requestDatafeed: datafeed });

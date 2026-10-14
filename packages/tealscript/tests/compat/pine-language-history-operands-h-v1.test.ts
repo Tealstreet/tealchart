@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -9,7 +10,7 @@ const bars = compatibilityBars.slice(0, 4);
 
 function values(body: string, version: number, title: string) {
   const source = `//@version=${version}\nindicator("History operands")\n${body}`;
-  expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+  expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
   const result = runCompatScript(source, { bars });
   expect(result.errors).toEqual([]);
   expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);
@@ -39,9 +40,9 @@ for (const version of [5, 6]) {
 
     it('row 144 refuses applying history twice directly', () => {
       const result = checkProgram(parse(`//@version=${version}\nindicator("Chained history")\nplot(close[1][2])`));
-      expect(result.diagnostics).toEqual([
+      expect(result.diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'type-mismatch', message: 'History [] cannot be chained on the same value' }),
-      ]);
+      ], version));
     });
   });
 }

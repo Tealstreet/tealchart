@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -48,7 +49,7 @@ array.set(trace, 0, 0)
 value = ${expression}
 plot(value ? 1 : 0, "Value")
 plot(array.get(trace, 0), "Trace")`);
-      expect(checkProgram(ast).diagnostics).toEqual([]);
+      expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], version));
       const compiled = tryCompile(ast);
       expect(compiled.success, compiled.unsupported.join(', ')).toBe(true);
       const result = executeCompiled(compiled, bars);

@@ -14,9 +14,15 @@ const bars: Bar[] = [2, 5, 8].map((volume, index) => ({
   close: 10 + index,
   volume,
 }));
-function values(body: string) {
+function values(body: string, computedDefault = false) {
   const ast = parse(`//@version=6\nindicator("default bar dependencies")\n${body}`);
-  expect(checkProgram(ast).diagnostics.filter((d) => d.severity === 'error')).toEqual([]);
+  expect(checkProgram(ast).diagnostics.filter((d) => d.severity === 'error')).toEqual(computedDefault
+    ? [expect.objectContaining({
+      code: 'invalid-parameter-default',
+      message: 'The default value assigned to a parameter must be either a literal value (e.g., "5") or a built-in variable (e.g., "close").',
+      line: 3,
+      column: 3,
+    })] : []);
   const result = executeScript(ast, bars);
   expect(result.errors).toEqual([]);
   return result.plots[0].values;
@@ -29,7 +35,7 @@ describe('bar fields used only by omitted UDF defaults', () => {
     expect(values('f(series int src=time) => src\nplot(f())')).toEqual([60000, 120000, 180000]);
   });
   it('captures volume inside a default expression', () => {
-    expect(values('f(series float src=volume*2) => src\nplot(f())')).toEqual([4, 10, 16]);
+    expect(values('f(series float src=volume*2) => src\nplot(f())', true)).toEqual([4, 10, 16]);
   });
   it('captures a method optional default', () => {
     expect(

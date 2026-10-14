@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -14,7 +15,7 @@ const examples = [
 describe('LEGACY-ROUND-X-SLOT', () => {
   it.each(examples)('binds v4 $call using the published x slot', ({ call, expected }) => {
     const source = `//@version=4\nstudy("old round slot")\nplot(${call}, title="rounded")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], 4));
     const old = runCompatScript(source);
     expect(old.errors).toEqual([]);
     expect(getPlot(old, 'rounded').values).toEqual(Array(12).fill(expected));

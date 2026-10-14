@@ -264,15 +264,18 @@ varip x = 0`);
         expect(varDecl.kind).toBe('varip');
       });
 
-      it('parses tuple discard placeholders with declaration modes', () => {
-        const ast = parse(`//@version=6
+      it('refuses tuple persistence while retaining ordinary discard placeholders', () => {
+        const source = `//@version=6
 indicator("Discard Tuple")
-var [_, direction, _] = [1, 2, 3]`);
+pair() => [1, 2, 3]
+var [_, direction, _] = pair()`;
+        expect(() => parse(source)).toThrow('""var"" cannot be used as a variable or function name.');
+        const ast = parse(source.replace('var [', '['));
 
-        const declaration = ast.body[1];
+        const declaration = ast.body[2];
         expect(declaration.type).toBe('VariableDeclaration');
         if (declaration.type === 'VariableDeclaration') {
-          expect(declaration.kind).toBe('var');
+          expect(declaration.kind).toBe('none');
           expect(declaration.names.type).toBe('TupleDeclarator');
           if (declaration.names.type === 'TupleDeclarator') {
             expect(declaration.names.names.map((name) => name.name)).toEqual(['_', 'direction', '_']);

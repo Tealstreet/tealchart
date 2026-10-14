@@ -200,7 +200,7 @@ plot(missingFunction + privateFunction)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Unknown library function: tools.missing',
-      'Unknown library function: tools.hidden',
+      "Could not find method or method reference 'tools.hidden'",
     ]);
   });
 

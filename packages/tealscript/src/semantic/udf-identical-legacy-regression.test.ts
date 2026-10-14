@@ -27,7 +27,9 @@ describe('ordinary v5 function signature uniqueness', () => {
       ),
     ).toEqual([]);
   });
-  it('preserves distinct total arities with optional parameters', () => {
-    expect(errors('f(float x) => x\nf(float x, float y=1) => x+y\nplot(close)')).toEqual([]);
+  // Native v60 legal-literal optional-only declarations refuse independently of calls.
+  it('refuses optional parameters as the only signature distinction', () => {
+    expect(errors('f(float x) => x\nf(float x, float y=1) => x+y\nplot(close)'))
+      .toContainEqual(expect.objectContaining({ code: 'invalid-overload' }));
   });
 });

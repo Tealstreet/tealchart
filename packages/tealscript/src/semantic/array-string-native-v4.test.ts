@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
@@ -99,8 +100,13 @@ describe('native string array predicate admission', () => {
       expect(createHash('sha256').update(source).digest('hex')).toBe(sha256);
       const result = errors(source);
       expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({ code: 'type-mismatch', line: 4 });
-      expect(result[0]?.message).toMatch(/array\.(every|some).*bool.*array<string>/);
+      const outcomes = JSON.parse(readFileSync(new URL('../../oracle-probes/v4/captures/v4/outcomes-v4.json', import.meta.url), 'utf8')) as {
+        script: string; attempt: number; diagnostic: { code: string | null; text: string; line: number; column: number };
+      }[];
+      const native = outcomes.find((row) => row.script === name && row.attempt === 1)!.diagnostic;
+      expect(result[0]).toMatchObject({
+        code: native.code ?? 'type-mismatch', message: native.text, line: native.line, column: native.column,
+      });
     });
   }
 });
@@ -109,7 +115,7 @@ for (const version of [5, 6]) {
   for (const method of ['every', 'some']) {
     const header = `//@version=${version}\nindicator("Predicate controls")\n`;
     it(`refuses named string ${method} v${version}`, () => {
-      const result = errors(header + `values = array.from("", "alpha")\nresult = array.${method}(id=values)`);
+      const result = errors(header + `values = array.from("", "alpha")\nresult = array.${method}(id=array.from("", "alpha"))`);
       expect(result.map((d) => d.code)).toEqual(['type-mismatch']);
       expect(result[0]?.message).toContain('array<string>');
     });

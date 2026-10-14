@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -15,7 +16,7 @@ bool state = na
 state := na
 plot(enabled() + enabled(na) + enabled(flag=na))
 `);
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], version));
     expect(executeScript(ast, [{ time: 1700000000000, open: 10, high: 12, low: 9, close: 11, volume: 100 }]).errors).toEqual([]);
   });
 
@@ -25,7 +26,7 @@ indicator("Nullable methods")
 method score(float this, bool flag=na) => flag ? this : 0
 plot(close.score() + close.score(na) + close.score(flag=na))
 `);
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('rejects v6 bool na initializers, defaults and arguments with honest guidance', () => {
@@ -84,7 +85,7 @@ indicator("Valid width")
 width = input.int(2, minval=1)
 plot(close, linewidth=width)
 hline(10, linewidth=width)
-`)).diagnostics).toEqual([]);
+`)).diagnostics).toEqual(withVersionAdvisory([], version));
   });
 
   it('keeps zero input width valid in v5', () => {
@@ -93,7 +94,7 @@ indicator("Legacy width")
 width = input.int(0)
 plot(close, linewidth=width)
 hline(10, linewidth=width)
-`)).diagnostics).toEqual([]);
+`)).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('does not extend the existing v5 refusal to negative input defaults', () => {
@@ -102,7 +103,7 @@ indicator("Legacy negative input width")
 width = input.int(-5)
 plot(close, linewidth=width)
 hline(10, linewidth=width)
-`)).diagnostics).toEqual([]);
+`)).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it('checks the reassigned width qualifier without reusing its initial zero value', () => {
@@ -133,8 +134,9 @@ plot(close, "Positional", color.red, 1, 1)
 hline(10, linestyle=1)
 hline(20, "Positional", color.red, 1)
 `)).diagnostics;
-    expect(diagnostics).toHaveLength(12);
-    expect(diagnostics.every((diagnostic) => diagnostic.code === 'type-mismatch')).toBe(true);
+    expect(diagnostics).toHaveLength(12 + expectedVersionAdvisories(version).length);
+    expect(diagnostics).toEqual(withVersionAdvisory(Array.from({ length: 12 }, () => expect.objectContaining({ code: 'type-mismatch' })), version));
+    for (let index = 0; index < 12; index++) expect(diagnostics[index + expectedVersionAdvisories(version).length]?.code).toBe('type-mismatch');
     expect(diagnostics.filter((diagnostic) => diagnostic.message.includes('must use a named')).map((diagnostic) => diagnostic.message)).toEqual([
       ...Array(4).fill(expect.stringContaining('plot style must use a named plot.style_')),
       ...Array(2).fill(expect.stringContaining('hline linestyle must use a named hline.style_')),
@@ -146,7 +148,7 @@ hline(20, "Positional", color.red, 1)
 study("Legacy styles")
 plot(close, style=1)
 hline(10, linestyle=1)
-`)).diagnostics).toEqual([]);
+`)).diagnostics).toEqual(withVersionAdvisory([], 4));
   });
 
   it.each([5, 6])('accepts named constants and input-selected style aliases in v%i', (version) => {
@@ -157,6 +159,6 @@ style = choice ? plot.style_line : plot.style_histogram
 plot(close, style=style)
 plot(close, linestyle=plot.linestyle_dashed)
 hline(10, linestyle=hline.style_dotted)
-`)).diagnostics).toEqual([]);
+`)).diagnostics).toEqual(withVersionAdvisory([], version));
   });
 });

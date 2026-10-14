@@ -5,7 +5,7 @@ import { checkProgram } from '../../src/semantic';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 // Authority: TV v2 linefill CE10123; v6 line/label reference admits equality.
-// Other drawing families await separate v4 native outcome probes.
+// Captured v4 box/point/polyline/table refusals have separate native tests.
 const constructors = [
   ['line', 'line.new(0,13,1,-7)'],
   ['label', 'label.new(0,13)'],
@@ -29,8 +29,10 @@ describe('Drawing equality authority boundaries', () => {
           const result = check(`a=${create}\nb=a\nvalue=${expression}`);
           expect(result.diagnostics).toEqual([
             expect.objectContaining({
-              code: 'invalid-operator-operands',
-              message: expect.stringContaining(`Operator ${operator} does not support operands`),
+              code: expression.startsWith('array.get(') ? 'CE10123' : 'invalid-operator-operands',
+              message: expression.startsWith('array.get(')
+                ? 'Cannot call "operator ==" with argument "expr0"="call "array.get" (series linefill)". An argument of "series linefill" type was used but a "simple string"  is expected.'
+                : expect.stringContaining(`Operator ${operator} does not support operands`),
             }),
           ]);
         });

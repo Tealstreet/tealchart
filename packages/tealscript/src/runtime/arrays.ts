@@ -842,7 +842,7 @@ function selectNumericArrayRank(values: number[], rank: number): number {
   return values[rank]!;
 }
 
-export function percentileNearestRankArrayValue(array: PineArray, percentage: number): number {
+export function percentileNearestRankArrayValue(array: PineArray, percentage: number, line?: number): number {
   const values = numericArrayValues(array);
   if (values.length === 0) return Number.NaN;
   if (Number.isNaN(percentage)) return selectNumericArrayRank(values, 0);
@@ -851,6 +851,8 @@ export function percentileNearestRankArrayValue(array: PineArray, percentage: nu
   if (percentage < 0 || percentage > 100) {
     throw new PineRuntimeArgumentError(
       `Invalid value of the 'percentage' argument (${percentage}) in the 'array.percentile_nearest_rank' function. It must be in the range [0..100].`,
+      line === undefined ? 'RE10001' : 'RE10002',
+      line,
     );
   }
   const clampedPercentage = Math.min(100, Math.max(0, percentage));

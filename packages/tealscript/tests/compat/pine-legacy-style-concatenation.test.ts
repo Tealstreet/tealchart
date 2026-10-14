@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -25,7 +26,7 @@ log.info("alias:" + style)
 `;
     const ast = parse(source);
     const checked = checkProgram(ast);
-    expect(checked.diagnostics).toEqual([]);
+    expect(checked.diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checked.symbols.find((symbol) => symbol.name === 'styleText')?.type).toEqual({
       kind: 'string',
       qualifier: 'const',

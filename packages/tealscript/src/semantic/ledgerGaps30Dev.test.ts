@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -15,12 +16,12 @@ describe.each([5, 6])('ledger gaps30: Dev length integer kind in Pine v%i', (ver
     'ta.dev(length=input.float(3.0, "Length"), source=close)',
     'ta.dev(source=close, length=close)',
   ])('rejects float length: %s', (call) => {
-    expect(check(`plot(${call})`, version)).toEqual([
+    expect(check(`plot(${call})`, version)).toEqual(withVersionAdvisory([
       expect.objectContaining({
         code: 'type-mismatch',
         message: expect.stringContaining('ta.dev length must be an integer'),
       }),
-    ]);
+    ], version));
   });
 
   it.each([
@@ -29,6 +30,6 @@ describe.each([5, 6])('ledger gaps30: Dev length integer kind in Pine v%i', (ver
     'ta.dev(source=close, length=int(bar_index % 3) + 1)',
     'ta.dev(source=3.0, length=3)',
   ])('accepts numeric sources and integer lengths including series: %s', (call) => {
-    expect(check(`plot(${call})`, version)).toEqual([]);
+    expect(check(`plot(${call})`, version)).toEqual(withVersionAdvisory([], version));
   });
 });

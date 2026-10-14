@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -24,13 +25,13 @@ function source(version: number, name: string, form: typeof forms[number]) {
 describe('ledger gaps 48: v5 reserved variable and function names', () => {
   it.each(refusals)('refuses $word as a $form name in v$version', ({ word, form, version }) => {
     const checked = checkProgram(parse(source(version, word, form)));
-    expect(checked.diagnostics).toEqual([
+    expect(checked.diagnostics).toEqual(withVersionAdvisory([
       expect.objectContaining({ code: 'reserved-identifier', severity: 'error', message: expect.stringContaining(`'${word}'`) }),
-    ]);
+    ], version));
   });
 
   it.each(declarations)('accepts legacy v4 $word as a $form name', ({ word, form }) => {
-    expect(checkProgram(parse(source(4, word, form))).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source(4, word, form))).diagnostics).toEqual(withVersionAdvisory([], 4));
   });
 
   it.each(declarations)('accepts a longer v6 name for $word as a $form', ({ word, form }) => {

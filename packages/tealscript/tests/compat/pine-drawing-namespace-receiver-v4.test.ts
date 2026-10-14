@@ -52,7 +52,7 @@ plot(close)`),
   }
 
   for (const declaration of ['string line = "bad"', 'int line = 1']) {
-    it(`refuses a locally shadowed drawing receiver: ${declaration}`, () => {
+    it(`refuses a namespace call without its explicit id: ${declaration}`, () => {
       expect(
         errors(`//@version=4
 study("shadowed receiver")
@@ -62,8 +62,8 @@ plot(close)`),
       ).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            code: 'type-mismatch',
-            message: expect.stringContaining('drawing receiver'),
+            code: 'argument-count',
+            message: expect.stringContaining("missing required argument 'id'"),
           }),
         ]),
       );

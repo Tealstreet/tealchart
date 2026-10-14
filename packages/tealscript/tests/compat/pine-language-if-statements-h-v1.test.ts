@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -25,7 +26,7 @@ else
     selected := 3
 plot(value, "Value")
 plot(selected, "Selected")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);
@@ -43,7 +44,7 @@ if bar_index % 2 == 0
     array.push(calls, 17)
 plot(value, "Value")
 plot(array.size(calls), "Calls")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);

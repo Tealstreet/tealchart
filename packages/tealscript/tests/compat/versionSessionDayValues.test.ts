@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -18,7 +19,7 @@ ${declarations}
 plot(time("60", ${sessionExpression}, "UTC"), "Open")
 plot(time_close("60", ${sessionExpression}, "UTC"), "Close")`;
   const ast = parse(source);
-  expect(checkProgram(ast).diagnostics).toEqual([]);
+  expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], version));
   const compiled = tryCompile(ast);
   expect(compiled.success, compiled.unsupported.join(', ')).toBe(true);
   const result = executeCompiled(compiled, bars, undefined, {

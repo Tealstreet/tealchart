@@ -26,12 +26,12 @@ import type { AnalysisContext, FuncInfo, ImportedMethodOverloadInfo, LocalMethod
 import { BUILTIN_NAMESPACES } from '../../builtinMetadata';
 import { pineVersionRules } from '../../pineVersionRules';
 import { pineColorConstant } from '../../pineColorConstants';
-import { checkProgram } from '../../semantic/checker';
+import { builtinNamespaceCallName, checkProgram, resolvesBuiltinReferenceNameForCoverage } from '../../semantic/checker';
 import type { SemanticExpressionTypeContext, SemanticType } from '../../semantic/checker';
 
 import { inferUdtArrayExpressions } from './udtArrayTypes';
 import { invariantLineReads } from './drawingLoopReads';
-import { extractStaticNumber } from './analyzer';
+import { extractStaticNumber, udtParameterMethodReceiver } from './analyzer';
 import { CORPORATE_FORECAST_MEMBERS } from '../../corporateForecastMetadata';
 import { canonicalBuiltinArguments } from '../../pineBuiltinParameterRenames';
 
@@ -758,6 +758,7 @@ function inferFunctionEmitContext(
   importedFunctionOwners: Map<string, string>,
   importedLocalFunctions: Map<string, string>,
   importedDependencyScopes: Map<string, Map<string, string>>,
+  selectedUdtMethods: WeakMap<CallExpression, FunctionDeclaration | null>,
 ): FunctionEmitContext {
   const functionNames = new Set(funcInfos.keys());
   const localVars = new Map<string, VarDeclInfo[]>();
@@ -822,7 +823,8 @@ function inferFunctionEmitContext(
     } else if (expr.callee.type === 'MemberExpression') {
       const rawName = staticMemberChainName(expr.callee);
       const fullName = rawName ? resolveDependencyMember(rawName, ownerName, importedDependencyScopes) : undefined;
-      const localOverloads = isStaticNamespaceReceiverName(staticMemberChainName(expr.callee.object))
+      const udtReceiver = udtParameterMethodReceiver(expr, ownerName ? funcInfos.get(ownerName) : undefined, selectedUdtMethods);
+      const localOverloads = isStaticNamespaceReceiverName(staticMemberChainName(expr.callee.object)) && !udtReceiver
         ? undefined
         : localMethodOverloads.get(expr.callee.property.name);
       const importedOverloads = importedMethodOverloads.get(expr.callee.property.name);
@@ -1329,7 +1331,10 @@ export interface RequestContextSelection {
   nodes: WeakSet<CallExpression>;
 }
 
-export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string, Program>, requestedContexts?: RequestContextSelection): string {
+export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string, Program>, requestedContexts?: RequestContextSelection, inheritedTypes?: readonly SemanticExpressionTypeContext[]): string {
+  const localNameStack: Map<string, string>[] = [];
+  const pendingRootShadows = new WeakMap<Map<string, string>, Set<string>>();
+  const functionNameStack: string[] = [];
   const versionRules = pineVersionRules(ctx.pineVersion);
   let literalTimestampCount: number | undefined;
   const loopResultTypes = ctx.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
@@ -1366,9 +1371,16 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (!additionSites.has(expression)) additionSites.set(expression, additionSites.size);
     collectAdditiveOperand(expression.left);
   }
+  const importedMethodNames = new Set([...ctx.importedMethodOverloads.values()].flatMap((overloads) => overloads.map((overload) => overload.internalName)));
+  let importedNamespaceMethodCall = false;
   function collectArithmeticSites(node: unknown): void {
     if (!node || typeof node !== 'object') return;
     const expression = node as Expression | AssignmentStatement;
+    if (expression.type === 'CallExpression') {
+      const name = getMemberChainName(expression.callee);
+      const imported = name && ctx.importedFunctions.get(name);
+      if (imported && importedMethodNames.has(imported)) importedNamespaceMethodCall = true;
+    }
     if (expression.type === 'BinaryExpression') {
       if (expression.operator === '/' && !divisionSites.has(expression)) divisionSites.set(expression, divisionSites.size);
       if (expression.operator === '+') collectAdditiveOperand(expression.right);
@@ -1391,9 +1403,18 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const expressionTypes = arithmeticTypes?.expressionTypes;
   const resolvedUserMethods = new WeakMap<CallExpression, FunctionDeclaration | null>();
   let methodTypes: ReturnType<typeof checkProgram> | undefined;
-  if (ctx.localMethodOverloads.size > 0 || requestedContexts?.ids) {
+  const needsMethodContexts = ctx.localMethodOverloads.size > 0 || ctx.deferredUserFunctionCalls.size > 0
+    || Boolean(requestedContexts?.ids) || importedNamespaceMethodCall;
+  const importedScalarMethods = [...ctx.importedMethodOverloads.values(), ...ctx.importedLocalMethods.values()].some((overloads) =>
+    overloads.some((overload) => ['int', 'float', 'bool', 'string', 'color'].includes(ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType ?? '')));
+  if (needsMethodContexts || importedScalarMethods) {
     recordedExpressionTypes ??= new WeakMap();
-    methodTypes = checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, resolvedUserMethods, libraries });
+    methodTypes = checkProgram(ast, { expressionTypes: recordedExpressionTypes, loopResultTypes, resolvedUserMethods, libraries, recordMethodFunctionCallTypeContexts: true });
+    if (importedScalarMethods) {
+      for (const library of libraries?.values() ?? []) {
+        checkProgram(library, { expressionTypes: recordedExpressionTypes, resolvedUserMethods, libraries, recordMethodFunctionCallTypeContexts: true });
+      }
+    }
     if (requestedContexts?.callTypes) methodTypes.callTypeContexts = requestedContexts.callTypes;
 
   }
@@ -1416,7 +1437,28 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     ctx.importedFunctionOwners,
     ctx.importedLocalFunctions,
     ctx.importedDependencyScopes,
+    ctx.resolvedUdtParameterMethods,
   );
+  if (importedScalarMethods && !needsMethodContexts) {
+    const scalarBodies = new Set([...ctx.funcInfos.values()].filter((info) =>
+      ['int', 'float', 'bool', 'string', 'color'].includes(info.paramTypes[0]?.baseType ?? '')).map((info) => info.body));
+    const visited = new Set<SemanticExpressionTypeContext>();
+    const containsScalarMethod = (contexts?: WeakMap<CallExpression, SemanticExpressionTypeContext>): boolean => {
+      for (const call of functionEmitContext.callSites.keys()) {
+        const context = contexts?.get(call);
+        if (!context || visited.has(context)) continue;
+        visited.add(context);
+        if (context.resolvedUserMethod && scalarBodies.has(context.resolvedUserMethod.body)
+          || containsScalarMethod(context.callTypeContexts)) return true;
+      }
+      return false;
+    };
+    const rootScalarMethod = [...functionEmitContext.callSites.keys()].some((call) => {
+      const selected = !functionEmitContext.nestedCallSites.has(call) && resolvedUserMethods.get(call);
+      return selected && scalarBodies.has(selected.body);
+    });
+    if (!rootScalarMethod && !containsScalarMethod(methodTypes?.callTypeContexts)) methodTypes = undefined;
+  }
   function isConstIntPair(left?: SemanticType, right?: SemanticType): boolean {
     return left?.kind === 'int' && right?.kind === 'int'
       && left.qualifier === 'const' && right.qualifier === 'const';
@@ -1437,19 +1479,26 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       })),
     };
   }
+  function contextCallSiteId(call: CallExpression): number | undefined {
+    return functionEmitContext.callSites.get(call) ?? (requestedContexts ? functionEmitContext.defaultCallSites.get(call) : undefined);
+  }
+
   function methodContextDescriptor(context?: SemanticExpressionTypeContext): unknown {
     if (!context) return null;
     const selected = context.resolvedUserMethod;
     const method = selected && [...ctx.funcInfos].find(([, info]) => info.body === selected.body)?.[0];
     const callable = requestedContexts && (context.resolvedUserMethod ?? context.resolvedUserFunction);
     const callableName = callable && [...ctx.funcInfos].find(([, info]) => info.body === callable.body)?.[0];
+    const selectedFunction = context.resolvedUserFunction;
+    const functionName = selectedFunction && [...ctx.funcInfos].find(([, info]) => info.body === selectedFunction.body)?.[0];
     return {
       method,
+      ...(functionName ? { function: functionName } : {}),
       ...(requestedContexts?.ids ? { callable: callableName, requests: Object.fromEntries(ctx.securitySites.flatMap(site => {
         const id = requestedContexts.ids.get(context)?.get(site.node);
         return id === undefined ? [] : [[site.id, id]];
       })) } : {}),
-      calls: Object.fromEntries([...functionEmitContext.callSites].flatMap(([call, id]) => {
+      calls: Object.fromEntries([...functionEmitContext.callSites, ...(requestedContexts ? functionEmitContext.defaultCallSites : [])].flatMap(([call, id]) => {
         const child = context.callTypeContexts.get(call);
         return child ? [[id, methodContextDescriptor(child)]] : [];
       })),
@@ -1515,7 +1564,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   };
   const expressionHistoryFunctions = new Set<string>();
   for (const [name, info] of ctx.funcInfos) {
-    if ([...expressionHistory.keys(), ...momentumSourceHistory.keys()].some((expression) => containsNode(info.body, "node" in expression ? expression.node : expression))) {
+    if ([...expressionHistory.keys(), ...momentumSourceHistory.keys()].some((expression) =>
+      containsNode(info.body, "node" in expression ? expression.node : expression)
+      || (!ctx.importedFunctionOwners.has(name) && info.paramDefaults.some((value) => value && containsNode(value, "node" in expression ? expression.node : expression))))) {
       expressionHistoryFunctions.add(name);
     }
   }
@@ -1576,9 +1627,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   let fixnanIndex = 0;
   let indexedTAResultIndex = 0;
   let loopId = 0;
-  const localNameStack: Map<string, string>[] = [];
   const nonnegativeIntegerLoopCounters = new Set<string>();
-  const pendingRootShadows = new WeakMap<Map<string, string>, Set<string>>();
   let rootShadowIndex = 0;
   const localSourceNameStack: Map<string, string>[] = [];
   const localHistoryNameStack: Map<string, string>[] = [];
@@ -1586,7 +1635,6 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const rootBlockPersistentLocals = new WeakMap<VariableDeclaration, { value: string; init: string; kind: 'var' | 'varip' }>();
   const rootBlockPersistentStates: { value: string; init: string; kind: 'var' | 'varip' }[] = [];
   const rootBlockPersistentInitByValue = new Map<string, string>();
-  const functionNameStack: string[] = [];
   const functionStateNameStack: string[] = [];
   const defaultArgumentStateStack: string[] = [];
   type EnumRelatedType = string | (EnumRelatedType | undefined)[];
@@ -1740,7 +1788,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const types = expr.arguments.map((arg) => enumRelatedValueType(arg.value, bindings, activeFunctions));
       return typeof types[0] === 'string' && types.every((type) => type === types[0]) ? `array<${types[0]}>` : undefined;
     }
-    const selectedMethod = resolvedUserMethods.get(expr);
+    const selectedMethod = (resolvedUserMethods.has(expr) ? resolvedUserMethods.get(expr) : ctx.resolvedUdtParameterMethods.get(expr));
     const selectedFunction = ctx.resolvedUserFunctionCalls.get(expr);
     const callables = (selectedFunction ? [selectedFunction] : functionEmitContext.callSiteFunctions.get(expr) ?? (name && ctx.funcInfos.has(name) ? [name] : [])).filter((functionName) => {
       if (expr.callee.type !== 'MemberExpression') return true;
@@ -1932,7 +1980,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       ...(ctx.funcInfos.has(name) ? [name] : []),
     ])].filter(candidate => !validateUserFunctionCall(candidate, expr, 0, false));
     if (candidates.length < 2) return undefined;
-    const id = functionEmitContext.callSites.get(expr);
+    const id = contextCallSiteId(expr);
     const branches = candidates.map(candidate =>
       `if (_methodContext?.calls[${id}]?.callable === ${JSON.stringify(candidate)}) return ${emitUserFunctionCall(candidate, expr)};`);
     const fallback = emitFunctionSyntaxMethodCall(name, expr);
@@ -1941,10 +1989,22 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     return `(() => { ${branches.join(' ')} return ${call}; })()`;
   }
 
+  function emitDeferredUserFunctionCall(name: string, expr: CallExpression): string | undefined {
+    if (functionStateNameStack.length === 0 || !ctx.deferredUserFunctionCalls.has(expr)) return undefined;
+    const selected = `_methodContext?.calls[${functionEmitContext.callSites.get(expr)}]?.function`;
+    const branches = (ctx.userFunctionOverloads.get(name) ?? []).map((overload) =>
+      `if (${selected} === ${JSON.stringify(overload)}) return ${emitUserFunctionCall(overload, expr)};`);
+    return `(() => { ${branches.join(' ')} return ${runtimeErrorExpr(`No user function overload matched ${name}`)}; })()`;
+  }
+
   function emitFunctionSyntaxMethodCall(name: string, expr: CallExpression): string | undefined {
     const methods = (ctx.localMethodOverloads.get(name) ?? [])
       .filter(overload => !validateUserFunctionCall(overload.internalName, expr, 0, true));
     if (methods.length === 0) return undefined;
+
+    const selected = methodTypes?.userFunctionCallDeclarations.get(expr);
+    const selectedIndex = selected && methods.findIndex(overload => ctx.funcInfos.get(overload.internalName)?.body === selected.body);
+    if (selectedIndex !== undefined && selectedIndex > 0) methods.unshift(...methods.splice(selectedIndex, 1));
 
     // Evaluate provided arguments once, including when the regular function is
     // the fallback. Dispatching on the first argument must not repeat side effects.
@@ -1970,7 +2030,11 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const fallback = regularFunction
       ? emitUserFunctionCall(regularFunction, expr, undefined, argumentValues)
       : runtimeErrorExpr(`No method overload matched function call ${name}`);
-    return `(() => { ${setup} ${branches.join(' ')} return ${fallback}; })()`;
+    const contextualBranches = functionStateNameStack.length > 0 ? methods.map((overload) => {
+      const call = emitUserFunctionCall(overload.internalName, expr, undefined, argumentValues);
+      return `if (_methodContext?.calls[${functionEmitContext.callSites.get(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${call};`;
+    }) : [];
+    return `(() => { ${setup} ${contextualBranches.join(' ')} ${branches.join(' ')} return ${fallback}; })()`;
   }
 
   function importedFunctionDisplayName(internalName: string): string | undefined {
@@ -2150,8 +2214,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
               && expr.left.left.type === 'CallExpression' && expr.right.left.type === 'CallExpression') {
               const firstRead = cachedLineReads.get(expr.left.left);
               const secondRead = cachedLineReads.get(expr.right.left);
-              const first = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))\)), "<="\)$/.exec(left);
-              const second = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))\)), ">="\)$/.exec(right);
+              const first = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))(?:, \d+)?\)), "<="\)$/.exec(left);
+              const second = /^_cmpLegacyNa\((.+), (this\._s_(?:high|low)\.get\((?:0|_historyOffset\(\w+\))(?:, \d+)?\)), ">="\)$/.exec(right);
               if (firstRead && secondRead && firstRead.cache === secondRead.cache
                 && firstRead.index.name === secondRead.index.name && first && second && first[1] === second[1]) {
                 needsDrawingBetween = true;
@@ -2533,6 +2597,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   registerRootBlockPersistentDeclarations(ast.body);
 
   function emitMemberExpr(expr: MemberExpression): string {
+    const receiverType = getFunctionParameterType(expr.object);
+    if (receiverType?.baseType === 'udt' && ctx.typeDecls.get(receiverType.name)?.fields.some(field => field.name === expr.property.name)) {
+      return `_getField(${emitExpr(expr.object)}, "${expr.property.name}")`;
+    }
     const rawChainName = getMemberChainName(expr);
     const chainName = rawChainName ? enumMemberName(rawChainName) : undefined;
     if (chainName) {
@@ -2664,7 +2732,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const taVarSite = ctx.taVarSiteMap.get(expr.object);
       if (taVarSite) return `this.${taVarSite.seriesName}.get(${historyIdx})`;
       if (isUserDeclaredSeriesName(name)) return `this.${jsSeriesMember(name)}.get(${historyIdx})`;
-      if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(${historyIdx})`;
+      if (name in BAR_FIELDS) {
+        const site = ctx.pineVersion !== 5 || expr.index.type === 'NumericLiteral' ? '' : `, ${expr.loc?.start.line ?? 'undefined'}`;
+        return `this.${BAR_FIELDS[name]}.get(${historyIdx}${site})`;
+      }
       if (name === 'bar_index' || name === 'n') return `_historyBarIndex(${idx}, ctx.barIndex, ${seriesHistoryHint(name)}, this._deps.historyCheck)`;
       if (name === 'last_bar_index') return `_historyConstant(ctx.lastBarIndex, ${idx}, ctx.barIndex, ${seriesHistoryHint(name)}, this._deps.historyCheck)`;
       if (RUNTIME_TIME_VALUES.has(name)) return `ctx.runtimeTimeValue("${name}", ${historyIdx}, ${seriesHistoryHint(name)})`;
@@ -2690,11 +2761,21 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const duplicateNamedArg = duplicateNamedArgument(expr.arguments);
     if (duplicateNamedArg) return runtimeErrorExpr(`Duplicate named argument: ${duplicateNamedArg}`);
 
-    const taSite = ctx.taCallSiteMap.get(expr);
-    if (taSite) return emitTACall(taSite, expr);
-
     const callee = expr.callee;
-    const fullName = importedMemberName(getMemberChainName(callee) ?? (callee.type === 'Identifier' ? callee.name : ''));
+    const ownerName = functionNameStack[functionNameStack.length - 1];
+    const udtNamespaceParameter = callee.type === 'MemberExpression' && callee.object.type === 'Identifier'
+      && BUILTIN_NAMESPACES.has(callee.object.name)
+      && udtParameterMethodReceiver(expr, ownerName ? ctx.funcInfos.get(ownerName) : undefined, ctx.resolvedUdtParameterMethods);
+    const taSite = ctx.taCallSiteMap.get(expr);
+    if (taSite && !udtNamespaceParameter) return emitTACall(taSite, expr);
+
+    const receiverKind = callee.type === 'MemberExpression'
+      ? getCollectionParameterKind(callee.object) ?? getCollectionExprKind(callee.object) ?? expressionKind(callee.object) : undefined;
+    const namespaceBuiltinReceiver = callee.type === 'MemberExpression' && callee.object.type === 'Identifier'
+      && BUILTIN_NAMESPACES.has(callee.object.name) && !resolvedBuiltinNamespaceCallName(expr)
+      && !!receiverKind && resolvesBuiltinReferenceNameForCoverage(`${receiverKind}.${callee.property.name}`);
+    const fullName = udtNamespaceParameter || namespaceBuiltinReceiver ? ''
+      : importedMemberName(getMemberChainName(callee) ?? (callee.type === 'Identifier' ? callee.name : ''));
     const namespace = fullName.split('.')[0] ?? '';
 
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
@@ -2733,6 +2814,19 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
     const importedFunctionName = ctx.resolvedUserFunctionCalls.get(expr) ?? ctx.importedFunctions.get(fullName);
     if (importedFunctionName) {
+      if (importedMethodNames.has(importedFunctionName) && methodTypes) {
+        const context = functionNameStack.length === 0 ? methodTypes.callTypeContexts?.get(expr) : undefined;
+        const declaration = context?.resolvedUserMethod;
+        const selected = declaration && [...ctx.funcInfos].find(([, info]) => info.body === declaration.body)?.[0];
+        if (selected) return emitUserFunctionCall(selected, expr);
+        if (functionNameStack.length > 0) {
+          const methods = (ctx.importedMethodOverloads.get(fullName.split('.').at(-1)!) ?? [])
+            .filter((overload) => ctx.importedFunctionOwners.get(overload.internalName) === namespace);
+          const branches = methods.map((overload) =>
+            `if (_methodContext?.calls[${contextCallSiteId(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${emitUserFunctionCall(overload.internalName, expr)};`);
+          return `(() => { ${branches.join(' ')} return ${emitUserFunctionCall(importedFunctionName, expr)}; })()`;
+        }
+      }
       return emitUserFunctionCall(importedFunctionName, expr);
     }
     if (
@@ -2764,6 +2858,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
       if (resolvedFunction) return emitUserFunctionCall(resolvedFunction, expr);
+      const deferredFunction = emitDeferredUserFunctionCall(fullName, expr);
+      if (deferredFunction) return deferredFunction;
     }
 
     if (fullName.startsWith('strategy.opentrades.') || fullName.startsWith('strategy.closedtrades.')) {
@@ -2878,7 +2974,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (RUNTIME_STR_FUNCTIONS.has(fullName)) {
       return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${nextBuiltinCallId(fullName)})`;
     }
-    if (fullName === 'str.format') return `ctx.strFormat([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'str.format') {
+      const site = ctx.pineVersion === 6 ? `, ${expr.loc?.start.line ?? 'undefined'}` : '';
+      return `ctx.strFormat([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}${site})`;
+    }
     if (fullName === 'str.format_time') return `ctx.strFormatTime([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
 
     // Color functions
@@ -2961,7 +3060,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
         ? `ctx.nextBuiltinCallId("${fullName}")`
         : `${nextBuiltinCallId(fullName)}`;
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj}, ${callId})`;
+      const call = `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj}, ${callId})`;
+      return fullName === 'box.new' ? recordRuntimeSource(call, expr) : call;
     }
 
     // Matrix functions
@@ -2979,6 +3079,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       }
       const boolAxis = emitOmittedBoolMatrixAxis(fullName, orderedArgExpression(expr.arguments, argNames ?? [], 'id', 0), args[0] ?? 'undefined', args.slice(1));
       if (boolAxis) return boolAxis;
+      if (ctx.pineVersion === 6 && fullName === 'matrix.pow') args.push(String(expr.loc?.start.line ?? 'undefined'));
       const mapped = MATRIX_FUNC_MAP[fullName];
       if (mapped) return `deps._mtx.${mapped}(${args.join(', ')})`;
       return `deps._mtx.${fullName.replace('matrix.', '')}(${args.join(', ')})`;
@@ -3209,6 +3310,12 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (expr.callee.type === 'MemberExpression' && !isStaticNamespaceReceiver(expr.callee.object)) {
       const localOverloads = ctx.localMethodOverloads.get(expr.callee.property.name);
       if (localOverloads && localOverloads.length > 0) {
+        const selected = functionNameStack.length === 0
+          ? requestedContexts?.callTypes.get(expr)?.resolvedUserMethod ?? resolvedUserMethods.get(expr) : undefined;
+        const importedOverloads = ctx.importedMethodOverloads.get(expr.callee.property.name);
+        if (selected && importedOverloads?.some((overload) => ctx.funcInfos.get(overload.internalName)?.body === selected.body)) {
+          return emitImportedMethodCall(importedOverloads, expr as CallExpression & { callee: MemberExpression });
+        }
         return emitLocalMethodCall(localOverloads, expr as CallExpression & { callee: MemberExpression });
       }
     }
@@ -3300,6 +3407,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (methodCall) return methodCall;
       const resolvedFunction = resolveUserFunctionCallName(fullName, expr);
       if (resolvedFunction) return emitUserFunctionCall(resolvedFunction, expr);
+      const deferredFunction = emitDeferredUserFunctionCall(fullName, expr);
+      if (deferredFunction) return deferredFunction;
     }
 
     const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
@@ -3322,18 +3431,36 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
     const importedReceiverCondition = (receiverExpr: string, receiverType: string | null): string => {
       if (!receiverType) return 'true';
-      const internalTypeName = receiverType.includes('.')
-        ? receiverType.replace(/^([^.]+)\.(.+)$/, '$1__type__$2')
-        : receiverType;
+      const publicTypeName = ctx.typeDecls.get(receiverType)?.name ?? receiverType;
+      const internalTypeName = publicTypeName.includes('.')
+        ? publicTypeName.replace(/^([^.]+)\.(.+)$/, '$1__type__$2')
+        : publicTypeName;
       const officialValueAtTimeData = receiverType.endsWith('.Data') ? ` || ${receiverExpr}.typeName === "TradingView.ValueAtTime.Data"` : '';
-      return `_isNa(${receiverExpr}) || (${receiverExpr} && ${receiverExpr}.__tealscriptUdt && (${receiverExpr}.typeName === ${JSON.stringify(receiverType)} || ${receiverExpr}.typeName === ${JSON.stringify(internalTypeName)}${officialValueAtTimeData}))`;
+      return `_isNa(${receiverExpr}) || (${receiverExpr} && ${receiverExpr}.__tealscriptUdt && (${receiverExpr}.typeName === ${JSON.stringify(publicTypeName)} || ${receiverExpr}.typeName === ${JSON.stringify(internalTypeName)}${officialValueAtTimeData}))`;
     };
+    const inheritedMethods = functionNameStack.length === 0 ? inheritedTypes?.map((scope) => scope.callTypeContexts.get(expr)?.resolvedUserMethod) : undefined;
+    const inheritedMethod = inheritedMethods?.[0];
+    const selected = inheritedMethod && inheritedMethods?.every((method) => method === inheritedMethod)
+      ? inheritedMethod : (resolvedUserMethods.has(expr) ? resolvedUserMethods.get(expr) : ctx.resolvedUdtParameterMethods.get(expr));
+    const selectedScalar = selected && overloads.find((overload) =>
+      ctx.funcInfos.get(overload.internalName)?.body === selected.body
+      && ['int', 'float', 'bool', 'string', 'color'].includes(ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType ?? ''));
+    if (selectedScalar) return emitUserFunctionCall(selectedScalar.internalName, expr, receiver);
+    const contextualBranches = functionNameStack.length > 0 ? overloads.flatMap((overload) => {
+      const kind = ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType;
+      if (!kind || !['int', 'float', 'bool', 'string', 'color'].includes(kind)) return [];
+      return [`if (_methodContext?.calls[${contextCallSiteId(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${emitUserFunctionCall(overload.internalName, expr, temp)};`];
+    }) : [];
     const branches = overloads.map((overload) => {
       const call = emitUserFunctionCall(overload.internalName, expr, temp);
       if (!overload.receiverType) return `return ${call};`;
-      const collectionReceiver = ctx.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType;
-      if (collectionReceiver === 'array' || collectionReceiver === 'matrix' || collectionReceiver === 'map') {
-        return `if (${localReceiverCondition(temp, collectionReceiver)}) return ${call};`;
+      const receiverAnnotation = ctx.funcInfos.get(overload.internalName)?.paramTypes[0];
+      const receiverKind = receiverAnnotation?.baseType === 'udt' ? receiverAnnotation.name : receiverAnnotation?.baseType;
+      if (receiverKind && ['line', 'label', 'box'].includes(receiverKind)) {
+        return `if (_isNa(${temp}) || (typeof ${temp} === "string" && ${temp}.startsWith(${JSON.stringify(`${receiverKind}_`)}))) return ${call};`;
+      }
+      if (receiverKind === 'array' || receiverKind === 'matrix' || receiverKind === 'map') {
+        return `if (${localReceiverCondition(temp, receiverKind)}) return ${call};`;
       }
       const enumReceiver = enumRelatedAnnotationType(ctx.funcInfos.get(overload.internalName)?.paramTypeAnnotations[0], ctx.importedFunctionOwners.get(overload.internalName));
       if (typeof enumReceiver === 'string' && enumTypeNames.has(enumReceiver) && enumRelatedValueType(expr.callee.object) === enumReceiver) {
@@ -3343,15 +3470,20 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       }
       return `if (${importedReceiverCondition(temp, overload.receiverType)}) return ${call};`;
     });
-    return `(() => { const ${temp} = ${receiver}; ${branches.join(' ')} throw new Error("No imported method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
+    return `(() => { const ${temp} = ${receiver}; ${contextualBranches.length ? contextualBranches.join(' ') + ' ' : ''}${branches.join(' ')} throw new Error("No imported method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
   }
 
   function emitLocalMethodCall(overloads: LocalMethodOverloadInfo[], expr: CallExpression & { callee: MemberExpression }): string {
-    const selected = functionNameStack.length === 0 && requestedContexts
+    const inheritedMethods = functionNameStack.length === 0
+      ? inheritedTypes?.map((scope) => scope.callTypeContexts.get(expr)?.resolvedUserMethod) : undefined;
+    const inheritedMethod = inheritedMethods?.[0];
+    const selected = inheritedMethod && inheritedMethods?.every((method) => method === inheritedMethod)
+      ? inheritedMethod
+      : functionNameStack.length === 0 && requestedContexts
       ? requestedContexts.callTypes.get(expr)?.resolvedUserMethod ?? resolvedUserMethods.get(expr)
-      : resolvedUserMethods.get(expr);
+      : (resolvedUserMethods.has(expr) ? resolvedUserMethods.get(expr) : ctx.resolvedUdtParameterMethods.get(expr));
     const selectedOverload = selected && overloads.find((overload) => ctx.funcInfos.get(overload.internalName)?.body === selected.body);
-    if (selectedOverload && (functionStateNameStack.length === 0 || localNameStack.length === 0)) return emitUserFunctionCall(selectedOverload.internalName, expr, emitExpr(expr.callee.object));
+    if (selectedOverload && (!requestedContexts || !defaultArgumentStateStack.length) && (functionStateNameStack.length === 0 || localNameStack.length === 0)) return emitUserFunctionCall(selectedOverload.internalName, expr, emitExpr(expr.callee.object));
     const receiver = emitExpr(expr.callee.object);
     const temp = `_method_receiver_${functionEmitContext.callSites.get(expr) ?? 'x'}`;
     const receiverKind = expressionKind(expr.callee.object);
@@ -3378,7 +3510,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     });
     const contextualBranches = functionNameStack.length > 0 ? candidates.map((overload) => {
       const call = emitUserFunctionCall(overload.internalName, expr, temp);
-      return `if (_methodContext?.calls[${functionEmitContext.callSites.get(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${call};`;
+      return `if (_methodContext?.calls[${contextCallSiteId(expr)}]?.method === ${JSON.stringify(overload.internalName)}) return ${call};`;
     }) : [];
     const builtinCall = emitReceiverBuiltinMethodCall(expr, temp);
     return `(() => { const ${temp} = ${receiver}; ${contextualBranches.join(' ')} ${branches.join(' ')} if (ctx.hasMethodBuiltin(${JSON.stringify(expr.callee.property.name)}, ${temp})) return ${builtinCall}; throw new Error("No local method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
@@ -3455,10 +3587,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const validationError = validateImportedCall(name, expr, start, receiver !== undefined)
       ?? validateUserFunctionCall(name, expr, start, receiver !== undefined);
     if (validationError) return runtimeErrorExpr(validationError);
-    const callSiteId = functionEmitContext.callSites.get(expr);
+    const callSiteId = contextCallSiteId(expr);
     const stateCallSiteId = callSiteId ?? functionEmitContext.defaultCallSites.get(expr);
     const arithmeticContextArgs = arithmeticTypes ? [functionStateNameStack.length > 0
-      ? `_arithmeticContext?.calls[${callSiteId}]`
+      ? `_arithmeticContext?.calls[${functionEmitContext.callSites.get(expr)}]`
       : JSON.stringify(arithmeticContextDescriptor(arithmeticTypes.callTypeContexts?.get(expr)))] : [];
     const methodContextArgs = methodTypes ? [functionStateNameStack.length > 0
       ? `_methodContext?.calls[${callSiteId}]`
@@ -3500,7 +3632,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         functionNameStack.push(name);
         defaultArgumentStateStack.push(ctx.importedFunctionOwners.has(name) ? '_state' : stateArg);
         try {
-          values.push(emitExpr(defaultArg));
+          const value = emitExpr(defaultArg);
+          values.push(requestedContexts && methodContextArgs.length
+            ? `((_methodContext) => ${value})(${methodContextArgs[0]})`
+            : value);
         } finally {
           defaultArgumentStateStack.pop();
           functionNameStack.pop();
@@ -3516,7 +3651,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
     const sourceDescriptors = fi.params.map((param) => emitSourceDescriptor(sourceArgs.get(param), functionRequestsData(name)));
     if (!needsHistory) {
-      return `this.${jsFunctionMember(name)}(${['ctx', stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`;
+      return recordRuntimeSource(`this.${jsFunctionMember(name)}(${['ctx', stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`, expr);
 
     }
     const tempPrefix = `_fn_arg_${stateCallSiteId}_`;
@@ -3539,8 +3674,15 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     });
     const localHistoryArgs = [...historyLocals].map((local) => historyMember('local', local));
     const callValues = fi.params.map((_, index) => `${tempPrefix}${index}`);
-    return `(() => { ${setup} ${historyUpdates.join(' ')} return this.${jsFunctionMember(name)}(${['ctx', currentFunctionName ? scopedState : stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...callValues, ...sourceDescriptors, ...historyArgs, ...localHistoryArgs].join(', ')}); })()`;
+    return recordRuntimeSource(`(() => { ${setup} ${historyUpdates.join(' ')} return this.${jsFunctionMember(name)}(${['ctx', currentFunctionName ? scopedState : stateArg, ...arithmeticContextArgs, ...methodContextArgs, ...callValues, ...sourceDescriptors, ...historyArgs, ...localHistoryArgs].join(', ')}); })()`, expr);
 
+  }
+
+  function recordRuntimeSource(expression: string, node: CallExpression): string {
+    if (node.loc) {
+      (ctx.runtimeSourceExpressions ??= []).push({ expression, owner: functionNameStack.length ? jsFunctionMember(functionNameStack.at(-1)!) : 'onBar', name: functionNameStack.at(-1) ?? '#main', line: node.loc.start.line, column: node.loc.start.column });
+    }
+    return expression;
   }
 
   function validateUserFunctionCall(name: string, expr: CallExpression, start: number, isMethod: boolean): string | undefined {
@@ -3715,17 +3857,24 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     return COLLECTION_METHOD_RETURNS[methodKind][expr.callee.property.name];
   }
 
+  function resolvedBuiltinNamespaceCallName(expr: CallExpression): string | undefined {
+    if (expr.callee.type !== 'MemberExpression' || expr.callee.object.type !== 'Identifier'
+      || !BUILTIN_NAMESPACES.has(expr.callee.object.name)) return undefined;
+    const receiverKind = expr.callee.type === 'MemberExpression'
+      ? getCollectionParameterKind(expr.callee.object) ?? getCollectionExprKind(expr.callee.object) ?? expressionKind(expr.callee.object) : undefined;
+    return builtinNamespaceCallName(expr, receiverKind,
+      expr.arguments[0] ? getCollectionExprKind(expr.arguments[0].value) ?? expressionKind(expr.arguments[0].value) : undefined);
+  }
+
   function getCollectionMethodKind(expr: CallExpression): CollectionKind | undefined {
     if (expr.callee.type !== 'MemberExpression') return undefined;
+    if (resolvedBuiltinNamespaceCallName(expr)) return undefined;
     const method = expr.callee.property.name;
     if (!COLLECTION_METHOD_NAMES.has(method)) return undefined;
-    const kind = getCollectionExprKind(expr.callee.object);
-    if (
-      kind === 'matrix'
-      && expr.callee.object.type === 'Identifier'
-      && expr.callee.object.name === 'matrix'
-      && isStaticCollectionNamespaceCall(expr, kind)
-    ) return undefined;
+    const inferredKind = expr.callee.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expr.callee.object.name)
+      ? expressionKind(expr.callee.object) : undefined;
+    const kind = getCollectionExprKind(expr.callee.object)
+      ?? (inferredKind === 'array' || inferredKind === 'map' || inferredKind === 'matrix' ? inferredKind : undefined);
     return kind && isCollectionReceiverMethod(kind, method) ? kind : undefined;
   }
 
@@ -4165,35 +4314,13 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   }
 
   function isStaticNamespaceReceiver(expr: Expression): boolean {
-    if (expr.type === 'Identifier' && collectionVars.has(expr.name)) return false;
+    if (expr.type === 'Identifier' && (collectionVars.has(expr.name) || getFunctionParameterType(expr)?.baseType === 'udt')) return false;
     const receiverName = getMemberChainName(expr);
     return isStaticNamespaceReceiverName(receiverName);
   }
 
   function isStaticCollectionNamespaceCall(expr: CallExpression, kind: CollectionKind): boolean {
-    if (expr.callee.type !== 'MemberExpression') return true;
-    if (expr.callee.object.type !== 'Identifier' || expr.callee.object.name !== kind) return true;
-    if (!collectionVars.has(kind)) return true;
-    if (!currentLocalName(kind) && !currentPersistentLocalName(kind) && !rootRegularVars.has(kind) && !rootPersistentVars.has(kind)) return true;
-    const method = expr.callee.property.name;
-    if (kind === 'matrix' && (method === 'get' || method === 'set')) {
-      const names = MATRIX_ARG_NAMES[`matrix.${method}`]!;
-      const id = readOrderedCallArg(expr.arguments, names, 'id', 0);
-      if (expr.arguments.length === names.length && id && getCollectionExprKind(id) === kind) return true;
-    }
-    if (method === 'new'
-      || (kind === 'array' && (method === 'from' || method.startsWith('new_')))
-      || (kind === 'matrix' && method.startsWith('new_'))) return true;
-    const fullName = `${kind}.${method}`;
-    const argNames = collectionArgNames(fullName);
-    if (!argNames?.[0]) return false;
-    const aliases = collectionArgAliases(fullName);
-    const namedReceiver = expr.arguments.find((arg) => arg.name && (aliases[arg.name.name] ?? arg.name.name) === argNames[0]);
-    // A single other collection is the argument to a receiver method such as
-    // matrix.sum(other), not a complete namespace call matrix.sum(id1, id2).
-    if (!namedReceiver && argNames[1] === 'id2' && expr.arguments.length === 1) return false;
-    const receiver = namedReceiver?.value ?? expr.arguments.find((arg) => !arg.name)?.value;
-    return receiver !== undefined && getCollectionExprKind(receiver) === kind;
+    return resolvedBuiltinNamespaceCallName(expr)?.startsWith(`${kind}.`) ?? false;
   }
 
   function emitCollectionCallArgs(
@@ -4290,6 +4417,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (!versionRules.allowsNegativeArrayIndices && ['array.get', 'array.set', 'array.insert', 'array.remove'].includes(fullName)) {
       posArgs[1] = `_arrayIndex(${posArgs[1] ?? 'undefined'})`;
     }
+    if (ctx.pineVersion === 6 && fullName === 'array.percentile_nearest_rank') posArgs.push(String(expr.loc?.start.line ?? 'undefined'));
     if (fullName === 'array.push') return `ctx.arrayPush(${posArgs.join(', ')})`;
     if (fullName === 'array.set') return `ctx.arraySet(${posArgs.join(', ')})`;
     if (fullName === 'array.unshift') return `ctx.arrayUnshift(${posArgs.join(', ')})`;
@@ -5253,7 +5381,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   }
 
   function seriesHistoryHint(name: string): number {
-    return ctx.maxBarsBackHints.get(name) ?? 0;
+    return Math.max(ctx.maxBarsBackHints.get(name) ?? 0, ctx.staticHistoryHints.get(name) ?? 0);
   }
 
   // Constructor
@@ -5350,7 +5478,11 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   // TA members
   for (const site of ctx.taCallSites) {
     if (site.dynamicCtorArgExprs) continue;
-    const argsStr = site.ctorArgs.map((a) => JSON.stringify(a)).join(', ');
+    const args = site.ctorArgs.map((a) => JSON.stringify(a));
+    if (ctx.pineVersion === 5 && site.className === 'Change' && Number.isInteger(site.ctorArgs[0]) && Number(site.ctorArgs[0]) <= 0) {
+      args.push(String(site.node.loc?.start.line ?? 'undefined'));
+    }
+    const argsStr = args.join(', ');
     lines.push(`    this.${site.memberName} = new deps.${site.className}(${argsStr});`);
   }
   for (const site of ctx.taCallSites) {

@@ -207,6 +207,7 @@ function handleInit(
         message: error.message,
         line: error.location?.start.line,
         column: error.location?.start.column,
+        ...(error.diagnostics ? { diagnostics: error.diagnostics } : {}),
         metadata,
       };
       postResult(parseError);

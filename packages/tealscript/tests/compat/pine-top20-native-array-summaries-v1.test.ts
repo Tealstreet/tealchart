@@ -36,8 +36,19 @@ it('binds CF003 source and native CE10123 receipt to the three captured numeric 
     ['CE10123', 20],
     ['CE10123', 21],
   ]);
-  const diagnostics = errors(text).filter((entry) => entry.code === 'type-mismatch');
+  const diagnostics = errors(text).filter((entry) => entry.code === 'CE10123');
   expect(diagnostics.map((entry) => entry.line)).toEqual([19, 20, 21]);
+  expect(diagnostics).toEqual(
+    outcome.runtime.error.compiler_markers.map(
+      (marker: { code: string; message: string; startLineNumber: number; startColumn: number }) =>
+        expect.objectContaining({
+          code: marker.code,
+          message: marker.message,
+          line: marker.startLineNumber,
+          column: marker.startColumn,
+        }),
+    ),
+  );
 });
 
 for (const form of ['namespace', 'method']) {
@@ -48,9 +59,13 @@ for (const form of ['namespace', 'method']) {
     ] as const) {
       for (const member of ['some', 'every']) {
         it(`v6 refuses known ${kind} ${member} and admits bool controls`, () => {
-          expect(errors(source(`a = array.new<${kind}>(2, 0)\nresult = ${call(form, member)}`))).toEqual(
-            expect.arrayContaining([expect.objectContaining({ code: 'type-mismatch' })]),
-          );
+          // v11 numeric-array-{some,every}-{int,float}-{namespace,method}-v1 attempt 1.
+          expect(errors(source(`a = array.new<${kind}>(2, 0)\nresult = ${call(form, member)}`))).toEqual([
+            expect.objectContaining({
+              code: 'CE10123',
+              message: `Cannot call "array.${member}" with argument "id"="a". An argument of "array<${kind}>" type was used but a "array<bool>"  is expected.`,
+            }),
+          ]);
           expect(errors(source(`a = array.from(false, true)\nresult = ${call(form, member)}`))).toEqual([]);
         });
       }

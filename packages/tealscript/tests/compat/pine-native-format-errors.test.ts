@@ -6,7 +6,7 @@ import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 // Authority: https://www.tradingview.com/pine-script-reference/v6/, fun_str.format.
-// Native CF027: oracle-probes/v2/captures/v2/evidence/conflicts-batch-23-v1-attempt1-error-v2.txt.
+// Native CF027: v2/captures/v2/outcomes-v2.json#conflicts-batch-23-v1.pine/attempt-1 compiler_markers CW10023.
 // Native CF028: oracle-probes/v2/captures/v2/evidence/conflicts-batch-24-v1-attempt1-error-v2.txt.
 describe('native CF027/28: formatting runtime refusal', () => {
   it.each([
@@ -14,7 +14,10 @@ describe('native CF027/28: formatting runtime refusal', () => {
     ['CF028 numeric array modifier', 'str.format("{0,number,#.#}", array.from(1.34, 2.56))', /Cannot format given Object as a Number/],
   ])('%s compiles and errors when executed', (_name, expression, message) => {
     const source = `//@version=6\nindicator("Native format errors")\nformattedValue = ${expression}\nplot(1, "After")`;
-    expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(source)).diagnostics).toEqual(_name.startsWith('CF027') ? [{
+      code: 'unused-format-value', nativeCode: 'CW10023', severity: 'warning', line: 3, column: 18,
+      message: 'The argument for the `formatString` parameter for `str.format` expects 0 value(s), but received 1 value(s).',
+    }] : []);
     const compiled = tryCompile(parse(source));
     expect(compiled.success).toBe(true);
     const result = executeCompiled(compiled, compatibilityBars.slice(0, 1));

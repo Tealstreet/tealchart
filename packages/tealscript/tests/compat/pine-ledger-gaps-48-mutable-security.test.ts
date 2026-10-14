@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -33,9 +34,9 @@ describe.each([3, 4])('ledger gaps 48: legacy mutable security in v%i', (version
   const source = (body: string) => `//@version=${version}\nstudy("Mutable security boundary")\n${body}`;
 
   it.each(refusals)('refuses $name', ({ body }) => {
-    expect(checkProgram(parse(source(body))).diagnostics).toEqual([
+    expect(checkProgram(parse(source(body))).diagnostics).toEqual(withVersionAdvisory([
       expect.objectContaining({ code: 'mutable-security-expression', severity: 'error' }),
-    ]);
+    ], version));
   });
 
   it.each(refusals)('refuses unchecked compilation of $name', ({ body }) => {
@@ -46,7 +47,7 @@ describe.each([3, 4])('ledger gaps 48: legacy mutable security in v%i', (version
 
   it.each(controls)('accepts $name', ({ body }) => {
     const program = parse(source(body));
-    expect(checkProgram(program).diagnostics).toEqual([]);
+    expect(checkProgram(program).diagnostics).toEqual(withVersionAdvisory([], version));
     expect(tryCompile(program).success).toBe(true);
   });
 

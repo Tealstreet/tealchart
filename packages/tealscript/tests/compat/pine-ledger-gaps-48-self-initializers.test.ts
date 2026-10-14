@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -15,13 +16,13 @@ describe('ledger gaps 48: self-referencing initializer boundary', () => {
 
   describe.each([3, 4, 5, 6])('from v%i', (version) => {
     it.each(initializers)('refuses %s', (body) => {
-      expect(checkProgram(parse(source(version, body))).diagnostics).toEqual([
+      expect(checkProgram(parse(source(version, body))).diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'unknown-identifier', severity: 'error', message: 'Unknown identifier: s' }),
-      ]);
+      ], version));
     });
 
     it.each(initializers)('admits the rewritten declaration and reassignment for %s', (body) => {
-      expect(checkProgram(parse(source(version, `s = 0.0\n${body.replace('s = ', 's := ')}`))).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source(version, `s = 0.0\n${body.replace('s = ', 's := ')}`))).diagnostics).toEqual(withVersionAdvisory([], version));
     });
   });
 });

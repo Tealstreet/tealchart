@@ -23,6 +23,6 @@ describe('Array average documented return inference', () => {
     expect(errors('f(series float s) => s\na = array.from(2.0, 5.0, 11.0)\nx = f(array.avg(a))')).toEqual([]);
   });
   it('preserves a custom average method contract', () => {
-    expect(errors('method avg(array<float> a) => 2.0\nf(simple float s) => s\na = array.from(2.0)\nx = f(a.avg())')).toEqual([]);
+    expect(errors('method avg(array<float> a) =>\n    na(a)\n    2.0\nf(simple float s) => s\na = array.from(2.0)\nx = f(a.avg())')).toEqual([]);
   });
 });

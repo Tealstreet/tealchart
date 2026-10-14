@@ -42,6 +42,8 @@ export interface CompiledScript {
   indicatorDynamicRequests?: boolean;
   success: boolean;
   unsupported: string[];
+  diagnostics?: { message: string; line?: number; column?: number }[];
+  runtimeSourceLocations?: { start: number; end: number; name: string; line: number; column: number }[];
   generatedCode?: string;
   securityScripts: Map<number, CompiledSecurityScript>;
   sourceScripts?: Map<number, CompiledSecurityScript>;
@@ -656,66 +658,8 @@ function isRequestFullName(fullName: string | null): boolean {
     || fullName === 'request.seed';
 }
 
-function buildRequestFunctionMap(parentAST: Program, securityNodes: Set<unknown>): Map<string, boolean> {
-  const functionBodies = new Map<string, Expression | Statement[]>();
-  for (const stmt of parentAST.body) {
-    if (stmt.type === 'FunctionDeclaration') {
-      functionBodies.set(stmt.name.name, stmt.body);
-    }
-  }
-
-  const functionContainsRequest = new Map<string, boolean>();
-  const visiting = new Set<string>();
-  const hasRequest = (name: string): boolean => {
-    const cached = functionContainsRequest.get(name);
-    if (cached !== undefined) return cached;
-    const body = functionBodies.get(name);
-    if (!body || visiting.has(name)) return false;
-    visiting.add(name);
-    const contains = Array.isArray(body)
-      ? body.some((stmt) => nodeContainsRequest(stmt, securityNodes, hasRequest))
-      : nodeContainsRequest(body, securityNodes, hasRequest);
-    visiting.delete(name);
-    functionContainsRequest.set(name, contains);
-    return contains;
-  };
-
-  for (const stmt of parentAST.body) {
-    if (stmt.type === 'FunctionDeclaration') {
-      hasRequest(stmt.name.name);
-    }
-  }
-  return functionContainsRequest;
-}
-
-function nodeContainsRequest(
-  node: unknown,
-  securityNodes: Set<unknown>,
-  functionContainsRequest: (name: string) => boolean,
-): boolean {
-  if (!node || typeof node !== 'object') return false;
-  const maybeNode = node as { type?: string; callee?: Expression };
-  if (maybeNode.type === 'CallExpression') {
-    if (securityNodes.has(node)) return true;
-    const fullName = maybeNode.callee ? expressionFullName(maybeNode.callee) : null;
-    if (isRequestFullName(fullName)) return true;
-    if (fullName && !fullName.includes('.') && functionContainsRequest(fullName)) return true;
-  }
-
-  for (const value of Object.values(node)) {
-    if (value === node || typeof value === 'function') continue;
-    if (Array.isArray(value)) {
-      if (value.some((item) => nodeContainsRequest(item, securityNodes, functionContainsRequest))) return true;
-    } else if (value && typeof value === 'object' && nodeContainsRequest(value, securityNodes, functionContainsRequest)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 interface SecurityParentContext {
   ownerIndices: WeakMap<object, number>;
-  functionContainsRequest: (name: string) => boolean;
   dynamicRequestsEnabled: boolean;
   rootTypes: SemanticExpressionTypeContext;
   callDeclarations: Map<CallExpression, FunctionDeclaration>;
@@ -725,8 +669,7 @@ interface SecurityParentContext {
   dependencyTypes: WeakMap<SecurityCallSite, SemanticExpressionTypeContext>;
 }
 
-function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unknown>, dynamicRequestsEnabled: boolean, options: CompileOptions): SecurityParentContext {
-  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
+function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unknown>, dynamicRequestsEnabled: boolean, options: CompileOptions, inheritedTypes?: readonly SemanticExpressionTypeContext[]): SecurityParentContext {
   const ownerIndices = new WeakMap<object, number>();
   const visit = (node: unknown, index: number): void => {
     if (!node || typeof node !== 'object' || ownerIndices.has(node)) return;
@@ -743,18 +686,20 @@ function buildSecurityParentContext(parentAST: Program, securityNodes: Set<unkno
     recordCallTypeContexts: true, recordMethodFunctionCallTypeContexts: true,
   }) : undefined;
   const context: SecurityParentContext = {
-    ownerIndices, functionContainsRequest: (name) => requestFunctionMap.get(name) === true, dynamicRequestsEnabled,
+    ownerIndices, dynamicRequestsEnabled,
     rootTypes: { expressionTypes, callTypeContexts: types?.callTypeContexts ?? new WeakMap() },
     callDeclarations: types?.userFunctionCallDeclarations ?? new Map(), resolvedMethods,
     siteTypes: new WeakMap(), dependencies: new WeakMap(), dependencyTypes: new WeakMap(),
   };
   if (securityNodes.size > 0) {
-    walkRequestedCalls(parentAST.body, context.rootTypes, context, (node, scope) => {
-      if (!securityNodes.has(node)) return;
-      const scopes = context.siteTypes.get(node) ?? new Set();
-      scopes.add(scope);
-      context.siteTypes.set(node, scopes);
-    });
+    for (const inherited of inheritedTypes ?? [context.rootTypes]) {
+      walkRequestedCalls(parentAST.body, inherited, context, (node, scope) => {
+        if (!securityNodes.has(node)) return;
+        const scopes = context.siteTypes.get(node) ?? new Set();
+        scopes.add(scope);
+        context.siteTypes.set(node, scopes);
+      });
+    }
   }
   return context;
 }
@@ -916,13 +861,24 @@ function walkRequestedCalls(
     const call = node as CallExpression;
     const declaration = requestedCallDeclaration(call, types, context);
     if (declaration) {
-      for (const value of omittedCallDefaults(call, declaration)) walkRequestedCalls(value, types, context, visit, seen);
-      walkRequestedCalls(declaration.body, types.callTypeContexts.get(call) ?? types, context, visit, seen);
+      const callTypes = types.callTypeContexts.get(call) ?? types;
+      for (const value of omittedCallDefaults(call, declaration)) walkRequestedCalls(value, callTypes, context, visit, seen);
+      walkRequestedCalls(declaration.body, callTypes, context, visit, seen);
     }
   }
   for (const [key, value] of Object.entries(node)) {
     if (key !== 'loc') walkRequestedCalls(value, types, context, visit, seen);
   }
+}
+
+function selectedNodeContainsRequest(node: unknown, context: SecurityParentContext): boolean {
+  let containsRequest = false;
+  walkRequestedCalls(node, context.rootTypes, context, (child) => {
+    if ('type' in child && child.type === 'CallExpression') {
+      containsRequest ||= isRequestFullName(expressionFullName((child as CallExpression).callee));
+    }
+  });
+  return containsRequest;
 }
 
 function collectFunctionBodyReferences(fn: FunctionDeclaration): Set<string> {
@@ -954,13 +910,11 @@ function collectSecurityGlobalDependencies(
   for (const stmt of priorDeclarations) {
     for (const name of variableDeclarationNames(stmt)) declarationByName.set(name, stmt);
   }
-  const securityNodes = new Set<unknown>();
-  const functionContainsRequest = parentContext.functionContainsRequest;
   const replayRequests = parentContext.dynamicRequestsEnabled;
   const candidates = priorDeclarations
     .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => (
       isRequestReplayableGlobalStatement(stmt)
-      && (replayRequests || !nodeContainsRequest(stmt.init, securityNodes, functionContainsRequest))
+      && (replayRequests || !selectedNodeContainsRequest(stmt.init, parentContext))
     ));
   const localFunctions = new Set(parentAST.body.filter((stmt): stmt is FunctionDeclaration => stmt.type === 'FunctionDeclaration'));
   const functions = new Set<FunctionDeclaration>();
@@ -1321,7 +1275,9 @@ function compileSecurityExpression(
     ...options,
     capturedParams: new Set(site.expressionCaptureParams ?? []),
     importedAliasContext: site.importedAliasContext,
-  });
+  }, parentContext.dependencyTypes.has(site)
+    ? [parentContext.dependencyTypes.get(site)!]
+    : [...(parentContext.siteTypes.get(site.node) ?? [parentContext.rootTypes])]);
   const scalarProgram = compiled.success && isIndependentScalarProgram(secAST);
   return compiled.success ? {
     ScriptClass: compiled.ScriptClass,
@@ -1366,13 +1322,67 @@ function isIndependentScalarProgram(ast: Program): boolean {
   return visit(ast);
 }
 
-function executableFunctionNames(ast: Program, analysis: AnalysisContext): Set<string> {
+function omittedDefaultReferences(ast: Program, analysis: AnalysisContext, options: CompileOptions, inheritedTypes?: readonly SemanticExpressionTypeContext[]): Set<string> {
+  const references = new Set<string>();
+  if (!analysis.securitySites.length || ![...analysis.funcInfos.values()].some((fn) => fn.paramDefaults.some(Boolean))) return references;
+  const resolvedMethods = new WeakMap<CallExpression, FunctionDeclaration | null>();
+  const expressionTypes = new WeakMap<Expression, SemanticType>();
+  const semantic = checkProgram(ast, { libraries: options.libraries, expressionTypes, resolvedUserMethods: resolvedMethods,
+    recordCallTypeContexts: true, recordMethodFunctionCallTypeContexts: true });
+  const rootTypes: SemanticExpressionTypeContext = { expressionTypes, callTypeContexts: semantic.callTypeContexts ?? new WeakMap() };
+  const bodyNames = new Map([...analysis.funcInfos].map(([name, info]) => [info.body, name]));
+  const seen = new WeakMap<object, Set<SemanticExpressionTypeContext>>();
+  const defaultSeen = new WeakMap<object, Set<SemanticExpressionTypeContext>>();
+  const visit = (node: unknown, types: SemanticExpressionTypeContext, owner?: string, defaultPath = false): void => {
+    if (!node || typeof node !== 'object') return;
+    const visited = defaultPath ? defaultSeen : seen;
+    const scopes = visited.get(node) ?? new Set();
+    if (scopes.has(types)) return;
+    scopes.add(types);
+    visited.set(node, scopes);
+    if (Array.isArray(node)) {
+      for (const child of node) visit(child, types, owner, defaultPath);
+      return;
+    }
+    if ('type' in node && node.type === 'FunctionDeclaration') return;
+    if ('type' in node && node.type === 'CallExpression') {
+      const call = node as CallExpression;
+      const callTypes = types.callTypeContexts.get(call) ?? types;
+      const declaration = callTypes.resolvedUserMethod ?? callTypes.resolvedUserFunction
+        ?? resolvedMethods.get(call) ?? semantic.userFunctionCallDeclarations.get(call);
+      const fullName = expressionFullName(call.callee);
+      const alias = owner ? analysis.importedFunctionOwners.get(owner) : analysis.importedAliasContext;
+      const name = declaration ? bodyNames.get(declaration.body)
+        : analysis.resolvedUserFunctionCalls.get(call) ?? (fullName ? analysis.importedFunctions.get(fullName)
+          ?? (alias ? analysis.importedLocalFunctions.get(`${alias}.${fullName}`) : undefined)
+          ?? (analysis.funcInfos.has(fullName) ? fullName : undefined) : undefined);
+      const fn = name ? analysis.funcInfos.get(name) : undefined;
+      if (fn && name) {
+        if (defaultPath) references.add(name);
+        const receiver = Boolean(declaration?.isMethod && call.callee.type === 'MemberExpression');
+        const positional = call.arguments.filter((argument) => !argument.name);
+        for (let index = receiver ? 1 : 0; index < fn.params.length; index++) {
+          if (call.arguments.some((argument) => argument.name?.name === fn.params[index]) || positional[index - Number(receiver)]) continue;
+          const value = fn.paramDefaults[index];
+          if (!value) continue;
+          visit(value, callTypes, name, true);
+        }
+        visit(fn.body, callTypes, name, defaultPath);
+      }
+    }
+    for (const [key, child] of Object.entries(node)) if (key !== 'loc') visit(child, types, owner, defaultPath);
+  };
+  for (const types of inheritedTypes ?? [rootTypes]) visit(ast.body, types);
+  return references;
+}
+
+function executableFunctionNames(ast: Program, analysis: AnalysisContext, options: CompileOptions, inheritedTypes?: readonly SemanticExpressionTypeContext[]): Set<string> {
   const references = new Set<string>();
   for (const stmt of ast.body) {
     if (stmt.type !== 'FunctionDeclaration') collectStatementReferences(stmt, references);
   }
   const functions = new Set<string>();
-  const pending = [...references];
+  const pending = [...references, ...omittedDefaultReferences(ast, analysis, options, inheritedTypes)];
   while (pending.length > 0) {
     const reference = pending.pop()!;
     const qualified = analysis.importedAliasContext ? `${analysis.importedAliasContext}.${reference}` : reference;
@@ -1404,10 +1414,24 @@ function executableFunctionNames(ast: Program, analysis: AnalysisContext): Set<s
   return functions;
 }
 
-export function compile(ast: Program, maxBarsBack?: number, options: CompileOptions = {}): CompiledScript {
+function runtimeSourceLocations(code: string, analysis: AnalysisContext): CompiledScript['runtimeSourceLocations'] {
+  const positions = new Map<string, number>();
+  return analysis.runtimeSourceExpressions?.flatMap(({ expression, owner, ...site }) => {
+    const key = owner + ':' + expression;
+    const ownerStart = code.indexOf(`\n  ${owner}(`);
+    if (ownerStart === -1) return [];
+    const ownerEnd = code.indexOf('\n  }', ownerStart);
+    const start = code.indexOf(expression, positions.get(key) ?? ownerStart);
+    if (start === -1 || start >= ownerEnd) return [];
+    positions.set(key, start + expression.length);
+    return [{ ...site, start, end: start + expression.length }];
+  });
+}
+
+export function compile(ast: Program, maxBarsBack?: number, options: CompileOptions = {}, inheritedTypes?: readonly SemanticExpressionTypeContext[]): CompiledScript {
   ast = normalizeV5DuplicateCallArguments(ast, options);
   const analysis = analyze(ast, options);
-  const executableFunctions = executableFunctionNames(ast, analysis);
+  const executableFunctions = executableFunctionNames(ast, analysis, options, inheritedTypes);
   const reachableTupleSites = analysis.securitySites.filter(
     (site) => !site.ownerFunctionName || executableFunctions.has(site.ownerFunctionName),
   );
@@ -1436,10 +1460,18 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
         ?? dynamicRequestsEnabled;
     }
   }
+  const diagnostics: NonNullable<CompiledScript['diagnostics']> = [];
   if (!dynamicRequestsEnabled) {
     for (const site of analysis.securitySites) {
       if (site.requiresDynamicRequestsReason !== 'local-scope') continue;
-      analysis.unsupported.push(`request.* calls in local scopes require dynamic_requests=true: request.${site.kind}`);
+      if (ast.version === 5 && analysis.declarationInfo?.kind === 'indicator' && !dynamicOption
+        && !site.ownerFunctionName && site.kind === 'security') {
+        const message = 'Cannot use `request.*()` call within loops or conditional structures, when `dynamic_requests` is `false` in the `indicator()` function.';
+        diagnostics.push({ message, line: site.node.callee.loc?.start.line, column: site.node.callee.loc?.start.column });
+        analysis.unsupported.push(message);
+      } else {
+        analysis.unsupported.push(`request.* calls in local scopes require dynamic_requests=true: request.${site.kind}`);
+      }
     }
   }
   if (analysis.plotSites.some((site) => site.funcName === 'fill')) {
@@ -1456,22 +1488,46 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
     }
   }
 
+  if ([...analysis.importedMethodOverloads.values()].some((overloads) => overloads.some((overload) =>
+    ['int', 'float', 'bool', 'string', 'color'].includes(analysis.funcInfos.get(overload.internalName)?.paramTypes[0]?.baseType ?? '')))) {
+    for (const diagnostic of checkProgram(ast, { libraries: options.libraries }).diagnostics) {
+      if (diagnostic.code === 'ambiguous-call' && diagnostic.message.startsWith('Ambiguous library method overload:')) analysis.unsupported.push(diagnostic.message);
+    }
+  }
+  if (!inheritedTypes?.length) {
+    const importedMethods = new Set([...analysis.importedMethodOverloads.values()].flatMap((overloads) => overloads.map((overload) => overload.internalName)));
+    const namespaceMethods = new Set([...analysis.importedFunctions].flatMap(([name, internal]) =>
+      importedMethods.has(internal) ? [`Ambiguous library function overload: ${name}`] : []));
+    if (namespaceMethods.size > 0) {
+      for (const diagnostic of checkProgram(ast, { libraries: options.libraries }).diagnostics) {
+        if (diagnostic.code === 'ambiguous-call' && namespaceMethods.has(diagnostic.message)) analysis.unsupported.push(diagnostic.message);
+      }
+    }
+  }
+  if (analysis.importedLocalMethods.size > 0) {
+    const prepared = options.semanticTypes?.ast === ast && options.semanticTypes.libraries === options.libraries
+      ? options.semanticTypes.result : undefined;
+    for (const diagnostic of (prepared ?? checkProgram(ast, { libraries: options.libraries })).diagnostics) {
+      if (diagnostic.code === 'private-library-method' || diagnostic.code === 'private-library-function') analysis.unsupported.push(diagnostic.message);
+    }
+  }
   if (analysis.unsupported.length > 0) {
     return {
       ScriptClass: null as unknown as CompiledScript['ScriptClass'],
       analysis,
       success: false,
       unsupported: analysis.unsupported,
+      ...(diagnostics.length ? { diagnostics } : {}),
       securityScripts: new Map(),
     };
   }
 
   const securityNodes = new Set<unknown>(analysis.securitySites.map((site) => site.node));
-  const parentContext = buildSecurityParentContext(ast, securityNodes, dynamicRequestsEnabled, options);
+  const parentContext = buildSecurityParentContext(ast, securityNodes, dynamicRequestsEnabled, options, inheritedTypes);
   const requestedContexts = specializeSecurityDependencies(ast, analysis, parentContext);
   prepareSecurityCaptureParams(ast, analysis, parentContext);
   analysis.discardedFootprintCalls = discardedFootprintCalls(ast, analysis);
-  const code = emit(ast, analysis, options.libraries, requestedContexts);
+  const code = emit(ast, analysis, options.libraries, requestedContexts, inheritedTypes);
 
   try {
     const factory = new Function(
@@ -1533,6 +1589,7 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
       success: true,
       unsupported: [],
       generatedCode: code,
+      runtimeSourceLocations: runtimeSourceLocations(code, analysis),
       securityScripts,
       sourceScripts,
     };

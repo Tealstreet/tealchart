@@ -81,6 +81,8 @@ export {
 export {
   // Parser functions
   parse,
+  getPineVersionAdvisory,
+  type PineVersionAdvisory,
   validate,
   formatParseError,
   TealscriptParseError,

@@ -20,10 +20,11 @@ describe('ledger gaps42 expression values', () => {
 2 +
     3 +
         4)
-[first, second] = [
+pair() => [
 1,
     2
 ]
+[first, second] = pair()
 wrapped() =>
     local = 1 +
       2

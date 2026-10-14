@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import type { Bar } from '../../src/runtime';
 
 import { describe, expect, it } from 'vitest';
@@ -170,7 +171,7 @@ describe('collection ranked batch20 bounded contracts', () => {
     },
   );
   it.each(['0,-7,0', '0.0,0.25,0.0'])('v5 some numeric truthiness uses zero/nonzero: %s (794/796)', (elements) => {
-    expect(check(`a = array.from(${elements})\nresult = a.some()`, 5).diagnostics).toEqual([]);
+    expect(check(`a = array.from(${elements})\nresult = a.some()`, 5).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(
       values(
         `a = array.from(${elements})\nz = array.from(0,0,0)`,
@@ -183,10 +184,16 @@ describe('collection ranked batch20 bounded contracts', () => {
     expect(check('result = array.some()').diagnostics.length).toBeGreaterThan(0);
   });
   it.each(['0,-7,0', '0.0,0.25,0.0'])('native v6 refuses numeric some arrays: %s (794; CF003)', (elements) => {
+    // v11 numeric-array-some-{int,float}-{namespace,method}-v1 attempt 1.
+    const kind = elements.includes('.') ? 'float' : 'int';
     for (const call of ['array.some(a)', 'array.some(id=a)', 'a.some()']) {
-      expect(check(`a = array.from(${elements})\nresult = ${call}`).diagnostics).toEqual(
-        expect.arrayContaining([expect.objectContaining({ code: 'type-mismatch' })]),
-      );
+      // v78-v6-some-{int,float}-named-tk-v1 attempt-v1 also witnesses named id=.
+      expect(check(`a = array.from(${elements})\nresult = ${call}`).diagnostics).toEqual([
+        expect.objectContaining({
+          code: 'CE10123',
+          message: `Cannot call "array.some" with argument "id"="a". An argument of "array<${kind}>" type was used but a "array<bool>"  is expected.`,
+        }),
+      ]);
     }
   });
   it.each([

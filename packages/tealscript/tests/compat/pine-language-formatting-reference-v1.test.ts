@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -19,7 +20,7 @@ describe('Pine script formatting preserves statement values', () => {
     it.each(cases)(`v${version} evaluates %s`, (_name, body) => {
       const source = `//@version=${version}\nindicator("Formatting values")\n${body}`;
       expect(() => parse(source)).not.toThrow();
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);

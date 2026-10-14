@@ -52,7 +52,9 @@ describe.each(members)('TA-C ta.%s integer length admission', (member) => {
     expect(
       diagnostics(`type Holder
     int seed
-method ${member}(Holder self, float source, float length, int percentage) => source
+method ${member}(Holder self, float source, float length, int percentage) =>
+    self.seed := self.seed
+    source
 holder = Holder.new(1)
 plot(holder.${member}(close, 4.0, 50))`),
     ).toEqual([]);

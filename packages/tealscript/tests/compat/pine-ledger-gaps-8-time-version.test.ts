@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -21,7 +22,7 @@ describe('ledger gaps 8: time resolution parameter migration', () => {
   for (const argument of ['resolution="2"', 'session="0000-0000:1234567", resolution="2"']) {
     it(`accepts and executes the v4 named slot: ${argument}`, () => {
       const script = source(4, argument);
-      expect(checkProgram(parse(script)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(script)).diagnostics).toEqual(withVersionAdvisory([], 4));
       const result = runCompatScript(script, { bars, engineOptions: { runtime: { timeframe: { period: '1' }, syminfo: { timezone: 'Etc/UTC' } } } });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'bucket').values).toEqual([start, start, start + 120_000, start + 120_000]);
@@ -29,10 +30,10 @@ describe('ledger gaps 8: time resolution parameter migration', () => {
   }
   for (const version of [5, 6]) {
     it(`uses the modern named slot and rejects resolution in v${version}`, () => {
-      expect(checkProgram(parse(source(version, 'timeframe="2"'))).diagnostics).toEqual([]);
-      expect(checkProgram(parse(source(version, 'resolution="2"'))).diagnostics).toEqual([
+      expect(checkProgram(parse(source(version, 'timeframe="2"'))).diagnostics).toEqual(withVersionAdvisory([], version));
+      expect(checkProgram(parse(source(version, 'resolution="2"'))).diagnostics).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'unknown-argument', message: "Unknown argument 'resolution' for time()" }),
-      ]);
+      ], version));
       const result = runCompatScript(source(version, 'timeframe="2"'), { bars, engineOptions: { runtime: { timeframe: { period: '1' }, syminfo: { timezone: 'Etc/UTC' } } } });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'bucket').values).toEqual([start, start, start + 120_000, start + 120_000]);

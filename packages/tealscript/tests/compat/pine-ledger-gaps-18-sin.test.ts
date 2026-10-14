@@ -18,7 +18,8 @@ describe('ledger18 sin migration slots', () => {
     if (version >= 5) {
       for (const call of ['sin(0.5)', 'math.sin(x=0.5)']) {
         it(`v${version} rejects obsolete ${call}`, () => {
-          expect(checkProgram(parse(`//@version=${version}\nindicator("old slot")\nplot(${call})`)).diagnostics.length).toBeGreaterThan(0);
+          const diagnostics = checkProgram(parse(`//@version=${version}\nindicator("old slot")\nplot(${call})`)).diagnostics;
+          expect(diagnostics.some(({ severity }) => severity === 'error')).toBe(true);
         });
       }
     }

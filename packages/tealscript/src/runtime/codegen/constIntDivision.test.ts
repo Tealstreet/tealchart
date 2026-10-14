@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../../tests/helpers/expectedVersionAdvisory';
 import type { SemanticQualifier } from '../../semantic';
 
 import { describe, expect, it } from 'vitest';
@@ -39,7 +40,7 @@ describe('v4/v5 const-int division', () => {
       }
     const ast = parse(lines.join('\n'));
     const checked = checkProgram(ast);
-    expect(checked.diagnostics).toEqual([]);
+    expect(checked.diagnostics).toEqual(withVersionAdvisory([], version));
     expect(checkSemanticTypeInvariants(ast, checked)).toEqual([]);
     const result = executeScript(ast, bars);
     expect(result.errors).toEqual([]);
@@ -61,7 +62,7 @@ describe('v4/v5 const-int division', () => {
     const ast = parse(
       '//@version=5\nindicator("nested")\na = 5 / 2\nint b = (a + 3) / 2\nplot(b)\nplot(5.0 / 2)\nplot(5 / 2.0)',
     );
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(executeScript(ast, bars).plots.map((plot) => plot.values)).toEqual([
       [2, 2, 2],
       [2.5, 2.5, 2.5],
@@ -92,7 +93,7 @@ describe('v4/v5 const-int division', () => {
     const ast = parse(
       `//@version=5\nindicator("exact division")\nint quotient = ${expression}\nplot(quotient)\nplot(1)`,
     );
-    expect(checkProgram(ast).diagnostics).toEqual([]);
+    expect(checkProgram(ast).diagnostics).toEqual(withVersionAdvisory([], 5));
     const result = executeScript(ast, bars);
     expect(result.errors).toEqual([]);
     expect(result.plots.map((plot) => plot.values)).toEqual([bars.map(() => expected), bars.map(() => 1)]);

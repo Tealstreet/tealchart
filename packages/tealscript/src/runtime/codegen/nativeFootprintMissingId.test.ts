@@ -102,7 +102,7 @@ describe('captured missing footprint and volume-row IDs', () => {
     const matrix = run('m = matrix.new<float>(2, 1, 0)\nplot(m.rows())');
     expect(matrix.errors).toEqual([]);
     expect(matrix.plots[0].values).toEqual(Array(6).fill(2));
-    const local = run('method rows(footprint fp) =>\n    7\nfootprint fp = na\nplot(fp.rows())');
+    const local = run('method rows(footprint fp) =>\n    na(fp) ? 7 : 7\nfootprint fp = na\nplot(fp.rows())');
     expect(local.errors).toEqual([]);
     expect(local.plots[0].values).toEqual(Array(6).fill(7));
   });

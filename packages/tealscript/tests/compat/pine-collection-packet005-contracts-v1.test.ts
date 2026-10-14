@@ -141,7 +141,7 @@ describe('collection packet005 contract facets', () => {
   }
   it('selected custom join method preserves numeric parameter admission', () =>
     values(
-      'method join(array<int> a, int separator) => separator\na = array.from(1, 2)\nplot(a.join(separator=17), "Outcome")',
+      'method join(array<int> a, int separator) =>\n    na(a)\n    separator\na = array.from(1, 2)\nplot(a.join(separator=17), "Outcome")',
       [17, 17, 17],
     ));
   it('547 UDT sort_indices explicit string field', () =>
@@ -213,7 +213,7 @@ describe('collection packet005 contract facets', () => {
   for (const name of ['stdev', 'percentile_linear_interpolation']) {
     it(`selected custom ${name} method preserves simple result admission`, () =>
       values(
-        `method ${name}(array<float> a) => 9.0\nf(simple float x) => x\na = array.from(2.0, 4.0)\nplot(f(a.${name}()), "Outcome")`,
+        `method ${name}(array<float> a) =>\n    na(a)\n    9.0\nf(simple float x) => x\na = array.from(2.0, 4.0)\nplot(f(a.${name}()), "Outcome")`,
         [9, 9, 9],
       ));
   }

@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -17,7 +18,7 @@ adjust(x) => first = x * 3, array.push(trace, first), last = first - 7, array.pu
 result = adjust(close)
 plot(result, "Result")
 plot(array.get(trace, 0) * 10 + array.get(trace, 1), "Trace")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars });
       expect(result.errors).toEqual([]);
       expect(result.profile?.compiledBarErrors?.count ?? 0).toBe(0);

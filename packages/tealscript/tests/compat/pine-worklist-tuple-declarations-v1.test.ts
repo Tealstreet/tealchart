@@ -19,9 +19,8 @@ describe('worklist tuple declaration boundaries', () => {
 
   for (const mode of ['var', 'varip']) {
     it(`refuses ${mode} tuple declarations`, () => {
-      expect(errors(`${mode} [first, second] = [close, open]`)).toEqual(expect.arrayContaining([
-        expect.objectContaining({ code: 'invalid-tuple-declaration' }),
-      ]));
+      expect(() => parse(`//@version=6\nindicator("Tuples")\npair() => [close, open]\n${mode} [first, second] = pair()`))
+        .toThrow(`""${mode}"" cannot be used as a variable or function name.`);
     });
   }
 

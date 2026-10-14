@@ -86,13 +86,13 @@ plot(ta.roc(src, length), "ROC")`,
 
   it.each(['root', 'scoped'])('replaces same-bar samples and restores %s history', (scope) => {
     const wrapper = scope === 'scoped' ? 'f(float src, int length) => [ta.roc(src,length), ta.change(src,length)]' : '';
-    const value = scope === 'scoped' ? 'f(close,length)' : '[ta.roc(close,length), ta.change(close,length)]';
+    const value = scope === 'scoped' ? 'f(close,length)' : 'rootPair()';
     const compiled = compile(
       parse(`//@version=6
 indicator("Lag rollback")
 ${wrapper}
 length = 1 + bar_index % 2
-[r,c] = ${value}
+${scope === 'root' ? 'rootRoc = ta.roc(close,length)\nrootChange = ta.change(close,length)\nrootPair() => [rootRoc,rootChange]\n' : ''}[r,c] = ${value}
 plot(r)
 plot(c)`),
       50,

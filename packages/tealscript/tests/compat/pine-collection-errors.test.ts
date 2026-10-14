@@ -153,7 +153,9 @@ ${name}(missing)`, message);
   });
 
   it('preserves a local method named size ahead of generic collection dispatch on na', () => {
-    const result = run(`method size(array<float> receiver) => 17
+    const result = run(`method size(array<float> receiver) =>
+    na(receiver)
+    17
 operation(array<float> receiver) => receiver.size()
 array<float> missing = na
 plot(operation(missing), "Custom")`);

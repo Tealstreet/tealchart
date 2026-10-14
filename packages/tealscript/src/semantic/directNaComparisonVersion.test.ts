@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -20,6 +21,6 @@ describe('direct na comparison versions', () => {
   it.each([5, 6])('accepts na(value) in v%s', (version) => {
     expect(
       checkProgram(parse(`//@version=${version}\nindicator("na helper")\nplot(na(close) ? 1 : 0)`)).diagnostics,
-    ).toEqual([]);
+    ).toEqual(withVersionAdvisory([], version));
   });
 });

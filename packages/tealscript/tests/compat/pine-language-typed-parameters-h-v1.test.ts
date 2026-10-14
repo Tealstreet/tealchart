@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -29,7 +30,7 @@ seriesValue(series float value) => value
 configured = input.float(2)
 simple float first = 3
 plot(constant(1) + simpleValue(configured) + simpleValue(first) + seriesValue(close), "Value")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Value').values).toEqual([108, 111, 113, 109]);

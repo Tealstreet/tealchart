@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -18,7 +19,7 @@ describe('visual offset version qualifiers', () => {
   });
 
   it.each(calls)('retains v5 series acceptance: %s', (call) => {
-    expect(checkProgram(parse(`//@version=5\nindicator("Offset")\n${call}, offset=bar_index)`)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(`//@version=5\nindicator("Offset")\n${call}, offset=bar_index)`)).diagnostics).toEqual(withVersionAdvisory([], 5));
   });
 
   it.each(['2', '-2', 'input.int(2)', 'timeframe.multiplier'])('accepts v6 weaker offsets: %s', (offset) => {
@@ -44,6 +45,6 @@ describe('visual offset version qualifiers', () => {
 
   it.each([3, 4])('preserves existing v%i acceptance without claiming undocumented rendering', (version) => {
     const offset = version === 3 ? 'n' : 'bar_index';
-    expect(checkProgram(parse(`//@version=${version}\nstudy("Offset")\nplot(close, offset=${offset})`)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(`//@version=${version}\nstudy("Offset")\nplot(close, offset=${offset})`)).diagnostics).toEqual(withVersionAdvisory([], version));
   });
 });

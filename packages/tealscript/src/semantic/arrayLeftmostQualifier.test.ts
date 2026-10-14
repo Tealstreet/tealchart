@@ -47,7 +47,9 @@ describe('array leftmost search result qualifiers', () => {
         });
       }
 
-      const method = `method binary_search_leftmost(array<${kind}> self, int val) => "custom"`;
+      const method = `method binary_search_leftmost(array<${kind}> self, int val) =>
+    na(self)
+    "custom"`;
       it(`v${version} ${kind} preserves the selected custom method's string result`, () => {
         const checked = check(`${method}\n${setup}\nconst string result = values.binary_search_leftmost(3)`, version);
         expect(checked.errors).toEqual([]);

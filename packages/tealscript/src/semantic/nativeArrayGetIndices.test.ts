@@ -38,7 +38,9 @@ plot(array.get(a, 1))`;
   it('preserves a selected user method with a float parameter', () => {
     expect(errors(`//@version=6
 indicator("User getter control")
-method get(array<int> id, float index) => index
+method get(array<int> id, float index) =>
+    na(id)
+    index
 a = array.from(10)
 plot(a.get(1.5))`)).toEqual([]);
   });

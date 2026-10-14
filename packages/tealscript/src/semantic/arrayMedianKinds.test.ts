@@ -26,7 +26,7 @@ describe('documented array median return kinds', () => {
   });
   it.each(['values.median()', 'values.copy().median()'])('preserves a user method return through %s', (call) => {
     expect(
-      errors(`method median(array<int> self) => 1.5\nvalues=array.from(1,7,3)\nint out=${call}\nplot(out)`).some(
+      errors(`method median(array<int> self) =>\n    na(self)\n    1.5\nvalues=array.from(1,7,3)\nint out=${call}\nplot(out)`).some(
         (d) => d.code === 'type-mismatch',
       ),
     ).toBe(true);
@@ -34,7 +34,7 @@ describe('documented array median return kinds', () => {
   it('keeps the namespace builtin independent of a user method', () => {
     expect(
       errors(
-        'method median(array<int> self) => 1.5\nvalues=array.from(1,7,3)\nint out=array.median(values)\nplot(out)',
+        'method median(array<int> self) =>\n    na(self)\n    1.5\nvalues=array.from(1,7,3)\nint out=array.median(values)\nplot(out)',
       ),
     ).toEqual([]);
   });

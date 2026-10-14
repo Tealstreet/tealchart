@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
@@ -13,7 +14,7 @@ describe('documented round_to_mintick migration', () => {
 ${version === 4 ? 'study' : 'indicator'}("mintick migration")
 plot(${version === 4 ? '' : 'math.'}round_to_mintick(${named ? (version === 4 ? 'x=' : 'number=') : ''}1.37))
 `;
-        expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+        expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
         const result = executeScript(parse(source), bars, undefined, { runtime: { syminfo: { mintick: 0.25 } } });
         expect(result.errors).toEqual([]);
         expect(result.plots[0]?.values).toEqual([1.25]);

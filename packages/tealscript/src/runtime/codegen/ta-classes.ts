@@ -680,7 +680,13 @@ export class Change implements Saveable {
 
   private snap: ChangeSnapshot | null = null;
 
-  constructor(maxLength: number = 1) {
+  constructor(maxLength: number = 1, line?: number) {
+    if (line !== undefined && Number.isInteger(maxLength) && maxLength <= 0) {
+      throw new PineRuntimeArgumentError(
+        `Invalid value of the 'length' argument (${maxLength}) in the ''change'' function. It must be > 0.`,
+        'RE10001', line, 0,
+      );
+    }
     this.maxLength = validatePositiveIntegerLength(maxLength, 'ta.change length');
     this.buf = new Float64Array(this.maxLength + 1);
     this.buf.fill(NaN);
@@ -3232,7 +3238,7 @@ export class TSI implements Saveable {
       ? this.absShort.recompute(smoothedAbsMomentum)
       : this.absShort.compute(smoothedAbsMomentum);
 
-    return doubleSmoothedAbsMomentum === 0 ? 0 : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
+    return doubleSmoothedAbsMomentum === 0 ? NaN : doubleSmoothedMomentum / doubleSmoothedAbsMomentum;
   }
 
   save(): TSISnapshot {
@@ -3595,7 +3601,7 @@ export class VWAP implements Saveable {
   private readonly stdevMult: number;
   private snap: VWAPSnapshot | null = null;
 
-  constructor(hasBands: boolean, stdevMult: number, private readonly hasExplicitAnchor = false) {
+  constructor(hasBands: boolean, stdevMult: number) {
     this.hasBands = hasBands;
     this.stdevMult = stdevMult;
   }
@@ -3618,9 +3624,8 @@ export class VWAP implements Saveable {
   private _advance(source: number, anchor: boolean, volume: number, stdevMult: number): number | [number, number, number] {
     if (anchor) this.initialized = true;
     if (!this.initialized) return this.hasBands ? [NaN, NaN, NaN] : NaN;
-    // Capture201 settles explicit-anchor source holes only. Omitted anchors
-    // retain their held source-hole policy; interior volume holes still skip.
-    if (!anchor && (volume !== volume || (!this.hasExplicitAnchor && source !== source))) return this.hasBands ? [NaN, NaN, NaN] : NaN;
+    // A missing source poisons this period; a later anchor resets it.
+    if (!anchor && volume !== volume) return this.hasBands ? [NaN, NaN, NaN] : NaN;
 
     const prevCumTpv = anchor ? 0 : this.cumTpv;
     const prevCumVolume = anchor ? 0 : this.cumVolume;

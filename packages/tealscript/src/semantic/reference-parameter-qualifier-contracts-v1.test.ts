@@ -97,7 +97,9 @@ plot(wrap(array.from(close)))`);
   });
 
   it('admits an explicitly qualified non-receiver method reference parameter', () => {
-    const result = check(`method read(array<float> receiver, simple matrix<float> value) => matrix.rows(value)
+    const result = check(`method read(array<float> receiver, simple matrix<float> value) =>
+    na(receiver)
+    matrix.rows(value)
 values = array.from(close)
 plot(values.read(matrix.new<float>(1, 1, close)))`);
     expect(result.diagnostics.filter((entry) => entry.severity === 'error')).toEqual([]);

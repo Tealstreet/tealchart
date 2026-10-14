@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { getPlot, runCompatScript } from './fixtures';
 
 // Ranks323/333: version-rules-v1#48/#44; reference/pine-v6-reference-v1.json syminfo.tickerid/timeframe.period.
@@ -23,7 +24,8 @@ describe('LEGACY-MARKET-VARIABLE-RENAMES', () => {
         },
       },
     };
-    expect(checkProgram(parse(source(3, old))).diagnostics).toEqual([]);
+    // V85 pins the v3 LF-header advisory; all market-name inputs and runtime assertions stay unchanged.
+    expect(checkProgram(parse(source(3, old))).diagnostics).toEqual(withVersionAdvisory([], 3));
     const legacy = runCompatScript(source(3, old), options);
     expect(legacy.errors).toEqual([]);
     expect(getPlot(legacy, 'metadata').values).toEqual(Array(12).fill(1));

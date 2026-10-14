@@ -524,6 +524,7 @@ export interface CallArgument extends BaseNode {
  * ta.sma, color.red, math.abs
  */
 export interface MemberExpression extends BaseNode {
+  accessLoc?: SourceLocation;
   type: 'MemberExpression';
   object: Expression;
   property: Identifier;

@@ -1,3 +1,4 @@
+import { expectedVersionAdvisories, withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser/parser';
@@ -7,9 +8,15 @@ const header = (version: number) => `//@version=${version}
 indicator("Array biased option type")
 type Point
     int value
-method stdev(Point receiver, string biased) => biased
-method variance(Point receiver, string biased) => biased
-method covariance(Point receiver, string biased) => biased
+method stdev(Point receiver, string biased) =>
+    receiver.value := receiver.value
+    biased
+method variance(Point receiver, string biased) =>
+    receiver.value := receiver.value
+    biased
+method covariance(Point receiver, string biased) =>
+    receiver.value := receiver.value
+    biased
 ai = array.from(1, 2)
 af = array.from(1.5, 2.5)
 inputBias = input.bool(false)
@@ -31,15 +38,17 @@ describe('array statistical biased options use documented bool kinds', () => {
           };
           const check = (biased?: string) => checkProgram(parse(`${header(version)}shadow = p.${member}("custom method string")\nresult = ${call(biased)}`)).diagnostics;
           for (const value of ['"wrong"', 'array.from(true)', 'matrix.new<int>(1, 1, 1)', 'p', 'color.red']) {
-            expect(check(value).map((error) => error.code), `${reference}; v${version}; ${form}; ${value}`).toEqual(['type-mismatch']);
-            expect(check(value)[0]?.message, reference).toContain(`array.${member} biased must be a boolean`);
+            expect(check(value)).toEqual(withVersionAdvisory((['type-mismatch']).map((value) => expect.objectContaining({ code: value })), version));
+            expect(check(value).map((error) => error.code), `${reference}; v${version}; ${form}; ${value}`).toEqual([...expectedVersionAdvisories(version).map((diagnostic) => diagnostic.code), ...(['type-mismatch'])]);
+            expect(check(value)[expectedVersionAdvisories(version).length]?.message, reference).toContain(`array.${member} biased must be a boolean`);
           }
           for (const value of ['0', '1', '2.5', 'input.int(1)', 'close']) {
             const errors = check(value);
-            expect(errors.map((error) => error.code), `${reference}; v${version}; ${form}; ${value}`).toEqual(version === 6 ? ['type-mismatch'] : []);
+            expect(errors).toEqual(withVersionAdvisory((version === 6 ? ['type-mismatch'] : []).map((value) => expect.objectContaining({ code: value })), version));
+            expect(errors.map((error) => error.code), `${reference}; v${version}; ${form}; ${value}`).toEqual([...expectedVersionAdvisories(version).map((diagnostic) => diagnostic.code), ...(version === 6 ? ['type-mismatch'] : [])]);
           }
           for (const value of [undefined, 'true', 'false', 'inputBias', 'simpleBias', 'seriesBias']) {
-            expect(check(value), `${reference}; v${version}; ${form}; ${value}`).toEqual([]);
+            expect(check(value), `${reference}; v${version}; ${form}; ${value}`).toEqual(withVersionAdvisory([], version));
           }
         }
       }

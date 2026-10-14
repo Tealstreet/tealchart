@@ -21,7 +21,7 @@ import First/Numbers/1 as numbers
 plot(numbers.abs(1.0))
 plot(numbers.hidden(1.0))
 `), { libraries });
-    expect(result.diagnostics.some((diagnostic) => diagnostic.message === 'Unknown library function: numbers.hidden')).toBe(true);
+    expect(result.diagnostics.some((diagnostic) => diagnostic.message === "Could not find method or method reference 'numbers.hidden'")).toBe(true);
   });
 
   it('refuses the same library version under distinct aliases and permits distinct versions', () => {

@@ -9,14 +9,14 @@ describe('ledger gaps42 declaration and scope rules', () => {
   it.each([
     ['case-sensitive spelling (1664)', 'Value = 1\nplot(value)'],
     ['declaration order (1668)', 'plot(later)\nlater = 1'],
-    ['discard cannot be read (1671)', '[_, kept] = [1, 2]\nplot(_)'],
+    ['discard cannot be read (1671)', 'pair() => [1, 2]\n[_, kept] = pair()\nplot(_)'],
     ['conditional locals stay in their block (1679)', 'if close > open\n    local = 1\nplot(local)'],
   ])('refuses unavailable identifiers: %s', (_rule, body) => {
     expect(check(body).diagnostics.map((diagnostic) => diagnostic.code)).toEqual(['unknown-identifier']);
   });
 
   it('requires tuple arity to match the initializer (1670)', () => {
-    expect(check('[first, second] = [1, 2, 3]').diagnostics).toEqual([
+    expect(check('triple() => [1, 2, 3]\n[first, second] = triple()').diagnostics).toEqual([
       expect.objectContaining({ code: 'builtin-shadow', severity: 'warning', message: "Variable 'second' shadows a Pine builtin" }),
       expect.objectContaining({ code: 'tuple-shape-mismatch', severity: 'error' }),
     ]);

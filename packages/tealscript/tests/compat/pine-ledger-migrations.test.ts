@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -13,8 +14,8 @@ describe('ledger legacy names and slots', () => {
     ['change', 'close', 'ta.change', 461],
     ['pow', 'close, 2', 'math.pow', 462],
   ])('migrates %s(%s) to %s (row%s)', (oldName, args, newName) => {
-    expect(checkProgram(parse(`//@version=4\nstudy("Legacy")\nx = ${oldName}(${args})`)).diagnostics).toEqual([]);
-    expect(checkProgram(parse(`//@version=5\nindicator("Modern")\nx = ${newName}(${args})`)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(`//@version=4\nstudy("Legacy")\nx = ${oldName}(${args})`)).diagnostics).toEqual(withVersionAdvisory([], 4));
+    expect(checkProgram(parse(`//@version=5\nindicator("Modern")\nx = ${newName}(${args})`)).diagnostics).toEqual(withVersionAdvisory([], 5));
     const rejected = checkProgram(parse(`//@version=5\nindicator("Legacy refusal")\nx = ${oldName}(${args})`));
     expect(rejected.diagnostics.some((d) => d.code === 'version-mismatch' && d.message.includes(newName))).toBe(true);
   });

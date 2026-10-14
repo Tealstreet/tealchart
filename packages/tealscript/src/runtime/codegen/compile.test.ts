@@ -434,10 +434,10 @@ plot(timeframe.in_seconds(helper.HTF), "Seconds")`;
   it('compiles request footprint calls through the provider seam', () => {
     const pine = `//@version=6
 indicator("test")
-footprint = request.footprint(10, 70)
-rows = na(footprint) ? array.new<float>() : footprint.rows()
+fp = request.footprint(10, 70)
+rows = na(fp) ? array.new<float>() : fp.rows()
 row = array.size(rows) > 0 ? array.get(rows, 0) : na
-plot(na(footprint) ? 0 : footprint.total_volume())
+plot(na(fp) ? 0 : fp.total_volume())
 plot(na(row) ? 0 : volume_row.delta(row))`;
 
     const ast = parse(pine);

@@ -37,9 +37,9 @@ describe('event memory contracts', () => {
     ]);
   });
 
-  it('skips an interior missing hlc3 sample without changing the VWAP accumulator', () => {
+  it('keeps shared VWAP state poisoned for a synthetic missing hlc3 sample', () => {
     const values = plots('plot(ta.vwap)', [10, NaN, 20, 30]);
-    expect(values).toEqual([[10, null, 15, 20]]);
+    expect(values).toEqual([[10, null, null, null]]);
   });
   it('keeps scalar VWAP defined when a missing band multiplier makes both bands unavailable', () => {
     const values = plots(

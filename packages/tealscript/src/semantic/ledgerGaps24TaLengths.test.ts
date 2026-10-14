@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -39,12 +40,12 @@ describe.each([5, 6])('ledger gaps 24 integer lengths, v%i', (version) => {
       ]) {
         expect
           .soft(diagnostics(version, declaration('float', qualifier), call))
-          .toEqual([
+          .toEqual(withVersionAdvisory([
             expect.objectContaining({
               code: 'type-mismatch',
               message: expect.stringContaining(`ta.${member} length must be an integer, got`),
             }),
-          ]);
+          ], version));
       }
     });
 
@@ -53,7 +54,7 @@ describe.each([5, 6])('ledger gaps 24 integer lengths, v%i', (version) => {
         `ta.${member}(${namedSources}, length=length)`,
         `ta.${member}(${positionalSources}, length)`,
       ]) {
-        expect(diagnostics(version, declaration('int', qualifier), call)).toEqual([]);
+        expect(diagnostics(version, declaration('int', qualifier), call)).toEqual(withVersionAdvisory([], version));
       }
     });
   });

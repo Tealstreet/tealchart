@@ -14,6 +14,12 @@ describe('ledger gaps 10 declaration contracts', () => {
   it.each(['float', 'series float', 'simple int', 'const int', 'var', 'varip', 'var float'])(
     'refuses tuple declaration keyword %s (row 380)',
     (prefix) => {
+      if (prefix === 'var' || prefix === 'varip') {
+        expect(() => check(`pair() => [1, 2]\n${prefix} [a, b] = pair()\nplot(a + b)`)).toThrow(
+          `""${prefix}"" cannot be used as a variable or function name.`,
+        );
+        return;
+      }
       expect(errors(`pair() => [1, 2]\n${prefix} [a, b] = pair()\nplot(a + b)`)).toEqual(
         expect.arrayContaining([expect.objectContaining({ code: 'invalid-tuple-declaration' })]),
       );
@@ -54,15 +60,13 @@ describe('ledger gaps 10 declaration contracts', () => {
     );
   });
 
-  // Methods specifically permit overriding user-defined methods. UDF required-
-  // signature uniqueness does not establish a method replacement refusal.
-  // This checks declaration admission only; identical invocation choice awaits TV.
-  it('admits method declarations sharing required types without selecting a replacement (row 382)', () => {
+  // Optional-only overloads differ from identical method overrides.
+  it('refuses method declarations distinguished only by optional parameters (row 382)', () => {
     expect(
       errors(
         `method f(int receiver, float x) => x\nmethod f(int receiver, float other, int optional = 1) => other\nplot(1)`,
       ),
-    ).toEqual([]);
+    ).toContainEqual(expect.objectContaining({ code: 'invalid-overload' }));
   });
 
   it('accepts distinct required types, qualifiers, counts and method receivers (row 382)', () => {

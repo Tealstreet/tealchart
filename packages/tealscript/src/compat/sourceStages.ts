@@ -62,6 +62,7 @@ function classifySemanticDiagnostics(diagnostics: CompatibilityDiagnostic[]): Co
 
 function createParseCompatibilityDiagnostics(error: unknown): CompatibilityDiagnostic[] {
   if (error instanceof TealscriptParseError) {
+    if (error.diagnostics) return error.diagnostics.map(diagnostic => ({ ...diagnostic }));
     return [{
       code: 'parse.error',
       message: error.message,

@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -11,12 +12,12 @@ describe('strategy exit false refusals', () => {
   });
 
   it.each([5, 6])('accepts zero profit and loss in v%i', (version) => {
-    expect(checkExit('"X", "E", profit=0', version)).toEqual([]);
-    expect(checkExit('"X", "E", loss=0', version)).toEqual([]);
+    expect(checkExit('"X", "E", profit=0', version)).toEqual(withVersionAdvisory([], version));
+    expect(checkExit('"X", "E", loss=0', version)).toEqual(withVersionAdvisory([], version));
   });
 
   it.each([5, 6])('accepts negative trailing distance in v%i', (version) => {
-    expect(checkExit('"X", "E", trail_points=-5, trail_offset=2', version)).toEqual([]);
+    expect(checkExit('"X", "E", trail_points=-5, trail_offset=2', version)).toEqual(withVersionAdvisory([], version));
   });
 
   it.each(['"X", "E", qty=0, profit=1', '"X", "E", qty=-1, profit=1', 'id="X", from_entry="E", qty=-1, profit=1'])('retains refusal of supplied nonpositive qty: %s', (call) => {

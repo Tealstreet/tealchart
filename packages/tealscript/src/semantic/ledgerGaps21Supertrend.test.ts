@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -17,19 +18,19 @@ describe('ledger gaps 21: Supertrend atrPeriod integer kind (816)', () => {
     ['simple', 'simple float period = 3.0', 'simple int period = 3'],
   ])('rejects %s float while retaining corresponding integer length', (_qualifier, floatDeclaration, intDeclaration) => {
     for (const version of [5, 6]) {
-      expect.soft(diagnostics(`${floatDeclaration}\n[line, direction] = ta.supertrend(factor=2.0, atrPeriod=period)\nplot(line)`, version)).toEqual([
+      expect.soft(diagnostics(`${floatDeclaration}\n[line, direction] = ta.supertrend(factor=2.0, atrPeriod=period)\nplot(line)`, version)).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'type-mismatch', message: expect.stringContaining('ta.supertrend atrPeriod must be an integer') }),
-      ]);
-      expect.soft(diagnostics(`${intDeclaration}\n[line, direction] = ta.supertrend(2.0, period)\nplot(line)`, version)).toEqual([]);
+      ], version));
+      expect.soft(diagnostics(`${intDeclaration}\n[line, direction] = ta.supertrend(2.0, period)\nplot(line)`, version)).toEqual(withVersionAdvisory([], version));
     }
   });
 
   it('rejects series integer atrPeriod while retaining simple integer (815)', () => {
     for (const version of [5, 6]) {
-      expect.soft(diagnostics('[line, direction] = ta.supertrend(2.0, bar_index + 3)\nplot(line)', version)).toEqual([
+      expect.soft(diagnostics('[line, direction] = ta.supertrend(2.0, bar_index + 3)\nplot(line)', version)).toEqual(withVersionAdvisory([
         expect.objectContaining({ code: 'qualifier-mismatch', message: expect.stringContaining('atrPeriod') }),
-      ]);
-      expect.soft(diagnostics('simple int period = 3\n[line, direction] = ta.supertrend(2.0, period)\nplot(line)', version)).toEqual([]);
+      ], version));
+      expect.soft(diagnostics('simple int period = 3\n[line, direction] = ta.supertrend(2.0, period)\nplot(line)', version)).toEqual(withVersionAdvisory([], version));
     }
   });
 });

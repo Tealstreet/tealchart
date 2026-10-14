@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../../tests/helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../parser';
@@ -34,6 +35,6 @@ describe('ledger gaps43 UDT default call prohibition', () => {
           '//@version=5\nindicator("Legacy defaults")\ntype State\n    array<int> values=array.new<int>()\nplot(1)',
         ),
       ).diagnostics,
-    ).toEqual([]);
+    ).toEqual(withVersionAdvisory([], 5));
   });
 });

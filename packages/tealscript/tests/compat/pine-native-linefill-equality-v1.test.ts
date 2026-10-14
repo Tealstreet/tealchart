@@ -28,10 +28,16 @@ it('rejects the captured linefill equality during semantic compilation', () => {
   const errors = checkProgram(parse(source)).diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
   expect(errors).toEqual([
     expect.objectContaining({
-      code: 'invalid-operator-operands',
+      code: native[0].runtime.error.editorError.code,
       line: native[0].runtime.error.editorError.start.line,
       column: native[0].runtime.error.editorError.start.column,
-      message: expect.stringMatching(/Operator ==.*linefill/),
+      message: 'Cannot call "operator ==" with argument "expr0"="call "array.get" (series linefill)". An argument of "series linefill" type was used but a "simple string"  is expected.',
+    }),
+    expect.objectContaining({
+      code: 'CE10123',
+      line: 78,
+      column: 94,
+      message: 'Cannot call "operator ==" with argument "expr1"="other". An argument of "series linefill" type was used but a "simple string"  is expected.',
     }),
   ]);
 });

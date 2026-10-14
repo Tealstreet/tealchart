@@ -30,7 +30,7 @@ describe('v6 TA-D valuewhen documented argument contracts', () => {
   it('retains an ordinary receiver method with the same name', () => {
     expect(
       errors(
-        'type Local\n    float value\nmethod valuewhen(Local this, string source) => source\nlocal = Local.new(1)\nx = local.valuewhen("text")',
+        'type Local\n    float value\nmethod valuewhen(Local this, string source) =>\n    this.value := this.value\n    source\nlocal = Local.new(1)\nx = local.valuewhen("text")',
       ),
     ).toEqual([]);
   });

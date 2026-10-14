@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
@@ -30,7 +31,7 @@ offset = ${name}(${binding})
               kind: length.kind, qualifier: length.qualifier,
             });
             if (length.kind === 'int') {
-              expect(result.diagnostics).toEqual([]);
+              expect(result.diagnostics).toEqual(withVersionAdvisory([], version));
               expect(result.symbols.find((symbol) => symbol.name === 'offset')?.type).toMatchObject({
                 kind: 'int', qualifier: 'series',
               });

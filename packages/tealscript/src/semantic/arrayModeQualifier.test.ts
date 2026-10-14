@@ -42,7 +42,9 @@ describe('array mode result qualifiers', () => {
         });
       }
 
-      const method = `method mode(array<${kind}> self) => "custom"`;
+      const method = `method mode(array<${kind}> self) =>
+    na(self)
+    "custom"`;
       it(`v${version} ${kind} preserves the selected custom method's string result`, () => {
         const checked = check(`${method}\n${setup}\nconst string result = values.mode()`, version);
         expect(checked.errors).toEqual([]);

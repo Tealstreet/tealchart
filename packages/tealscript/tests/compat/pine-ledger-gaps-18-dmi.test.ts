@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/parser';
 import { checkProgram } from '../../src/semantic/checker';
@@ -18,7 +19,7 @@ describe('ledger18 DMI adxSmoothing documented simple int', () => {
   it('retains legacy dmi namespace rename', () => {
     for (const version of [3, 4, 5, 6]) {
       const call = version < 5 ? 'dmi(3,3)' : 'ta.dmi(3,3)';
-      expect(checkProgram(parse(`//@version=${version}\n${version < 5 ? 'study' : 'indicator'}("DMI renamed")\n[p,m,a] = ${call}\nplot(a)`)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(`//@version=${version}\n${version < 5 ? 'study' : 'indicator'}("DMI renamed")\n[p,m,a] = ${call}\nplot(a)`)).diagnostics).toEqual(withVersionAdvisory([], version));
     }
   });
 });

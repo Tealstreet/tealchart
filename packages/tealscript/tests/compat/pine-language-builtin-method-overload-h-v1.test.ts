@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -24,7 +25,7 @@ plot(checksum(custom), "Custom")
 plot(checksum(named), "Named")
 plot(source.copy().fill(13.0, -4.0, 1.0, 9.0).get(1), "Chained")
 plot(checksum(source), "Original")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Custom').values).toEqual([-2574, -2574, -2574, -2574]);
@@ -41,7 +42,7 @@ fallback = source.copy()
 fallback.fill(5.0)
 plot(checksum(fallback), "Builtin")
 plot(checksum(source), "Original")`;
-      expect(checkProgram(parse(source)).diagnostics).toEqual([]);
+      expect(checkProgram(parse(source)).diagnostics).toEqual(withVersionAdvisory([], version));
       const result = runCompatScript(source, { bars: compatibilityBars.slice(0, 4) });
       expect(result.errors).toEqual([]);
       expect(getPlot(result, 'Builtin').values).toEqual([5555, 5555, 5555, 5555]);

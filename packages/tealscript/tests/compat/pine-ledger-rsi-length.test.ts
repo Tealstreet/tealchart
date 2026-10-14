@@ -1,3 +1,4 @@
+import { withVersionAdvisory } from '../helpers/expectedVersionAdvisory';
 import { describe, expect, it } from 'vitest';
 
 import { parse } from '../../src/parser';
@@ -13,7 +14,7 @@ describe('RSI length kind and qualifier', () => {
   });
 
   it('retains the legacy v4 float overload eligibility', () => {
-    expect(checkProgram(parse('//@version=4\nstudy("Legacy RSI")\nx = rsi(close, 3.0)')).diagnostics).toEqual([]);
+    expect(checkProgram(parse('//@version=4\nstudy("Legacy RSI")\nx = rsi(close, 3.0)')).diagnostics).toEqual(withVersionAdvisory([], 4));
   });
 
   it.each([5, 6])('accepts integer lengths and rejects series length in Pine v%s (row445)', (version) => {
@@ -23,7 +24,7 @@ simple int n = 3
 x = ta.rsi(close, n)
 y = ta.rsi(source=close, length=input.int(3))
 z = ta.rsi(close, 3)`));
-    expect(accepted.diagnostics).toEqual([]);
+    expect(accepted.diagnostics).toEqual(withVersionAdvisory([], version));
     const rejected = checkProgram(parse(`//@version=${version}\nindicator("RSI qualifier")\nx = ta.rsi(close, bar_index + 1)`));
     expect(rejected.diagnostics.some((d) => d.code === 'qualifier-mismatch' && d.message.includes("simple parameter 'length'") && d.message.includes('ta.rsi'))).toBe(true);
   });
