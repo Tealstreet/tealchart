@@ -1,7 +1,6 @@
 // ============================================================================
 // Simple Chart Wrapper (optional convenience class)
 // ============================================================================
-import type { CanvasContext } from './rendering';
 import type { Bar, ChartMargins, RenderOptions, ResolutionString, Viewport } from './types';
 
 import { WebCanvasContext } from './rendering';
@@ -9,6 +8,7 @@ import { getChartStore } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
 import { ChartTopBar } from './ui/ChartTopBar';
+import { readDevicePixelRatio, watchDevicePixelRatio } from './ui/devicePixelRatio';
 import { IndicatorsModal } from './ui/IndicatorsModal';
 import { dedupeBarsByTime } from './utils/dedupeBars';
 
@@ -195,8 +195,12 @@ export class SimpleChart {
 
   private _rootEl: HTMLElement;
   private _canvasEl: HTMLCanvasElement;
-  private _ctx: CanvasContext;
+  private _ctx: WebCanvasContext;
   private _renderer: TealchartRenderer;
+  private _ownerWindow: Window;
+  private _stopWatchingDevicePixelRatio: (() => void) | null = null;
+  private _pixelRatio = 0;
+  private _disposed = false;
 
   private _topBar: ChartTopBar | null = null;
   private _indicatorsModal: IndicatorsModal | null = null;
@@ -214,7 +218,7 @@ export class SimpleChart {
     this._interval = (options.interval || '1h') as ResolutionString;
     this._chartKey = options.chartKey || `chart_${Date.now()}`;
     this._margins = { ...DEFAULT_MARGINS, ...options.margins };
-    this._renderOptions = { ...DEFAULT_RENDER_OPTIONS, ...options.renderOptions };
+    this._renderOptions = { ...DEFAULT_RENDER_OPTIONS, ...options.renderOptions, devicePixelRatio: 1 };
 
     // Initialize store
     const store = getChartStore(this._chartKey);
@@ -271,6 +275,7 @@ export class SimpleChart {
 
     this._rootEl.appendChild(chartArea);
     this._container.appendChild(this._rootEl);
+    this._ownerWindow = this._canvasEl.ownerDocument.defaultView ?? window;
 
     // Get context and wrap in abstraction layer
     const nativeCtx = this._canvasEl.getContext('2d')!;
@@ -289,23 +294,29 @@ export class SimpleChart {
 
     // Handle resize
     this._handleResize();
-    window.addEventListener('resize', () => this._handleResize());
+    this._ownerWindow.addEventListener('resize', this._handleResize);
+    this._stopWatchingDevicePixelRatio = watchDevicePixelRatio(this._ownerWindow, this._handleResize);
   }
 
-  private _handleResize(): void {
+  private _handleResize = (): void => {
+    if (this._disposed) return;
     const rect = this._canvasEl.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = readDevicePixelRatio(this._ownerWindow);
+    const width = Math.floor(rect.width * dpr);
+    const height = Math.floor(rect.height * dpr);
+    if (width === this._canvasEl.width && height === this._canvasEl.height && dpr === this._pixelRatio) return;
 
-    this._canvasEl.width = rect.width * dpr;
-    this._canvasEl.height = rect.height * dpr;
-    this._ctx.scale(dpr, dpr);
+    this._canvasEl.width = width;
+    this._canvasEl.height = height;
+    this._ctx.getNativeContext().setTransform(dpr, 0, 0, dpr, 0, 0);
+    this._pixelRatio = dpr;
 
     this._requestRender();
-  }
+  };
 
   private _requestRender(): void {
-    if (this._rafId !== null) return;
-    this._rafId = requestAnimationFrame(() => {
+    if (this._disposed || this._rafId !== null) return;
+    this._rafId = this._ownerWindow.requestAnimationFrame(() => {
       this._rafId = null;
       this._render();
     });
@@ -428,15 +439,20 @@ export class SimpleChart {
    * Dispose and clean up
    */
   dispose(): void {
+    if (this._disposed) return;
+    this._disposed = true;
+    this._ownerWindow.removeEventListener('resize', this._handleResize);
+    this._stopWatchingDevicePixelRatio?.();
+    this._stopWatchingDevicePixelRatio = null;
+
     if (this._rafId !== null) {
-      cancelAnimationFrame(this._rafId);
+      this._ownerWindow.cancelAnimationFrame(this._rafId);
+      this._rafId = null;
     }
 
     this._topBar?.unmount();
     this._indicatorsModal?.unmount();
     this._rootEl.remove();
-
-    window.removeEventListener('resize', () => this._handleResize());
   }
 }
 

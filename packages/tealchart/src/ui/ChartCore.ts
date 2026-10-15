@@ -95,6 +95,7 @@ import { tradingLineToBracketLines } from '../utils/tradeLineBrackets';
 import { orderLineToPriceLine, positionLineToPriceLine } from '../utils/tradingPriceLines';
 import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
+import { readDevicePixelRatio, watchDevicePixelRatio } from './devicePixelRatio';
 import { button, div, icons } from './dom';
 import { mountWebFloatingElement, positionFixedFloatingElement, resolveFixedFloatingPosition } from './FloatingLayer';
 import { showWebOverlayError, type WebOverlayEnvironment, type WebOverlayHost, type WebOverlayHostFactory } from './OverlayHost';
@@ -364,6 +365,7 @@ export class ChartCore {
   private eventManager: EventManager;
   private priceLineManager: PriceLineManager | null = null;
   private stage: Konva.Stage | null = null;
+  private stopWatchingDevicePixelRatio?: () => void;
 
   // Data refs
   private bars: Bar[] = [];
@@ -504,7 +506,7 @@ export class ChartCore {
     this.chartContainer.appendChild(this.crosshairCanvas);
 
     // Set initial canvas sizes
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = readDevicePixelRatio(this.canvas.ownerDocument.defaultView ?? window);
     this.canvas.width = options.width * dpr;
     this.canvas.height = options.height * dpr;
     this.canvas.style.width = `${options.width}px`;
@@ -773,6 +775,13 @@ export class ChartCore {
 
     // Set cursor style
     this.chartContainer.style.cursor = this.cursor;
+
+    this.stopWatchingDevicePixelRatio = watchDevicePixelRatio(this.canvas.ownerDocument.defaultView ?? window, (ratio) => {
+      this.resizeCanvasBackings(ratio);
+      this.refreshScenePixelRatio(ratio);
+      this.paint(DIRTY.REPAINT);
+      this.stage?.getLayers().forEach((layer) => layer.batchDraw());
+    });
   }
 
   private getChartLabelMinX(): number {
@@ -1049,7 +1058,26 @@ export class ChartCore {
     stageContainer.style.cursor = this.cursor;
 
     const layer = new Konva.Layer();
+    layer.getCanvas().setPixelRatio(readDevicePixelRatio(this.canvas.ownerDocument.defaultView ?? window));
     this.stage.add(layer);
+  }
+
+  private resizeCanvasBackings(ratio: number): void {
+    for (const canvas of [this.canvas, this.crosshairCanvas]) {
+      if (!canvas) continue;
+      canvas.width = this.options.width * ratio;
+      canvas.height = this.options.height * ratio;
+      canvas.style.width = `${this.options.width}px`;
+      canvas.style.height = `${this.options.height}px`;
+      canvas.getContext('2d')?.scale(ratio, ratio);
+    }
+  }
+
+  private refreshScenePixelRatio(ratio: number): void {
+    this.stage?.getLayers().forEach((layer) => {
+      const scene = layer.getCanvas();
+      if (scene.getPixelRatio() !== ratio) scene.setPixelRatio(ratio);
+    });
   }
 
   private isOverKonvaInteractiveElement(x: number, y: number): boolean {
@@ -1143,30 +1171,8 @@ export class ChartCore {
     this.chartContainer.style.width = `${width}px`;
     this.chartContainer.style.height = `${height}px`;
 
-    // Resize main canvas
-    const dpr = window.devicePixelRatio || 1;
-    this.canvas.width = width * dpr;
-    this.canvas.height = height * dpr;
-    this.canvas.style.width = `${width}px`;
-    this.canvas.style.height = `${height}px`;
-
-    // Reset context scale
-    const ctx = this.canvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(dpr, dpr);
-    }
-
-    // Resize crosshair overlay canvas
-    if (this.crosshairCanvas) {
-      this.crosshairCanvas.width = width * dpr;
-      this.crosshairCanvas.height = height * dpr;
-      this.crosshairCanvas.style.width = `${width}px`;
-      this.crosshairCanvas.style.height = `${height}px`;
-      const crosshairCtx = this.crosshairCanvas.getContext('2d');
-      if (crosshairCtx) {
-        crosshairCtx.scale(dpr, dpr);
-      }
-    }
+    const ratio = readDevicePixelRatio(this.canvas.ownerDocument.defaultView ?? window);
+    this.resizeCanvasBackings(ratio);
 
     // Update renderer options
     this.renderer.setOptions({
@@ -1178,6 +1184,7 @@ export class ChartCore {
       this.stage.width(width);
       this.stage.height(height);
     }
+    this.refreshScenePixelRatio(ratio);
     this.priceLineManager?.setDimensions(width, height, this.margins);
 
     // Update reset button position
@@ -1266,6 +1273,8 @@ export class ChartCore {
    * Dispose and clean up
    */
   dispose(preserveDom = false): void {
+    this.stopWatchingDevicePixelRatio?.();
+    this.stopWatchingDevicePixelRatio = undefined;
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
     }

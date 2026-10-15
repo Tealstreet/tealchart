@@ -1546,6 +1546,16 @@ and is deliberately OUTSIDE `FULL`: `ChartCore.paint` gates on
 lines. The TradingView path supplies the same field from the patched bundle; see
 `apps/web/src/components/chart/CLAUDE.md`.
 
+**Web display scaling.** `ChartCore` watches its canvas owner window's device
+pixel ratio. DPR-only changes rebuild canvas backing stores and the Konva scene
+ratio, then repaint without resizing the
+viewport or rebuilding trading nodes. Host contexts apply DPR once; renderer
+ratio and Konva hit canvases remain at 1. Dispose also retires the watcher when
+old DOM is preserved during widget replacement.
+`SimpleChart` uses the same owner-window watcher and pins renderer DPR to 1;
+its frame scheduling and cancellation use that window too. It removes both
+display-scale and CSS-resize subscriptions before disposal.
+
 External hosts and ChartCore share `rendering/jailbreakTooltips.ts` for the
 original grouped hover/left tooltip placement and styling. Tooltip bar callbacks
 consume seconds, as do existing jailbreak drawing factories; internal renderer
