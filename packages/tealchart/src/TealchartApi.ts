@@ -1309,6 +1309,11 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      setPartialPercents(percents: number[]) {
+        data.partialPercents = percents;
+        notifyChange();
+        return this;
+      },
       setPnlCalculator(calculator: BracketPnlCalculator) {
         _pnlCalculator = calculator;
         return this;
@@ -1762,6 +1767,11 @@ export class TealchartApi {
       },
       setPartialEnabled(enabled: boolean) {
         data.partialEnabled = enabled;
+        notifyChange();
+        return this;
+      },
+      setPartialPercents(percents: number[]) {
+        data.partialPercents = percents;
         notifyChange();
         return this;
       },

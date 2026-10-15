@@ -13,9 +13,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_TRADE_LINE_COLOR,
   DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
   DEFAULT_TRADE_LINE_LABEL_FONT,
-  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   DEFAULT_TRADE_LINE_SELL_COLOR,
 } from './constants';
@@ -229,6 +229,7 @@ const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
   'setQuantityShort',
   'setBrackets',
   'setPartialEnabled',
+  'setPartialPercents',
   'onTPClick',
   'onTPMove',
   'onTPMoveEnd',
@@ -249,6 +250,7 @@ const TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS = [
   'setPositionData',
   'setBrackets',
   'setPartialEnabled',
+  'setPartialPercents',
   'onTPClick',
   'onTPMove',
   'onTPMoveEnd',
@@ -517,7 +519,8 @@ describe('imperative chart API contract', () => {
     // commit it arrives — keyed on the PROP, in a layout effect. Routing it
     // through core state puts the api two commits behind, and a host rebuilding
     // per-market state in that window binds to the market just left.
-    const layoutEffect = source.match(/useLayoutEffect\(\(\) => \{[\s\S]*?propSymbol[\s\S]*?\}, \[chartApi, propSymbol\]\);/)?.[0] ?? '';
+    const layoutEffect =
+      source.match(/useLayoutEffect\(\(\) => \{[\s\S]*?propSymbol[\s\S]*?\}, \[chartApi, propSymbol\]\);/)?.[0] ?? '';
 
     expect(layoutEffect).toContain('chartApi.setSymbol(propSymbol)');
   });
@@ -640,7 +643,9 @@ describe('imperative chart API contract', () => {
     expect(runtimeSource).toContain('applyNativeOrderActionState,');
     expect(runtimeSource).toContain('applyNativePositionActionState,');
     expect(layerSource).toContain('{tradeLineGeometries.map((geometry) => {');
-    expect(layerSource).toContain('lineSnapshot.orderLines.find((candidate) => getOrderObjectId(candidate) === geometry.objectId)');
+    expect(layerSource).toContain(
+      'lineSnapshot.orderLines.find((candidate) => getOrderObjectId(candidate) === geometry.objectId)',
+    );
     expect(layerSource).toContain(
       'lineSnapshot.positionLines.find((candidate) => getPositionObjectId(candidate) === geometry.objectId)',
     );
@@ -658,6 +663,7 @@ describe('imperative chart API contract', () => {
       'setQuantityShort',
       'setCancelAsSubmit',
       'setPartialEnabled',
+      'setPartialPercents',
       'setCancelTooltip',
       'setModifyTooltip',
       'setCloseTooltip',

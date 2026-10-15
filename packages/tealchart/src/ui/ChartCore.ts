@@ -2270,6 +2270,7 @@ export class ChartCore {
           b.orderId = line.orderId;
           b.positionId = line.positionId;
           b.partialEnabled = line.partialEnabled;
+          b.partialPercents = line.partialPercents;
           b.positionData = line.positionData;
           b.brackets = line.brackets;
           b.callbacks = line.callbacks;
@@ -2628,6 +2629,7 @@ export class ChartCore {
         entryPrice: position.positionData.entryPrice,
         partialPercent,
         partialEnabled: position.partialEnabled ?? false,
+        partialPercents: position.partialPercents,
         dragStartX,
         dragCurrentX,
         positionData: position.positionData,
@@ -2650,6 +2652,7 @@ export class ChartCore {
         entryPrice: order.price,
         partialPercent,
         partialEnabled: order.partialEnabled ?? false,
+        partialPercents: order.partialPercents,
         dragStartX,
         dragCurrentX,
         positionData: { entryPrice: order.price, isLong: true, notional: 0 },

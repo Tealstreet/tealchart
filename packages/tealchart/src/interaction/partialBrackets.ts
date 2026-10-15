@@ -4,18 +4,51 @@
  * These thresholds mirror TradingView's bracket magnet behavior: dragging the
  * TP/SL handle farther horizontally reduces the bracket size.
  */
-export function calculatePartialBracketPercentFromDelta(deltaX: number): number {
+export const DEFAULT_PARTIAL_BRACKET_PERCENTS = [100, 75, 50, 25, 10] as const;
+
+export function normalizePartialBracketPercents(percents?: readonly number[] | null): number[] {
   'worklet';
-  const absoluteDeltaX = Math.abs(deltaX);
-  if (absoluteDeltaX <= 27) return 100;
-  if (absoluteDeltaX <= 82) return 75;
-  if (absoluteDeltaX <= 137) return 50;
-  if (absoluteDeltaX <= 192) return 25;
-  return 10;
+  if (!percents || percents.length !== DEFAULT_PARTIAL_BRACKET_PERCENTS.length) {
+    return [...DEFAULT_PARTIAL_BRACKET_PERCENTS];
+  }
+
+  const normalized: number[] = [];
+  for (let index = 0; index < percents.length; index += 1) {
+    const percent = Math.round(percents[index]);
+    if (!Number.isFinite(percent)) return [...DEFAULT_PARTIAL_BRACKET_PERCENTS];
+    normalized.push(Math.min(100, Math.max(1, percent)));
+  }
+
+  return normalized.sort((a, b) => b - a);
 }
 
-export function calculatePartialBracketPercent(startX: number, currentX: number): number {
-  return calculatePartialBracketPercentFromDelta(currentX - startX);
+/**
+ * The physical band index (0 = center/100%, 4 = outermost/smallest %) selected
+ * by a horizontal drag of `deltaX` pixels. Shared with the renderer so that
+ * highlighting a label never has to look the active percent up by value — a
+ * lookup that silently picks the wrong band when the user configures duplicate
+ * percentages (e.g. `[100, 25, 25, 25, 10]`).
+ */
+export function calculatePartialBracketIndexFromDelta(deltaX: number, bandCount: number): number {
+  'worklet';
+  const absoluteDeltaX = Math.abs(deltaX);
+  const total = Math.max(1, bandCount);
+  return Math.min(total - 1, Math.max(0, Math.floor((absoluteDeltaX + 27) / 55)));
+}
+
+export function calculatePartialBracketPercentFromDelta(deltaX: number, percents?: readonly number[] | null): number {
+  'worklet';
+  const normalizedPercents = normalizePartialBracketPercents(percents);
+  const index = calculatePartialBracketIndexFromDelta(deltaX, normalizedPercents.length);
+  return normalizedPercents[index];
+}
+
+export function calculatePartialBracketPercent(
+  startX: number,
+  currentX: number,
+  percents?: readonly number[] | null,
+): number {
+  return calculatePartialBracketPercentFromDelta(currentX - startX, percents);
 }
 
 export const PARTIAL_BRACKET_MARKER_INTERVAL = 55;
@@ -23,7 +56,7 @@ export const PARTIAL_BRACKET_ZONE_HALF_WIDTH = 220;
 
 /** Ordered outward from the drag origin; the offsets are the band midpoints
  *  `calculatePartialBracketPercentFromDelta` splits on. */
-export const PARTIAL_BRACKET_PERCENTS = [100, 75, 50, 25, 10];
+export const PARTIAL_BRACKET_PERCENTS = [...DEFAULT_PARTIAL_BRACKET_PERCENTS];
 
 /** Enough to read as present without competing with the active marker. */
 export const PARTIAL_BRACKET_DIMMED_OPACITY = 0.35;
@@ -65,6 +98,7 @@ export function resolvePartialBracketMarkers({
   characterWidth,
   paddingX,
   minGap,
+  partialPercents,
 }: {
   dragStartX: number;
   currentX: number;
@@ -73,25 +107,29 @@ export function resolvePartialBracketMarkers({
   characterWidth: number;
   paddingX: number;
   minGap: number;
+  partialPercents?: readonly number[] | null;
 }): PartialBracketMarker[] {
   'worklet';
   const deltaX = currentX - dragStartX;
-  // The percent itself stays direction-agnostic - it is derived from |deltaX| by
+  const percents = normalizePartialBracketPercents(partialPercents);
+  // The band itself stays direction-agnostic - it is derived from |deltaX| by
   // the same function the drag commit uses. Only which arm gets DRAWN depends on
-  // the sign, so a one-sided ladder cannot make dragging one-way.
-  const activePercent = calculatePartialBracketPercentFromDelta(deltaX);
+  // the sign, so a one-sided ladder cannot make dragging one-way. We key the
+  // active marker by band index instead of percent so a user-configured
+  // duplicate (e.g. `[100, 25, 25, 25, 10]`) still highlights exactly one slot.
+  const activeIndex = calculatePartialBracketIndexFromDelta(deltaX, percents.length);
   const direction = deltaX < 0 ? -1 : 1;
 
   const markers: PartialBracketMarker[] = [];
-  for (let index = 0; index < PARTIAL_BRACKET_PERCENTS.length; index += 1) {
-    const percent = PARTIAL_BRACKET_PERCENTS[index];
+  for (let index = 0; index < percents.length; index += 1) {
+    const percent = percents[index];
     const text = `${percent}%`;
     markers.push({
       percent,
       text,
       centerX: dragStartX + direction * index * PARTIAL_BRACKET_MARKER_INTERVAL,
       width: Math.ceil(text.length * characterWidth) + paddingX * 2,
-      isActive: percent === activePercent,
+      isActive: index === activeIndex,
       opacity: 1,
     });
   }

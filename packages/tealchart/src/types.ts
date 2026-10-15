@@ -3,7 +3,6 @@
  * Designed to be compatible with existing TradingView datafeed infrastructure
  */
 
-import type { ReactNode } from 'react';
 import type {
   FromWorkerMessage,
   Program,
@@ -13,6 +12,7 @@ import type {
   ToWorkerMessage,
   WorkerError,
 } from '@tealstreet/tealscript';
+import type { ReactNode } from 'react';
 import type { AnalysisRequestIntent } from './analysis/analysisSelection';
 import type {
   UserDrawingCommandEvent,
@@ -52,11 +52,7 @@ export type TealscriptRequestDataResolver = (
 export type TealscriptExecutionTelemetryStatus = 'ok' | 'empty-output' | 'runtime-error';
 export type TealscriptExecutionTelemetryOutputKind = 'visual' | 'side-effect' | 'empty';
 export type TealscriptExecutionTelemetryFallbackKind =
-  | 'none'
-  | 'request-data'
-  | 'realtime-safety'
-  | 'runtime-error'
-  | 'other';
+  'none' | 'request-data' | 'realtime-safety' | 'runtime-error' | 'other';
 
 export interface TealscriptExecutionTelemetry {
   scriptId: string;
@@ -246,6 +242,8 @@ export interface PriceLine {
   positionId?: string;
   /** Whether partial percentage is enabled for this position */
   partialEnabled?: boolean;
+  /** Five partial TP/SL percentages, stored user-facing and normalized by the renderer. */
+  partialPercents?: number[];
   /** Position data for PnL calculations during drag */
   positionData?: PositionData;
   /** Current bracket configuration (TP/SL prices if already set) */
@@ -397,6 +395,8 @@ export interface PriceLineLabelBounds {
   positionId?: string;
   /** Whether partial percentage is enabled for this position */
   partialEnabled?: boolean;
+  /** Five partial TP/SL percentages, stored user-facing and normalized by the renderer. */
+  partialPercents?: number[];
   /** Position data for PnL calculations during drag */
   positionData?: PositionData;
   /** Current bracket configuration (TP/SL prices if already set) */
@@ -1367,6 +1367,7 @@ export interface OrderLineRenderData {
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  partialPercents?: number[];
   /** Current OEMS action lifecycle state for presentation and input blocking. */
   actionState?: OemsLineActionState;
   /** Adapter callbacks carried through render data for direct invocation */
@@ -1434,6 +1435,7 @@ export interface PositionLineRenderData {
   profitState: ProfitState;
   brackets: BracketConfig | null;
   partialEnabled: boolean;
+  partialPercents?: number[];
   positionData: PositionData | null;
   /** Current OEMS action lifecycle state for presentation and input blocking. */
   actionState?: OemsLineActionState;
@@ -1498,6 +1500,13 @@ export interface TealstreetOrderLineExtensions {
   // Bracket TP/SL controls
   setBrackets(brackets: BracketConfig | null): this;
   setPartialEnabled(enabled: boolean): this;
+  /**
+   * Five-slot custom partial ladder for the TP/SL magnet. Both Tealchart and
+   * the patched TradingView bundles implement this; the call site keeps the
+   * optional-chaining guard so a stale cached bundle on the user's machine
+   * degrades silently instead of throwing.
+   */
+  setPartialPercents(percents: number[]): this;
   setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
   onTPClick(callback: OemsActionCallback): this;
@@ -1525,6 +1534,13 @@ export interface TealstreetPositionLineExtensions {
   // Bracket TP/SL controls
   setBrackets(brackets: BracketConfig | null): this;
   setPartialEnabled(enabled: boolean): this;
+  /**
+   * Five-slot custom partial ladder for the TP/SL magnet. Both Tealchart and
+   * the patched TradingView bundles implement this; the call site keeps the
+   * optional-chaining guard so a stale cached bundle on the user's machine
+   * degrades silently instead of throwing.
+   */
+  setPartialPercents(percents: number[]): this;
   setPnlCalculator(calculator: BracketPnlCalculator): this;
   // Bracket callbacks
   onTPClick(callback: OemsActionCallback): this;

@@ -1506,7 +1506,11 @@ export class PriceLineManager {
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialBracketPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
+              ? calculatePartialBracketPercent(
+                  activeDrag.startCenterX ?? startCenterX,
+                  currentCenterX,
+                  currentBound.partialPercents,
+                )
               : 100;
 
             if (buttonType === 'tp') {
@@ -1553,7 +1557,11 @@ export class PriceLineManager {
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
-              ? calculatePartialBracketPercent(activeDrag.startCenterX ?? startCenterX, currentCenterX)
+              ? calculatePartialBracketPercent(
+                  activeDrag.startCenterX ?? startCenterX,
+                  currentCenterX,
+                  currentBound.partialPercents,
+                )
               : undefined;
 
             hitRect.x(activeDrag.originalX ?? originalX);

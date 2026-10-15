@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  calculatePartialBracketIndexFromDelta,
   calculatePartialBracketPercent,
   calculatePartialBracketPercentFromDelta,
   PARTIAL_BRACKET_DIMMED_OPACITY,
@@ -41,6 +42,22 @@ describe('calculatePartialBracketPercentFromDelta', () => {
   it('reads the same through the start/current wrapper', () => {
     expect(calculatePartialBracketPercent(400, 300)).toBe(calculatePartialBracketPercentFromDelta(-100));
   });
+
+  it('uses custom percentages in drag-distance order', () => {
+    const customPercents = [11, 33, 47, 71, 92];
+    expect(calculatePartialBracketPercentFromDelta(0, customPercents)).toBe(92);
+    expect(calculatePartialBracketPercentFromDelta(100, customPercents)).toBe(47);
+    expect(calculatePartialBracketPercentFromDelta(220, customPercents)).toBe(11);
+  });
+
+  it('still returns a stable active band when custom percentages contain duplicates', () => {
+    const withDuplicates = [100, 25, 25, 25, 10];
+    expect(calculatePartialBracketIndexFromDelta(0, withDuplicates.length)).toBe(0);
+    expect(calculatePartialBracketIndexFromDelta(90, withDuplicates.length)).toBe(2);
+    expect(calculatePartialBracketIndexFromDelta(160, withDuplicates.length)).toBe(3);
+    expect(calculatePartialBracketIndexFromDelta(500, withDuplicates.length)).toBe(4);
+    expect(calculatePartialBracketPercentFromDelta(90, withDuplicates)).toBe(25);
+  });
 });
 
 describe('resolvePartialBracketMarkers', () => {
@@ -51,6 +68,11 @@ describe('resolvePartialBracketMarkers', () => {
       const percents = markersAt(560).map((marker) => marker.percent);
       expect(percents).toEqual([100, 75, 50, 25, 10]);
       expect(new Set(percents).size).toBe(percents.length);
+    });
+
+    it('draws custom percents in descending drag order', () => {
+      const percents = markersAt(560, { partialPercents: [11, 33, 47, 71, 92] } as any).map((marker) => marker.percent);
+      expect(percents).toEqual([92, 71, 47, 33, 11]);
     });
 
     it('lays the ladder out to the right when dragging right', () => {
@@ -72,6 +94,15 @@ describe('resolvePartialBracketMarkers', () => {
       const left = markersAt(400 - 100).find((marker) => marker.isActive);
       expect(right?.percent).toBe(left?.percent);
       expect(right?.percent).toBe(calculatePartialBracketPercentFromDelta(100));
+    });
+
+    // Keying active by percent value would highlight every slot sharing that value.
+    it('highlights exactly one slot even when the ladder has duplicate percents', () => {
+      const markers = markersAt(400 + 100, { partialPercents: [100, 25, 25, 25, 10] } as any);
+      const active = markers.filter((marker) => marker.isActive);
+      expect(active).toHaveLength(1);
+      // 100px delta maps to band index 2 (center at offset 110).
+      expect(active[0].centerX).toBe(400 + PARTIAL_BRACKET_MARKER_INTERVAL * 2);
     });
   });
 

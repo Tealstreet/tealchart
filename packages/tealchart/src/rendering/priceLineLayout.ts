@@ -66,6 +66,7 @@ export function computeProjectedPriceLineLabelBounds(
       orderId: line.orderId,
       positionId: line.positionId,
       partialEnabled: line.partialEnabled,
+      partialPercents: line.partialPercents,
       positionData: line.positionData,
       // Adapter callbacks carried through for direct invocation
       callbacks: line.callbacks,

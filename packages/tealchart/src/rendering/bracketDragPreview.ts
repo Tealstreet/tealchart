@@ -1,8 +1,8 @@
 import type { BracketPnlCalculatorResult, PositionData } from '../types';
 
 import {
+  normalizePartialBracketPercents,
   PARTIAL_BRACKET_MARKER_INTERVAL,
-  PARTIAL_BRACKET_PERCENTS,
   PARTIAL_BRACKET_ZONE_HALF_WIDTH,
   resolvePartialBracketMarkers,
 } from '../interaction/partialBrackets';
@@ -15,6 +15,7 @@ export interface BracketDragPreviewState {
   entryPrice: number;
   partialPercent: number;
   partialEnabled: boolean;
+  partialPercents?: number[];
   dragStartX: number;
   dragCurrentX: number;
   positionData: PositionData;
@@ -40,6 +41,7 @@ export function drawBracketDragPreview(
   const color = state.color;
   const bracketType = state.type === 'tp' ? 'TP' : 'SL';
   const isPartialMode = state.partialEnabled;
+  const partialPercents = normalizePartialBracketPercents(state.partialPercents);
 
   // Convert prices to Y coordinates
   const bracketY = options.priceToY(state.price);
@@ -114,7 +116,7 @@ export function drawBracketDragPreview(
     // Boundary lines sit under their own markers, on the dragged arm only.
     ctx.globalAlpha = 0.3;
     const boundaryDirection = state.dragCurrentX < centerX ? -1 : 1;
-    for (let index = 1; index < PARTIAL_BRACKET_PERCENTS.length; index += 1) {
+    for (let index = 1; index < partialPercents.length; index += 1) {
       const boundaryX = centerX + boundaryDirection * index * PARTIAL_BRACKET_MARKER_INTERVAL;
       ctx.beginPath();
       ctx.moveTo(boundaryX, top);
@@ -148,6 +150,7 @@ export function drawBracketDragPreview(
       characterWidth,
       paddingX: padding,
       minGap: 8,
+      partialPercents,
     });
 
     for (const marker of markers) {
@@ -212,6 +215,7 @@ export function drawBracketDragPreview(
       characterWidth: 0,
       paddingX: 0,
       minGap: 0,
+      partialPercents,
     }).find((marker) => marker.isActive);
     cornerX = activeMarker ? activeMarker.centerX : centerX;
   } else {
