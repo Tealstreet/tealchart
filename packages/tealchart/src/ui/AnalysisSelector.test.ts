@@ -349,20 +349,48 @@ describe('web analysis controls', () => {
     document.body.append(chart);
     const move = vi.fn();
     chart.addEventListener('pointermove', move);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
     pointer(chart, 'pointermove', 120);
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     expect(move).toHaveBeenCalledOnce();
     expect(move.mock.calls[0]![0].defaultPrevented).toBe(false);
     pointer(window, 'pointermove', 1100);
     vi.advanceTimersByTime(749);
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     pointer(chart, 'pointermove', 120);
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     document.dispatchEvent(new MouseEvent('pointerout', { bubbles: true }));
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
+  });
+
+  it('fades the controls in and out, dropping hidden controls from input and the tab order after the fade', () => {
+    const { control, pointer } = fixture({ controlsLeftTransition: 'left 120ms ease' });
+    const toolbar = control('Analyze chart').parentElement!;
+    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.opacity).toBe('0');
+    expect(toolbar.style.pointerEvents).toBe('none');
+    expect(toolbar.style.transition).toBe('left 120ms ease, opacity 160ms ease, visibility 0s linear 160ms');
+    pointer(window, 'pointermove', 120);
+    expect(toolbar.style.opacity).toBe('1');
+    expect(toolbar.style.pointerEvents).toBe('auto');
+    expect(toolbar.style.transition).toBe('left 120ms ease, opacity 160ms ease, visibility 0s linear 0ms');
+  });
+
+  it('swaps visibility with no fade under reduced motion', () => {
+    const matchMedia = vi.fn(() => ({ matches: true }));
+    vi.stubGlobal('matchMedia', matchMedia);
+    try {
+      const { control, pointer } = fixture();
+      const toolbar = control('Analyze chart').parentElement!;
+      pointer(window, 'pointermove', 120);
+      expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)');
+      expect(toolbar.style.opacity).toBe('1');
+      expect(toolbar.style.transition).toBe('');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('keeps keyboard focused controls and active selection actions visible, then hides on blur', () => {
@@ -373,10 +401,10 @@ describe('web analysis controls', () => {
     control('Analyze chart').focus();
     pointer(window, 'pointermove', 1100);
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     window.dispatchEvent(new Event('blur'));
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
     selector!.start();
     const actions = control('Cancel').parentElement!;
     pointer(window, 'pointermove', 1100);
@@ -407,10 +435,10 @@ describe('web analysis controls', () => {
     control('Describe this TA pattern').focus();
     control('Describe this TA pattern').click();
     const toolbar = control('Analyze chart').parentElement!;
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     pointer(window, 'pointermove', 1100);
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
   });
 
   it('starts the leave delay after cancelling a keyboard focused active action', () => {
@@ -422,9 +450,9 @@ describe('web analysis controls', () => {
     selector!.leave('Selection cancelled because the chart lost focus.');
     const toolbar = control('Analyze chart').parentElement!;
     expect(selector!.isActive()).toBe(false);
-    expect(toolbar.style.display).toBe('flex');
+    expect(toolbar.style.visibility).toBe('visible');
     vi.advanceTimersByTime(750);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
   });
 
   it('clears the tool and retained selection on Escape even after focus moves to chat', () => {
@@ -460,13 +488,13 @@ describe('web analysis controls', () => {
     const { control, pointer } = fixture({ acceptsEvent: () => admitted });
     const toolbar = control('Analyze chart').parentElement!;
     pointer(window, 'pointermove', 120);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
     admitted = true;
     pointer(window, 'pointermove', 120);
     pointer(window, 'pointermove', 1100);
     selector!.setHandler(undefined);
     selector!.setHandler(vi.fn());
     expect(vi.getTimerCount()).toBe(0);
-    expect(toolbar.style.display).toBe('none');
+    expect(toolbar.style.visibility).toBe('hidden');
   });
 });

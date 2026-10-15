@@ -7,6 +7,8 @@ import type {
 import { AnalysisSelection, analysisSelectionXAtTime } from '../analysis/analysisSelection';
 import { button, div, icons } from './dom';
 
+const CONTROLS_FADE_MS = 160;
+
 export interface AnalysisSelectorOptions {
   container: HTMLElement;
   getFrame: () => AnalysisSelectionFrame | null;
@@ -249,7 +251,7 @@ export class AnalysisSelector {
     if (!state.active) this.pointerId = undefined;
     const frame = this.selection.getFrame();
     this.root.style.display = this.handler ? 'block' : 'none';
-    this.toolbar.style.display = !state.active && this.controlsVisible ? 'flex' : 'none';
+    this.renderToolbarVisibility(state.active);
     this.actions.style.display = state.active ? 'flex' : 'none';
     const controlsLeft = Math.max((frame?.plot.left ?? 0) + 32, this.options.getControlsLeft?.() ?? 0);
     this.toolbar.style.left = `${controlsLeft}px`;
@@ -301,6 +303,20 @@ export class AnalysisSelector {
         boxSizing: 'border-box',
       });
     }
+  }
+
+  // Fades rather than toggling display; visibility follows the fade out so hidden controls leave the tab order.
+  private renderToolbarVisibility(selecting: boolean): void {
+    const shown = !selecting && this.controlsVisible;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const fade = reducedMotion ? [] : [`opacity ${CONTROLS_FADE_MS}ms ease`, `visibility 0s linear ${shown ? 0 : CONTROLS_FADE_MS}ms`];
+    Object.assign(this.toolbar.style, {
+      display: selecting ? 'none' : 'flex',
+      opacity: shown ? '1' : '0',
+      visibility: shown ? 'visible' : 'hidden',
+      pointerEvents: shown ? 'auto' : 'none',
+      transition: [this.options.controlsLeftTransition, ...fade].filter(Boolean).join(', '),
+    });
   }
 
   private localPoint(event: PointerEvent): { x: number; y: number } {
