@@ -153,6 +153,7 @@ export interface AnalysisContext {
   runtimeSourceExpressions?: { expression: string; owner: string; name: string; line: number; column: number }[];
   recordedExpressionTypes?: WeakMap<Expression | IfStatement, SemanticType>;
   loopResultTypes?: WeakMap<ForStatement | WhileStatement, SemanticType[]>;
+  fillColorQualifiers?: ReturnType<typeof checkProgram>['fillColorQualifiers'];
   pineVersion: number;
   discardedFootprintCalls?: Set<Expression>;
   seriesVars: Set<string>;
@@ -1948,9 +1949,11 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       ? options.semanticTypes : undefined;
     const recordedExpressionTypes = prepared?.recordedExpressionTypes ?? new WeakMap<Expression | IfStatement, SemanticType>();
     const loopResultTypes = prepared?.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
-    const types = (prepared?.result ?? checkProgram(ast, { libraries: options.libraries, expressionTypes: recordedExpressionTypes, loopResultTypes })).expressionTypes;
+    const semantic = prepared?.result ?? checkProgram(ast, { libraries: options.libraries, expressionTypes: recordedExpressionTypes, loopResultTypes });
+    const types = semantic.expressionTypes;
     ctx.recordedExpressionTypes = recordedExpressionTypes;
     ctx.loopResultTypes = loopResultTypes;
+    ctx.fillColorQualifiers = semantic.fillColorQualifiers;
     if (legacyDeclarationDivision && ctx.declarationInfo) ctx.declarationInfo.constantExpressionTypes = types;
     let v6Types: typeof types;
     for (const site of ctx.taCallSites) {

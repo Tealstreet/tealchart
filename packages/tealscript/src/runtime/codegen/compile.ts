@@ -1475,7 +1475,7 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
     }
   }
   if (analysis.plotSites.some((site) => site.funcName === 'fill')) {
-    const qualifiers = checkProgram(ast, { libraries: options.libraries }).fillColorQualifiers;
+    const qualifiers = analysis.fillColorQualifiers ?? checkProgram(ast, { libraries: options.libraries }).fillColorQualifiers;
     for (const site of analysis.plotSites) {
       if (site.funcName !== 'fill') continue;
       const qualifier = qualifiers.get(site.node);
