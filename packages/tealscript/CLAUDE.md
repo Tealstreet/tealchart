@@ -1,3 +1,11 @@
+V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
+zero facet credit. Closed-row regressions cover pointwise presence/getters and
+TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
+objects or zero rows. Four developing window snapshots remain OBSERVED/excluded;
+the actual close is independently confirmed. All retained totals are positive,
+full distribution and unavailable/zero-total states remain held, and the sampled
+window makes no execution-completeness claim or change to historic hold 21.
+
 V91 footprint regression locks cover all six getter repeats at the three October 14
 drift keys and all 27 lowest/POC/highest role records, preserving raw zero strings
 and float residue. Replay supplies only the three observed roles; native row counts
