@@ -4793,3 +4793,8 @@ Native v95 item14 negative half-tick outputs require math.round_to_mintick to
 round magnitudes and restore the sign, retaining nearest-tick compensation guards.
 Only the selected closed suffix is credited; random cells are observed/excluded
 with seed identity held, and raw decimal strings do not expose signed-zero bits.
+
+Native v95 item16 locks only its bounded ASCII literals: occurrence1 replaces the
+second match, split a,,b retains the empty middle field, and no-match pos has a raw
+blank with NA flag1. Preserve its UNDECIDED hypothesis metadata while asserting the
+observed missing result; Unicode-wide and all-overload behavior is not certified.
