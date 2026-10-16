@@ -148,8 +148,8 @@ const contracts = [
   },
   {
     // Native4c37c51a15 / CF016 settles half ties away from zero.
-    // The old interpretation of reference 'ties up' was refuted; mintick
-    // retains its separate tie rule below.
+    // The old interpretation of reference 'ties up' was refuted. Native v95
+    // item14 also settles mintick half-ties away from zero at mintick0.01.
     member: 'math.round',
     entry: 152,
     args: ['2.5', '-2.5', '2.25', '-2.75', 'na'],
@@ -167,8 +167,8 @@ const contracts = [
     member: 'math.round_to_mintick',
     entry: 160,
     args: ['1.125', '-1.125', '1.1', '-1.1', 'na'],
-    expected: [1.25, -1, 1, -1, null],
-    rejects: 'hard-coded decimal precision, ignoring mintick, floor, negative ties away from zero, and na as zero',
+    expected: [1.25, -1.25, 1, -1, null],
+    rejects: 'hard-coded decimal precision, ignoring mintick, floor, negative ties toward positive infinity, and na as zero',
   },
 ];
 

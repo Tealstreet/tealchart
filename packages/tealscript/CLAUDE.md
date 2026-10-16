@@ -4760,3 +4760,8 @@ Native v95 item10 locks only the selected closed suffix: v5 numeric bool NA enco
 -1 while v6 encodes 0; fixnan carries a witnessed previous finite input. Raw cast
 blanks stay missing. Missing-string outputs are exact targets with archive model
 UNDECIDED retained; own-origin Boolean/fixnan startup remains held.
+
+Native v95 item14 negative half-tick outputs require math.round_to_mintick to
+round magnitudes and restore the sign, retaining nearest-tick compensation guards.
+Only the selected closed suffix is credited; random cells are observed/excluded
+with seed identity held, and raw decimal strings do not expose signed-zero bits.
