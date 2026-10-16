@@ -157,8 +157,27 @@ indicator("Chosen styles")
 choice = input.bool(true)
 style = choice ? plot.style_line : plot.style_histogram
 plot(close, style=style)
-plot(close, linestyle=plot.linestyle_dashed)
+${version === 6 ? 'plot(close, linestyle=plot.linestyle_dashed)' : ''}
 hline(10, linestyle=hline.style_dotted)
 `)).diagnostics).toEqual(withVersionAdvisory([], version));
+  });
+
+  it('refuses the v6-only plot linestyle slot while retaining valid v5 style aliases', () => {
+    const diagnostics = checkProgram(parse(`//@version=5
+indicator("Chosen styles")
+choice = input.bool(true)
+style = choice ? plot.style_line : plot.style_histogram
+plot(close, style=style)
+plot(close, linestyle=plot.linestyle_dashed)
+hline(10, linestyle=hline.style_dotted)
+`)).diagnostics;
+    expect(diagnostics).toEqual(withVersionAdvisory([
+      { code: 'plot-linestyle-version', severity: 'error', line: 6, column: 23,
+        message: "Undeclared identifier 'plot'" },
+      { code: 'plot-linestyle-version', severity: 'error', line: 6, column: 23,
+        message: "Undeclared identifier 'plot.linestyle_dashed'" },
+      { code: 'plot-linestyle-version', severity: 'error', line: 6, column: 13,
+        message: "The 'plot' function does not have an argument with the name 'linestyle'" },
+    ], 5));
   });
 });
