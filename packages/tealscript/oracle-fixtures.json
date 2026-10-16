@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "b190ede52a57f1105cc5ff55a06f268d8d05e4df",
+  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10561,6 +10561,431 @@
       "path": "v92/captures/v92/validation-result-v2.json",
       "bytes": 479,
       "sha256": "4bd0e56d2ce5e2bda40dfd6b266fbfd773f3ca5a892422a9bdf9f3fa75deef64"
+    },
+    {
+      "path": "v93/REQUEST-v93-v1.md",
+      "bytes": 34933,
+      "sha256": "134b4e8a6a813cd393777b5d9e52ee80da4803eca3f890ed4351f9f18771121c"
+    },
+    {
+      "path": "v93/captures/v93/RESPONSE-v93-v1.md",
+      "bytes": 5167,
+      "sha256": "b8f9c80f10c351fa2c23f55c1534a2a1c4b4a5a03ea04cb1ba4125fa02ac82c3"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v1.json",
+      "bytes": 97024,
+      "sha256": "994cbb7e155251bda212513484d4a0392b267fdab65b3905e2838d132d02bb2b"
+    },
+    {
+      "path": "v93/captures/v93/attempt-inventory-v1.json",
+      "bytes": 553064,
+      "sha256": "5d47ad341a1987adb7f245fc7a679b0adfa965c142d56a73673337115b8c67ef"
+    },
+    {
+      "path": "v93/captures/v93/facet-capabilities-v1.json",
+      "bytes": 25113,
+      "sha256": "22ea90d99706ed865a66f579e75b641c84a221474b35aa357eaa318fbd11c1df"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v1.json",
+      "bytes": 516720,
+      "sha256": "74ff415c3d4e9420fe878466db7f98e87ebe21bdfbda994eeeaafe2eafcbd5d7"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/add-response-v1.json",
+      "bytes": 9645,
+      "sha256": "56b8308ac4dd66cc08c6e4512afb4cb579eabbf65039b25aab062d7bf42f484a"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2452,
+      "sha256": "7eb9502ec7a35f853b0124a01a9ae1f3f3f95adac09aa109db68ea3b0c1118a2"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1182,
+      "sha256": "a2709a8288ecf97944ab6d47b59cbe93ceed1f81b7c54f05e36158b156ed451c"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/observation-v1.json",
+      "bytes": 1917,
+      "sha256": "6d45625fb5ee0de1707f32b02ba5723766220dd90e14656fa0ccbad6159e6ef6"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/save-response-v1.json",
+      "bytes": 9645,
+      "sha256": "867d15b4d130ff6d2ea29a532b07b2eb08739040e7858223b0689c85c7eb677c"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29350,
+      "sha256": "8a4c467dea87537f9fa14cfbb84b55a106c39c5e64b57a0279f94e0e8eb433f0"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5867,
+      "sha256": "983cc529a8e0a24dc7e9d38be12d6e6c354fc14bd6f63a083ce31e8c79f3a2b3"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4746,
+      "sha256": "2691ee4d79a72a889ad94c76e1b38e299b1a138e8085c6f37b3481314bdf9b94"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 131625,
+      "sha256": "85d2f3b4cea6ee661c2486ca64b7fa4dfa7a23eec2f7abdf4a19ccbc085a84da"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 47898,
+      "sha256": "84e0cb93fb0337983af6cefe12a11f11d263a1ac35059a747a6e2d74fac18b46"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31200,
+      "sha256": "18e203eac5c961280a8928461cbcf022cad6df255d51253a10b5c2f0d350a4a5"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 764,
+      "sha256": "195840fbf3dc22783cbf77e8e21b4ba754ea36a804f1e687f6fba113f0166235"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/add-response-v1.json",
+      "bytes": 9714,
+      "sha256": "4a29baf5a87e05bfe0331231eeed79fa4f00a500bea08292622928e38ef2536c"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2452,
+      "sha256": "0eee57169fd49b76ff747a8eeb73245978aab77e6c1d9f446d9a05d66defc480"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1182,
+      "sha256": "651157f6e4107625c99e7912dfd2035a6e852f0917dd35be3ff867d9426a7624"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/observation-v1.json",
+      "bytes": 1917,
+      "sha256": "c76fd8f06205cf9c86d0b24a58ee85414a113ff1bb563b3b17b6ef2f5ae86330"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/save-response-v1.json",
+      "bytes": 9714,
+      "sha256": "ad9fc9d60884e5e99fd6a725e2cefb7de05373ecffbfe711585a3741c4c780ba"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29535,
+      "sha256": "c4a77165b663c7937cad559f5956b730d956149944be1d6eee88fc379c79dc24"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5867,
+      "sha256": "6c807fef44061a79a424280c48dfa6086a26b998cce9a16c9967cdeb6ab9fbce"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4746,
+      "sha256": "aee7b4d7db48c33eee07e09a8e56fe7e5644b507d7e919f99a5a1aa44d956771"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 128219,
+      "sha256": "4c21ec1b8916047899e87c46361f6b54370984b8631bfbc0db3dafc63c61e7e7"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48204,
+      "sha256": "24bf24d6553691626a3d154f9d0e2dc64b6981ccf40717bdbbd5b457ce90fc3e"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31393,
+      "sha256": "073b02e68faf4a1399a113afb1000ea269cc64a21f99316e3b54aaa05eb4f454"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-objects-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 764,
+      "sha256": "4823447fd48656c3f1dda6726fcb130efb75eae3adeef628d0b4128b13e59cce"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/add-response-v1.json",
+      "bytes": 5555,
+      "sha256": "37ef9a3969262d4e96b093ba348f312e3f14bd856e69bbe47cf3c00a2f41af08"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2452,
+      "sha256": "05a0c4c1f29299d0934c062576800796b41dbdbbd02cfb8238eb815b01197f44"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/executed-v1.pine",
+      "bytes": 566,
+      "sha256": "bbb2d94b1de5d10241501b9c243bb58cecfd682deba970116a12a796a61557e1"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/observation-v1.json",
+      "bytes": 1916,
+      "sha256": "1542fa49d84bd895905ee000c99e05e9a648a46c64826b70e66002b9996cc72c"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/save-response-v1.json",
+      "bytes": 5555,
+      "sha256": "82dde98467505a6f0d603eb1d5b0bc90402351085608b8a0ff61709fc2e00f74"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 24177,
+      "sha256": "678c46426c2b4bb44cec09783d4ec4c580d755d72d78b48b6de7a290eeab3087"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5204,
+      "sha256": "0570095cbb18b590e293c97e522430db835173551ad4dfe3a055866d8dc8fa26"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4153,
+      "sha256": "b6171d60b19061c1f67399a46a9e630387dd21caf262b6aa5d797c72602a13cf"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 147779,
+      "sha256": "4fbc35d2dfb8b12ef55e89cb7705c58f6d0249e44da702ad53d8cbd80880188e"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 47592,
+      "sha256": "d152a5a7929dee000faee20dd7ff9ad98f3ce3364ae3dbd1972eff8021d60c7f"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30953,
+      "sha256": "64ed5062f01c09ed1dc8dd97e1f92fe32333864b812cde4044d612dff12aad28"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 764,
+      "sha256": "d4ec411a8644538829bd5110a0534a5e796ea397a447640b27d28efea2d3c58d"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/add-response-v1.json",
+      "bytes": 5525,
+      "sha256": "167c8dd39862d6e4f9acd38df001110aae65ccadff3a3e4224992eaa1c0ae8f7"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2452,
+      "sha256": "711b024f9b5af616139c05119e5eb77f9bfe21faf6518aafbc2dc7c1ce68dbef"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/executed-v1.pine",
+      "bytes": 566,
+      "sha256": "6e144d69bc0f0b1c7f06338050969132f898b25a374085d39290f5df4516e578"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/observation-v1.json",
+      "bytes": 1916,
+      "sha256": "a3e3a017479900619d1709ae03d0a601f33c2852110080950136b57456de520d"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/save-response-v1.json",
+      "bytes": 5525,
+      "sha256": "04f88fa8083d4862a25d83a7b2233a7958d8853bd771aba3caac6037cdc29e09"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 24174,
+      "sha256": "c38c35b34f40e24159132dc2418bf508cdde456385ce253d6a1f61688c58bf51"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5204,
+      "sha256": "8f869e23576e29d683642a07e5f19d23b0577f6c596fd92b904af24f03ce243d"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4153,
+      "sha256": "c29e4e56186f5787735dd84d0dcc12effcaeeb35a41a8864d9b160b5f3a1f500"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 146956,
+      "sha256": "f9ac5be6a394d44a27ca86bc2982613c2eba87ebfb0698a18202ea3a2e518680"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 47592,
+      "sha256": "1000d65885714b0e3d599dba3b404a8de49a9f431895c31674d54acd5cdc4a5b"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30950,
+      "sha256": "c084c056bea3dc025ff3c5d93077ce572349bde3875d4af014760e567360e0fb"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-plot-bg-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 764,
+      "sha256": "5ddd98330f6ab7d9c1ed15c8ff2c1555d64f12eb432786604d7817f9cc84a3f1"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/add-response-v1.json",
+      "bytes": 11244,
+      "sha256": "c558723770191f069566abc7024974edfff0144d9aafc1596697a0824cbcbceb"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2482,
+      "sha256": "b20b08782dd450719a91219466a28bf17e8f378b04a5568e9df9b4dc9f8c24cb"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1369,
+      "sha256": "bf230c95f49da347e87cd867652b470c498985f31cdb1aefb8f57541c9c69470"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/observation-v1.json",
+      "bytes": 1961,
+      "sha256": "bb857baebda4302fa4127b7f3bbac89630fcfd701ca4981f287308f4ecd71e44"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/save-response-v1.json",
+      "bytes": 11244,
+      "sha256": "c4b65397be22629c8229fc7550a9b1815892b758f48bc2c3fdd64239ee4bd0c4"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29629,
+      "sha256": "88bc5e4d16160364e4fe9eebc3f3e21b03e6752d47cad4f4ed01a6f2e8c214d9"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5918,
+      "sha256": "04f62418d68e27f02acf3cc272c6fed9cd360b0b4c5e60bc42c58aa4df59dc74"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4707,
+      "sha256": "9600153458b9e5f5c1d714effa10aa0d22047de108ce22c7a462b4a2fc232214"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 138965,
+      "sha256": "4dbbafce7beb4fa006a98371a0ccb5d4fe6c00985e0796d6df8f79716d2433e9"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48357,
+      "sha256": "21973c1e7270a4f6837aafaa531100e77719e636a193445ce0aac36dc47d6fa0"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31520,
+      "sha256": "3ad245bb772ed9cea3ab0e36d9312002d0e15787df6b82b0093784e5a0850579"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 778,
+      "sha256": "1dbea386eb1ecec168e447fd03a9607471c8e2655f924afc234da8fb69d4b507"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/add-response-v1.json",
+      "bytes": 11297,
+      "sha256": "671379fbc4521afe9d42447a404caf1303d661ffdce3356c1437a3275fa64d85"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2482,
+      "sha256": "665d2229defb6192e858f52792a00a96c2a6cb7455b6376086c7761d209d9683"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1369,
+      "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/observation-v1.json",
+      "bytes": 1961,
+      "sha256": "ccaa2506cbf5ec7e19a39c21f3b8d3d8ab0e8bead03125791f6be35603055bcb"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/save-response-v1.json",
+      "bytes": 11297,
+      "sha256": "2a09f5ee9c651897c589f9258e8c4cbac1d9bdec91ce7fc5fd0900f70244fb07"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29820,
+      "sha256": "c2c481db02e2481adb51af8fdd411cd8fc9a63accf57e38a4ee8c5817ad9f5c4"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5918,
+      "sha256": "7e9dc18a2c57e59235319d096ea7f349c2954bdbd3ae6661a2b2823c979eaaea"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4707,
+      "sha256": "b9f28439fd55e9fa3aeda5be97ff0f57a9b2577b42355c2513d5dfdf8a9e28b3"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 137473,
+      "sha256": "a7bd6835c83c92fa67bf4747d076f45a2bd44e032e5990c3138bf50d9f6bae4f"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48663,
+      "sha256": "016731f8f9a4dc74be4848331dc34a2107b44e8e5fc2419bb107c8c6d1e21eeb"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31710,
+      "sha256": "79055d0bf6c010ad88b3929b6519e0954fffcf62bc0834c44e38fdfb9544e73a"
+    },
+    {
+      "path": "v93/captures/v93/v93-overlay-table-polyline-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 778,
+      "sha256": "6f240e94290aa9b5553870cc504c5334ef225d7e57b174596751409464c1170f"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v1.json",
+      "bytes": 399,
+      "sha256": "fefa2f9f5358ecf070a2a78982d83704c2f211f1f8a62184647a170f8d02bf25"
+    },
+    {
+      "path": "v93/sources/v93-overlay-objects-v5.pine",
+      "bytes": 1182,
+      "sha256": "a2709a8288ecf97944ab6d47b59cbe93ceed1f81b7c54f05e36158b156ed451c"
+    },
+    {
+      "path": "v93/sources/v93-overlay-objects-v6.pine",
+      "bytes": 1182,
+      "sha256": "651157f6e4107625c99e7912dfd2035a6e852f0917dd35be3ff867d9426a7624"
+    },
+    {
+      "path": "v93/sources/v93-overlay-plot-bg-v5.pine",
+      "bytes": 566,
+      "sha256": "bbb2d94b1de5d10241501b9c243bb58cecfd682deba970116a12a796a61557e1"
+    },
+    {
+      "path": "v93/sources/v93-overlay-plot-bg-v6.pine",
+      "bytes": 566,
+      "sha256": "6e144d69bc0f0b1c7f06338050969132f898b25a374085d39290f5df4516e578"
+    },
+    {
+      "path": "v93/sources/v93-overlay-table-polyline-v5.pine",
+      "bytes": 1369,
+      "sha256": "bf230c95f49da347e87cd867652b470c498985f31cdb1aefb8f57541c9c69470"
+    },
+    {
+      "path": "v93/sources/v93-overlay-table-polyline-v6.pine",
+      "bytes": 1369,
+      "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
     }
   ]
 }
