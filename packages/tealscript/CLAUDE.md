@@ -298,6 +298,13 @@ infer exact native garbage-collection cadence from the approximate retention lim
 
 # CLAUDE.md — @tealstreet/tealscript
 
+Native v93 refuses `box.set_xloc` in Pine v5 at its first callee, with the
+unknown-function diagnostic. Checking and unchecked compilation share that refusal;
+v6 remains admitted. Independent v5/v6 line time/point and box point setter
+captures pin closed-row relative getters, including copying supplied point fields.
+The refused v5 box-xloc getter values remain uncaptured; label coordinates and
+rendering are outside this evidence.
+
 Requested EMA programs bulk-fill only the selected result prefix after the existing
 fixed-input state/output certificate settles. Keep that Object.is certificate,
 request identities and adaptive-history restart behavior unchanged. Uncertified
