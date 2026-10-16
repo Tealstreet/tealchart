@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
+  "revision": "443700ff4e2499e29067e2ddc7aafe1a1165a7e1",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -11346,6 +11346,361 @@
       "path": "v93/sources/v93-overlay-table-polyline-v6.pine",
       "bytes": 1369,
       "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
+    },
+    {
+      "path": "v95/REQUEST-v95-v1.md",
+      "bytes": 53504,
+      "sha256": "e57421e259f56f2dd95344a96e893114d7d78ebb11b99da8c643afbaf1ab59e0"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v4.md",
+      "bytes": 5027,
+      "sha256": "fcd2bbb17751abc9aa53e1cab8b70fb9e9b9080233a58bbca12ee6e1339a9b15"
+    },
+    {
+      "path": "v95/captures/v95/artifact-integrity-v4.json",
+      "bytes": 86124,
+      "sha256": "31371ba15de0e9970a7472f6a93637e6822bc94d22d05942aee7360e645d1955"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v4.json",
+      "bytes": 572310,
+      "sha256": "55e3202b4e2ae038032f9aa197c1178ddfac8a727f1a392db436c750c61b39fa"
+    },
+    {
+      "path": "v95/captures/v95/facet-capabilities-v4.json",
+      "bytes": 994593,
+      "sha256": "6969ea9d1d9eba124f09f85b2c113d99cae6a0f8275d0c655a8aa02662c5d0df"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v4.json",
+      "bytes": 971727,
+      "sha256": "02254d56b0c295c3a07e6f987f46808194853aebaa309c6f06daf8ea70f2c64b"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/add-response-v1.json",
+      "bytes": 10654,
+      "sha256": "9db99c2863b73103f1cb544af53225c1e09045d575f201604ac1605dd399e4ef"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2608,
+      "sha256": "7b3c26e7a549dd56d017f02a71d21955798a4cec9a6d3dca484fca4132b44f04"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1548,
+      "sha256": "62e64e15926c68a97f54ce56604ce442da7ed3fb248365054a2f3186012517a0"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/executed-v1.pine",
+      "bytes": 995,
+      "sha256": "949a7940f2f08a0e597958ec78cdb262b5b8d706fc17ebe6acce9dfd7bad0e25"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 1006444,
+      "sha256": "1a06a33ec561e2bbf03611663e72370e49ec56237914683a5f37306950830dc5"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/observation-v1.json",
+      "bytes": 9502,
+      "sha256": "7747114f8afb6ef0bcda4a773531075bc52497df82f27f337876be76441bc979"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1162,
+      "sha256": "35e37dc7d057a7fc5c2f26ce5c6414b3df58e8fbb06de90df4c7d866b708b80a"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/save-response-v1.json",
+      "bytes": 10654,
+      "sha256": "52d3d4036ed766aaf457f8a0d5eb35e7c528a96cf844bc6102ac516aa870f1e1"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1766,
+      "sha256": "5a105204f3658bdafcda7efe00cc29f46ad625fc733ea3aebb2cfa6ed0fedd4b"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 78161,
+      "sha256": "f3586897788c4d8cb0881b8346b2398a3e10a4a588e7b8e44ce54e3713ab0dac"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 10794,
+      "sha256": "5333cc91b04ade7d1ac0a84809e16e4abb807c49306f7e107ed544fa34c0c917"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8007,
+      "sha256": "3c07dc3d35447849bb92eba337f3e4b6fa1583a6b393c1546f45a31afdb5f754"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48510,
+      "sha256": "d66fd50093228e26584759d4b0d4c090643b1cbefc1eb2b2f3577e69888c028b"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32321,
+      "sha256": "b84ae5e0cf7ff4b4e243d0ceb5b66725392de83e6e853ad361478e74b356e34e"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 914,
+      "sha256": "432914ff99da92652c7bedd26c5452c09903d02bb7c54cdf094df95b7afe6a5d"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/add-response-v1.json",
+      "bytes": 10538,
+      "sha256": "6a1eecc4c63f8cef6d5c372464935c0d391b4c4a88543796c5852edeccf6db31"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2608,
+      "sha256": "dcdd069b616892c6794cb5f17c941d2c1de62e5921c87ca88778008c64250b67"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1548,
+      "sha256": "88481128ad37a8a5032215df3b2940554a203066d0a02e448acf06e9acb34a21"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/executed-v1.pine",
+      "bytes": 995,
+      "sha256": "39db60cb152030602463067e2c1bd873db978a1c26096a5989791127af424fc4"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 1006444,
+      "sha256": "076cfb08d10b04a6824e81c269f9884cff1e3a8e40b292776c41de24686ade45"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/observation-v1.json",
+      "bytes": 9187,
+      "sha256": "9472ab0dfba003b9c6886edf0abbada7ce5589f942c239f143c0680df391b0a2"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1162,
+      "sha256": "ae201b54ca87953cd426f6482cd1d08c2529e58dd96a88794671df4d580053bc"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/save-response-v1.json",
+      "bytes": 10538,
+      "sha256": "09fd8f65fc600b584ee8bd087d251d38835f4823b24e47bcb4f33f437a1c10c4"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1780,
+      "sha256": "740b7e44caa030ed516751556f8fba665864e97f912da0091b22bb1cbb3e5da4"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 78648,
+      "sha256": "4506540d8bd344b95f958e13708f9da3bc5cea426cd07708871fac32af7df646"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 10794,
+      "sha256": "824c5b29f3acf14f6563ec0d7fbfd145f231a0484742a1de81e220a5ba0255e8"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8010,
+      "sha256": "c5fee479fca72631b4bfaaeb99d00152e709b2ec31d66581bad0008bdd985d77"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48816,
+      "sha256": "cfe7fdc7f5b295b7409517f67635283177581c13c33f64926dce8ffbdbbe94a5"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32524,
+      "sha256": "6069c42234fd957b711bcb0430cb6469d1d55f7e7a3419a60ead714f9e1299f3"
+    },
+    {
+      "path": "v95/captures/v95/v95-implicit-ta-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 914,
+      "sha256": "40349f5fd52fa8a7978ca229c0ad91659feb7bfecc3526b63f83a1fdd6ce5d60"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/add-response-v1.json",
+      "bytes": 12445,
+      "sha256": "fb685fcbc50de41909adf30d44fe64cf082682f730744da13adeba1a016791b3"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2624,
+      "sha256": "00de3e92190c415a94df033185e58976febeecd41073698a3f0eda8f779292d9"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1560,
+      "sha256": "0b5f894d474ac98eacffc9fb0194d59f093c36ffed368762445a700bf06b70cb"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1399,
+      "sha256": "f964228f035a4d4824654fcb116cb6dc07086ace2534638b257a58fbdc41f8ec"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 1109714,
+      "sha256": "0153c6313622214a2d74a0cabd6c4ad4be5073296814b78c4b676941ea3a0e1e"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/observation-v1.json",
+      "bytes": 10583,
+      "sha256": "3c343b4b9f9b32e05b12ca21aff17bb3d99f083986547e1a65dfe3b1db470238"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1577,
+      "sha256": "66b9336580eeac2d9b1badb24c47d92fd16775acfc79cac0f7fbc7fbbcdd4097"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/save-response-v1.json",
+      "bytes": 12445,
+      "sha256": "a7763db0379d495b8399a7a3c64cf501c998106de616f65586c6e91ae631854a"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1819,
+      "sha256": "047fc7f36a768c8b99873a7382e2e5d29fe9c6f08bda1309dbad9c8894d0c170"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 81597,
+      "sha256": "3d562a793272631242959201d984d8f70f3349d5beb3affe423f85961f4a3238"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11641,
+      "sha256": "f460347621add24773793b6b61b887c0e68e5490716cab19e91b1160fcbf7933"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8068,
+      "sha256": "57db254fbcd8d2896937221c7ebbfd0fb1a306e2c5ab4b64b12a4c5ba75e16a0"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48514,
+      "sha256": "703762b65ecc1485875a565386900ab4e703d2ba1f18ec46949174349f1b45c7"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32059,
+      "sha256": "1fc088fb95314b686b4b4d18739ac80d6d59c649fcb8db02074cc289e210a63c"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 922,
+      "sha256": "a181b387f2bb37e8bf7794cf9c7473c658d99cbab6d596793e1e687e0df168d0"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/add-response-v1.json",
+      "bytes": 12311,
+      "sha256": "ae68a5da62a85c2948ae56a6f9d8c89904fffe20a9ce4eaec3edc693884cf688"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2624,
+      "sha256": "00c15344f2d95231c03b285caf0662d93dfba1b4cd4d143b7226c6deacc8f270"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1560,
+      "sha256": "a93d6919472456c28d617bdc56c569c802fb35bce7cf4a98383151ed173fa1ef"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1399,
+      "sha256": "b1a5aefe9200c6077be710ad31f1461856f0579d2313748e2a98288541dedacc"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 1109714,
+      "sha256": "d5848d41ba98352312ea8ae76b95eb3cd1c3bf9920a2562a3c789fb5a171a8ba"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/observation-v1.json",
+      "bytes": 10230,
+      "sha256": "ff5fdf46995119b7893aad5880cf8aa5a09d54728d9b5ffa3ab62d72a5ecd62f"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1577,
+      "sha256": "ab1617740ef136736c9f99c7366aeadb49724ea48d0bc68943e0ffdd5c7a62cf"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/save-response-v1.json",
+      "bytes": 12311,
+      "sha256": "f5cdc3a04d5a739d7b581b39fb370626db98fba92bc3c9da9d6e62ff3004bfde"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1882,
+      "sha256": "d385a622183c945ff81f413445ca2b3048eff853685efc7952c80e90071fa0d1"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 82090,
+      "sha256": "049623177609f8f6ed484d89d9bc5afc353915e3d2c7d5a39a0671a1e108016a"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11641,
+      "sha256": "b69188e274702f99dddebbcbdf9e482a648fd0efb13f7b45c6682fe8a6151264"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8112,
+      "sha256": "75f4de6186f5b0171f76ebe7452492033921d70c60ae2afeb3bfb544a5463baa"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48827,
+      "sha256": "1c403e9c55154d778be4c8c71a2ad8ac04cae93aa4540bc6b08608ca05af26da"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32312,
+      "sha256": "c6162c11dbfb2107544f672cfae09d6df4536f63aee4ad64fd495ae96c731659"
+    },
+    {
+      "path": "v95/captures/v95/v95-recursive-holes-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 922,
+      "sha256": "8f63e5ba92e8035c49ae20c78ecd26c0c6b03edc596369b06f54a913b51f0c49"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v4.json",
+      "bytes": 658,
+      "sha256": "fadf6127188d4e548443dba7c3814e2fd137455c39d4d100d244a024166f2902"
+    },
+    {
+      "path": "v95/sources/v95-implicit-ta-v5.pine",
+      "bytes": 995,
+      "sha256": "949a7940f2f08a0e597958ec78cdb262b5b8d706fc17ebe6acce9dfd7bad0e25"
+    },
+    {
+      "path": "v95/sources/v95-implicit-ta-v6.pine",
+      "bytes": 995,
+      "sha256": "39db60cb152030602463067e2c1bd873db978a1c26096a5989791127af424fc4"
+    },
+    {
+      "path": "v95/sources/v95-recursive-holes-v5.pine",
+      "bytes": 1399,
+      "sha256": "f964228f035a4d4824654fcb116cb6dc07086ace2534638b257a58fbdc41f8ec"
+    },
+    {
+      "path": "v95/sources/v95-recursive-holes-v6.pine",
+      "bytes": 1399,
+      "sha256": "b1a5aefe9200c6077be710ad31f1461856f0579d2313748e2a98288541dedacc"
     }
   ]
 }

@@ -1,3 +1,13 @@
+V95 recursive/implicit TA suffix exports lack their own index0..127 prefix.
+EMA/RMA/RSI/TSI and ATR/DMI/Supertrend numeric targets remain OBSERVED/excluded
+from startup scoring. Only input controls, NA witnesses and the ten exact-rational
+TR native cells per version earn credit; fractional TR residues remain held.
+TR integer-cent input projections check all previous-close formulas separately.
+Recursive-hole presence replay rebinds bar_index to captured INPUT_INDEX and uses
+six actual preceding rows. The first TSI witness has insufficient local warmup
+and is checked only as a native scalar presence projection. Native Supertrend
+direction transitions remain observed, without a prefix-independent replay claim.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
