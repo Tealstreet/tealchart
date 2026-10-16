@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
+  "revision": "2bb7aa930f38ec94fe9a6298599bc6486568f735",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -11346,6 +11346,156 @@
       "path": "v93/sources/v93-overlay-table-polyline-v6.pine",
       "bytes": 1369,
       "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v1.md",
+      "bytes": 3456,
+      "sha256": "d76519e0e2a70d672ac3f0a23833317317fee32451ca677be9ac34679495fa10"
+    },
+    {
+      "path": "v95/captures/v95/artifact-integrity-v1.json",
+      "bytes": 24436,
+      "sha256": "cdbf66e7963ab92aa318df71c75fc9b3e09784573dfca01d5808943201c6953d"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v1.json",
+      "bytes": 123993,
+      "sha256": "26824f5ee939b9f36c8392b38e8f6aceb45ea4cba905426432157ece512c4cd1"
+    },
+    {
+      "path": "v95/captures/v95/facet-capabilities-v1.json",
+      "bytes": 895563,
+      "sha256": "2ff8f5e054daee9efe734bed2ec17a6186f499f1f93baabaf7939f9bfbb850e2"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v1.json",
+      "bytes": 19265883,
+      "sha256": "5af4254e48162ba352c34ac0b16bab35ef9d1c1e9c4adf6445ed64892519151d"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/add-response-v1.json",
+      "bytes": 18975,
+      "sha256": "2b7c03f1091543c584a77ff00cd8bd1366762706818eb40dfba178fa875b91d3"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2602,
+      "sha256": "f808d28980a3d3f9c2c8da91be6bc9192d92c6dbe135f6b270bcc8b03603ba91"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1615,
+      "sha256": "ed6e8093c61b738a1e68e0e830b8c6b7ea31122ac1b823f8df1b2f709a4902ef"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/observation-v1.json",
+      "bytes": 14653,
+      "sha256": "dbd365f7ba6bc1fb77e58f61749cb3e41d3f139a8611de28fa57977afeff2d6a"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1794,
+      "sha256": "294f038c9ac79c5882c9e950a3beddbe062dd63fd7b2cd9e30ad2b933ed6cde8"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/save-response-v1.json",
+      "bytes": 18975,
+      "sha256": "a3b59089090f89796d4570f3d9e660512dd80896686200f2cb35a42e3d75755e"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 86523,
+      "sha256": "fffa8d8c63a86d006fdb4c79b5a34d547d991b59dfe7476ef6ca88cf7e79fbff"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 15279,
+      "sha256": "f8bffc4eee4267bb9b64a33f275fcd6cdb004f73f3d175bd20833f4f7e4f0a16"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46546,
+      "sha256": "dfd7c61e720f04024913404fc46ae2eae6152de2d860cf2e0749700cc7d07b7e"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31248,
+      "sha256": "a5c9cabc27ef1c8490e939a7ac9644a205d3153bf00d98628b2071c7357b0bf0"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 912,
+      "sha256": "6b6c79c41c7fab4b306c6ceab89e6d1f8364df539ee8889d1606a491489b187a"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/add-response-v1.json",
+      "bytes": 18731,
+      "sha256": "53180a4bd6b9ec86398253c22da5acba41a7fde540ea8f3da367f387114266cc"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2604,
+      "sha256": "adb4832b4870bc3a57ea26b2865c633760f87c992d4c8499e9ca64fe858b2bac"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1615,
+      "sha256": "f2c234f9da2424fd07c835892b3eef80fd725263671e60492d7306953e76a417"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/observation-v1.json",
+      "bytes": 14097,
+      "sha256": "03391757a82ed3339b8e4816ab80d7b680a01a33736e32aad4e81592d64ac943"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1794,
+      "sha256": "745dd60b4609112eaa6b918e2aef7617fcf9b5d08ac3e6d51048726b03cccff2"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/save-response-v1.json",
+      "bytes": 18731,
+      "sha256": "236c1f732949f34f9e41beaab019f4804d24a692922e2624cab0c9c38e5f0fd4"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 87089,
+      "sha256": "522932552f5a8bfa2a206616265a2d09feb31bfab687c4c394f18d00228527bb"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 15279,
+      "sha256": "57e6fd75b7d2efb8052926fb2869ce993ed7e5b091dcce42a5a64ef1c21bb457"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46852,
+      "sha256": "cec96734fd39f2e6a354a69950ba0f8bc290dda661d8766ca2ce184e76be1d74"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31443,
+      "sha256": "9f727c3361aed0219176aed2ddc2a8b688799898d819b1e14b1cb74cc1892511"
+    },
+    {
+      "path": "v95/captures/v95/v95-ltf-tuples-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 912,
+      "sha256": "0d3c771d1e2bbe19b733f5308d475c447476bacb537e06038857c4113e1f3fd5"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v1.json",
+      "bytes": 622,
+      "sha256": "dc5101793e9e01aa6b418d51846c9f4d2f0db47e1ec54527519ebde6f7d1eae5"
+    },
+    {
+      "path": "v95/sources/v95-ltf-tuples-v5.pine",
+      "bytes": 1615,
+      "sha256": "ed6e8093c61b738a1e68e0e830b8c6b7ea31122ac1b823f8df1b2f709a4902ef"
+    },
+    {
+      "path": "v95/sources/v95-ltf-tuples-v6.pine",
+      "bytes": 1615,
+      "sha256": "f2c234f9da2424fd07c835892b3eef80fd725263671e60492d7306953e76a417"
     }
   ]
 }
