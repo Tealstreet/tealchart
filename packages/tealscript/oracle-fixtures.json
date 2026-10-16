@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "e75d8349031e28202b0440dc40f9bd950075da42",
+  "revision": "a22cb6e73dfedd2527e0461566890736617e86b5",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -8551,6 +8551,941 @@
       "path": "v9/w8-exact-source-compile-corpus-v7-427-v1.pine",
       "bytes": 28342,
       "sha256": "cbedb2c50cf428eb62771a60dbf4f977be9ce6e661a79c1e32feedaedf17bcae"
+    },
+    {
+      "path": "v90/captures/v90/RESPONSE-v90-v3.md",
+      "bytes": 6531,
+      "sha256": "bfe2b863659057b993bdba60c21fe0460f93e05f1bec0499da372c9b44df313c"
+    },
+    {
+      "path": "v90/captures/v90/artifact-integrity-v3.json",
+      "bytes": 176297,
+      "sha256": "6cbc985bef2a76fd68aab44124730ec2b78c028c036275b3201f85e1e2f09776"
+    },
+    {
+      "path": "v90/captures/v90/attempt-inventory-v3.json",
+      "bytes": 15779,
+      "sha256": "9630fab0615219cfe66496df25c9fd02578f23e50cbbbe5348f8766bb1998a02"
+    },
+    {
+      "path": "v90/captures/v90/chart2m-inputs-v1.json",
+      "bytes": 12179330,
+      "sha256": "9fe682b846e49142e882045f749dd5f0629bd766b52b2adb78c499935c2cc546"
+    },
+    {
+      "path": "v90/captures/v90/context-family-audit-v1.json",
+      "bytes": 1348,
+      "sha256": "284b10c80779ecda1ed4d53f6d50bf310a43a62a143a358797080d33704e6ddb"
+    },
+    {
+      "path": "v90/captures/v90/daily-frontiers-v1.json",
+      "sha256": "ec0bb5e0a88034e834570b6872200fd131535485a96255fa30162d31b9c126d5",
+      "bytes": 12633
+    },
+    {
+      "path": "v90/captures/v90/daily-provider-table-v1.json",
+      "sha256": "082e02d9acf4941a74022fe63ddd6e8e4f788607a31797bc8cc544472c86a9ec",
+      "bytes": 4141792
+    },
+    {
+      "path": "v90/captures/v90/footprint-provider-facets-v1.json",
+      "bytes": 4080,
+      "sha256": "91d019688a3a5537726a51066ec98d59aa2d5a4420057a5bcb4b7f8d0611ff5e"
+    },
+    {
+      "path": "v90/captures/v90/prefix-table-v1.json",
+      "bytes": 13981426,
+      "sha256": "b07bc9cd321c1e648cf81238558b684f544cdac77e61bdd512a684b538bc4daf"
+    },
+    {
+      "path": "v90/captures/v90/provenance-annotations-v1.json",
+      "bytes": 1869,
+      "sha256": "8d13def19618490a2a13c8a03fe6a8e58018d776eb01a87bd53ad09422167038"
+    },
+    {
+      "path": "v90/captures/v90/provider-presence-v1.json",
+      "bytes": 20389732,
+      "sha256": "018fb812b79e2d8c32feb5966ed0cf720f641afde3e54d560f9c7b0202ec466b"
+    },
+    {
+      "path": "v90/captures/v90/strict-repetition-comparisons-v1.json",
+      "bytes": 22556,
+      "sha256": "63e25c875170222d62606ff232d42ee820d9808d2a272158d388fc43fa0c7f93"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/add-response-v1.json",
+      "bytes": 3762,
+      "sha256": "ed09bc7371567eba02c0edc97db425d9867f32c890b147c5a54424d4815ab2f3"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 2043,
+      "sha256": "831ad91a75feb2a931d659bdb09143da52b668834515ec9c0453ff029db1aa03"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/chart-native-v1.csv",
+      "bytes": 1359736,
+      "sha256": "4cf3577a349249e2ef1809248554dcb724eb71e7b4619a2dabb36f76cc3fea32"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 5221894,
+      "sha256": "21f583ab4f548a48d3eb211afecc286e9cee08a3ab4f63b26e2b460830247b94"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "532c4b8445d7057db408070ee96803b51d47a05475b3cd98d026f4138077e2e4"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/observation-v1.json",
+      "bytes": 2664,
+      "sha256": "a128a9a566298e79485afc6133673d07589420559a8aa61f5d53b8d900878e19"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v1/save-response-v1.json",
+      "bytes": 3762,
+      "sha256": "e0206cc42412e428afaa41c81be6572f1d6e5d45b106a4d4d2e9dc0e3b4eea34"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/add-response-v1.json",
+      "bytes": 3762,
+      "sha256": "ad38970794a066b4f8b1ccde205ade842eb52ec309a9abe1c496e6aeb8a02db1"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 2043,
+      "sha256": "ef61f074c85377db09cf8810c93d6a9b08c0932eb274e52741bc4ea0b794f744"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/chart-native-v1.csv",
+      "bytes": 1359737,
+      "sha256": "44f1ff4e23139a35e28e50823adb3b08d122a50509edcc3164e93ebe4a49b724"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 5221894,
+      "sha256": "10413d1a2272884c866a1c181fb48dc2e1f35fd1a0d5e1b6769972ba1c84dc93"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "532c4b8445d7057db408070ee96803b51d47a05475b3cd98d026f4138077e2e4"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/observation-v1.json",
+      "bytes": 2664,
+      "sha256": "043f0ab55cc4cd19bba44d4fb73fddc3d0206482b1e53ab301901fd172cf24ba"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v5/attempt-v2/save-response-v1.json",
+      "bytes": 3762,
+      "sha256": "33841b9389b5448db82e4e88f110ff91e6973d2193c1b9aa9aece3735e90329c"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/add-response-v1.json",
+      "bytes": 3861,
+      "sha256": "e9451a0217e996c5041da1617e5fd6796176e5f557cfa7d8418d4e8b3e4aeeca"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 2043,
+      "sha256": "8b1cb25fbedc28668217d0db8255ff4459b94adadb8cf428cabfc02ecc5edde1"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/chart-native-v1.csv",
+      "bytes": 1359799,
+      "sha256": "bac53186fcb329d08cbfd4ac259dd0f16ebf605602407577d7cdd9e63e583b40"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 5222121,
+      "sha256": "046000bd36cc11ba51e4334b29f1d73d2a9488e6298714bff9ca95fcb79500bf"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "888c7d70d01804d5aea36eed8b4b6c91f67bb5f029389f04985074faeabb5a3f"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/observation-v1.json",
+      "bytes": 2664,
+      "sha256": "0ed88a11b011f5418fcdb6964fbc22850f5c3b958d8421b93f9cc778b1cf553c"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v1/save-response-v1.json",
+      "bytes": 3861,
+      "sha256": "d8ffc337d7aa5843dfde4fe43398d4fa9f752dcee86938238bab9335dd74eac9"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/add-response-v1.json",
+      "bytes": 3861,
+      "sha256": "15259ee5adfc4ea33486a8c5a0a8012056a8e7a07e2f37940babd20dc6e7e0f3"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 2043,
+      "sha256": "a73d6e17c1a650dde38e550771f3969b0ae59dcce1a430392054c93391dece19"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/chart-native-v1.csv",
+      "bytes": 1359800,
+      "sha256": "a60301f43825ebb0c5c4d6539e805e07ef7089622e5322339f43db046917a72d"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 5222121,
+      "sha256": "dd60c0397a78b706fc68b54fb27d001b7523bc17aa97593970cb0f6a4ea71502"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "888c7d70d01804d5aea36eed8b4b6c91f67bb5f029389f04985074faeabb5a3f"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/observation-v1.json",
+      "bytes": 2664,
+      "sha256": "9c8afaa497237c54c52104a1833840ac6f7552be99b082cecf1d452bc18859b6"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-original-v6/attempt-v2/save-response-v1.json",
+      "bytes": 3861,
+      "sha256": "ce26105e90a9363e30f036764fbad52a4b757411e2da6a65205e2d454627faa7"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/add-response-v1.json",
+      "bytes": 6218,
+      "sha256": "f74fe9252fb167fb80ca17f5336468ffcd03facb11735b6d2dff6b05bc0eb9f9"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/executed-v1.pine",
+      "bytes": 752,
+      "sha256": "f480b621aeda4bb5f46fa4845eb72db88868cbf763ed2217fc3921a2f2c32f59"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/frontier-column-bindings-v1.json",
+      "bytes": 1957,
+      "sha256": "d59e0bd588d0e50a2ff80b396d66a524a5b50112e5282ecfd2d1fdf99ee95a50"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/frontier-native-v1.csv",
+      "bytes": 2577119,
+      "sha256": "393d7923f2cf3e3aea5ee0399f53e9d147679f6775e0cd7a31b18cbd31103dca"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/frontier-row-closure-mask-v1.csv",
+      "bytes": 2309535,
+      "sha256": "c6f1ea48b34758c91212405d092303489ec888171ba954767e0904350764aea0"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/observation-v1.json",
+      "bytes": 3320,
+      "sha256": "2ddbc80c6372fc6188e4a24b5f86151a14083b06bfc1986bfaa5d4c0ac9afdba"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/save-response-v1.json",
+      "bytes": 6218,
+      "sha256": "46c96288ddd5e42f70e0eded92ce82a94104054733dfabe45bbc468d7d9aae91"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/viewport-column-bindings-v1.json",
+      "bytes": 1947,
+      "sha256": "454e530ed2ecdf9af954075b8da0489b85e817e042f7f68326c6c773a4b0f2f9"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/viewport-native-v1.csv",
+      "bytes": 58680,
+      "sha256": "668d6abc25413e007bc5f51b9b77b9dd41d1bc40f1e7cbc631949ddf4e944237"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v1/viewport-row-closure-mask-v1.csv",
+      "bytes": 74900,
+      "sha256": "b0084c9bc76efc7f09e93d000467673284cdeb3dec214c2879613af208749028"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/add-response-v1.json",
+      "bytes": 6218,
+      "sha256": "219efd5d9732108d89996c48bab626f95657f1c94597a08184c295a9bf2140e1"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 1951,
+      "sha256": "03e75151f1490d604b32701d6435f16427a24500e9d2457fd82f08fa0a4a2a0e"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/chart-native-v1.csv",
+      "bytes": 2577462,
+      "sha256": "8a38a826b86dd048a8d67814297720037e6291a52f09800fe68efcc3a24c9c56"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 2309841,
+      "sha256": "af6bdf3776d5cd283411e00de3530d1cd7e557b532de749ea95382e89af3ba05"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/executed-v1.pine",
+      "bytes": 752,
+      "sha256": "f480b621aeda4bb5f46fa4845eb72db88868cbf763ed2217fc3921a2f2c32f59"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/observation-v1.json",
+      "bytes": 2759,
+      "sha256": "5eec3254d06468aa6f217f48c17bda485711adf772a2bf16d52aaa1f486e3362"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v5/attempt-v2/save-response-v1.json",
+      "bytes": 6218,
+      "sha256": "7b9125ab1b8a799282d2a833f64a2891b148eb45e5bb88827711b59682da30d5"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/add-response-v1.json",
+      "bytes": 6163,
+      "sha256": "32a8766e991bb1e1e51cc50e61652a62d52f9cdce5bef83bac4a7d010a4395d6"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 1951,
+      "sha256": "d9a51ef549e7385e13a7808b98581e9fc30f7eed94e6d5fce7911d88149e1f08"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/chart-native-v1.csv",
+      "bytes": 2577463,
+      "sha256": "7e7d76547ae4d7917c5def75b94705d2cb92862e5b0c4f365318b073048ac2cb"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 2309841,
+      "sha256": "3cdfbfbf08ec12523d33e3042889e3adc427660c749765fb1a316e96ada7477c"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/executed-v1.pine",
+      "bytes": 752,
+      "sha256": "61b8da0de225c44bdc27d71d93b16dc5506771d93ce139481a8cbdb252b7f192"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/observation-v1.json",
+      "bytes": 2759,
+      "sha256": "f361958bce5f33f97f9c34db6ec9df7b6151f7b4388ca1e007bab6fa371670c6"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v1/save-response-v1.json",
+      "bytes": 6163,
+      "sha256": "4edad27b80c16fe771d9fefbdb045306d8c6bb6652cebff4ec2d68a757dd63d6"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/add-response-v1.json",
+      "bytes": 6163,
+      "sha256": "c7c38dde5aedfc98dee4462d3446fcf52f36987f74ff2d3326cbfc2be9000b50"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 1951,
+      "sha256": "f1216a7575ab66e70ca3f48154f36cc00f81f60550efc4be083bf11a10aa2f3d"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/chart-native-v1.csv",
+      "bytes": 2577463,
+      "sha256": "97e85a80c237faf5a683abb001e5222b62abf8c72e8fede379aadc700bff19cb"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 2309841,
+      "sha256": "286a69a3a280d1bbaf1df5ce2153e5d3182305a6a6e0f7801643357479a28530"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/executed-v1.pine",
+      "bytes": 752,
+      "sha256": "61b8da0de225c44bdc27d71d93b16dc5506771d93ce139481a8cbdb252b7f192"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/observation-v1.json",
+      "bytes": 2759,
+      "sha256": "a80a88dc3d968a3cd29d3993bab15ae39fe8c09182294ec9cf4d03d93c779dda"
+    },
+    {
+      "path": "v90/captures/v90/v90-cum-prefix-v6/attempt-v2/save-response-v1.json",
+      "bytes": 6163,
+      "sha256": "af1eb640c158f4d5fd6de7cba5884a7b383ab452854363a6a0f55c6b94eed8fe"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v1/column-bindings-v1.json",
+      "sha256": "2f245497e2808dc0bd19712540070f59260ae00e1030c750d6a135e53f6f8768",
+      "bytes": 2768
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v1/executed-v1.pine",
+      "sha256": "630e6784cb7e27585b74bf864d6a1b99c722c7882d113b6ecaec8a39b9337864",
+      "bytes": 2454
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v1/frontier-native-v1.csv",
+      "sha256": "e2b2615c20486863e5ca43abf8a47be5fec3db304c62f81911f7d964d57c761c",
+      "bytes": 433333
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v1/frontier-row-closure-mask-v1.csv",
+      "sha256": "a85371d216016695f1713c356bd2e781cb62a97c3a696c19290cc422c1e870e8",
+      "bytes": 337081
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v1/observation-v1.json",
+      "sha256": "8224b26b8251ed679a84d35975a70888106e6514ec079f2fa7a47385260b46eb",
+      "bytes": 4863
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v2/chart-native-v1.csv",
+      "sha256": "13ff62382d7cbec5f7b69c5cb99e7a79955ca5d1a931c8987c6709a9f2360899",
+      "bytes": 433333
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v2/chart-row-closure-mask-v1.csv",
+      "sha256": "7d54bc00f00333c5c014474dc0c7944d82dad7952b704479d93b60be552db244",
+      "bytes": 337081
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v2/column-bindings-v1.json",
+      "sha256": "a1bf5599ea5028e1f25893d1d26fa5fd179012151212366b6ec8d78c7f633711",
+      "bytes": 2762
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v2/executed-v1.pine",
+      "sha256": "630e6784cb7e27585b74bf864d6a1b99c722c7882d113b6ecaec8a39b9337864",
+      "bytes": 2454
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v5/attempt-v2/observation-v1.json",
+      "sha256": "08e56b947c8ed73665c17690c8cae8e30028300495ea01ba93a8c10ba1ab75fc",
+      "bytes": 2959
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v1/chart-native-v1.csv",
+      "sha256": "aa9cd2c61aa6aacf7ec38fa4cbbf27e228914161c3e316cfa66fb861152ad09f",
+      "bytes": 433333
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v1/chart-row-closure-mask-v1.csv",
+      "sha256": "8d97a55c87536cb51c9e23d0914728f9b4ab28103a0bd22c2c484b1d8342cee4",
+      "bytes": 337081
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v1/column-bindings-v1.json",
+      "sha256": "0a3b90339bfaee74a30483de8d58713be49755dd771b7b7cb788d24bf1b5f12f",
+      "bytes": 2762
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v1/executed-v1.pine",
+      "sha256": "5177d6d738e1f4bdf9339c6fc0374826b76ebc877de78b386f053537a983021b",
+      "bytes": 2433
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v1/observation-v1.json",
+      "sha256": "c8866a696e8c03237437894c59cf2b8952f64af4dfa81cdd54d444f3e23bf102",
+      "bytes": 2959
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v2/chart-native-v1.csv",
+      "sha256": "9630f0a351782cd2aeda1841ca71f5438d56574bd95851ff62775815d97c1b86",
+      "bytes": 433333
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v2/chart-row-closure-mask-v1.csv",
+      "sha256": "58eda0364e02a81ded7f754e215d8dd2651448dd663b5371468593170ccc9547",
+      "bytes": 337081
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v2/column-bindings-v1.json",
+      "sha256": "8df64a2db95634248fe50e59f39d28ae8620bda6ff37ad8eb5a7d9826446c96e",
+      "bytes": 2762
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v2/executed-v1.pine",
+      "sha256": "5177d6d738e1f4bdf9339c6fc0374826b76ebc877de78b386f053537a983021b",
+      "bytes": 2433
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-chart-v6/attempt-v2/observation-v1.json",
+      "sha256": "dc9fe498fd715bc42a952b75934eb33d392c38adf1a90ccf08d25a0a8fb533ee",
+      "bytes": 2959
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 2617,
+      "sha256": "f1a1952cd4dc2c83b03b940bbab06ce9151f6ea7516c6d1a96d59c227179f0d6"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/chart-native-v1.csv",
+      "bytes": 95213,
+      "sha256": "54d5199bba99281627350d7c6443934e8ba3bb9b10f83714a064d9e5fb484270"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 69559,
+      "sha256": "527e0a72dbe1c2a19707010098fbc8ff0d2c20d60de777da8abb66fca68a1308"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/column-bindings-v1.json",
+      "sha256": "f1a1952cd4dc2c83b03b940bbab06ce9151f6ea7516c6d1a96d59c227179f0d6",
+      "bytes": 2617
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/executed-v1.pine",
+      "sha256": "d89b902fe4610b8caa31cd545b11a373fed2c34c783342c916584896591f2526",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v1/observation-v1.json",
+      "bytes": 2873,
+      "sha256": "7c863d41bb82d005a6e764f03d02347c16aceb2db9a5a647059244690cc0b966"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 2617,
+      "sha256": "e848d6f159fb4c38d30983f73861fbc85938661df252dadc457dfab205b8a3f9"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/chart-native-v1.csv",
+      "bytes": 95214,
+      "sha256": "5e95e6b2f3d1ad746506ffe44f4ec7e11f17826da18a9edd4152c48411fad2be"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 69559,
+      "sha256": "bc3d05ba024a066f8e82faaba2b1c72a1dd964ebb81a349b335c6e9d01fc07f7"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/column-bindings-v1.json",
+      "sha256": "e848d6f159fb4c38d30983f73861fbc85938661df252dadc457dfab205b8a3f9",
+      "bytes": 2617
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/executed-v1.pine",
+      "sha256": "d89b902fe4610b8caa31cd545b11a373fed2c34c783342c916584896591f2526",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v2/observation-v1.json",
+      "bytes": 2873,
+      "sha256": "d85bf2061ea47a0537d4ed4a0518351d1ef7a04686e86e0ff85c890ff55897bc"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/chart-column-bindings-v1.json",
+      "bytes": 2622,
+      "sha256": "2f2412b8c98f74ddb5cd447be55d8a5ccc8c1c82df5e91d62aabf72a23bace34"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/chart-native-v1.csv",
+      "bytes": 4189823,
+      "sha256": "7ff4d09ff2e2dc1fdbed82cbfde43cc7a88b03a3a6677e644425c157b3f5f6ba"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/chart-row-closure-mask-v1.csv",
+      "bytes": 2883977,
+      "sha256": "7f7600f63ccd2cae1d59f82b2ae981582e2b745f80637249087356d5c8391879"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/column-bindings-v1.json",
+      "sha256": "2f2412b8c98f74ddb5cd447be55d8a5ccc8c1c82df5e91d62aabf72a23bace34",
+      "bytes": 2622
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/executed-v1.pine",
+      "sha256": "d89b902fe4610b8caa31cd545b11a373fed2c34c783342c916584896591f2526",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v3/observation-v1.json",
+      "bytes": 2874,
+      "sha256": "24b25fff64d16714d35fdbf86bbfc09fdae4d826a2784878fefa077b2de2cbf8"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/chart-column-bindings-v1.json",
+      "bytes": 2622,
+      "sha256": "27acdc4e7334d852dd50f9d24bbd2abface8c0f17235b0d3eee65ddb367406d6"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/chart-native-v1.csv",
+      "bytes": 4190681,
+      "sha256": "47b6d190087aea37917437f00a574cf71d3019a7610606d6ce6add0714735037"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/chart-row-closure-mask-v1.csv",
+      "bytes": 2883977,
+      "sha256": "c156d410d96102957a2fa7add2e923eef81b205a4f13f8671fcddd9120f41ce4"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/column-bindings-v1.json",
+      "sha256": "27acdc4e7334d852dd50f9d24bbd2abface8c0f17235b0d3eee65ddb367406d6",
+      "bytes": 2622
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/executed-v1.pine",
+      "sha256": "d89b902fe4610b8caa31cd545b11a373fed2c34c783342c916584896591f2526",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v5/attempt-v4/observation-v1.json",
+      "bytes": 2874,
+      "sha256": "122f04c3add4d653582a252c574dedac4a9e206ef16e6b2b976ab793d3bae192"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 2617,
+      "sha256": "448b06efe3669e661275139f8dd3c38a7fcdbf1345a5ec2f95153787bf76e399"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/chart-native-v1.csv",
+      "bytes": 95214,
+      "sha256": "eccbd2992cb0a6482fa1efb1e4e04677f67c378114393034742d5e7ef6958b28"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 69559,
+      "sha256": "96a7464f003eda9b232f09662b8669d3dd175188c6a7313d61dd5a9c010cb2dd"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/column-bindings-v1.json",
+      "sha256": "448b06efe3669e661275139f8dd3c38a7fcdbf1345a5ec2f95153787bf76e399",
+      "bytes": 2617
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/executed-v1.pine",
+      "sha256": "f933ddba24bcc6aaa007fd3ae7ad1fdbdfa6edec6b86c6639b7adcfc9943bc7d",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v1/observation-v1.json",
+      "bytes": 2873,
+      "sha256": "c7fbb7ec0f946d2b1a76b52b68841a637df6924a12361424ddbb8eacdcfcf4ce"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 2617,
+      "sha256": "8952a770e34633d3167e8d7a768a304aed64ef0cafab228f1b2b97e19f57c8e3"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/chart-native-v1.csv",
+      "bytes": 95401,
+      "sha256": "d62519c2c97b8df9a63fcf70c0abb6fcf7df224f619f7b8684d70d809f09c414"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 69697,
+      "sha256": "f2813ef67aaa0489b501ea2691ca4f6d4be2777f4f981daac89d160137a4cbd8"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/column-bindings-v1.json",
+      "sha256": "8952a770e34633d3167e8d7a768a304aed64ef0cafab228f1b2b97e19f57c8e3",
+      "bytes": 2617
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/executed-v1.pine",
+      "sha256": "f933ddba24bcc6aaa007fd3ae7ad1fdbdfa6edec6b86c6639b7adcfc9943bc7d",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v2/observation-v1.json",
+      "bytes": 2873,
+      "sha256": "39b1d1a93c65f7e477283505023ef7fd041795d8f6cd2632a0c2d6dd38811724"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/chart-column-bindings-v1.json",
+      "bytes": 2622,
+      "sha256": "5308ba7abd80d8c2b2129f3f28ca9632b22e105f7fb2ef79dc1e45716811970d"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/chart-native-v1.csv",
+      "bytes": 4191113,
+      "sha256": "b1b3f723f5d89647553841de973e9ae5c2795fc889f65cdf379d086f51c4d1d6"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/chart-row-closure-mask-v1.csv",
+      "bytes": 2883977,
+      "sha256": "8893fd9f2114481f38ef738e45d8a19fd77f382eb66a72ea955bc4b34efe8085"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/column-bindings-v1.json",
+      "sha256": "5308ba7abd80d8c2b2129f3f28ca9632b22e105f7fb2ef79dc1e45716811970d",
+      "bytes": 2622
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/executed-v1.pine",
+      "sha256": "f933ddba24bcc6aaa007fd3ae7ad1fdbdfa6edec6b86c6639b7adcfc9943bc7d",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v3/observation-v1.json",
+      "bytes": 2874,
+      "sha256": "5b92e79babe0d2c04b8013766f2669d1639841f3222673a0f80b57bef4d002cb"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/chart-column-bindings-v1.json",
+      "bytes": 2622,
+      "sha256": "b21bc589198f0bbf74bed4a4c2e47b60b5eccd0a7fca9f44c39af64fe7bbc54f"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/chart-native-v1.csv",
+      "bytes": 4191113,
+      "sha256": "d946619e3eb6eb7e1b03d8fddc6609f7c39dabd44d799f4dadda926b507738d1"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/chart-row-closure-mask-v1.csv",
+      "bytes": 2883977,
+      "sha256": "732d99ce364e4f6cca8ae4dbdb775fe479ad7f958b8f72fdb3662d0ebff8a23b"
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/column-bindings-v1.json",
+      "sha256": "b21bc589198f0bbf74bed4a4c2e47b60b5eccd0a7fca9f44c39af64fe7bbc54f",
+      "bytes": 2622
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/executed-v1.pine",
+      "sha256": "f933ddba24bcc6aaa007fd3ae7ad1fdbdfa6edec6b86c6639b7adcfc9943bc7d",
+      "bytes": 1328
+    },
+    {
+      "path": "v90/captures/v90/v90-daily-provider-v6/attempt-v4/observation-v1.json",
+      "bytes": 2874,
+      "sha256": "4b76f96c97b303fc197d7f3c08c0b3fb0972bb70cf5ce5ee1163a0c87e1d2d28"
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/close-native-v1.csv",
+      "sha256": "1a7bf90a7a0ff39bfba7aa8d0ca214cda7de00dd7a0b492a2d46be8e0caad911",
+      "bytes": 59273
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/close-row-closure-mask-v1.csv",
+      "sha256": "9fe0a25b3250c8dce6fee97f435cf4c629e7660d349d8a4ffb65554f2ec4fc95",
+      "bytes": 37829
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/column-bindings-v1.json",
+      "sha256": "bb80f0c9865e0d24862f148b6092c132412b43a455701fd659bb65aaddfcca9f",
+      "bytes": 10869
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/confirmed-close-v1.json",
+      "sha256": "6e644e323fd295a89d5a1b5d1b4b05c2969d0b56a89e352022805d9748a21c92",
+      "bytes": 1673
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/executed-v1.pine",
+      "sha256": "a603888e4cdbfddbcddda898400c5058b55c9fd691c5a0b3246b678cace3d60e",
+      "bytes": 5474
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/initial-native-v1.csv",
+      "sha256": "e765a28e3da9f89e25dc28f5b837d6ff1f09364f74ffb442368e3487d653fc97",
+      "bytes": 58776
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/initial-row-closure-mask-v1.csv",
+      "sha256": "23d5539293e2e10c79e23358e69f2c1d2dd29e5c2414845b4fdaf7d9502f04e8",
+      "bytes": 37706
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/realtime-events-v1.jsonl",
+      "sha256": "4ad784983f8e4d9391e603fb11f2b48060d72d29e3b2393cdd3c189315f28a7b",
+      "bytes": 6078
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/update1-native-v1.csv",
+      "sha256": "adbc9a52c8132218258c82761d93374942fefc546d14ec464160e2412aacb38e",
+      "bytes": 58776
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/update1-row-closure-mask-v1.csv",
+      "sha256": "d71432d78a40fa9f412944296369f12bdcce054fbc71e9c1516e83c7d8eaf600",
+      "bytes": 37706
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/update2-native-v1.csv",
+      "sha256": "7ebf1b16bddbf54c0fcb10eb95e2131c7e81c1031257828276edbdef843adfe1",
+      "bytes": 58776
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-natural/attempt-v2/update2-row-closure-mask-v1.csv",
+      "sha256": "0ead32dd8024a7916de3bf8eebb9d783c3cfeb0c914d84fb46f49d1dd010a650",
+      "bytes": 37706
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/close-native-v1.csv",
+      "sha256": "2b9e06038d680d1572d94995e22879b00b21fe713317225e7e65f02fd5f36358",
+      "bytes": 59852
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/close-row-closure-mask-v1.csv",
+      "sha256": "f607fcde65ba00d86c4c01c313834e50e2aa931f42cff1a2629194e731fe29c9",
+      "bytes": 38201
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/column-bindings-v1.json",
+      "sha256": "e0c65c201ae788276f2ac6322aec8bca9bce5e450f772200ad15c8e222ad2fa9",
+      "bytes": 10902
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/confirmed-close-v1.json",
+      "sha256": "8021d50d11d7929fd093e35ad60dfd2040de8d0da5ad5814f6658bc399ecc80b",
+      "bytes": 1698
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/executed-v1.pine",
+      "sha256": "3a25fbc2a18c0d208d0f5c4d4139e5befea70d071949fc605e7370225acc8b4d",
+      "bytes": 5903
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/initial-native-v1.csv",
+      "sha256": "6bb0f84dfdefb0633b011e62e0c1162169e42d40ea13a80635a980398d67df2d",
+      "bytes": 59189
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/initial-row-closure-mask-v1.csv",
+      "sha256": "b8041eca627f6089ad46a607bab6bd2ecd43818d823abae940083bc42d3eb490",
+      "bytes": 38079
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/realtime-events-v1.jsonl",
+      "sha256": "bd5c2c4789e02672ba1d92a80b959ab13e33ca501eff83e6c4f454babf96199c",
+      "bytes": 6187
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/update1-native-v1.csv",
+      "sha256": "aa6adab70810ff6168e1825b66fa74e40542d5ce8f50c7eaad933e2254e0de95",
+      "bytes": 59342
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/update1-row-closure-mask-v1.csv",
+      "sha256": "31310cfdd8e5ef5ccb3743fa681af5b7ed1f445cb4226197c2b87be0831c3249",
+      "bytes": 38078
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/update2-native-v1.csv",
+      "sha256": "0bebb80e52f957a9c3fed4aee8a519ec0b80729e6bcb49013934c6e231f4594b",
+      "bytes": 59340
+    },
+    {
+      "path": "v90/captures/v90/v90-dxy-renamed-control/attempt-v1/update2-row-closure-mask-v1.csv",
+      "sha256": "c3c69c51110a5cbee3c3228ef9b36f920e177ec860679c5d6ae9649e6e0e1d1e",
+      "bytes": 38078
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v1/chart-native-v1.csv",
+      "bytes": 1250360,
+      "sha256": "d66a6cc3d88eb64345091f6ddb1344e845e3cf61f359b37c215fb5f6c5b8c785"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 5267866,
+      "sha256": "6ad52c7916add032129b1e657cddb4eedd209513821ef4c9cffe7ad240dc0024"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v1/executed-v1.pine",
+      "bytes": 111,
+      "sha256": "de1d7e2a863b01667c408d6c492444104fa81c52ceef13a972934ba13ab25203"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v1/observation-v1.json",
+      "bytes": 2638,
+      "sha256": "4b0d8342d4b985571372839f24e53795da64d37045a02d488930cea4e07a06ec"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v2/chart-native-v1.csv",
+      "bytes": 1250357,
+      "sha256": "32b9419a75749ff6090f98bb212cea594dbe171534f5f008025a6e3852a264c9"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 5267866,
+      "sha256": "f3c141339f2206212e693bb2b503b78e88bff35979b9efca0ef77d9010da3f1b"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v2/executed-v1.pine",
+      "bytes": 111,
+      "sha256": "de1d7e2a863b01667c408d6c492444104fa81c52ceef13a972934ba13ab25203"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-original/attempt-v2/observation-v1.json",
+      "bytes": 2713,
+      "sha256": "c785ec9178d437e8f1714126a37e4c302051f834f8d0e69126fb6f727bbf9475"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v1/chart-native-v1.csv",
+      "bytes": 1409752,
+      "sha256": "75e1b3a7e69f9bacb59c0b49ada875b097de706bbb164a7d68f67fc36b3f04f5"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 2491944,
+      "sha256": "5468b7af41429b5db3d30f44d88eb7495a8bbf7b0c67d3ac05a36448c177807a"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v1/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v1/observation-v1.json",
+      "bytes": 2873,
+      "sha256": "32a035f9f069270c84f89c4e7ae9dd26954dac4ef700c40f52881b05e8b5909c"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v2/chart-native-v1.csv",
+      "bytes": 3290775,
+      "sha256": "032db7a261a2f4c1ff1428cbfcf6fb7a9b763211f0a9128773db5f83f6d9f162"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 2309943,
+      "sha256": "500a1410a77447207eb2f68f9bff5f4aefa61684eb207385e2ed73d09633f934"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v2/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v2/observation-v1.json",
+      "bytes": 2845,
+      "sha256": "ef1ac3999eb43a9b2852285bda30328df6dd6bd0758f515314dddcb9e2b28769"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v3/chart-native-v1.csv",
+      "bytes": 3291057,
+      "sha256": "7bb781ae801d16c76ac131db0be1d88eb8688808659b810211116eb7b9b3fffd"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v3/chart-row-closure-mask-v1.csv",
+      "bytes": 2310147,
+      "sha256": "7f7bef0b9707f061303fae4f32d7c0185b119d12e076d932d70bd410b0c00352"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v3/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v90/captures/v90/v90-footprint-provider/attempt-v3/observation-v1.json",
+      "bytes": 2921,
+      "sha256": "82ad514f0bb21d70535c2b889b5aa0be974d4d69a00e68855530d3abf58ead61"
+    },
+    {
+      "path": "v90/sources/v90-cum-original-v5.pine",
+      "bytes": 190,
+      "sha256": "532c4b8445d7057db408070ee96803b51d47a05475b3cd98d026f4138077e2e4"
+    },
+    {
+      "path": "v90/sources/v90-cum-original-v6.pine",
+      "bytes": 190,
+      "sha256": "888c7d70d01804d5aea36eed8b4b6c91f67bb5f029389f04985074faeabb5a3f"
+    },
+    {
+      "path": "v90/sources/v90-cum-prefix-v5.pine",
+      "bytes": 752,
+      "sha256": "f480b621aeda4bb5f46fa4845eb72db88868cbf763ed2217fc3921a2f2c32f59"
+    },
+    {
+      "path": "v90/sources/v90-cum-prefix-v6.pine",
+      "bytes": 752,
+      "sha256": "61b8da0de225c44bdc27d71d93b16dc5506771d93ce139481a8cbdb252b7f192"
     }
   ]
 }

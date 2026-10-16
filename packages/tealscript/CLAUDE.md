@@ -1,3 +1,5 @@
+V90 footprint originals and provider repeats certify presence only on each export's closed-row mask. Provider attempt1's blank study cells stay UNOBSERVED; masked nonblank native cells stay OBSERVED with no parity credit. Three closed getter drift keys keep numeric-summary stability HELD. The historic1,934 Plot values are OBSERVED with capture-time provider context HELD; price-row distributions remain UNOBSERVED.
+
 Native v89 daily requests report daily timeframe.change false at requested
 index0 with an absent prior timestamp and counter0. This correction is limited
 to first daily-request evaluations; chart startup, post-NaN and other periods retain their prior policy.
