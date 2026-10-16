@@ -206,6 +206,10 @@ export function paintTealScriptDrawings(
         const font = fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
         ctx.font = font;
         if (box.textColor && box.textWrap === 'auto') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(rect.x, rect.y, rect.width, rect.height);
+          ctx.clip();
           ctx.fillStyle = box.textColor;
           const textLayout = resolveWrappedBoxTextLayout(box, rect, fontSize, font);
           ctx.textAlign = textLayout.align;
@@ -213,6 +217,7 @@ export function paintTealScriptDrawings(
           for (let index = 0; index < textLayout.lines.length; index++) {
             ctx.fillText(textLayout.lines[index]!, textLayout.x, textLayout.y + index * textLayout.lineHeight);
           }
+          ctx.restore();
         } else if (box.textColor) {
           ctx.fillStyle = box.textColor;
           const textLines = splitDrawingTextLines(box.text);
@@ -305,6 +310,23 @@ export function paintTealScriptDrawings(
 
       let currentLine = '';
       for (const word of words) {
+        // Native v93 continues oversized words (EPSIL / ON) on the next line.
+        // Use host measurements; this does not assume native glyph widths.
+        if (getTextWidth(ctx, word, font) > maxWidth) {
+          if (currentLine) wrappedLines.push(currentLine);
+          let fragment = '';
+          for (const character of word) {
+            const candidate = fragment + character;
+            if (fragment && getTextWidth(ctx, candidate, font) > maxWidth) {
+              wrappedLines.push(fragment);
+              fragment = character;
+            } else {
+              fragment = candidate;
+            }
+          }
+          currentLine = fragment;
+          continue;
+        }
         const candidate = currentLine ? `${currentLine} ${word}` : word;
         if (currentLine && getTextWidth(ctx, candidate, font) > maxWidth) {
           wrappedLines.push(currentLine);
@@ -581,6 +603,12 @@ export function paintTealScriptDrawings(
       const lineHeight = Math.ceil(fontSize * 1.25);
       const shouldExpandBody = !isSymbolLabelStyle(label.style) && textLines.length > 1;
       const height = shouldExpandBody ? Math.max(minHeight, textLines.length * lineHeight + paddingY * 2) : minHeight;
+      // Native v93 centered above/below-bar labels keep their whole body beyond
+      // the candle. The coordinate resolver supplies the gap from its high/low.
+      if (label.style === 'label_center') {
+        if (label.yloc === 'abovebar') position.y -= height / 2;
+        else if (label.yloc === 'belowbar') position.y += height / 2;
+      }
       const font = fontForDrawing(label.size, label.textFontFamily, label.textFormatting, 'label');
       ctx.font = font;
       const textWidth = measureDrawingTextLines(textLines, font);
