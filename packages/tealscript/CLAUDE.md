@@ -1,3 +1,15 @@
+V91 footprint regression locks cover all six getter repeats at the three October 14
+drift keys and all 27 lowest/POC/highest role records, preserving raw zero strings
+and float residue. Replay supplies only the three observed roles; native row counts
+54/45/31 are observations, without full distribution or native count replay credit.
+Masked nonblank cells remain OBSERVED with zero parity credit. Unavailable and
+available-zero-total states remain HELD; v90 drift and historic hold 21 remain unchanged.
+
+V91 developing v5/v6 events remain SAME-SESSION-ONLY with EXACT-AS-OF-INPUT
+CONTEXT-UNMET. All 360 present event cells (312 plot cells) are OBSERVED and
+excluded from closed scoring, including the confirmed 2m closes. Time-only counter
+and phase regressions earn no parity credit; failed native-entry Saves are evidence only.
+
 V90 footprint originals and provider repeats certify presence only on each export's closed-row mask. Provider attempt1's blank study cells stay UNOBSERVED; masked nonblank native cells stay OBSERVED with no parity credit. Three closed getter drift keys keep numeric-summary stability HELD. The historic1,934 Plot values are OBSERVED with capture-time provider context HELD; price-row distributions remain UNOBSERVED.
 
 Native v89 daily requests report daily timeframe.change false at requested
