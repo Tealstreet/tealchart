@@ -3890,7 +3890,20 @@ Native v4 capture shows descending array.sort_indices reverses finite equal-key 
 
 Background and bar colors retain raw source-bar samples and the latest global offset, applied by web/native rendering, so legacy series offsets cannot overwrite earlier color samples.
 
-Pre-v6 const plot_style and plot_line_style values retain legacy string concatenation admission. Pine v6 keeps unique style operator refusal. This preserves known-original corpus admission; whole-source native acceptance remains unknown.
+Pre-v6 const plot_style values retain legacy string concatenation admission.
+Native v93 item 8 corrects the earlier v5 plot_line_style admission assumption:
+`plot.linestyle_solid/dashed/dotted` and the `plot()` named `linestyle` slot are
+unavailable under `//@version=5`. The checker preserves the seven witnessed
+error messages, original order and start positions; native end spans are retained
+in the fixture because SemanticDiagnostic exposes only starts. Unchecked analysis
+also refuses these builtins after resolving local/imported shadows. Coverage
+signatures omit the v5 slot. V6 keeps admission, unique style operator refusal,
+and exact closed constants 10/20/30. Native v6 stroke evidence supports pattern
+classes only (solid / long dash / short dot), with no pixel equality claim.
+The 361 closed rows earn 1083 numeric comparisons; the developing row's three
+nonblank constants remain OBSERVED / EXCLUDED. V5 has no value/rendering credit.
+The source/Save/CSV/mask/PNG/region-map evidence and v6 integrity/validation are
+bound to oracle c75cf8c0; no v6 acceptance transfers to v5.
 Visual style validation applies after callable resolution; local functions named
 `plot` or `hline` retain their declared parameter contracts.
 Runtime math dispatch resolves an evaluator once per execution and call-site ID,

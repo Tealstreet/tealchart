@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "b190ede52a57f1105cc5ff55a06f268d8d05e4df",
+  "revision": "c75cf8c081ecaa3ef468b58410aa8eb2e724a6e2",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10561,6 +10561,276 @@
       "path": "v92/captures/v92/validation-result-v2.json",
       "bytes": 479,
       "sha256": "4bd0e56d2ce5e2bda40dfd6b266fbfd773f3ca5a892422a9bdf9f3fa75deef64"
+    },
+    {
+      "path": "v93/captures/v93/RESPONSE-v93-v6.md",
+      "bytes": 6079,
+      "sha256": "ffa1c9b27a768132f31e4ee8ce4e37aac61b3c54d38ad48f0c566b36dfdacd7a"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v6.json",
+      "bytes": 281214,
+      "sha256": "b5d5766ff30de4f9a47a34dfe290d4d50eff198fb2d67176acff16a84275b324"
+    },
+    {
+      "path": "v93/captures/v93/attempt-inventory-v6.json",
+      "bytes": 1867259,
+      "sha256": "6195171bc50f5f4802f88139ac5b53ec8e3b3202596ecf09ee6b58fd3b52f4c6"
+    },
+    {
+      "path": "v93/captures/v93/facet-capabilities-v6.json",
+      "bytes": 2267993,
+      "sha256": "48c9ac684cbb33f26c0b238d00275ea873c2624bae9b54af823412667128940d"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v6.json",
+      "bytes": 2696133,
+      "sha256": "e2b5869fa4a222507b5574bce9c4922feb622f334c08358fb55878e443685f7c"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/attempt-start-v1.json",
+      "bytes": 272,
+      "sha256": "a02ac2b32dcf9a8a9f558c7d8588baee0e5dc509bd11e90da53c5a49fbec36c0"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 1087,
+      "sha256": "9abf80b621ea5774888ab2b28df56e17ab00447b9711ee0ba14e38d329e44c72"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/compiler-refusal-observation-v1.json",
+      "bytes": 2361,
+      "sha256": "fe7625c1dbd7ff919e9adc82ce421c8f5c78e5eeb09616c98519bdb6ef172d6c"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/context-before-v1.txt",
+      "bytes": 7163,
+      "sha256": "ebc931bae1afeff9d1b8a82c654c2ffce5afdee8de8970acc39720b489034b42"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/executed-v1.pine",
+      "bytes": 514,
+      "sha256": "cf1a295445fecfd4ed0d1205ac0877c48cd6ef8b8f4a52d22e19fadceb4e1589"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/observation-v1.json",
+      "bytes": 1699,
+      "sha256": "ce3baee646c795546f6ae9c96ee078ad195884264ed4cf8677a8d048c818cdd0"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7741,
+      "sha256": "69701148597698a537c308579f6e7032eeca7be35656bc563628a7d258561e8e"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 166573,
+      "sha256": "872089dda95e066120b87f6b26782a0fa8670c94df04e6ba8a73ee6f69d0e209"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7812,
+      "sha256": "eaf6fffa267192eed6de1b70112a1f9e176ee72e8ffee5f7d70dc613cadd3d07"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 659,
+      "sha256": "da4eef8f15cec3307b6a249bece316b6bd3f85decbbfbc53413c104db3e94299"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/save-response-v1.json",
+      "bytes": 4596,
+      "sha256": "d155a944ef388293da1d01693316f5f64fd3e53a175aeafd97a3f0bd719c0fe2"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v5/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "630abd786f201956c034647b14cbe5894f9b04a4e863a111122872883d75b9f4"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/add-response-v1.json",
+      "bytes": 5041,
+      "sha256": "b95b209a3dcfafc70bbd62c6219acd2edfe0042eba7c70ec30e42940f7068596"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 315,
+      "sha256": "bf5332011e12ccfeaaac281402458160f3a263bb4200ad8782c95bbfc2afa27f"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "05ad84129e38aa50463c2fec54a10d049834200ca610c083af2ca5dbe59fa0ac"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 272,
+      "sha256": "2d73849037bc4414d3a5b2b0e43548edd827d0e6371bd254066c226cdcf102e1"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2642,
+      "sha256": "122db539f7201661ab1a9f323ae4434a1e692e7f5fa26cfc5e19a4199eb56e37"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6321,
+      "sha256": "9e5d303f1f3e5d0cc5eb6d247410d7039f26655ea7f81e4f937e425cc3e21051"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/executed-v1.pine",
+      "bytes": 514,
+      "sha256": "2a3c40d586654f8b59e951832dd36d1db12ec4df52de2fc89a1fffa7d96693c5"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/observation-v1.json",
+      "bytes": 1880,
+      "sha256": "1af7dc4e30c9564aed491c4b6ba2361cc3c7729c236a07a1b21420c1406b94fa"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8324,
+      "sha256": "1018c6146cf292bba9cd557dc3d46e06480152116e5ef9fa1a02ea99d165a96d"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8370,
+      "sha256": "9fbc8336afbf1f8a45438558cc9d127f8cbd00889843c51fcb3d23cbf23f3a54"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6337,
+      "sha256": "f59dab86aa91b9be15810a3dd56dbd2defc628e3cde4edd3f3340832cb9f329b"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7770,
+      "sha256": "6cdb7a4c70c42ca595946cb734adf20a3ee44b65421dc63272728ee8d1075cbf"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 157514,
+      "sha256": "ce546209dd2ca9ff46fc6f5b647e79c4d4475435075296d4136bf06978d21108"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7826,
+      "sha256": "548113040c9c256ff02191c9a8717df78b1790be0e7e9c8f5d4237d2a89afb64"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 157302,
+      "sha256": "3a06c13c0291b923ca02a7dc4ed0ed6289d633097cc2f96fc72dc038a8ae3eb0"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7826,
+      "sha256": "e55ac9ed1182278abeaaf1e05e1c166d56ca0e4307e847853cbe97709477ff56"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 659,
+      "sha256": "a9f5c2ded30df8434a5e659b73a774abb67fbc001d322c2d1a8d7b0a1437d67e"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/save-response-v1.json",
+      "bytes": 5041,
+      "sha256": "81a57c738cbbacd9be91da1f4be6ad7554b9a32901499f79726a87b645ff350d"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 663,
+      "sha256": "3b7a0c6e693ba4085cf3d18fc94ec1fffe48ae1c61a4be3fc736c7f3eaf29fbb"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6765,
+      "sha256": "c3eef8b2170448356d6e999fa6ba325ccc5d1c03d356a8a60fbabcd12e4c3174"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/capture-timing-v1.json",
+      "bytes": 190,
+      "sha256": "cc5bf321cbee99c82ed292c42e3bd4d2b255c1ed6a2e2bf72a49e0579e1ab7f9"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 957,
+      "sha256": "68b6f3c3a62e911bf8de2ed1657c93d1cd935cfdcb22c171cd0f2d0c3fe1eb8f"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7593,
+      "sha256": "049321fee16a907f5ebe582786f7b1306e8fb8e06dcd4a09678413142390ea79"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "c02ab78f63999a9711b4f7621cebc5e097c00f9deaecc1e867629915f108882b"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 27380,
+      "sha256": "e7da74be1f6ea9e703844ee98a5cf73ab3bb0149a97d0d5e851ea57bd2c0cb91"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6770,
+      "sha256": "76a2dedaf6a93ee5510c25c744bac37b5ac833414348f6d84b73b6e29628dead"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/chart-post-export-v1.jpg",
+      "bytes": 163639,
+      "sha256": "d1a0d66d37919f4e0982541c69ad324ebae061e0307572135371590693fbf959"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5467,
+      "sha256": "f05fdbe5fff95bba60e06bdfe1a2e75ea545ec423d9b57508f88e94ca2e4a9e0"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 4165,
+      "sha256": "a27dd767afbf47d627e93da839565f3a472d81d07635c23e1e5217fe8939a63d"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6771,
+      "sha256": "def957d915f6ee07244e4d5e621ce2fdcf7309dc1549a64052a57c02a00a6894"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 133796,
+      "sha256": "13423e7ec06c6a5350cf8c8d123f5f69d0aee074b2843059d30246d9b835dba0"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 55548,
+      "sha256": "f059ebcf768b61908fc2be15e191e08218d4467f632042b1e32e52be2917aa12"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 35871,
+      "sha256": "b188f6a4904e36411dd520b06a0486755871bf9dc4113aaa94fb53b0820c33d2"
+    },
+    {
+      "path": "v93/captures/v93/v93-plot-dash-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 954,
+      "sha256": "74a0f70f6b76de3c00d32a4e4a2b51f5e51fb27c04009b2440f220a7981a09bc"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v6.json",
+      "bytes": 517,
+      "sha256": "3c034a004cfb2191a18c32a6a297a78ffcd32ec24773f16c10b20f5663002ba1"
+    },
+    {
+      "path": "v93/sources/v93-plot-dash-v5.pine",
+      "bytes": 514,
+      "sha256": "cf1a295445fecfd4ed0d1205ac0877c48cd6ef8b8f4a52d22e19fadceb4e1589"
+    },
+    {
+      "path": "v93/sources/v93-plot-dash-v6.pine",
+      "bytes": 514,
+      "sha256": "2a3c40d586654f8b59e951832dd36d1db12ec4df52de2fc89a1fffa7d96693c5"
     }
   ]
 }

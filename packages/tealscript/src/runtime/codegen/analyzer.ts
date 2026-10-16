@@ -696,6 +696,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
   }
   let hasFootprintAvailabilitySyntax = false;
+  let hasV5PlotLineStyleSyntax = false;
   let namespaceReceiverTypes: WeakMap<Expression, SemanticType> | undefined;
   let udtNamespaceDiagnostics: ReturnType<typeof checkProgram>['diagnostics'] | undefined;
   let activeFunctionName: string | null = null;
@@ -1315,6 +1316,9 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const resolved = resolveCallee(expr.callee);
         const fullName = resolveDependencyMember(resolved.fullName, activeFunctionName, ctx.importedDependencyScopes);
         const namespace = fullName.split('.')[0] ?? '';
+        if (ast.version === 5 && fullName === 'plot' && expr.arguments.some(arg => arg.name?.name === 'linestyle')) {
+          hasV5PlotLineStyleSyntax = true;
+        }
         if (ast.version === 5 && fullName === 'request.footprint') hasFootprintAvailabilitySyntax = true;
         if (!hasUserDeclarationName('timeframe')) {
           const refusal = tradingViewTimeframeCompileRefusal(expr, ast.version);
@@ -1652,6 +1656,10 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       case 'MemberExpression':
         if (expr.object.type === 'Identifier') {
           const fullName = `${expr.object.name}.${expr.property.name}`;
+          if (ast.version === 5 && expr.object.name === 'plot'
+            && ['linestyle_solid', 'linestyle_dashed', 'linestyle_dotted'].includes(expr.property.name)) {
+            hasV5PlotLineStyleSyntax = true;
+          }
           if (Object.prototype.hasOwnProperty.call(TA_VAR_CLASS_MAP, fullName)) {
             registerTAVarSite(expr, fullName);
             break;
@@ -1966,6 +1974,13 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         site.captureInitialCtorArgs = v6Types?.get(args[0])?.qualifier === 'series';
       }
       if (site.integerDivisionLength && !site.dynamicCtorArgExprs) site.ctorArgs[0] = Math.trunc(Number(site.ctorArgs[0]));
+    }
+  }
+  if (hasV5PlotLineStyleSyntax) {
+    // Unchecked compilation must retain version admission. The checker resolves
+    // local/imported shadows and supplies the same refusal messages.
+    for (const diagnostic of checkProgram(ast, { libraries: options.libraries }).diagnostics) {
+      if (diagnostic.code === 'plot-linestyle-version') addUnsupported(diagnostic.message);
     }
   }
   if (hasFootprintAvailabilitySyntax) {
