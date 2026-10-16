@@ -4685,3 +4685,7 @@ diagnostics' relative order; advisory and shorttitle ordering remain separate.
 Array/map mutation validation and matrix set/fill bind argument slots through the shared
 selected namespace/receiver call-form resolver, including collection receivers named
 after namespaces. Explicit namespace calls retain their ID argument.
+
+V93 overlay=false preserves the visible PANE table when a later force_overlay table
+uses the same position: replacement and cell capacity share effective pane ownership.
+Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.

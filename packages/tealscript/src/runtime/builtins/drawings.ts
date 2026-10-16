@@ -1114,14 +1114,20 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     withDrawing(value, ctx, 'table', runtime.isNa, fn);
   };
   const tableCellCapacity = (table: Pick<TableDrawingOutput, 'columns' | 'rows'>): number => table.columns * table.rows;
+  const sameTableLocation = (
+    ctx: ExecutionContext,
+    previous: Pick<TableDrawingOutput, 'position' | 'forceOverlay'>,
+    next: Pick<TableDrawingOutput, 'position' | 'forceOverlay'>,
+  ): boolean => previous.position === next.position
+    && (ctx.indicatorOverlay || Boolean(previous.forceOverlay) === Boolean(next.forceOverlay));
   const assertTableCellCapacity = (
     ctx: ExecutionContext,
-    table: Pick<TableDrawingOutput, 'columns' | 'rows' | 'position'>,
+    table: Pick<TableDrawingOutput, 'columns' | 'rows' | 'position' | 'forceOverlay'>,
   ): void => {
     const nextCells = tableCellCapacity(table);
     const currentCells = ctx
       .getDrawings()
-      .filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table' && drawing.position !== table.position)
+      .filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table' && !sameTableLocation(ctx, drawing, table))
       .reduce((sum, drawing) => sum + tableCellCapacity(drawing), 0);
 
     if (nextCells + currentCells > MAX_TABLE_CELLS) {
@@ -1250,7 +1256,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     const columns = tableDimension(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 'columns');
     const rows = tableDimension(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 'rows');
     const position = runtime.toStringValue(orderedCallArg(args, namedArgs, tableNewArgs, 0, 'top_right'));
-    assertTableCellCapacity(ctx, { columns, rows, position });
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8, false));
+    assertTableCellCapacity(ctx, { columns, rows, position, forceOverlay });
 
     const drawing: TableDrawingOutput = {
       id,
@@ -1267,11 +1274,10 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       borderWidth: tableBorderWidth(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 7)),
       cells: [],
     };
-    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8, false));
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     for (const previous of ctx.getDrawings()) {
-      if (previous.type === 'table' && previous.position === position) ctx.deleteDrawing(previous.id);
+      if (previous.type === 'table' && sameTableLocation(ctx, previous, drawing)) ctx.deleteDrawing(previous.id);
     }
     ctx.addDrawing(drawing);
     return ctx.getTableReference(id);
