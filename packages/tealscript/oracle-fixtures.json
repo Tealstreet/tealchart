@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "b190ede52a57f1105cc5ff55a06f268d8d05e4df",
+  "revision": "4fd1b643c80bdab0ea19a46b1ccf658c5ccb1526",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10561,6 +10561,151 @@
       "path": "v92/captures/v92/validation-result-v2.json",
       "bytes": 479,
       "sha256": "4bd0e56d2ce5e2bda40dfd6b266fbfd773f3ca5a892422a9bdf9f3fa75deef64"
+    },
+    {
+      "path": "v93/REQUEST-v93-v1.md",
+      "bytes": 34933,
+      "sha256": "134b4e8a6a813cd393777b5d9e52ee80da4803eca3f890ed4351f9f18771121c"
+    },
+    {
+      "path": "v93/captures/v93/RESPONSE-v93-v2.md",
+      "bytes": 4034,
+      "sha256": "45cbd82df74979ad115eaa45abed5cdb76732529882f296bde65c5166ed674de"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v2.json",
+      "bytes": 111717,
+      "sha256": "ed85c73ca67843f3216f7579a9ac8794150d3783bf261072de9f6fc83755e983"
+    },
+    {
+      "path": "v93/captures/v93/attempt-inventory-v2.json",
+      "bytes": 649955,
+      "sha256": "4f81d4e04146837968b92a8b587b6e663ec882d398ef122ec1551597e0b37759"
+    },
+    {
+      "path": "v93/captures/v93/facet-capabilities-v2.json",
+      "bytes": 512092,
+      "sha256": "736cf7891214e9b9ee8e54c900ad92c58482b9745944c7d5442d4481a65cedb5"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v2.json",
+      "bytes": 948435,
+      "sha256": "8f5998137ed8d1c010277b1828836468731d2a09ea5810dafbc1cd5f9c8cbe66"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/add-response-v1.json",
+      "bytes": 13513,
+      "sha256": "5d2b0372524a2226a54ba662e2345c7c60fe58693477f56fbfb5d5973ee10ac9"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2428,
+      "sha256": "02f26cceddad0d4180510f4047c8774df2e2272ddace4a99718454c942a86ba7"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1736,
+      "sha256": "ad51f7f4d1b2d8d2fd62f7eeae166a4b2504432b14bcb35ec039ee4b40f30210"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/observation-v1.json",
+      "bytes": 1913,
+      "sha256": "ddc58921f58538f708e31eb17e1804441bd16504c689d3205c878dff38a4709f"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/save-response-v1.json",
+      "bytes": 13513,
+      "sha256": "2e4dd9fee4d4c317fe31b3a12622e7e8baf13e24c0408751e4b3a6f00e8afb7e"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 41904,
+      "sha256": "589af79afb8a6be6e28e583f3691eee349a5f53dea556aaf5d4bb584233d54c7"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11439,
+      "sha256": "2fbb1e6e4fa475224203bfbf0f07961859c818acf371e30294c0b24b73931372"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 49581,
+      "sha256": "e23a629e5af9ce18383e90f563bbc8676586ca56e81819f9d0bfebc7016f8c9d"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32271,
+      "sha256": "7717f76f8579df57b79be884713adc764d75fc152fb14932cdfde43c1ab59850"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 740,
+      "sha256": "54cbe4e14cbf415bf2149fffe9cdb1fea4fd57de97fc56f67a7f943db9ebb9ed"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/add-response-v1.json",
+      "bytes": 13193,
+      "sha256": "2b62255652f22fb8f68e4c69c93b6c3cecb175848a25a11e0d347cf66ce62bdb"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2428,
+      "sha256": "0b147e48cddf2024c6d98cd854dcd3375306d81cb1423d6442b64ee3d22558c2"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1736,
+      "sha256": "bc7a3fc82f69c4f058f64b73f8201bb79453959761eb8634171e4cea8785b18a"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/observation-v1.json",
+      "bytes": 1913,
+      "sha256": "b0b361fdcf2561144b5bf0d52ae0ee4bbdd2d72b313158b67018197336803b16"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/save-response-v1.json",
+      "bytes": 13193,
+      "sha256": "9dcc6491690fbc6b3477447ccbf82312320392ebb223f329b7fb0c9a6eb2ad7e"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 42423,
+      "sha256": "1d02c72c37d44291d142f032fdd4a968743cb54a0af49040b4b3686e1e75eb88"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11439,
+      "sha256": "56c51abce2bdfd2f1387d053f04ab6ba0fe0961a0b1953b5354551482cd36498"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 50193,
+      "sha256": "64102376f8cb7bf44960fdf6aea3cd4ece227532073aa7d8a057a41350ec0b34"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 32650,
+      "sha256": "9ff330e28bd6fc98099c4b2c84319834cfcabf84f56a17765900f75ac030b034"
+    },
+    {
+      "path": "v93/captures/v93/v93-color-channels-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 740,
+      "sha256": "97546ace2950e6add9185632cac9063c298a1b4e6c8a4de4971bbba2d67afec0"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v2.json",
+      "bytes": 450,
+      "sha256": "015c0898991810b9bfb5e47c4ef4d303f54205ffbdc638af5e67e0ca12878139"
+    },
+    {
+      "path": "v93/sources/v93-color-channels-v5.pine",
+      "bytes": 1736,
+      "sha256": "ad51f7f4d1b2d8d2fd62f7eeae166a4b2504432b14bcb35ec039ee4b40f30210"
+    },
+    {
+      "path": "v93/sources/v93-color-channels-v6.pine",
+      "bytes": 1736,
+      "sha256": "bc7a3fc82f69c4f058f64b73f8201bb79453959761eb8634171e4cea8785b18a"
     }
   ]
 }

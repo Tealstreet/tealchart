@@ -51,21 +51,33 @@ plot(close, "Colored", color=x)`,
       expect(values.every((value) => value === expected)).toBe(true);
     });
   }
-  for (const [name, expression] of [
-    ['missing value', 'color.from_gradient(na,0,10,#000000,#FFFFFF)'],
-    ['missing lower endpoint at lower clamp', 'color.from_gradient(0,0,10,na,#FF0000)'],
-    ['missing numeric bound', 'color.from_gradient(5,na,10,#000000,#FFFFFF)'],
-    ['both missing colors', 'color.from_gradient(5,0,10,na,na)'],
-    ['missing upper color', 'color.from_gradient(5,0,10,#000000,na)'],
+  // V93's captured E tuples supersede the former uncaptured low-clamp NA assumption.
+  // Keep every boundary case and assert all channels as well as missingness.
+  for (const [name, expression, missing] of [
+    ['missing value', 'color.from_gradient(na,0,10,#000000,#FFFFFF)', 1],
+    ['missing lower endpoint at lower clamp', 'color.from_gradient(0,0,10,na,#FF0000)', 0],
+    ['missing numeric bound', 'color.from_gradient(5,na,10,#000000,#FFFFFF)', 1],
+    ['both missing colors', 'color.from_gradient(5,0,10,na,na)', 1],
+    ['missing upper color', 'color.from_gradient(5,0,10,#000000,na)', 1],
   ] as const) {
-    it(`retains the earlier ${name} missing route`, () => {
+    it(`preserves the complete ${name} result`, () => {
       const result = runCompatScript(
-        `//@version=6\nindicator("Gradient missing control")\nplot(na(${expression})?1:0,"NA")`,
+        `//@version=6
+indicator("Gradient missing control")
+c = ${expression}
+plot(na(c)?1:0,"NA")
+plot(color.r(c),"R")
+plot(color.g(c),"G")
+plot(color.b(c),"B")
+plot(color.t(c),"T")`,
       );
       expect(result.errors).toEqual([]);
       const values = getPlot(result, 'NA').values;
       expect(values).toHaveLength(compatibilityBars.length);
-      expect(values.every((value) => value === 1)).toBe(true);
+      expect(values.every((value) => value === missing)).toBe(true);
+      for (const [channel, expected] of [['R', 0], ['G', 0], ['B', 0], ['T', 100]] as const) {
+        expect(getPlot(result, channel).values).toEqual(compatibilityBars.map(() => missing ? null : expected));
+      }
     });
   }
 });
