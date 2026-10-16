@@ -1,3 +1,7 @@
+V93 linefill locks cover same-execution counts/parent identities and endpoint tracking.
+PNG-bound output fields cover red/blue and source-line deletion; no native color
+getter, recalculation identity, all-object deletion, or pixel parity is claimed.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
