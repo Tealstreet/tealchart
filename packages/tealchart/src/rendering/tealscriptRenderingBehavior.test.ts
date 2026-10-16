@@ -15,6 +15,8 @@ import type { Bar, ComputedPane, PaneLayout, Viewport } from '../types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { executePlotstyleV93 } from '../../../tealscript/tests/helpers/plotstyleV93';
+
 import { TealchartRenderer, type IndicatorPaneInfo } from '../TealchartRenderer';
 import { clearChartStoreCache } from '../state/chartState';
 import { DEFAULT_UNIFIED_PANE_LAYOUT } from '../types';
@@ -1221,4 +1223,39 @@ describe('v93 box/table native local controls', () => {
       });
     }
   }
+});
+
+// Native v93 item 8, oracle c75cf8c0: render-v1.png + derived-region-map-v1.json
+// are authenticated in pine-v93-plotstyle-native.test.ts. Only pattern classes
+// are supported here, not exact dash dimensions, colors, or pixel parity.
+describe('v93 plotstyle native stroke classes', () => {
+  it.each(['legacy', 'unified'] as const)('%s paints the compiled v6 solid/dashed/dotted lanes distinctly', path => {
+    const { result, bars } = executePlotstyleV93();
+    const plots = result.plots.filter(p => ['SOLID', 'DASHED', 'DOTTED'].includes(p.title ?? ''))
+      .map(p => ({ ...p, scriptId: 'overlay-script' }));
+    expect(plots).toHaveLength(3);
+    const viewport = { startTime: bars[288].time, endTime: bars[319].time, priceMin: 0, priceMax: 40 };
+    const ctx = new RecordingCanvasContext();
+    const renderer = makeRenderer(ctx);
+    if (path === 'legacy') renderer.renderPlots(plots, bars, viewport);
+    else renderer.renderWithLayoutPasses({ bars, viewport, layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+      plots, indicatorPaneInfo: { 'overlay-script': { overlay: true } }, passes: ['main-overlay-content'] });
+    const patterns = plots.map(plot => {
+      const color = Array.isArray(plot.color) ? plot.color[0] : plot.color;
+      const strokes = strokeCalls(ctx).filter(call => call.strokeStyle === color);
+      expect(strokes.length).toBeGreaterThan(0);
+      const pattern = strokes[0].lineDash;
+      strokes.forEach(call => expect(call.lineDash).toEqual(pattern));
+      return pattern;
+    });
+    expect(patterns[0]).toEqual([]);
+    // A separated long dash, and a separated short dot. No pixel-size equality.
+    expect(patterns[1]).toHaveLength(2);
+    expect(patterns[2]).toHaveLength(2);
+    expect(patterns[1].every(n => n > 0)).toBe(true);
+    expect(patterns[2].every(n => n > 0)).toBe(true);
+    expect(patterns[1][0]).toBeGreaterThan(patterns[1][1]);
+    expect(patterns[2][0]).toBeLessThan(patterns[2][1]);
+    expect(patterns[1][0]).toBeGreaterThan(patterns[2][0]);
+  });
 });

@@ -3341,6 +3341,7 @@ export function builtinSignatureForCoverage(name: string, pineVersion = 6): Buil
   if (name === 'box.new') overloads = [[...BOX_NEW_POINT_SIGNATURE.params]];
   const cancellation = name === 'strategy.cancel' || name === 'strategy.cancel_all';
   let params = [...(cancellation && pineVersion === 5 ? signature.legacyV5Params! : signature.params)];
+  if (name === 'plot' && pineVersion === 5) params = params.filter(param => param !== 'linestyle');
   if (name === 'str.format') params = ['formatString', 'arg0, arg1, ...'];
   if (name === 'array.from') params = ['arg0, arg1, ...'];
   if (name === 'color') params = ['x'];
@@ -3403,6 +3404,7 @@ class SemanticChecker {
   private readonly deferredNamespaceReceiverCalls = new Set<CallExpression>();
   private diagnostics: SemanticDiagnostic[] = [];
   private reportedGenericInputRangeArgument = false;
+  private reportedV5PlotLineStyleNamespace = false;
   private legacyUndeclaredSymbols = new WeakSet<SemanticSymbol>();
   private legacyUndeclaredDiagnostics = new WeakSet<SemanticDiagnostic>();
   private legacyUndeclaredSites = new Set<string>();
@@ -3475,6 +3477,7 @@ class SemanticChecker {
   check(program: Program): SemanticCheckResult {
     this.diagnostics = [];
     this.reportedGenericInputRangeArgument = false;
+    this.reportedV5PlotLineStyleNamespace = false;
     this.legacyUndeclaredSymbols = new WeakSet();
     this.legacyUndeclaredDiagnostics = new WeakSet();
     this.legacyUndeclaredSites.clear();
@@ -7535,6 +7538,16 @@ class SemanticChecker {
         this.activeLegacySecurityReferences.pop();
       }
     }
+    if (this.currentPineVersion === 5 && this.memberPath(expression.callee).join('.') === 'plot'
+      && this.resolveBuiltinSignature('plot', expression, scope)) {
+      for (const argument of expression.arguments) {
+        if (argument.name?.name === 'linestyle') this.addDiagnostic(
+          'plot-linestyle-version',
+          "The 'plot' function does not have an argument with the name 'linestyle'",
+          argument.name.loc,
+        );
+      }
+    }
   }
 
   private checkUniqueBuiltinArguments(expression: CallExpression, scope: SemanticScope): void {
@@ -7644,6 +7657,26 @@ class SemanticChecker {
   }
 
   private checkMemberExpression(expression: MemberExpression, scope: SemanticScope): void {
+    // v93 item 8: these constants and the plot() linestyle slot are unavailable
+    // in v5. Actual local fields, enum types, and imported members retain their
+    // own resolution; a same-name callable/scalar cannot enable the namespace.
+    if (this.currentPineVersion === 5 && expression.object.type === 'Identifier'
+      && expression.object.name === 'plot'
+      && PLOT_LINESTYLE_CONSTANT_VALUES.has(`plot.${expression.property.name}`)) {
+      const symbol = scope.lookup('plot');
+      const receiver = symbol ? this.inferExpressionType(expression.object, scope) : undefined;
+      const localField = receiver?.kind === 'udt' && receiver.name
+        && this.findUdtField(receiver.name, expression.property.name);
+      if (!localField && symbol?.kind !== 'import' && symbol?.kind !== 'type') {
+        if (!this.reportedV5PlotLineStyleNamespace) {
+          this.addDiagnostic('plot-linestyle-version', "Undeclared identifier 'plot'", expression.object.loc);
+          this.reportedV5PlotLineStyleNamespace = true;
+        }
+        this.addDiagnostic('plot-linestyle-version', `Undeclared identifier 'plot.${expression.property.name}'`, expression.loc);
+        return;
+      }
+    }
+
     if (this.checkImportedEnumMemberExpression(expression, scope)) {
       return;
     }
@@ -13302,6 +13335,9 @@ class SemanticChecker {
         && this.versionRules.allowsLegacyGlobalBuiltinAliases
         && Object.values(signature.legacyV4Aliases ?? {}).includes(arg.name.name);
       if (arg.name && (renamedModernSlotInLegacy || !allowed.has(this.canonicalSignatureArgumentName(arg.name.name, signature)))) {
+        // Native v5 reports the unavailable value before the unsupported slot.
+        // Defer this one diagnostic until this call's values have been checked.
+        if (this.currentPineVersion === 5 && displayName === 'plot' && arg.name.name === 'linestyle') continue;
         if (capturedGenericInputRange && INPUT_RANGE_OPTION_RANGE_PARAMS.has(arg.name.name)) continue;
         if (
           mixedInputRangeArg
@@ -13669,6 +13705,11 @@ class SemanticChecker {
   }
 
   private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
+    if (this.currentPineVersion === 5 && signature === BUILTIN_SIGNATURES.get('plot')) {
+      const params = signature.legacyV5Params && this.usesNamedLegacyArgument(args, signature)
+        ? signature.legacyV5Params : signature.params;
+      return params.filter(param => param !== 'linestyle');
+    }
     if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
       return this.resolveTimestampSignatureParams(args, signature, scope);
     }
