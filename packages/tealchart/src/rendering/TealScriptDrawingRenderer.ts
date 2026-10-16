@@ -581,6 +581,12 @@ export function paintTealScriptDrawings(
       const lineHeight = Math.ceil(fontSize * 1.25);
       const shouldExpandBody = !isSymbolLabelStyle(label.style) && textLines.length > 1;
       const height = shouldExpandBody ? Math.max(minHeight, textLines.length * lineHeight + paddingY * 2) : minHeight;
+      // Native v93 centered above/below-bar labels keep their whole body beyond
+      // the candle. The coordinate resolver supplies the gap from its high/low.
+      if (label.style === 'label_center') {
+        if (label.yloc === 'abovebar') position.y -= height / 2;
+        else if (label.yloc === 'belowbar') position.y += height / 2;
+      }
       const font = fontForDrawing(label.size, label.textFontFamily, label.textFormatting, 'label');
       ctx.font = font;
       const textWidth = measureDrawingTextLines(textLines, font);

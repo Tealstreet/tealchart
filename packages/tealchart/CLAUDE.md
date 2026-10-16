@@ -416,6 +416,12 @@ anchor, while `label_right` places it to the left. A gap separates the anchor
 from the body, and the triangle base attaches to the nearest body edge. Web and
 native share this layout and path; exact spacing and glyph pixels remain unpinned.
 
+Native v93 v5/v6 `label_center` captures place the complete body above the
+referenced candle high for abovebar and below its low for belowbar. Offset the
+center by half the measured body height in the shared painter; price mode stays
+centered on the supplied price. This pins placement topology, not native pixel
+spacing, pane-edge clamping or other label styles.
+
 **Corner label pointers:** `label_lower_left` and `label_lower_right` place the
 body above the tip; `label_upper_left` and `label_upper_right` place it below.
 Left/right controls which side the body extends toward, and the pointer base

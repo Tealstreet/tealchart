@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "b190ede52a57f1105cc5ff55a06f268d8d05e4df",
+  "revision": "df32cf9599829abed05f312fb59a0c6bf1ef04c5",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10561,6 +10561,316 @@
       "path": "v92/captures/v92/validation-result-v2.json",
       "bytes": 479,
       "sha256": "4bd0e56d2ce5e2bda40dfd6b266fbfd773f3ca5a892422a9bdf9f3fa75deef64"
+    },
+    {
+      "path": "v93/captures/v93/RESPONSE-v93-v5.md",
+      "bytes": 5103,
+      "sha256": "a19ff4d4a67d44303f80d735ebd7af058ba93a108f4666ba9ccc9bf9e95a31b3"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v5.json",
+      "bytes": 225099,
+      "sha256": "5c7abf57e6470a8cdbf135a6ff66485ed8b200b1beeb8838b76fe7e590cc0015"
+    },
+    {
+      "path": "v93/captures/v93/attempt-inventory-v5.json",
+      "bytes": 1495636,
+      "sha256": "b9253e52442d6e770eb1d57a5683243431188a6a98d1c759bc7ceb5d760efe67"
+    },
+    {
+      "path": "v93/captures/v93/facet-capabilities-v5.json",
+      "bytes": 1965072,
+      "sha256": "fb11a58fc83cc69bd4e3798a812e56eb98ffe898e85069431ed47cb6c95035aa"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v5.json",
+      "bytes": 2230945,
+      "sha256": "c61ba1944ff7416f46694cb4b98c6a5649e31ee0b12457c66e5a52494684fb15"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/add-response-v1.json",
+      "bytes": 11279,
+      "sha256": "e6e8a4a3c244d8dcd4744667e439cc05602eb44399205e44c5ae14f74bbcecec"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/capture-receipt-v3.json",
+      "bytes": 4876,
+      "sha256": "0e75d30ad924edde8c2468fd8221c99f94a2855afc7afab3def920455fd4f9f3"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1363,
+      "sha256": "72245f4969aa2b8c61c992495e8fa6f1f3e918c905c1558d3ddcf0ab7c7c223d"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/observation-v1.json",
+      "bytes": 1925,
+      "sha256": "eacd6bfbec23655b249ac0e13861864919ee5a96993818155e0df93f9023b7a6"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1528,
+      "sha256": "94b75ac2bbe35a5713a02795ec1a4ba33d09afb5e793f7ae958d4e3ee15b4bcc"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/save-response-v1.json",
+      "bytes": 11279,
+      "sha256": "9241a4cf2e88bc4636494de7850154ce4acdbd4e2b053f03e41b938d9b0bd212"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 42979,
+      "sha256": "28cff6b380ce4f99a0aa2a78b1d51fb7b34b3dcaaba9dd89e852c75a61f31720"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "3545ccef2c06f3056170175bf68af898d40c7569018285495bccb1010fb6c604"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 6737,
+      "sha256": "58cdb78018c889346838bc28b5d3a35e001ccc5e1b16ef90f7ab23a45fb02420"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 143837,
+      "sha256": "e450a06b42a1eec7e02b96bd41639f2a7564e7cb446173aab8a545b417933426"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 53100,
+      "sha256": "fda7d2b985fc1f734e4e234a70522be8f636713f493eccacc1276490b71d010d"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 34556,
+      "sha256": "cf6526120168a7ed5709d09fd74818bc78f2f3f813c14ca9bcbeb701ae7d216b"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "d219a8fcbd51ee97b1b063fd9eef56c1e078a4e3f765973d517369a8b7e3f462"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/chart-native-v1.csv",
+      "bytes": 43105,
+      "sha256": "628871022f935a986cad380e7193da2bfc1732fed214c10d88009450ffbf2b0a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "57687b9ac6fff40e215f848b94f306537a4f8fd830ded8090e8007b82b70d362"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/derived-region-map-v1.json",
+      "bytes": 6717,
+      "sha256": "ac2618d1732166efc83ac8231da0c0cdc751081c26fbd1797272314cfbe294bf"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/render-v1.png",
+      "bytes": 143616,
+      "sha256": "bdc6c2bc923187e4e5276881bbf4933629157f701f156c625fd9d805cf1111a0"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/row-closure-mask-v1.csv",
+      "bytes": 53253,
+      "sha256": "0aae43f133ca2418365170525df979c2755922b3560319fa2042532dbcce83a0"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/row-set-observation-v1.json",
+      "bytes": 34660,
+      "sha256": "acd70d1cec50a8acb528a57b2ca242b1631a4dd7732b0c3d996d52a320f09d6b"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode1-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "3e6987087981c5b82d211d241f3c576d09a469306ee67bebf074800d2f658366"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/chart-native-v1.csv",
+      "bytes": 43105,
+      "sha256": "83c9cbbc0822f231f17930553466a2750b42833b31e5bf28f1d1bd1bec99a5fc"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "465cd99eb0a0e8103bcff6bfb37b0267e6b1b51b4aabb777ff976dd71e3f199a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/derived-region-map-v1.json",
+      "bytes": 6718,
+      "sha256": "b5a57bb92ef67cf2eaa2efee2c3c657ba5abffa5f5eeaf20da16c4c24943652c"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/render-v1.png",
+      "bytes": 144270,
+      "sha256": "0d68cfecdd03cfc21085a191086bef6aec18170616525f9b84ce0dfb1334a7a1"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/row-closure-mask-v1.csv",
+      "bytes": 53253,
+      "sha256": "738821cf2588224a7fa9ca178f3b1f5b68ea368c6183345a289f30f0e6963ad9"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/row-set-observation-v1.json",
+      "bytes": 34660,
+      "sha256": "8bdae3d536e110767cc7f4f945d612509f083289a7c1ec017ee64803dd37c2a0"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v5/attempt-v1/session-mode2-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "00127a2d8ff0d1f56146378ed7e95ca94d762784dcb0a9fc2e25cb6b9c0f9c83"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/add-response-v1.json",
+      "bytes": 11208,
+      "sha256": "4f00dd5c9b8414db120178a4b8ec84d766342f4ae4c6768065cb3ceefe309d72"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/capture-receipt-v3.json",
+      "bytes": 4876,
+      "sha256": "c72edc496034bf986d3c55af0469e13fb8f617574bc4aaba2b3606467305cc2c"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1363,
+      "sha256": "5f61d016d85ee16245c7249556ad80de161fa1d294111979857c79dd74c3e759"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/observation-v1.json",
+      "bytes": 1925,
+      "sha256": "19524725655e7f9a4b0f57c4147c455690fbf45ff800ddabdf86998c0ac8bcc2"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1528,
+      "sha256": "a3ce7f2006ee8539ee54bab0e99e5505c775e40809d178ce5ab624c9f49da685"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/save-response-v1.json",
+      "bytes": 11208,
+      "sha256": "b7753b50a4851522ad4b639fa489a30e081bded7d04d034a3d50538165478a71"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 43490,
+      "sha256": "d953f704d4774c8ba5cae1d3abd47198b62ca17b503b776a1f67d7c2a9b5d732"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "818ed726c02188a32788e953f983ce408a7d9d16d8f886174b4a477797887751"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 6754,
+      "sha256": "53a17e263638813ea607c4a3c553a14e48030846d6c1b2c99ca444767c54649e"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 143375,
+      "sha256": "1d43649edee931193165a641e6df3bfbd062bd57229ec1e0efa857fa11db811b"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 53712,
+      "sha256": "31a6c0665899ea019745ecc5e7983a623f4b6e193b042d3a46c69df3e6b01a72"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 34944,
+      "sha256": "d437ed081af600f8c04032ca6bcc3573dc23b03d7528b3206a976a05864aa330"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "32bd76dcb40dd4b5a797ad49b8cd5c8585e3129c5b18e01f6514ae9677e7eeaf"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/chart-native-v1.csv",
+      "bytes": 43490,
+      "sha256": "2fd36ff2449502710194038b00de802748cac9cfd952a522a8c424bc83674ef4"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "678e96c9265d7547a364ee6c43a76e4bec78df09c200d2508693c0732db32a20"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/derived-region-map-v1.json",
+      "bytes": 6717,
+      "sha256": "8cc71a0eb09cad57ac748a7fa874095974e6f602f0ec273ea8a60a8d4ad625a3"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/render-v1.png",
+      "bytes": 143773,
+      "sha256": "e8e092fcf4fb4d71a3cb36bd24d92b0cbbf66c199cc91b8414caeb3201ffc862"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/row-closure-mask-v1.csv",
+      "bytes": 53712,
+      "sha256": "dbd86c2b58f73ef92ffcaaed0f08a25105c59e0d56cdf854ca86eebdffa6f848"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/row-set-observation-v1.json",
+      "bytes": 34944,
+      "sha256": "904018267de7a785c4fa725412ec6572720a01efe06f1fd7b65ba0d72d74d35f"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode1-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "43ba6d64f2cbdd96f8daa7b196243e972319f84d2ee97bcdd4a2f93446d4b207"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/chart-native-v1.csv",
+      "bytes": 43616,
+      "sha256": "6768fa749131dc614d0a52255c4e782698f47d8f1a95bbba217b6b67e801d51d"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/column-bindings-v1.json",
+      "bytes": 7520,
+      "sha256": "c38705ed8ede318acfeba0bef025e17cfbec7b4fef606819b838fda7ce861520"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/derived-region-map-v1.json",
+      "bytes": 6720,
+      "sha256": "8f79f8d6e2d3a3cde285705567c6dcb76c5be52a6f6146cf285e52f487abd7c2"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/render-v1.png",
+      "bytes": 143232,
+      "sha256": "ee5bc12a5c3a2345dbebe9d89601d7ac5b9bbb3e67a36ce1dc43a16214ef985a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/row-closure-mask-v1.csv",
+      "bytes": 53865,
+      "sha256": "e043ff8705b058cc39408329530e682e55718aafc849be74b1e03ca0526f35bf"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/row-set-observation-v1.json",
+      "bytes": 35039,
+      "sha256": "04aedec3e6312c103f762c5f594cdc9bf3ac0177e44b74c1e0f0e741dcebd551"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-label-v6/attempt-v1/session-mode2-v1/session-receipt-v1.json",
+      "bytes": 975,
+      "sha256": "5a893c0e05297abcc116bfb1d34a04b5578697d6a45faa2ad7a79d0c0e87ae91"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v5.json",
+      "bytes": 517,
+      "sha256": "3ea67da89a7d2ea23f437660d279b19b4987aa283e2dd5323756d68ce3ff786c"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-label-v5.pine",
+      "bytes": 1363,
+      "sha256": "72245f4969aa2b8c61c992495e8fa6f1f3e918c905c1558d3ddcf0ab7c7c223d"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-label-v6.pine",
+      "bytes": 1363,
+      "sha256": "5f61d016d85ee16245c7249556ad80de161fa1d294111979857c79dd74c3e759"
     }
   ]
 }
