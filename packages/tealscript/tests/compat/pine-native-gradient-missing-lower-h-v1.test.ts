@@ -32,17 +32,16 @@ plot(close, "Colored", color=x)`,
         expect(getPlot(result, title).values).toEqual([expected, expected, expected]);
       }
       expect(getPlot(result, 'Colored').values).toEqual(bars.map((bar) => bar.close));
-      // V94's byte-floor model changes this local packed-alpha representation
-      // to 127. V52 native R/G/B/T/NA assertions above (including T50) stay exact;
-      // that capture does not certify the engine's packed hexadecimal alpha.
+      // Native v96 v5/v6 rows1..32 MISSING_EQ_FLOOR=1 rejects #FF000080.
+      // The positional expression is identical; named argument permutation
+      // remains a synthetic equivalence check without an extra native claim.
       expect(getPlot(result, 'Colored').color).toEqual(['#FF00007F', '#FF00007F', '#FF00007F']);
     });
   }
   for (const [name, expression, expected] of [
-    // Local opaque consistency control for the single V94 floor-byte model.
-    // This predicts 127; the integer-channel V94 opaque control does not
-    // independently certify this half-byte midpoint.
-    ['finite midpoint', 'color.from_gradient(5,0,10,#000000,#FFFFFF)', 127],
+    // Synthetic opaque half-byte check: this exact midpoint is uncaptured.
+    // Its expected127 is an integration constraint, with zero native credit.
+    ['synthetic finite midpoint (no native certificate)', 'color.from_gradient(5,0,10,#000000,#FFFFFF)', 127],
     ['finite lower clamp', 'color.from_gradient(-5,0,10,#000000,#FFFFFF)', 0],
     ['finite upper clamp', 'color.from_gradient(15,0,10,#000000,#FFFFFF)', 255],
     ['degenerate finite range', 'color.from_gradient(5,5,5,#FF0000,#FFFFFF)', 0],
@@ -57,8 +56,9 @@ plot(close, "Colored", color=x)`,
       expect(values.every((value) => value === expected)).toBe(true);
     });
   }
-  // V93's captured E tuples supersede the former uncaptured low-clamp NA assumption.
-  // Keep every boundary case and assert all channels as well as missingness.
+  // These local boundary variants retain strict integration checks. V93 E
+  // witnesses a different upper endpoint, so no exact native certificate is
+  // claimed for this red-upper lower-clamp variant.
   for (const [name, expression, missing] of [
     ['missing value', 'color.from_gradient(na,0,10,#000000,#FFFFFF)', 1],
     ['missing lower endpoint at lower clamp', 'color.from_gradient(0,0,10,na,#FF0000)', 0],

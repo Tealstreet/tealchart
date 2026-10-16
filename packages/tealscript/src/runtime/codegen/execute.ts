@@ -7987,19 +7987,21 @@ function executeCompiledPass(
         if (range === 0) return bottomColor ? formatRuntimeColorAlpha(0, 0, 0, 0) : Number.NaN;
         if (!isFiniteRuntimeNumber(value)) return Number.NaN;
         const ratio = Math.min(1, Math.max(0, (value - bottomValue) / range));
-        const bottomWeight = (bottomColor?.alpha ?? 0) * (1 - ratio);
-        const topWeight = topColor.alpha * ratio;
-        const alpha = bottomWeight + topWeight;
+        const bottomAlpha = (bottomColor?.alpha ?? 0) / 255;
+        const topAlpha = topColor.alpha / 255;
+        const alpha = bottomAlpha + (topAlpha - bottomAlpha) * ratio;
         if (alpha === 0) return formatRuntimeColorAlpha(0, 0, 0, 0);
-        // V94 clamp/RSI adjudication: floor the unpremultiplied RGB and alpha
-        // bytes. color.t then rounds byte-derived transparency to integer percent.
-        // This algebraic form preserves equal channels exactly without an epsilon.
-        const interpolate = (from: number, to: number): number => Math.floor(from + (to - from) * (topWeight / alpha));
+        const interpolate = (from: number, to: number): number => {
+          if (bottomAlpha === 0) return to;
+          if (topAlpha === 0) return from;
+          const bottom = from * bottomAlpha;
+          return Math.floor((bottom + (to * topAlpha - bottom) * ratio) / alpha);
+        };
         return formatRuntimeColorAlpha(
           interpolate(bottomColor?.red ?? 0, topColor.red),
           interpolate(bottomColor?.green ?? 0, topColor.green),
           interpolate(bottomColor?.blue ?? 0, topColor.blue),
-          Math.floor(alpha),
+          Math.floor(alpha * 255),
         );
       },
       mathCall(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string) {

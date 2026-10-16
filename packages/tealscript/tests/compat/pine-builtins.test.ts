@@ -1602,7 +1602,7 @@ plot(showSignalsInput, title="Show Signals")
     expect(getPlot(result, 'Show Signals').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
-  it('matches documented Pine calculated color idioms', () => {
+  it('retains synthetic RSI/color integration expectations without native fixture credit', () => {
     const result = runCompatScript(`
 indicator("Color docs smoke", overlay=true)
 baseColor = color.rgb(255, 0, 0)
@@ -1652,10 +1652,9 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       67.937983,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
-    // V94 RSI v5/v6 (oracle ac491fdc) adjudicates premultiplied RGB, floor
-    // byte conversion and quantized transparency for this gradient idiom.
-    // These arrays project that model onto local fixture RSI values; they are
-    // not native observations of this fixture or its RSI calculation frontier.
+    // Synthetic fixture expectations only: neither these RSI inputs nor the
+    // Prefix gradient were captured. Native parity is asserted separately in
+    // pine-v94-color-native.test.ts; these arrays receive no native credit.
     expect(getPlot(result, 'Prefix Signal').color).toEqual([
       null,
       null,
