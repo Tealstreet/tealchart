@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "a22cb6e73dfedd2527e0461566890736617e86b5",
+  "revision": "1ec35ab7b6879f83487ed59a67406a6cb8d20605",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -9486,6 +9486,331 @@
       "path": "v90/sources/v90-cum-prefix-v6.pine",
       "bytes": 752,
       "sha256": "61b8da0de225c44bdc27d71d93b16dc5506771d93ce139481a8cbdb252b7f192"
+    },
+    {
+      "path": "v91/captures/v91/RESPONSE-v91-v1.md",
+      "bytes": 7180,
+      "sha256": "45373907f9f745c79c325190e58964aecfe6151ed0a7f582b812428db853bcd5"
+    },
+    {
+      "path": "v91/captures/v91/artifact-integrity-v1.json",
+      "bytes": 109495,
+      "sha256": "cfda235fe0cf185ff7afcc8e4e87af61463154262d70509cdc921ac36a7b3ba8"
+    },
+    {
+      "path": "v91/captures/v91/attempt-inventory-v1.json",
+      "bytes": 8721,
+      "sha256": "62ae981ff7a8c016ca1cfe70995f4615ba00c9e498b96beb4568c2446b2fb8a9"
+    },
+    {
+      "path": "v91/captures/v91/environment-v1/layout-menu-after-v1.txt",
+      "bytes": 8545,
+      "sha256": "de2468530252afd6b4b57e69356bd9224eb01c7cbe33a6584bfc486b4ca335d5"
+    },
+    {
+      "path": "v91/captures/v91/footprint-repeat-facets-v1.json",
+      "bytes": 89831,
+      "sha256": "6e1e87de9ec9885e71828ce3c91f040d2a1686cb004828c59d1426db0eb6823b"
+    },
+    {
+      "path": "v91/captures/v91/native-price-rows-v1.json",
+      "bytes": 45934,
+      "sha256": "1ce7545a66e05422837cc8264fdfb1110d9cdb9b848449cb5ddb6f2e1aba02dd"
+    },
+    {
+      "path": "v91/captures/v91/presence-state-observations-v1.json",
+      "bytes": 9737,
+      "sha256": "765ed4c328c91d1079f085efa8c49556253c748d9e35ae16ef3365874f334a37"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/add-response-v1.json",
+      "bytes": 4021,
+      "sha256": "b430b8e44a88bd5c80a7d0565d2b8709e9612fdd74b8132b3e593265852684f0"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 3796,
+      "sha256": "5a0da29127255041d2f662098477a0d6d000f87b31fd6f76393170e6e9c8fd9c"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/chart-native-v1.csv",
+      "bytes": 87612,
+      "sha256": "18cd524838d0de4edf832dfb0140216f3e297437d0e2dfe21910a44268cebfb6"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 372403,
+      "sha256": "f965a376e032eceba6c2a6070e120e7fe170e27da44ecab479a9dc768a328ec3"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/executed-v1.pine",
+      "bytes": 111,
+      "sha256": "de1d7e2a863b01667c408d6c492444104fa81c52ceef13a972934ba13ab25203"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/observation-v1.json",
+      "bytes": 3676,
+      "sha256": "9be2e0a347a14f298c7fca0fd3876aed0208223714063f7f19f3a434f10558ab"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/save-request-v1.txt",
+      "bytes": 252,
+      "sha256": "f1cb59e429c336c17aab576db1f780c7728db3c5a1c86d5e87da062531a0b504"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-original/attempt-v1/save-response-v1.json",
+      "bytes": 4021,
+      "sha256": "71d436149c0d80180b4309302b07267f73f59a952632a17bcf9a189adb7220be"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/add-response-v1.json",
+      "bytes": 22305,
+      "sha256": "4400072ba34479cdb00c0fdb7b1401c80ea98c4ec3a6dcf9bede6980cf4a3d92"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 18058,
+      "sha256": "4ec6676b25b6ca5aa2afad4e0ead80a27062740de138e45ea4e9054bd9a18c9b"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/chart-export-dialog-v1.txt",
+      "bytes": 7510,
+      "sha256": "c424ed64b74d580be85989da7a6c2648b58deaf259ac015c92add94b33e08b3a"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/chart-native-v1.csv",
+      "bytes": 382450,
+      "sha256": "c1e4c7259c3faf8c08a271ab5f883424149537bd7a3dc2c3e26c401054c1b7d7"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 178776,
+      "sha256": "c6bec8f89c712177200c6de71bcd4bf64affe34187dc8c2d0a69bea5a3ef381c"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/executed-v1.pine",
+      "bytes": 4018,
+      "sha256": "c75136308573ce0e00dd190ad6ec8b79aa80e733395a6ccc7f7ed6be4b020e63"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/observation-v1.json",
+      "bytes": 4876,
+      "sha256": "1e460614b30971fcfadcffc709153abe15d0ef3ad325aba996cb97a70ffbca3f"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/save-request-v1.txt",
+      "bytes": 4217,
+      "sha256": "4ec6f674665ec7c372439279efef561ec466a8d29e3d1eacc81ad03b6a46708e"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v1/save-response-v1.json",
+      "bytes": 22305,
+      "sha256": "d4685bd5f08c4db729fd81228f9a6e06341c16a7baabe5856853da1481e01cd2"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/add-response-v1.json",
+      "bytes": 22305,
+      "sha256": "42bd4d58cbfe00bcd8b559a4983a7779e39c01b97247f01f7a89a74438147d0d"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 18058,
+      "sha256": "314ce0970938c2931f4143a1ea2b3f74483985603b322d2dc1bc07a261aec0f5"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/chart-native-v1.csv",
+      "bytes": 382678,
+      "sha256": "30c650e690b4306983290e8ff797ea19add784324c1cef7ea99fc42acfddf8b8"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 178889,
+      "sha256": "c28e4c3e953b8c577ccce57788e3586f460a5b04e6fd822ffdef4e330fd7a070"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/executed-v1.pine",
+      "bytes": 4018,
+      "sha256": "c75136308573ce0e00dd190ad6ec8b79aa80e733395a6ccc7f7ed6be4b020e63"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/observation-v1.json",
+      "bytes": 4876,
+      "sha256": "86e195998800a457ecfc30e88638a0c7db9e0b684e3999eded9f86b076c2317b"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/save-request-v1.txt",
+      "bytes": 4217,
+      "sha256": "7f46de17f67caced1fc940d347de8079a2a456f783c50fb4351b4c319783bf17"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v2/save-response-v1.json",
+      "bytes": 22305,
+      "sha256": "77d0fc42d3f2ad93af4e8340c4aae57a9dede6b822190aede881fc7f21e9ff7e"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/add-response-v1.json",
+      "bytes": 22305,
+      "sha256": "9d6a64900a6a4209c645b8b6483cb60feb7858854fcd63d9a610c5cbca6eb352"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/chart-column-bindings-v1.json",
+      "bytes": 18058,
+      "sha256": "dfc276c4de41a93a13c38abe0b0ea99e8841e317ddbc4aeea5e77a7e5a01efbc"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/chart-native-v1.csv",
+      "bytes": 382688,
+      "sha256": "c7081d38524ccc197129be7a4fe0220f7a5c27740dd64a3bc109f6e936b796a7"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/chart-row-closure-mask-v1.csv",
+      "bytes": 178889,
+      "sha256": "fb428fe3a485d209f95c5b1328e57359902a979b9c0be93654a3695488fd66a3"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/executed-v1.pine",
+      "bytes": 4018,
+      "sha256": "c75136308573ce0e00dd190ad6ec8b79aa80e733395a6ccc7f7ed6be4b020e63"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/observation-v1.json",
+      "bytes": 4876,
+      "sha256": "ac27ca5250e183d1d19da4957071034b5a2854a90bf6fcf5e9d6dbbc54c6f762"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/save-request-v1.txt",
+      "bytes": 4217,
+      "sha256": "38043e0641d645d3f0317f3a2cb99fd935681c9a47663b46f60d34dc3ffe62e0"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-price-rows/attempt-v3/save-response-v1.json",
+      "bytes": 22305,
+      "sha256": "9b44525d2fee9edbe3b6c44c5516a141fdfbb00f838d87078ad588a242bef286"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/add-response-v1.json",
+      "bytes": 7473,
+      "sha256": "ccaa0198ca13caad44250aecd2d053e978c7842060b8c133af8d248613bf4576"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/chart-column-bindings-v1.json",
+      "bytes": 5078,
+      "sha256": "ba3f63dedeeba71aefde78e5a7c12e74c9a780a029ed22bb89a2e7c71a76b030"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/chart-native-v1.csv",
+      "bytes": 245902,
+      "sha256": "314b34ddf0f3e2353dbc18bf18b93325aa71d77daafbfdda6ef48dcc512865d1"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/chart-row-closure-mask-v1.csv",
+      "bytes": 175488,
+      "sha256": "524482fbb37b5d141ff52451793d8d045acbb00ee29df757ca84cb15cb37f012"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/observation-v1.json",
+      "bytes": 3881,
+      "sha256": "9bcbbbec1880560bf679e7c5c0c2962307d055b0d15d02612cd38331bb80fd6e"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/save-request-v1.txt",
+      "bytes": 889,
+      "sha256": "07312ad61e43126947e82af3434af7c1cefbcb2396e31217f33e71c7e73ef27d"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v1/save-response-v1.json",
+      "bytes": 7473,
+      "sha256": "b94c1cea402c27a03db79a5bd31788be4e29d9d368af8490b05f9c1008c47bd7"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/add-response-v1.json",
+      "bytes": 7473,
+      "sha256": "48ebf5adf699c55f45196a41d45d631b64485251ee51cd18cd769245c89ce995"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/chart-column-bindings-v1.json",
+      "bytes": 5078,
+      "sha256": "255b1a015171f4406c765282152ff94f3dd43420f8e09b90e04b86a2bb26342b"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/chart-native-v1.csv",
+      "bytes": 246013,
+      "sha256": "70285eb4ad3b0a2d1d2f3d76895e4f856150c502cf760972baf456878c799bb5"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/chart-row-closure-mask-v1.csv",
+      "bytes": 175599,
+      "sha256": "798f543fda3e809c4a368f7791edab59795ffdabe3f6a18d84c88274192ee3ed"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/observation-v1.json",
+      "bytes": 3883,
+      "sha256": "f8f07c59b20bba62a88cf91073aa2e8297656cd546e345092189f8c785919c50"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/save-request-v1.txt",
+      "bytes": 889,
+      "sha256": "17d63592305a6d9f1b0cffaa32b8c9a32862f1bdca56144626453df1367d4f20"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v2/save-response-v1.json",
+      "bytes": 7473,
+      "sha256": "0fabe8ed0186acc0641148efeb28e1ce588b3b3644a78b6101896982101c0c34"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/add-response-v1.json",
+      "bytes": 7473,
+      "sha256": "55660366c7c165efca1ef4a0f576886d1e333b6ddd7a9717d553e0d88654aaaa"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/chart-column-bindings-v1.json",
+      "bytes": 5078,
+      "sha256": "62d4e814dd6f1f8a3fd9bbe15dff9e0632cc5f41f27d693d4776d613626c73b8"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/chart-native-v1.csv",
+      "bytes": 246052,
+      "sha256": "437077ff88d9c8e3c00f38ec9d85549d21a96065a36d28d43d692f86e339c284"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/chart-row-closure-mask-v1.csv",
+      "bytes": 175599,
+      "sha256": "98b06a7e0ee8209c2370ef9304f8656c6b17abf0b2e68ed5c8685be5ab2eda26"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/executed-v1.pine",
+      "bytes": 740,
+      "sha256": "dbd2ce13d612f9ff5c97ee3c5b0302da2347adc6c51f8f458117d6fadb7355ee"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/observation-v1.json",
+      "bytes": 3883,
+      "sha256": "9eb7c0cf91f33a8b6abee932e8fa70ac4b36f705c40af703b613232b627ee9fa"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/save-request-v1.txt",
+      "bytes": 889,
+      "sha256": "6fa8e4246634b980ace38c75a176723b543107b8e0af82140fcf8da8953987c1"
+    },
+    {
+      "path": "v91/captures/v91/v91-footprint-provider/attempt-v3/save-response-v1.json",
+      "bytes": 7473,
+      "sha256": "81bf85f0940baa2b78af1906a4ab1493b545a28259e08c83685d365f5737efe0"
+    },
+    {
+      "path": "v91/captures/v91/validation-result-v1.json",
+      "bytes": 519,
+      "sha256": "efe54234fc6ccc1b10a8bcfe912006fcb44b8f2a3f67c112dbbfc064379341d0"
     }
   ]
 }
