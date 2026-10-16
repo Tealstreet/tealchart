@@ -391,6 +391,12 @@ box and table text use 8/10/14/20/36px. Positive integer strings are pixel sizes
 Do not share the label map with table measurement or box wrapping; their font
 and line-height calculations must agree with the font used to paint text.
 
+Native v93 v5/v6 box-text controls continue oversized wrapped words across
+lines and clip wrapped text at its own box boundary. The shared painter uses
+host text measurements for character breaks and a box-local clip; unwrapped
+sentinels retain pane clipping. Local constructor/setter agreement does not
+certify complete clipped strings, resolved OS fonts or native pixel spacing.
+
 **Table dimensions:** A cell width or height of zero selects automatic text
 measurement, just like omission. Positive dimensions are percentages of the
 pane's drawable space; explicit columns/rows still take precedence over auto
@@ -423,6 +429,12 @@ not a TradingView raster-dimension certification.
 anchor, while `label_right` places it to the left. A gap separates the anchor
 from the body, and the triangle base attaches to the nearest body edge. Web and
 native share this layout and path; exact spacing and glyph pixels remain unpinned.
+
+Native v93 v5/v6 `label_center` captures place the complete body above the
+referenced candle high for abovebar and below its low for belowbar. Offset the
+center by half the measured body height in the shared painter; price mode stays
+centered on the supplied price. This pins placement topology, not native pixel
+spacing, pane-edge clamping or other label styles.
 
 **Corner label pointers:** `label_lower_left` and `label_lower_right` place the
 body above the tip; `label_upper_left` and `label_upper_right` place it below.

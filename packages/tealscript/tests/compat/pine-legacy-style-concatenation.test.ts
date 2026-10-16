@@ -16,7 +16,7 @@ const cases = [
 ] as const;
 
 describe('legacy plot style string concatenation', () => {
-  it.each(cases)('admits and compiles v5 %s concatenation', (_name, constant, expression) => {
+  it.each(cases)('checks version availability before v5 %s concatenation', (_name, constant, expression) => {
     const source = `//@version=5
 indicator("Legacy style strings")
 style = ${constant}
@@ -26,6 +26,19 @@ log.info("alias:" + style)
 `;
     const ast = parse(source);
     const checked = checkProgram(ast);
+    if (constant === 'plot.linestyle_solid') {
+      // Correct the earlier unbacked v5 admission assumption: native v93 item 8
+      // refuses this namespace. Preserve the case as an exact refusal lock.
+      expect(checked.diagnostics).toEqual(withVersionAdvisory([
+        { code: 'plot-linestyle-version', severity: 'error', message: "Undeclared identifier 'plot'", line: 3, column: 9 },
+        { code: 'plot-linestyle-version', severity: 'error', message: "Undeclared identifier 'plot.linestyle_solid'", line: 3, column: 9 },
+        { code: 'plot-linestyle-version', severity: 'error', message: "Undeclared identifier 'plot.linestyle_solid'", line: 4, column: 13 },
+        { code: 'plot-linestyle-version', severity: 'error', message: "Undeclared identifier 'plot.linestyle_dotted'", line: 4, column: 42 },
+        { code: 'plot-linestyle-version', severity: 'error', message: "Undeclared identifier 'plot.linestyle_dashed'", line: 4, column: 72 },
+      ], 5));
+      expect(compile(ast).success).toBe(false);
+      return;
+    }
     expect(checked.diagnostics).toEqual(withVersionAdvisory([], 5));
     expect(checked.symbols.find((symbol) => symbol.name === 'styleText')?.type).toEqual({
       kind: 'string',

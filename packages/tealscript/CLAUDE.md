@@ -1,3 +1,7 @@
+V93 linefill locks cover same-execution counts/parent identities and endpoint tracking.
+PNG-bound output fields cover red/blue and source-line deletion; no native color
+getter, recalculation identity, all-object deletion, or pixel parity is claimed.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
@@ -297,6 +301,13 @@ refused through the existing integer-range checker. This ceiling check does not
 infer exact native garbage-collection cadence from the approximate retention limit.
 
 # CLAUDE.md — @tealstreet/tealscript
+
+Native v93 refuses `box.set_xloc` in Pine v5 at its first callee, with the
+unknown-function diagnostic. Checking and unchecked compilation share that refusal;
+v6 remains admitted. Independent v5/v6 line time/point and box point setter
+captures pin closed-row relative getters, including copying supplied point fields.
+The refused v5 box-xloc getter values remain uncaptured; label coordinates and
+rendering are outside this evidence.
 
 Requested EMA programs bulk-fill only the selected result prefix after the existing
 fixed-input state/output certificate settles. Keep that Object.is certificate,
@@ -3890,7 +3901,20 @@ Native v4 capture shows descending array.sort_indices reverses finite equal-key 
 
 Background and bar colors retain raw source-bar samples and the latest global offset, applied by web/native rendering, so legacy series offsets cannot overwrite earlier color samples.
 
-Pre-v6 const plot_style and plot_line_style values retain legacy string concatenation admission. Pine v6 keeps unique style operator refusal. This preserves known-original corpus admission; whole-source native acceptance remains unknown.
+Pre-v6 const plot_style values retain legacy string concatenation admission.
+Native v93 item 8 corrects the earlier v5 plot_line_style admission assumption:
+`plot.linestyle_solid/dashed/dotted` and the `plot()` named `linestyle` slot are
+unavailable under `//@version=5`. The checker preserves the seven witnessed
+error messages, original order and start positions; native end spans are retained
+in the fixture because SemanticDiagnostic exposes only starts. Unchecked analysis
+also refuses these builtins after resolving local/imported shadows. Coverage
+signatures omit the v5 slot. V6 keeps admission, unique style operator refusal,
+and exact closed constants 10/20/30. Native v6 stroke evidence supports pattern
+classes only (solid / long dash / short dot), with no pixel equality claim.
+The 361 closed rows earn 1083 numeric comparisons; the developing row's three
+nonblank constants remain OBSERVED / EXCLUDED. V5 has no value/rendering credit.
+The source/Save/CSV/mask/PNG/region-map evidence and v6 integrity/validation are
+bound to oracle c75cf8c0; no v6 acceptance transfers to v5.
 Visual style validation applies after callable resolution; local functions named
 `plot` or `hline` retain their declared parameter contracts.
 Runtime math dispatch resolves an evaluator once per execution and call-site ID,
@@ -4186,6 +4210,10 @@ Compiled line/label/box copy dispatch counts each written call's invocations per
 bar, retaining its first-call ID and distinguishing repeated UDF/loop copies.
 Each family caches its last written call and counts interleaved sites separately;
 both states reset on the next bar, without changing constructor invocation state.
+
+V93 v5/v6 copy locks cover initial line Y2/box bottom/label text and independent
+same-row source/copy getter mutations, including exact text-equality flags.
+They do not certify copied appearance, styles, quotas or a native index frontier.
 
 Imported callable enum members resolve through their defining library alias,
 including requested execution and enum-title inference. Library parameters and

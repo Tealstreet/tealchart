@@ -15,6 +15,8 @@ import type { Bar, ComputedPane, PaneLayout, Viewport } from '../types';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { executePlotstyleV93 } from '../../../tealscript/tests/helpers/plotstyleV93';
+
 import { TealchartRenderer, type IndicatorPaneInfo } from '../TealchartRenderer';
 import { clearChartStoreCache } from '../state/chartState';
 import { DEFAULT_UNIFIED_PANE_LAYOUT } from '../types';
@@ -24,6 +26,8 @@ import {
 } from './indicatorOutputAxisLabels';
 import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
+import { entries as nativeV93BoxTableEntries, replay as replayV93BoxTable } from '../../../tealscript/tests/compat/boxTableV93';
+import { replay as replayV93Labels, sessions as nativeV93LabelSessions } from '../../../tealscript/tests/compat/labelCoordinatesV93';
 
 type DrawCall =
   | { op: 'arc'; fillStyle: string; strokeStyle: string; x: number; y: number; radius: number }
@@ -1075,5 +1079,185 @@ describe("web review flat-range gradient", () => {
     makeRenderer(ctx).renderPlots([upper, lower, fill], BARS, { ...VIEWPORT, priceMin: 100, priceMax: 100 });
     expect(ctx.gradients).toHaveLength(3);
     expect(ctx.gradients.every(g => Number.isFinite(g.y0) && Number.isFinite(g.y1) && g.y0 === g.y1)).toBe(true);
+  });
+});
+
+describe('v93 label-coordinate native placement topology', () => {
+  afterEach(() => clearChartStoreCache());
+
+  for (const entry of nativeV93LabelSessions) {
+    it(`${entry.source.sourceId} mode${entry.mode}: paints the centered body relative to the referenced candle`, () => {
+      const { result, bars } = replayV93Labels(entry);
+      expect(result.errors).toEqual([]);
+      const labels = result.drawings.filter((drawing): drawing is LabelDrawingOutput => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      const label = labels[0];
+      const anchor = entry.region.anchor;
+      const anchorIndex = anchor.referencedChartRowOrdinal - 1;
+      expect([label.style, label.xloc, label.yloc, label.x, label.barIndex]).toEqual([
+        'label_center', 'bar_index', ['price', 'abovebar', 'belowbar'][entry.mode], anchorIndex, anchorIndex + 1]);
+      expect(label.y).toBe(Number(anchor.referencedChartOHLC.close));
+      expect(bars[anchorIndex].time).toBe(Number(anchor.referencedChartTimeRawSeconds) * 1000);
+      // A developing source row supplies a drawing for a separately closed candle.
+      // This adds no closed numeric credit or provider frame identity.
+      expect(entry.mask.rows[anchorIndex][8]).toBe('1');
+      expect(entry.mask.rows[anchorIndex + 1][8]).toBe('0');
+      const pane: ComputedPane = { ...DRAWING_PANE, yMin: 81100, yMax: 81500, top: 0, height: 400, bottom: 400 };
+      const viewport: Viewport = { startTime: bars[anchorIndex - 32].time, endTime: bars.at(-1)!.time,
+        priceMin: pane.yMin, priceMax: pane.yMax };
+      const valueToY = (price: number) => pane.yMax - price;
+      const ctx = new RecordingCanvasContext();
+      const drawingRenderer = new TealScriptDrawingRenderer({
+        ctx, options: { ...makeRenderer(ctx).getOptions(), width: 500, height: 400 },
+        margins: { top: 0, bottom: 0, left: 0, right: 0 }, font: 'sans-serif',
+        coordinateResolvers: {
+          timeToX: time => 100 + (time - bars[anchorIndex].time) / 120000 * 6,
+          valueToY,
+        },
+        getTextWidth: (_ctx, text) => text.length * 7,
+      });
+      drawingRenderer.render(partitionTealScriptDrawings(result.drawings), bars, viewport, pane);
+      const rectangles = ctx.calls.filter((call): call is Extract<DrawCall, { op: 'rect' }> => call.op === 'rect');
+      expect(rectangles).toHaveLength(1);
+      const body = rectangles[0];
+      expect(body.x + body.width / 2).toBe(100);
+      expect(fillTextCalls(ctx).map(call => call.text)).toEqual(['ANCHOR']);
+      const candle = bars[anchorIndex];
+      if (entry.mode === 0) expect(body.y + body.height / 2).toBe(roundCoord(valueToY(candle.close)));
+      if (entry.mode === 1) expect(body.y + body.height).toBeLessThan(valueToY(candle.high));
+      if (entry.mode === 2) expect(body.y).toBeGreaterThan(valueToY(candle.low));
+      // Bounds come from native PNG/region topology; local padding and glyph pixels
+      // are intentionally not compared to native screenshot coordinates.
+    });
+  }
+});
+
+describe('v93 box/table native local controls', () => {
+  afterEach(() => clearChartStoreCache());
+
+  function paint(entry: typeof nativeV93BoxTableEntries[number], height = 240) {
+    const { result, bars } = replayV93BoxTable(entry);
+    expect(result.errors).toEqual([]);
+    const ctx = new RecordingCanvasContext();
+    const pane: ComputedPane = { ...DRAWING_PANE, id: 'v93', yMin: 0, yMax: entry.source.item === 6 ? 100 : 10,
+      top: 0, height, bottom: height };
+    const viewport: Viewport = { startTime: bars.at(-33)!.time, endTime: bars.at(-1)!.time + 120000,
+      priceMin: pane.yMin, priceMax: pane.yMax };
+    const renderer = new TealScriptDrawingRenderer({
+      ctx, options: { ...makeRenderer(ctx).getOptions(), width: 500, height },
+      margins: { left: 0, right: 0, top: 0, bottom: 0 }, font: 'sans-serif',
+      coordinateResolvers: {
+        timeToX: time => 10 + (time - bars.at(-29)!.time) / 120000 * 6,
+        valueToY: value => (pane.yMax - value) / pane.yMax * pane.height,
+      },
+      // Controlled host metrics exercise layout semantics, not native OS fonts.
+      getTextWidth: (_ctx, text) => text.length * 7,
+    });
+    renderer.render(partitionTealScriptDrawings(result.drawings), bars, viewport, pane);
+    return { ctx, result };
+  }
+
+  for (const entry of nativeV93BoxTableEntries) {
+    if (entry.source.item === 6) {
+      it(`${entry.source.sourceId}: visible wrapped setter text matches the same-shot constructor control`, () => {
+        // Leave room for the witnessed prefix under these controlled host metrics.
+        // This host geometry is not a native zoom/DPI/font-size measurement.
+        const { ctx, result } = paint(entry, 360);
+        const boxes = result.drawings.filter((drawing): drawing is BoxDrawingOutput => drawing.type === 'box');
+        const blue = fillTextCalls(ctx).filter(call => call.fillStyle === boxes[0].textColor);
+        const control = blue.filter(call => call.x < 60);
+        const changed = blue.filter(call => call.x >= 60 && call.x < 120);
+        const visiblePrefix = ['WRAP', 'ME', 'ALPHA', 'BETA', 'GAMMA', 'DELTA', 'EPSIL', 'ON', 'ZETA', 'ETA', 'THETA', 'IOTA', 'KAPPA'];
+        // Native PNGs expose this prefix, including continuation inside EPSILON.
+        // The clipped tail does not receive a full-string or generic font certificate.
+        expect(control.slice(0, 13).map(call => call.text)).toEqual(visiblePrefix);
+        expect(changed.slice(0, 13).map(call => call.text)).toEqual(visiblePrefix);
+        expect(changed.slice(0, 13).map(call => [call.text, call.y, call.font, call.fillStyle, call.textAlign, call.textBaseline]))
+          .toEqual(control.slice(0, 13).map(call => [call.text, call.y, call.font, call.fillStyle, call.textAlign, call.textBaseline]));
+        expect(control[0]).toMatchObject({ x: 16, y: 42, textAlign: 'left', textBaseline: 'top' });
+        expect(changed[0]).toMatchObject({ x: 76, y: 42, textAlign: 'left', textBaseline: 'top' });
+        expect(control[12].y + 18).toBeLessThanOrEqual(324);
+        expect(changed[12].y + 18).toBeLessThanOrEqual(324);
+        expect(control[0].font).toContain('monospace');
+        if (entry.source.pineVersion === 6) {
+          expect(control[0].font).toContain('bold');
+          expect(control[0].font).toContain('italic');
+        }
+        const red = fillTextCalls(ctx).filter(call => call.fillStyle === boxes[2].textColor);
+        expect(red).toHaveLength(1);
+        expect(red[0].text.startsWith('WRAP ME')).toBe(true);
+        expect(red[0].y).toBe(control[0].y);
+      });
+
+      it(`${entry.source.sourceId}: clips wrapped text to each current box and leaves the red horizontal sentinel pane-clipped`, () => {
+        const { ctx } = paint(entry);
+        const rectangles = ctx.calls.filter((call): call is Extract<DrawCall, { op: 'rect' }> => call.op === 'rect');
+        expect(rectangles).toContainEqual({ op: 'rect', x: 10, y: 24, width: 48, height: 192 });
+        expect(rectangles).toContainEqual({ op: 'rect', x: 70, y: 24, width: 48, height: 192 });
+        expect(rectangles).not.toContainEqual({ op: 'rect', x: 130, y: 24, width: 48, height: 192 });
+        expect(ctx.calls.filter(call => call.op === 'clip')).toHaveLength(3);
+        // Native full strings and prior-object strips remain excluded. Clip commands
+        // establish the boundary, without comparing tail glyphs or exact pixels.
+      });
+    } else {
+      it(`${entry.source.sourceId}: paints only the final table anchors with matching backgrounds, external frames and internal borders`, () => {
+        const { ctx, result } = paint(entry);
+        const tables = result.drawings.filter((drawing): drawing is TableDrawingOutput => drawing.type === 'table');
+        expect(tables.map(table => table.position)).toEqual(['top_left', 'top_right']);
+        const backgrounds = fillRectCalls(ctx).filter(call => call.fillStyle === tables[0].bgcolor);
+        expect(backgrounds).toHaveLength(2);
+        expect(backgrounds[0].y).toBe(backgrounds[1].y);
+        expect(backgrounds[0].x).toBeLessThan(250);
+        expect(backgrounds[1].x).toBeGreaterThan(250);
+        expect(backgrounds[0].y).toBeLessThan(20);
+        expect(backgrounds.map(call => [call.width, call.height])).toEqual([
+          [backgrounds[0].width, backgrounds[0].height], [backgrounds[0].width, backgrounds[0].height] ]);
+        const strokes = ctx.calls.filter((call): call is Extract<DrawCall, { op: 'strokeRect' }> => call.op === 'strokeRect');
+        const frames = strokes.filter(call => call.strokeStyle === tables[0].frameColor);
+        const borders = strokes.filter(call => call.strokeStyle === tables[0].borderColor);
+        expect(frames).toHaveLength(2);
+        expect(frames.every(call => call.lineWidth === 5)).toBe(true);
+        expect(borders).toHaveLength(8);
+        expect(borders.every(call => call.lineWidth === 3)).toBe(true);
+        expect(frames.map(call => [call.x, call.y, call.width, call.height])).toEqual(backgrounds.map(call => [call.x, call.y, call.width, call.height]));
+        expect(new Set(borders.map(call => call.lineWidth))).not.toEqual(new Set(frames.map(call => call.lineWidth)));
+        // Same-shot constructor control only: no CSS/DPI or intermediate position claim.
+      });
+    }
+  }
+});
+
+// Native v93 item 8, oracle c75cf8c0: render-v1.png + derived-region-map-v1.json
+// are authenticated in pine-v93-plotstyle-native.test.ts. Only pattern classes
+// are supported here, not exact dash dimensions, colors, or pixel parity.
+describe('v93 plotstyle native stroke classes', () => {
+  it.each(['legacy', 'unified'] as const)('%s paints the compiled v6 solid/dashed/dotted lanes distinctly', path => {
+    const { result, bars } = executePlotstyleV93();
+    const plots = result.plots.filter(p => ['SOLID', 'DASHED', 'DOTTED'].includes(p.title ?? ''))
+      .map(p => ({ ...p, scriptId: 'overlay-script' }));
+    expect(plots).toHaveLength(3);
+    const viewport = { startTime: bars[288].time, endTime: bars[319].time, priceMin: 0, priceMax: 40 };
+    const ctx = new RecordingCanvasContext();
+    const renderer = makeRenderer(ctx);
+    if (path === 'legacy') renderer.renderPlots(plots, bars, viewport);
+    else renderer.renderWithLayoutPasses({ bars, viewport, layout: DEFAULT_UNIFIED_PANE_LAYOUT,
+      plots, indicatorPaneInfo: { 'overlay-script': { overlay: true } }, passes: ['main-overlay-content'] });
+    const patterns = plots.map(plot => {
+      const color = Array.isArray(plot.color) ? plot.color[0] : plot.color;
+      const strokes = strokeCalls(ctx).filter(call => call.strokeStyle === color);
+      expect(strokes.length).toBeGreaterThan(0);
+      const pattern = strokes[0].lineDash;
+      strokes.forEach(call => expect(call.lineDash).toEqual(pattern));
+      return pattern;
+    });
+    expect(patterns[0]).toEqual([]);
+    // A separated long dash, and a separated short dot. No pixel-size equality.
+    expect(patterns[1]).toHaveLength(2);
+    expect(patterns[2]).toHaveLength(2);
+    expect(patterns[1].every(n => n > 0)).toBe(true);
+    expect(patterns[2].every(n => n > 0)).toBe(true);
+    expect(patterns[1][0]).toBeGreaterThan(patterns[1][1]);
+    expect(patterns[2][0]).toBeLessThan(patterns[2][1]);
+    expect(patterns[1][0]).toBeGreaterThan(patterns[2][0]);
   });
 });
