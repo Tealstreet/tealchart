@@ -4740,3 +4740,8 @@ after namespaces. Explicit namespace calls retain their ID argument.
 V93 overlay=false preserves the visible PANE table when a later force_overlay table
 uses the same position: replacement and cell capacity share effective pane ownership.
 Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.
+
+Native v95 item10 locks only the selected closed suffix: v5 numeric bool NA encodes
+-1 while v6 encodes 0; fixnan carries a witnessed previous finite input. Raw cast
+blanks stay missing. Missing-string outputs are exact targets with archive model
+UNDECIDED retained; own-origin Boolean/fixnan startup remains held.
