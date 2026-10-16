@@ -696,6 +696,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
   }
   let hasFootprintAvailabilitySyntax = false;
+  let hasV5BoxXlocSyntax = false;
   let namespaceReceiverTypes: WeakMap<Expression, SemanticType> | undefined;
   let udtNamespaceDiagnostics: ReturnType<typeof checkProgram>['diagnostics'] | undefined;
   let activeFunctionName: string | null = null;
@@ -1316,6 +1317,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const fullName = resolveDependencyMember(resolved.fullName, activeFunctionName, ctx.importedDependencyScopes);
         const namespace = fullName.split('.')[0] ?? '';
         if (ast.version === 5 && fullName === 'request.footprint') hasFootprintAvailabilitySyntax = true;
+        if (ast.version === 5 && expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'set_xloc') hasV5BoxXlocSyntax = true;
         if (!hasUserDeclarationName('timeframe')) {
           const refusal = tradingViewTimeframeCompileRefusal(expr, ast.version);
           if (refusal) addUnsupported(refusal);
@@ -1968,10 +1970,11 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       if (site.integerDivisionLength && !site.dynamicCtorArgExprs) site.ctorArgs[0] = Math.trunc(Number(site.ctorArgs[0]));
     }
   }
-  if (hasFootprintAvailabilitySyntax) {
+  if (hasFootprintAvailabilitySyntax || hasV5BoxXlocSyntax) {
     for (const diagnostic of checkProgram(ast, { libraries: options.libraries }).diagnostics) {
       if ((diagnostic.code === 'invalid-type-annotation' && diagnostic.message === "'footprint' is not a valid type keyword.")
         || (diagnostic.code === 'unknown-function' && diagnostic.message === "Could not find function or function reference 'request.footprint'")
+        || (diagnostic.code === 'unknown-function' && diagnostic.message === "Could not find function or function reference 'box.set_xloc'")
         || (diagnostic.code === 'namespace-obscuring' && diagnostic.message === 'Invalid object name: footprint. Namespaces of built-ins cannot be used.')) addUnsupported(diagnostic.message);
     }
   }

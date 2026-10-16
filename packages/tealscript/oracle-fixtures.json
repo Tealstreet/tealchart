@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "72c761048bceb27f99090fdcdfa8a71b8a9eeb35",
+  "revision": "8069e315083c1e516b9da5771c082431d48f6d81",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10573,9 +10573,19 @@
       "sha256": "e3d6ba6e28bc6812893a24a6682b1c802c566c50bc8804f86a2528cc4b7297b0"
     },
     {
+      "path": "v93/captures/v93/RESPONSE-v93-v4.md",
+      "bytes": 3973,
+      "sha256": "d2b7294b285f3cd2790e01ddf193829f05116b4c3e812121c06656a3dde95028"
+    },
+    {
       "path": "v93/captures/v93/artifact-integrity-v3.json",
       "bytes": 151923,
       "sha256": "9c4ab3530c08fb7131f9c06337116782c4612ebe2cb9b9eecbde2dd0a343b1b6"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v4.json",
+      "bytes": 189414,
+      "sha256": "b68865f9dbb7d4428fac794068323e121e5884aa71de2deb3db83cb138c28519"
     },
     {
       "path": "v93/captures/v93/attempt-inventory-v3.json",
@@ -10583,14 +10593,284 @@
       "sha256": "6cae3aa0b140e80bf2e92f109395ed5754303d1f2eb8328ae92a325e560b6301"
     },
     {
+      "path": "v93/captures/v93/attempt-inventory-v4.json",
+      "bytes": 1195199,
+      "sha256": "c5c8a1462c7ad4b216745d9cfa165516425be1d0bc62e7014f0b031f201c2e24"
+    },
+    {
       "path": "v93/captures/v93/facet-capabilities-v3.json",
       "bytes": 1048453,
       "sha256": "aae946e6379a1da7469229fa23d95a16a88c056434eb040ee2972191833faa71"
     },
     {
+      "path": "v93/captures/v93/facet-capabilities-v4.json",
+      "bytes": 1343831,
+      "sha256": "a1e4b72c4870fd5b67636aabd4c6b56932ff5adbc550175fb5e94cc20fd75d55"
+    },
+    {
       "path": "v93/captures/v93/numeric-controls-v3.json",
       "bytes": 1425011,
       "sha256": "a204544dab0465945b5d8a73cf419b8bd517a07212bc96618bc49668ca00e7f0"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v4.json",
+      "bytes": 1683327,
+      "sha256": "52cdb91e860de995d2c6e71b84f9aa931f117f68144981b0a139ab2444a570d4"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/add-response-v1.json",
+      "bytes": 8513,
+      "sha256": "60e8466153ed29b48bc7e83c81285f116160ffed5aa3d0e15701e934496f1b7c"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/executed-v1.pine",
+      "bytes": 841,
+      "sha256": "e47c26b210a28629626daadce65c834ce1dc25781ab5eb5f85c0058a3d2d5c41"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/observation-v1.json",
+      "bytes": 1952,
+      "sha256": "744ec4fc95f2423d5696552a668510ef343556bc231ee5bc01116b8a3f3df2d8"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 996,
+      "sha256": "f19fbbc47ac679653c1e2672fa4657df972d4e275857bf8c4d0499bf0a416ac2"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/save-response-v1.json",
+      "bytes": 8513,
+      "sha256": "a60bd744259cb071460d1f56a33347184163fdc0a0db541e3c9551829bdf2203"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 25997,
+      "sha256": "eee98ed4be562e03f9d9f8dd03986537f6ad0b4c395535db45186db9fac2afa4"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5922,
+      "sha256": "66035b2d84d93e7ecfe42704aa75634bc80c3699fa40719d98a565a495fdfbe7"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 52641,
+      "sha256": "73279a95e6e21b684bfe92d334e71a7f7d017bccfe264721138d08fa81d0c449"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33829,
+      "sha256": "f03104d6dc0c576d9a1281b24a463cfd5dca3797809e1e4d6d81bd6751757084"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/add-response-v1.json",
+      "bytes": 8489,
+      "sha256": "311a8e515cba105249d78c4c18b6827909f712f0d7c60328d0ae73b10e21eb6d"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/executed-v1.pine",
+      "bytes": 841,
+      "sha256": "2e2b07b469d8e60add6edd1724b6037e0e1839721dc79afbf9f6bb384f85ac11"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/observation-v1.json",
+      "bytes": 1952,
+      "sha256": "f0968bfc834b30f0e5d35e9ff37117e4dd84912a1a652ee7921f867b46f054ab"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 996,
+      "sha256": "9a6e24e80b0d9840aff8533a108120944e23e8d0616b69920330808a046ac1c1"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/save-response-v1.json",
+      "bytes": 8489,
+      "sha256": "e481d3a9d69dbf493fb0924be36b0231c26c27a7a9823f19fee0ba025ed7a288"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 26075,
+      "sha256": "40f7ac53ce356347e876a74eab7f29817e86af5117ec8a7ae6888d72323423aa"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5922,
+      "sha256": "f8eb0e82ee040ca38762d0947b6d93e898659ae02e2b1a4bf6a98caf7fea51fd"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 52794,
+      "sha256": "0078bf73a201a698af50a68eaed42e763dd08456256a4d30de3c5ce99346b5cd"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-points-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33927,
+      "sha256": "769b17564b871b16ea5598b4e810cc4e61f168d0e5e2b0423ac85f065a8f6071"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/executed-v1.pine",
+      "bytes": 814,
+      "sha256": "381127d42d77579308078fb2073ed62b1c279069f6599716e9bd18045541b3c8"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/observation-v1.json",
+      "bytes": 1749,
+      "sha256": "822160051a7a961eb3bae545f1190040b9504b7b752d070dae384b5c9dc2b42a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7835,
+      "sha256": "8c36e186381fee34adf4a00bdcf57e9718e8962bb88de705f38311c19d942064"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 8441,
+      "sha256": "1331ef98352f98cd047d32045a2802ee25febdc6275b834ea3aeebe4e07673ed"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 966,
+      "sha256": "735774973d0e2257a2c07fa26185d345c409ba6c82cbce28e839fc1eb48f696b"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v5/attempt-v1/save-response-v1.json",
+      "bytes": 3475,
+      "sha256": "d08bead73c34291a5500e8653ed2eb22d81d7597f2c35ecbe4757149cf5e79cd"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/add-response-v1.json",
+      "bytes": 7761,
+      "sha256": "8021621f6ed82098e338aa3de5874958ccae7a4d228bef83b512c0c31f91baa4"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/executed-v1.pine",
+      "bytes": 814,
+      "sha256": "d866b8a1452e1bb4c684a26b1f57f4516e309b3ee25fd4b0fc1a5211d3ae0069"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/observation-v1.json",
+      "bytes": 1940,
+      "sha256": "173a884c83998f59b81388333a6c6ea099e788007487ce345a37d2426c940ae3"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 966,
+      "sha256": "da671ca6dd9abf712cac696445958344278d98dc251277903d12505b2447cc68"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/save-response-v1.json",
+      "bytes": 7761,
+      "sha256": "a0d2355c6d14db63e50f85cf346e9a5d9428d994262d6a91b581bdd3b82ffb7a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 27220,
+      "sha256": "0e1bbfa8e97ca06bfc87d08f85e6fa207603064f39cb95f8425396572db38858"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 5932,
+      "sha256": "7e802257e9993668d56ba9497bfb829d091d40b4352d03203fc381ab82901785"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 52335,
+      "sha256": "2c00af0830cf253660799f29412adc92bc5ccf68cc5f96fb804199214354652f"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-box-xloc-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33636,
+      "sha256": "0dda26c45b462b2e74def201c3360c4dc099575f0a8d5e62cddb410a821a5a5a"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/add-response-v1.json",
+      "bytes": 10321,
+      "sha256": "7127203c999919b7c025d9669f03980179307f5a8bab200578cef457d6d8f805"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1195,
+      "sha256": "1688a377701cbac5cfc3dc49329d2c804fc5f0eb71dfc10f2d3124639adc9f4e"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/observation-v1.json",
+      "bytes": 1919,
+      "sha256": "fd2f7d493d61317ef45127ee8df7b6dfc4993140f4f88a34d19a0a1977c64f5c"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1358,
+      "sha256": "dbf4ed2985ad4dfaa17c2e40e175eff71f6ac3c904cf0b0422a229bb4f3d79ce"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/save-response-v1.json",
+      "bytes": 10321,
+      "sha256": "5780df6c3ea9f7cf6c56e2116e1c2f6f6061f0747a6abf08355f80370ce2dd05"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29033,
+      "sha256": "8fd03753ed36cf82ae22f39ad8b992679c9a64a55184f111c3f71f3a9a0b0c16"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6856,
+      "sha256": "39e1acf935566752bdb089c930269a54f3ee68dd1a088bbf6b87688ccf84d14c"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 51876,
+      "sha256": "40005e34300e174fb18417d4acc2941ae9145c29db4db162629c3f033c8640fb"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33393,
+      "sha256": "fe620aa43441e036550fe9ef9c9469637a1c0c39581da15b1ef39676f6ecebc8"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/add-response-v1.json",
+      "bytes": 10234,
+      "sha256": "ae70e1d73800c41e33fc4b851baed51820bf6fc3f02bfc26c415f06bc0549a4b"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1195,
+      "sha256": "4fe76d2db747f6e041c1d14e28cc24e07832ac91ccd8c6cc344f5902e4cf0000"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/observation-v1.json",
+      "bytes": 1919,
+      "sha256": "672a86567a2787d7468e53a616d22236add437908a0254abe2a13395e113f650"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1358,
+      "sha256": "cc852d7fdf4cac1093e1d79d2d789dfa841e4b78a3c7dd03a82e3dc90afe389f"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/save-response-v1.json",
+      "bytes": 10234,
+      "sha256": "d2b8ca38979654aadce931677dc7aae5acdd62f2bc42b2527081ceee4dcf96bc"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29119,
+      "sha256": "a5557c1ff0572d3794d59598389770988791769d4f462f2ab7bdfa7f537f6cdb"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6856,
+      "sha256": "7a590ca821141a2a320778f37c855569e704c4cf2cd7f9ecc190e3fd53f4e26d"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 52029,
+      "sha256": "41a5f32807b813e01a8855bd25640eb264b0e8809fb0d2be1e172ba25fdc7bf0"
+    },
+    {
+      "path": "v93/captures/v93/v93-coordinate-line-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33490,
+      "sha256": "41758596401e21984b5f883cdac214a81ce6e2515c1be54dd37240ae828c41d7"
     },
     {
       "path": "v93/captures/v93/v93-copy-box-v5/attempt-v1/add-response-v1.json",
@@ -10896,6 +11176,41 @@
       "path": "v93/captures/v93/validation-result-v3.json",
       "bytes": 451,
       "sha256": "6a6058bb6ef7efb7c765b1cf5dadfea7ff03afa6389e46bf01f06516911f5418"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v4.json",
+      "bytes": 501,
+      "sha256": "dfb6764d9544b7a5c7c512c647ee212c77921e9520bd083775fa8332b00533fe"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-box-points-v5.pine",
+      "bytes": 841,
+      "sha256": "e47c26b210a28629626daadce65c834ce1dc25781ab5eb5f85c0058a3d2d5c41"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-box-points-v6.pine",
+      "bytes": 841,
+      "sha256": "2e2b07b469d8e60add6edd1724b6037e0e1839721dc79afbf9f6bb384f85ac11"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-box-xloc-v5.pine",
+      "bytes": 814,
+      "sha256": "381127d42d77579308078fb2073ed62b1c279069f6599716e9bd18045541b3c8"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-box-xloc-v6.pine",
+      "bytes": 814,
+      "sha256": "d866b8a1452e1bb4c684a26b1f57f4516e309b3ee25fd4b0fc1a5211d3ae0069"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-line-v5.pine",
+      "bytes": 1195,
+      "sha256": "1688a377701cbac5cfc3dc49329d2c804fc5f0eb71dfc10f2d3124639adc9f4e"
+    },
+    {
+      "path": "v93/sources/v93-coordinate-line-v6.pine",
+      "bytes": 1195,
+      "sha256": "4fe76d2db747f6e041c1d14e28cc24e07832ac91ccd8c6cc344f5902e4cf0000"
     },
     {
       "path": "v93/sources/v93-copy-box-v5.pine",

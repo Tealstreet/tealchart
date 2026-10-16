@@ -3379,6 +3379,7 @@ export function builtinSignatureMapForCoverage(options: BuiltinSignatureMapForCo
 
 function isBuiltinSignatureAvailableInPineVersion(name: string, pineVersion: number): boolean {
   const rules = pineVersionRules(pineVersion);
+  if (name === 'box.set_xloc') return pineVersion !== 5;
   if (name === 'iff') return rules.supportsIffFunction;
   if (name === 'offset') return rules.supportsOffsetFunction;
   return true;
@@ -7907,6 +7908,14 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(displayName, expression, scope);
     if (!signature) {
       this.checkUnsupportedBuiltinNamespaceCall(expression, displayName, scope);
+      return;
+    }
+    if (this.currentPineVersion === 5 && displayName === 'box.set_xloc') {
+      // V93's exact source calls this twice; native reports only the first callee.
+      const message = "Could not find function or function reference 'box.set_xloc'";
+      if (!this.diagnostics.some(diagnostic => diagnostic.code === 'unknown-function' && diagnostic.message === message)) {
+        this.addDiagnostic('unknown-function', message, expression.callee.loc);
+      }
       return;
     }
     if (
