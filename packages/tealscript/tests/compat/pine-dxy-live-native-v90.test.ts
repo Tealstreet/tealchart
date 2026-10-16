@@ -87,7 +87,7 @@ function replay(compiled: CompiledScript) {
         if (key in target) return Reflect.get(target, key);
         throw new Error(`Unexpected observer dependency: ${String(key)}`);
       },
-    }) as CompiledBarContext);
+    }) as unknown as CompiledBarContext);
     return output;
   };
 }
