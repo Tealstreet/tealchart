@@ -368,6 +368,14 @@ Missing switch results in v6 must use `false` when the scope-aware semantic
 expression kind is boolean. Both discriminant and predicate switches use the
 same typed fallback; v5 booleans and numeric results retain `NaN`. Reuse the
 emitter's semantic expression map rather than guessing from branch syntax.
+
+V95 item1 regression replays 606 closed 2m rows from separate v5/v6 suffix
+exports: all eight lower-timeframe arrays have two ordered, physically closed 1m
+slots and LX=2*LC+1. Source-owned tuple OHLCV are replay inputs; the native target
+vectors retain UNDECIDED provider hypotheses. INPUT_INDEX starts at 23338, so no
+omitted prefix, startup seed, FIRST_* or native phase parity is claimed. Both
+developing N1 rows remain OBSERVED/excluded; closed N0/N1/N>2 are unobserved.
+
 Lower-timeframe array requests share the cached scalar selector's timeline
 validation and binary interval bounds. Ordered finite timestamps visit only
 the chart interval; unordered or nonfinite datasets retain the original full
