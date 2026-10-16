@@ -237,7 +237,7 @@ function makeTable(overrides: Partial<TableDrawingOutput> = {}): TableDrawingOut
 }
 
 describe('TealScriptDrawingRenderer', () => {
-  it('renders linefills, boxes, lines, then labels in pane-clipped order', () => {
+  it('renders linefills, lines, boxes, then labels in native v93 pane-clipped order', () => {
     const events: string[] = [];
     const getTextWidth = vi.fn(
       (activeCtx: CanvasContext, text: string, font: string) => activeCtx.measureText(text).width,
@@ -256,14 +256,15 @@ describe('TealScriptDrawingRenderer', () => {
 
     const firstFillIndex = events.indexOf('fill');
     const boxIndex = events.findIndex((event) => event.startsWith('strokeRect:'));
-    const firstStrokeAfterBox = events.findIndex((event, index) => index > boxIndex && event === 'stroke');
+    const lineStrokes = events.flatMap((event, index) => event === 'stroke' ? [index] : []);
     const labelTextIndex = events.findIndex((event) => event.startsWith('fillText:Label:'));
     const clipCount = events.filter((event) => event === 'clip').length;
 
     expect(firstFillIndex).toBeGreaterThan(-1);
-    expect(boxIndex).toBeGreaterThan(firstFillIndex);
-    expect(firstStrokeAfterBox).toBeGreaterThan(boxIndex);
-    expect(labelTextIndex).toBeGreaterThan(firstStrokeAfterBox);
+    expect(lineStrokes).toHaveLength(2);
+    expect(lineStrokes[0]).toBeGreaterThan(firstFillIndex);
+    expect(boxIndex).toBeGreaterThan(lineStrokes[1]);
+    expect(labelTextIndex).toBeGreaterThan(boxIndex);
     expect(clipCount).toBe(3);
     expect(getTextWidth).toHaveBeenCalledWith(ctx, 'Label', '18px sans-serif');
   });

@@ -6052,6 +6052,7 @@ function executeCompiledPass(
   const indicatorDeclarationNode = declarationNode?.type === 'IndicatorDeclaration'
     ? declarationNode
     : undefined;
+  ctx.indicatorOverlay = staticBooleanValue(indicatorDeclarationNode?.overlay) ?? false;
   const declaredMaxBarsBack = declarationNode && 'max_bars_back' in declarationNode
     ? declarationNumberValue(declarationNode.max_bars_back ?? undefined, compiled.analysis.declarationInfo)
     : undefined;
