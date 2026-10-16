@@ -4433,7 +4433,8 @@ two-state bool cast. Valuewhen receives the preserved v5 source directly.
 ### Gradient missing lower endpoint
 
 A missing lower colour in `color.from_gradient` fades the upper colour alpha by the clamped interpolation ratio while preserving its RGB.
-The v52 midpoint observers pin this route; finite endpoints and missing numeric bounds retain their existing behaviour.
+V93's D/E tuples require premultiplied-alpha RGB interpolation; zero opacity gives nonmissing transparent black.
+All captured E cells stay hypothesis-UNDECIDED; exact tuple locks do not certify unobserved colors or pixels.
 
 ### Native string overload admission
 
