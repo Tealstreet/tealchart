@@ -13213,6 +13213,11 @@
       "sha256": "e57421e259f56f2dd95344a96e893114d7d78ebb11b99da8c643afbaf1ab59e0"
     },
     {
+      "path": "v95/captures/v95/RESPONSE-v95-v21.md",
+      "bytes": 5153,
+      "sha256": "e462d239139686352b7f352c8a489c98b95545ef14895625fb08a17c12532d40"
+    },
+    {
       "path": "v95/captures/v95/RESPONSE-v95-v23.md",
       "bytes": 5157,
       "sha256": "200034c94dcd04325377f7ff59edc60991d8c86a0e57f14f1279d1aac80988f6"
@@ -13223,9 +13228,19 @@
       "sha256": "afbaacf72f2c989721ce79c134341951ce028c6a232fd8a499f050a57e954d98"
     },
     {
+      "path": "v95/captures/v95/artifact-integrity-v21.json",
+      "bytes": 294827,
+      "sha256": "3ace6a1303a077f91e2492a06c4fe72fb3c6706a27d35885fc7c506b9bf8cc95"
+    },
+    {
       "path": "v95/captures/v95/artifact-integrity-v23.json",
       "bytes": 312543,
       "sha256": "71eeecf1ed9d2b8b423a06f9f28d54355043b652ecfcb0ca753d6762283d0651"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v21.json",
+      "bytes": 2187044,
+      "sha256": "7fafa1f0a0e3f2b1a0f976ca9b5734a1b4bd37ebad4ef381fbdf2c9e29dfa16b"
     },
     {
       "path": "v95/captures/v95/attempt-inventory-v23.json",
@@ -13233,14 +13248,189 @@
       "sha256": "cf91f5759d659b0e3f76b5ddaad237741999adc1879e89a2bce5fe2d3685b56a"
     },
     {
+      "path": "v95/captures/v95/facet-capabilities-v21.json",
+      "bytes": 3481504,
+      "sha256": "584a3965faf6cfb738592bead0b4d54021eca438f138d226d0a0cf229db50c6b"
+    },
+    {
       "path": "v95/captures/v95/facet-capabilities-v23.json",
       "bytes": 4043286,
       "sha256": "4295c732c3986ca9968f5a98ad92da8fa644e1c91950193130395b7a4fbef5ec"
     },
     {
+      "path": "v95/captures/v95/numeric-controls-v21.json",
+      "bytes": 3414430,
+      "sha256": "33d8a7c919be5b12978525628316deb9d9e98f3ea9795ff843fa2f1c85b4064f"
+    },
+    {
       "path": "v95/captures/v95/numeric-controls-v23.json",
       "bytes": 3972794,
       "sha256": "54e82fb710fd2490d0a3bb65d6b6a820a73cd1c8be15c774815a05570382256b"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/add-response-v1.json",
+      "bytes": 18440,
+      "sha256": "bbf820cb1201f7596a43791c97e27fbb656a5494ccb903554823072147af9502"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2628,
+      "sha256": "ee2efa6a0d376cddcb1d464b4df5b7512e1f8c96abbf7848961e406c100106bd"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1563,
+      "sha256": "0e896a1b1cf0eacfe278363ce627096244b565031238fe3fd5528691c9762ca0"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/executed-v1.pine",
+      "bytes": 2170,
+      "sha256": "9834eaad48a4b717fa492c74b33cbebe2f22abed9473be2d1b211b0ed033d1cc"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 3482,
+      "sha256": "a8a1c1d810b33f5fbc2610bc797d67c0f3ab19a82ce6172e992b2e4b7c5f09d1"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/observation-v1.json",
+      "bytes": 13758,
+      "sha256": "dc85e2c4d952593c84f6de835aa906fbfbec27aafe1747b34f87eeaa209587b8"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8444,
+      "sha256": "acc6bf746978bae981f1971749a5e9f13c22ec5680e2dc158b186133316ebb8f"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/runtime-observation-v1.json",
+      "bytes": 1542,
+      "sha256": "d80d389f9c716a3ad92920b12e16b74affbcc4ec0851c338e6a2e242a1c47f1f"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 2349,
+      "sha256": "75b9cf0836dd8dd7aabdca08f4c5c1793e0362d03a76348d6f58e0e0ff1bf2b4"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/save-response-v1.json",
+      "bytes": 18440,
+      "sha256": "4c3cf9f49c2d4cdc77673c52589d46189a7789862085ceb432ac83a746ddac05"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 29930,
+      "sha256": "4f266f9437d5a69edde97fb989c5a1b0bcd0c07edb784f1ced979c417054e618"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 7137,
+      "sha256": "b0bc5d345d5492aad1614df393609b590232819e7e3b0bf43a70b86e74c4c0f5"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 12476,
+      "sha256": "dcab9da7c33c96153a14b2982da785ebf125e2d0830553a9937400fcaa663e85"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 106600,
+      "sha256": "5427bfd0aa79a02d5579225bf5ee5641432370e53ba318d5cd6e168f73179543"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 2115,
+      "sha256": "aca9c44378dbe7162a8e92d695c708a9e11d2366aa41e1af2f1045e47d0b231b"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 924,
+      "sha256": "bdf4414f3efc7b7fb6b6fe4410061ea9419977e3d388140806e1a83be04fe06d"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/add-response-v1.json",
+      "bytes": 18288,
+      "sha256": "8f767e74e78c293bbd250865705c545b9d89d6ad80432368313f7ae84a6b5364"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/capture-continuation-v1.json",
+      "bytes": 327,
+      "sha256": "f043aa86938dc699067b338d98b765bbcb318e57192bf3fb3802e1f355ed80f2"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2857,
+      "sha256": "6c559c74239ff6b10c01d540ab8caf36f4361d53cf7de67068f485e69ecf8886"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1563,
+      "sha256": "7f7ef279eb7dde9b100a36eb5cd1565b6ef4a37a8d026aa96be42a3f4810da16"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/executed-v1.pine",
+      "bytes": 2170,
+      "sha256": "79b468c23b6e6b2ec1c451dd1a37db1e88179ca9404af12fe3d6a7e3dcb93299"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 3355,
+      "sha256": "3c67b51f338a10b3ee548056361799ccfeaa75e5ad9edf91736e3edd7a0e46ca"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/observation-v1.json",
+      "bytes": 13367,
+      "sha256": "720f4d7877c0258a0d2bbf6113b8450dabd3eb93d85ad7d9804a21fe4a2ef97a"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/runtime-error-expanded-v1.jpg",
+      "bytes": 154153,
+      "sha256": "6c80b4c92aae03a4be29bb74041e779418fc8058b59bb6fac111126fbe74f2d9"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/runtime-error-expanded-v1.txt",
+      "bytes": 7638,
+      "sha256": "47590a7b82ea400a5ee2cb03db02e0d971f8fcf5d368d45fc7c5139b7a793bd5"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/runtime-observation-v1.json",
+      "bytes": 1381,
+      "sha256": "e87676cba8e1815186abf52526bba8eadb28adb5e5356e7d410afdfb83cf4d43"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 2349,
+      "sha256": "02ef78d9a8e5fb7cf59bf5c60b1df2c671fd3671a1b2383a8189332880490ab4"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/save-response-v1.json",
+      "bytes": 18288,
+      "sha256": "df55270140ac2fd38e50cb450d95e8d78bca4338e6fa6a8544c6381ff64eb42f"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 30169,
+      "sha256": "8118739c023003211b75cffbf8ec974c6c4df255c637d736798059374b964604"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 12476,
+      "sha256": "6f3505fdb3dc44a3bb1cad2213402f90e5cb8a68017071232ad08b8bbf4bf7c6"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 107443,
+      "sha256": "6e00a7b0893ede81bea9758c003f6aa6f414132fb8cb0c090af3abc066d63588"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 2112,
+      "sha256": "3c40cf0f272ae12bf177a6f4504085e71f3a185d2b33fcb4989e3df271dc9722"
+    },
+    {
+      "path": "v95/captures/v95/v95-matrix-mutations-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 924,
+      "sha256": "d68f977c3f2901b8820c2147ef25087ede6fa4aede14210ef558dc13c70781db"
     },
     {
       "path": "v95/captures/v95/v95-matrix-numerics-v5/attempt-v1/add-response-v1.json",
@@ -13593,9 +13783,24 @@
       "sha256": "b1c36761043e9e41e561fc71e9ab9cd3363992c0b390f39a21c570c3d635a00b"
     },
     {
+      "path": "v95/captures/v95/validation-result-v21.json",
+      "bytes": 786,
+      "sha256": "993ae0663c807be730704db8b03bfad14c0cbcc9a4106093ec014f339a5d6e96"
+    },
+    {
       "path": "v95/captures/v95/validation-result-v23.json",
       "bytes": 786,
       "sha256": "5e28ac6d7911e5034d43ba0e69943dc577d5ac178a1e1341b04298d0cd5618fa"
+    },
+    {
+      "path": "v95/sources/v95-matrix-mutations-v5.pine",
+      "bytes": 2170,
+      "sha256": "9834eaad48a4b717fa492c74b33cbebe2f22abed9473be2d1b211b0ed033d1cc"
+    },
+    {
+      "path": "v95/sources/v95-matrix-mutations-v6.pine",
+      "bytes": 2170,
+      "sha256": "79b468c23b6e6b2ec1c451dd1a37db1e88179ca9404af12fe3d6a7e3dcb93299"
     },
     {
       "path": "v95/sources/v95-matrix-numerics-v5.pine",

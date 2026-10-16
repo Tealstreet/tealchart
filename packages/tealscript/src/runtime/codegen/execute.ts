@@ -160,7 +160,7 @@ function throwCompiledRuntimeError(message: string): never {
   throw new CompiledRuntimeErrorException(message);
 }
 
-function attachBoxRuntimeSource(error: PineRuntimeArgumentError, compiled: CompiledScript): void {
+function attachRuntimeArgumentSource(error: PineRuntimeArgumentError, compiled: CompiledScript): void {
   const code = compiled.generatedCode;
   if (!code || !error.stack) return;
   const helperLines = RUNTIME_HELPERS.split('\n').length;
@@ -7870,7 +7870,7 @@ function executeCompiledPass(
           return builtin(args, namedRecordToMap(named), ctx, builtinScope, callId ?? name);
         } catch (error) {
           if (error instanceof PineRuntimeArgumentError && error.runtimeErrorCode === 'RE10026') {
-            attachBoxRuntimeSource(error, compiled);
+            attachRuntimeArgumentSource(error, compiled);
           }
           throw error;
         }
@@ -8152,6 +8152,9 @@ function executeCompiledPass(
       } catch (error) {
         if (isHistoryBufferResize(error)) throw error;
         if (error instanceof CompiledRuntimeErrorException || isKnownPineRuntimeError(error)) {
+          if (error instanceof PineRuntimeArgumentError && error.runtimeErrorCode === 'RE10094') {
+            attachRuntimeArgumentSource(error, compiled);
+          }
           errors.push(createCompiledExecutionError(error, barIndex));
           return true;
         }

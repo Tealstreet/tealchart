@@ -3081,7 +3081,10 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (boolAxis) return boolAxis;
       if (ctx.pineVersion === 6 && fullName === 'matrix.pow') args.push(String(expr.loc?.start.line ?? 'undefined'));
       const mapped = MATRIX_FUNC_MAP[fullName];
-      if (mapped) return `deps._mtx.${mapped}(${args.join(', ')})`;
+      if (mapped) {
+        const call = `deps._mtx.${mapped}(${args.join(', ')})`;
+        return fullName === 'matrix.concat' ? recordRuntimeSource(call, expr) : call;
+      }
       return `deps._mtx.${fullName.replace('matrix.', '')}(${args.join(', ')})`;
     }
 
@@ -3295,6 +3298,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         }
         const helpers = collectionMethodKind === 'array' ? '_arr' : collectionMethodKind === 'map' ? '_map' : '_mtx';
         const call = `deps.${helpers}.${runtimeMethod}(${[receiver, ...methodArgs].join(', ')})`;
+        if (methodFullName === 'matrix.concat') return recordRuntimeSource(call, expr);
         return collectionMethodKind === 'map' ? emitBoolMapReturn(methodFullName, (expr.callee as MemberExpression).object, call) : call;
       }
       return `_callCollectionMethod("${collectionMethodKind}", ${receiver}, "${runtimeMethod}", [${methodArgs.join(', ')}])`;
