@@ -4187,6 +4187,10 @@ bar, retaining its first-call ID and distinguishing repeated UDF/loop copies.
 Each family caches its last written call and counts interleaved sites separately;
 both states reset on the next bar, without changing constructor invocation state.
 
+V93 v5/v6 copy locks cover initial line Y2/box bottom/label text and independent
+same-row source/copy getter mutations, including exact text-equality flags.
+They do not certify copied appearance, styles, quotas or a native index frontier.
+
 Imported callable enum members resolve through their defining library alias,
 including requested execution and enum-title inference. Library parameters and
 local fields that shadow enum names retain ordinary field access.
