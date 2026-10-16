@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "a22cb6e73dfedd2527e0461566890736617e86b5",
+  "revision": "1ec35ab7b6879f83487ed59a67406a6cb8d20605",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -9486,6 +9486,186 @@
       "path": "v90/sources/v90-cum-prefix-v6.pine",
       "bytes": 752,
       "sha256": "61b8da0de225c44bdc27d71d93b16dc5506771d93ce139481a8cbdb252b7f192"
+    },
+    {
+      "path": "v91/captures/v91/RESPONSE-v91-v1.md",
+      "bytes": 7180,
+      "sha256": "45373907f9f745c79c325190e58964aecfe6151ed0a7f582b812428db853bcd5"
+    },
+    {
+      "path": "v91/captures/v91/artifact-integrity-v1.json",
+      "bytes": 109495,
+      "sha256": "cfda235fe0cf185ff7afcc8e4e87af61463154262d70509cdc921ac36a7b3ba8"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-frontier-v1.json",
+      "bytes": 15696,
+      "sha256": "d712f8a211940cd9cc4860f40c70cc207048cff2e90241edb82ec44d00492a1f"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-comparison-v1.json",
+      "bytes": 1557,
+      "sha256": "a61173a1880c149f203995c5a16c17430ce7c0d3ca80c722005199e7266a02f4"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/pair-receipt-v1.json",
+      "bytes": 3377,
+      "sha256": "0d50ecbb8df980b5ec8713882d25a913b94b5da5502de96c92ae114059909400"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v1/viewport-column-bindings-v1.json",
+      "bytes": 6688,
+      "sha256": "59b58895fa71ee6131cf406a896b43f7de2229af743de9c935b37fc9fd4257d0"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v1/viewport-native-v1.csv",
+      "bytes": 249096,
+      "sha256": "c2967f69649499d5382b6f6f7e8f4abd5ecda8c40c0f71d1ad8a4d6c627d8f43"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v1/viewport-row-closure-mask-v1.csv",
+      "bytes": 177525,
+      "sha256": "482fa9ebed306e580027b26fe9a54d2642e6b07d3c6d91f8923da5f06ad67974"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v2/frontier-column-bindings-v1.json",
+      "bytes": 6691,
+      "sha256": "79e40d5c5cb0d0ebbbeb2178918010f1550ad560703cfb51c7ddacaf355f4f3d"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v2/frontier-native-v1.csv",
+      "bytes": 3584063,
+      "sha256": "a5dcf1ee9c68b6f5fd0559111125627dc2a3ffc83e0fc5ca5064d666a02ba266"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v5/session-v2/frontier-row-closure-mask-v1.csv",
+      "bytes": 2597828,
+      "sha256": "ec875a0f09548d90d9712bdef06270a86374d9550ee269b219ed2fe31a945020"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v6/pair-receipt-v1.json",
+      "bytes": 3296,
+      "sha256": "2fb1a6530203cf30ddeab46c5602bbab45f2d49c997da552a6d17e4eb5f7aec6"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v6/session-v1/frontier-column-bindings-v1.json",
+      "bytes": 6691,
+      "sha256": "1557a2441041e1a7b406ef4c5a92fe2068fb47f5760b89d2e890db97e914a67a"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v6/session-v1/frontier-native-v1.csv",
+      "bytes": 3584065,
+      "sha256": "339f261d507e2634bdb270c27d945b8348b1d98fbb5a2e0d649218f699c622f6"
+    },
+    {
+      "path": "v91/captures/v91/cumulative-pair-v6/session-v1/frontier-row-closure-mask-v1.csv",
+      "bytes": 2597828,
+      "sha256": "e0571bdf49a6b57785edc98ddab2035355b9b46a7cf293324f6fcebf83a34e34"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v5/attempt-v1/add-response-v1.json",
+      "bytes": 7151,
+      "sha256": "e450d7bfddc9d949f25cbbef0efb1afa0385cc023f3e52bbb5f0e9a9078a2674"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v5/attempt-v1/executed-v1.pine",
+      "bytes": 917,
+      "sha256": "eb754ebca0f9795fb123ac6b632f6aea5fa9b7b6602616f52c0fbd25c3b621d7"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v5/attempt-v1/observation-v1.json",
+      "bytes": 4535,
+      "sha256": "95ffc94629865e5cb62151a4634cf282a2b672e84cc698d91b8c25712c126ea8"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v5/attempt-v1/save-response-v1.json",
+      "bytes": 7151,
+      "sha256": "5dd8f85da24f6ab702fdf952e403ddc06aef925d2809e25c167036d18c2ad139"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v6/attempt-v1/add-response-v1.json",
+      "bytes": 7020,
+      "sha256": "e89f768babf6e927b33996dc44134a0466d6ae6f063497d774bc234fd8f2c843"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v6/attempt-v1/executed-v1.pine",
+      "bytes": 917,
+      "sha256": "88868e5b6280317c53fc5f46360de5c049afd91a5f80ec29540d99c62914b697"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v6/attempt-v1/observation-v1.json",
+      "bytes": 3639,
+      "sha256": "0bc5c5b89984ffef03dea240247bd39e080cc0ec5879cada106e75a3bea3a8a9"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-frontier-v6/attempt-v1/save-response-v1.json",
+      "bytes": 7020,
+      "sha256": "778581d1969502dfb050cd529e044d44c8bf3d3a1e1df7a4b12f74ef10e70987"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v5/attempt-v2/add-response-v1.json",
+      "bytes": 3762,
+      "sha256": "a7f483bc0d99bcec14f744a9320ebaf12c9a0e7ca55f161ba6c19fd6dcf606ef"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v5/attempt-v2/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "532c4b8445d7057db408070ee96803b51d47a05475b3cd98d026f4138077e2e4"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v5/attempt-v2/observation-v1.json",
+      "bytes": 4596,
+      "sha256": "be888342141e93b6bc106c9db390fa610e83fbe408943f18b394d2bedd3c0604"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v5/attempt-v2/save-response-v1.json",
+      "bytes": 3762,
+      "sha256": "d25d75c6c764383f764317a0a60549702dce23c16e3d5e45b1bc182f8659d70a"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v6/attempt-v1/add-response-v1.json",
+      "bytes": 3861,
+      "sha256": "089cd1153ef33a136c59471abd0e6dd0010e19bd6cb7ee6d8c4dc846ae66301f"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v6/attempt-v1/executed-v1.pine",
+      "bytes": 190,
+      "sha256": "888c7d70d01804d5aea36eed8b4b6c91f67bb5f029389f04985074faeabb5a3f"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v6/attempt-v1/observation-v1.json",
+      "bytes": 3623,
+      "sha256": "140e537334c23ae7c60bda946a29274942f0b7f60561ed0966ed9efc2843598e"
+    },
+    {
+      "path": "v91/captures/v91/v91-cum-original-v6/attempt-v1/save-response-v1.json",
+      "bytes": 3861,
+      "sha256": "247212abf0918aba44d64790f4a57055a6e090aeed22ea93ae65bc2c7c0e8295"
+    },
+    {
+      "path": "v91/captures/v91/validation-result-v1.json",
+      "bytes": 519,
+      "sha256": "efe54234fc6ccc1b10a8bcfe912006fcb44b8f2a3f67c112dbbfc064379341d0"
+    },
+    {
+      "path": "v91/sources/v91-cum-frontier-v5.pine",
+      "bytes": 917,
+      "sha256": "eb754ebca0f9795fb123ac6b632f6aea5fa9b7b6602616f52c0fbd25c3b621d7"
+    },
+    {
+      "path": "v91/sources/v91-cum-frontier-v6.pine",
+      "bytes": 917,
+      "sha256": "88868e5b6280317c53fc5f46360de5c049afd91a5f80ec29540d99c62914b697"
+    },
+    {
+      "path": "v91/sources/v91-cum-original-v5.pine",
+      "bytes": 190,
+      "sha256": "532c4b8445d7057db408070ee96803b51d47a05475b3cd98d026f4138077e2e4"
+    },
+    {
+      "path": "v91/sources/v91-cum-original-v6.pine",
+      "bytes": 190,
+      "sha256": "888c7d70d01804d5aea36eed8b4b6c91f67bb5f029389f04985074faeabb5a3f"
     }
   ]
 }
