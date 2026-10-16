@@ -213,7 +213,8 @@ export function copyMatrix<T = unknown>(matrix: PineMatrix<T>): PineMatrix<T> {
 
 export function concatMatrix<T = unknown>(matrix: PineMatrix<T>, other: PineMatrix<T>): PineMatrix<T> {
   if (matrix.columns !== other.columns) {
-    throw new Error(`Matrix concat requires matching column counts. Left has ${matrix.columns}, right has ${other.columns}`);
+    // Native v95 item18 exposes RE10094 at the concat call, before mutation.
+    throw new PineRuntimeArgumentError("In the 'matrix.concat()' function. The number of columns in both matrices must be identical.", 'RE10094');
   }
   assertMatrixCapacity(matrix.rows + other.rows, matrix.columns);
   if (other.rows === 0) return matrix;

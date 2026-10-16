@@ -125,14 +125,16 @@ describe('Pine matrix documented collection contracts', () => {
       reference: ref('concat'),
       rejects: 'truncation, padding, and silently accepting incompatible shapes',
       source: `${base}\ns = matrix.new<int>(1, 2, -47)\nm.concat(s)`,
-      error: /Matrix concat requires matching column counts/,
+      // Native v95 item18 v6 (e09e8def), runtime-error-expanded-v1.txt; shape rule unchanged.
+      error: /In the 'matrix\.concat\(\)' function\. The number of columns in both matrices must be identical\./,
     },
     {
       name: 'concat requires equal column counts even when the second matrix has zero rows',
       reference: ref('concat'),
       rejects: 'returning early for zero rows before checking the documented column constraint',
       source: `${base}\ns = matrix.new<int>(0, 2)\nm.concat(s)`,
-      error: /Matrix concat requires matching column counts/,
+      // Native v95 item18 v6 (e09e8def), runtime-error-expanded-v1.txt; shape rule unchanged.
+      error: /In the 'matrix\.concat\(\)' function\. The number of columns in both matrices must be identical\./,
     },
     ...(['row', 'col'] as const).map((axis) => ({
       name: `add_${axis} refuses an array whose size does not match the opposite dimension`,

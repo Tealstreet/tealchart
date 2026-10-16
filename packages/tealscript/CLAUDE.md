@@ -1522,6 +1522,11 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   built-in indicator values; with negative offsets, a `length`-only window
   cannot reach the 0 endpoint. Do not compensate by flipping the sign again in
   Aroon or corpus-facing helpers.
+- Native v95 item18 unchanged v5/v6 programs compile, then fail with RE10094
+  before any plot. V6 exposes the concat column-mismatch message on bar0 and
+  #main():16; emitted concat call metadata supplies the source frame. V5's code
+  is observed but its detail/stack wording stays unobserved. All25 native plot
+  fields are blank in every exported row: zero numeric or earlier-getter credit.
 - `matrix.concat(id1, id2)` appends the rows of `id2` into `id1` and returns
   `id1`, matching array-style left mutation. Do not "fix" corpus rows by
   returning a detached combined copy; scripts that need an unmutated left matrix
