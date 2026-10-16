@@ -802,7 +802,24 @@ function replaceRuntimeStringOccurrence(source: string, target: string, replacem
   return source;
 }
 
-function formatRuntimeNumber(value: number, format: string): string {
+// Decimal masks in str.format use ties-even (v95 item15: binary-exact 1.25 -> 1.2).
+// Keep str.tostring's rounding separate, including its existing mintick contract.
+function formatRuntimeFixed(value: number, precision: number, halfEven: boolean): string {
+  const fixed = value.toFixed(precision);
+  if (!halfEven) return fixed;
+  // A binary float is an exact decimal half-tie at d places iff multiplying by
+  // 2^(d+1) gives an odd integer. Power-of-two scaling is exact; multiplying by
+  // 10^d first could manufacture a tie through floating-point rounding.
+  const binaryUnits = Math.abs(value) * 2 ** (precision + 1);
+  if (!Number.isSafeInteger(binaryUnits) || binaryUnits % 2 !== 1) return fixed;
+  const lower = (BigInt(binaryUnits) * 5n ** BigInt(precision) - 1n) / 2n;
+  const even = lower + lower % 2n;
+  const digits = even.toString().padStart(precision + 1, '0');
+  const unsigned = `${digits.slice(0, -precision)}.${digits.slice(-precision)}`;
+  return value < 0 ? `-${unsigned}` : unsigned;
+}
+
+function formatRuntimeNumber(value: number, format: string, halfEven = false): string {
   if (isRuntimeNa(value)) return toRuntimeString(value);
   const normalizedFormat = format.trim().toLowerCase();
   if (normalizedFormat === 'integer') return Math.round(value).toString();
@@ -815,7 +832,7 @@ function formatRuntimeNumber(value: number, format: string): string {
   if (mask) {
     const [, integerMask, digits = '', percent] = mask;
     const scaled = percent ? value * 100 : value;
-    const rounded = digits ? scaled.toFixed(digits.length) : Math.round(scaled).toString();
+    const rounded = digits ? formatRuntimeFixed(scaled, digits.length, halfEven) : Math.round(scaled).toString();
     const [integer, fractional = ''] = rounded.split('.');
     const sign = integer.startsWith('-') ? '-' : '';
     const minimumIntegerDigits = integerMask.split('0').length - 1;
@@ -848,13 +865,13 @@ function formatRuntimeStringPlaceholder(value: unknown, modifier?: string, forma
 
   if (normalizedModifier === undefined) {
     return typeof value === 'number'
-      ? formatRuntimeNumber(value, normalizedFormat ?? '#,###.###')
+      ? formatRuntimeNumber(value, normalizedFormat ?? '#,###.###', true)
       : toRuntimeString(value);
   }
   if (normalizedModifier === 'number') {
     if (isRuntimeNa(value)) return toRuntimeString(value);
     if (isPineArray(value)) throw new CompiledRuntimeErrorException('Cannot format given Object as a Number', line, undefined, includeBarContext);
-    return typeof value === 'number' ? formatRuntimeNumber(value, normalizedFormat ?? '#,###.###') : toRuntimeString(value);
+    return typeof value === 'number' ? formatRuntimeNumber(value, normalizedFormat ?? '#,###.###', true) : toRuntimeString(value);
   }
   return toRuntimeString(value);
 }
