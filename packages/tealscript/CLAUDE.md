@@ -2546,6 +2546,13 @@ documented representations.
 `math.random()` uses fresh randomness when seed is omitted. Explicit seeds retain
 repeatable per-call-site streams; both paths exclude the minimum and maximum.
 
+Native v95 item15 independently captures v5/v6 `str.format("{0,number,0.0}",
+1.25)` as `"1.2"`. Decimal masks in `str.format` use ties-even for exact binary
+half-ties, without rounding the value through a decimal scale first. This path
+is separate from `str.tostring` and `math.round`; neither inherits this rounding
+mode. The capture covers four literal inputs and the one-decimal mask, not a
+universal native rounding certification for other patterns or negative ties.
+
 `str.format()` removes apostrophe delimiters around literal text and leaves quoted
 placeholders uninterpreted. Two adjacent apostrophes emit one literal apostrophe.
 
