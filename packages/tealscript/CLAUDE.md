@@ -4798,3 +4798,8 @@ Native v95 item16 locks only its bounded ASCII literals: occurrence1 replaces th
 second match, split a,,b retains the empty middle field, and no-match pos has a raw
 blank with NA flag1. Preserve its UNDECIDED hypothesis metadata while asserting the
 observed missing result; Unicode-wide and all-overload behavior is not certified.
+
+Native v95 item17 pins final B/C/A map order and shallow sharing of the copied
+map's Cell value for its exact merge/remove/reinsert/clear sequence. Only three
+earlier MERGED slots are exposed; their array count stays NOT OBSERVED/HELD.
+No Cell.copy call, arbitrary key/value kinds or generic iteration policy is certified.
