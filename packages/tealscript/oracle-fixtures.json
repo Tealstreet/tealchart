@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "b190ede52a57f1105cc5ff55a06f268d8d05e4df",
+  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -10561,6 +10561,396 @@
       "path": "v92/captures/v92/validation-result-v2.json",
       "bytes": 479,
       "sha256": "4bd0e56d2ce5e2bda40dfd6b266fbfd773f3ca5a892422a9bdf9f3fa75deef64"
+    },
+    {
+      "path": "v93/captures/v93/RESPONSE-v93-v1.md",
+      "bytes": 5167,
+      "sha256": "b8f9c80f10c351fa2c23f55c1534a2a1c4b4a5a03ea04cb1ba4125fa02ac82c3"
+    },
+    {
+      "path": "v93/captures/v93/artifact-integrity-v1.json",
+      "bytes": 97024,
+      "sha256": "994cbb7e155251bda212513484d4a0392b267fdab65b3905e2838d132d02bb2b"
+    },
+    {
+      "path": "v93/captures/v93/attempt-inventory-v1.json",
+      "bytes": 553064,
+      "sha256": "5d47ad341a1987adb7f245fc7a679b0adfa965c142d56a73673337115b8c67ef"
+    },
+    {
+      "path": "v93/captures/v93/facet-capabilities-v1.json",
+      "bytes": 25113,
+      "sha256": "22ea90d99706ed865a66f579e75b641c84a221474b35aa357eaa318fbd11c1df"
+    },
+    {
+      "path": "v93/captures/v93/numeric-controls-v1.json",
+      "bytes": 516720,
+      "sha256": "74ff415c3d4e9420fe878466db7f98e87ebe21bdfbda994eeeaafe2eafcbd5d7"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/add-response-v1.json",
+      "bytes": 6466,
+      "sha256": "aef4b2af0174d32b6ba7a8b1954c4dbd8141ca50a6dfc622ab6e2c9223dd5a88"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2440,
+      "sha256": "5456c753993ff6155af210c1e34c1aa44209fd01acb794432867a09d756f9793"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/executed-v1.pine",
+      "bytes": 605,
+      "sha256": "c353cd46f8a0da654c92394d07ab398403addf8449f6cc6b303f94fad58dab90"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/observation-v1.json",
+      "bytes": 1898,
+      "sha256": "1cac0fbed32fa644776fa6051bfb38661840727a5387efe78165328de9397b1c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 754,
+      "sha256": "e21e9f2627cdd4da1e293529b41b9bae7ce06fbfe8237644fa191c301a1d9e77"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/save-response-v1.json",
+      "bytes": 6466,
+      "sha256": "961ac98045ebcdfd36fc694d9e8b04fef2f474ac0811f365f5dcebde635993b3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 23392,
+      "sha256": "891f3224d98ad5efb7f49866dc030b297055204fca326bfa8f9638a2b8b0154f"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6160,
+      "sha256": "6d5490c0d5e8496dafc21b0d5f8097a14f5dd6193c869b6e35d670b03a00c1af"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 3232,
+      "sha256": "1497947d094a16ce0d79d9dd1d9992ab5092b7cae49f0e04bae4cd90b453f871"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 128806,
+      "sha256": "a1e4346e075696bc7edf89389323f66c26f8d68964bbf7159ea618b9e23ed352"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46215,
+      "sha256": "62577a9c1295aaca1516ceb3c8dac8d1f432ed6d479bfa6af7bdccba68abb126"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30126,
+      "sha256": "ec935825c67e59316eef8f31e8a4a6907a327f7e98c27a5bd660df4925399c0e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/add-response-v1.json",
+      "bytes": 6005,
+      "sha256": "67e3b82e1c1624f041f3c8f396da683ae5e913e912886a9d05e4891064a40bb2"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2440,
+      "sha256": "07c56ca2a43391a6ee1486cfd93ed72766c3d9eec3fef467cfa0f1a2eaf6b36b"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/executed-v1.pine",
+      "bytes": 605,
+      "sha256": "120212c001ce74153b1fb31dbf6607989f17b17e46118aeec37c0e031e4ac17a"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/observation-v1.json",
+      "bytes": 1898,
+      "sha256": "1609b3a1c74e8c7cc876e2c5c57fdb0869755bf4c26044dfb39e553344a7f8fc"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 754,
+      "sha256": "60651ef0a5beb873da73caf1d3762e11b656e2e3d6e85340bde0ddf96a031269"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/save-response-v1.json",
+      "bytes": 6005,
+      "sha256": "53166e2d56371f82d7dbc9dc9dc3fbb3051d763ff225c142d4b14f598d5835a2"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 23469,
+      "sha256": "73809f8a79fe1db07b197f85e43a22041286ab9aa0a4a2b4c92f6d8ea86c5b32"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6160,
+      "sha256": "08714ef791ea7d892b618b86bdacb97b7e222d26581c6de4f68a59281655d5fc"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 3232,
+      "sha256": "7b923c41bf6dc9c2cf157cf4718f04118d1de9d2f2f22f7e00f13804dfce68fe"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 131858,
+      "sha256": "7964639af2e29fa627795d8ce08fe91b3b0986773204a6e76666fd3776b80e91"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46368,
+      "sha256": "712faca6759585652a6c7a60b522a2a899ba2434440a369136cca2128e82416a"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-false-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30218,
+      "sha256": "771c0d4538c65412b295c81933d9aba7b4bcc827fb5b6d05949591bf01b5008e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/add-response-v1.json",
+      "bytes": 12200,
+      "sha256": "eabffc04ff3ec0468d5b16ab2c849ed540c73c7aceb18c106a1b1f6165477194"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2446,
+      "sha256": "d4df4dc8e6a298918b2e932b72651fd815c1efd0fa4a37e1a2d43cab6a35edd6"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1330,
+      "sha256": "7988f177e1cef9cbfcd99afaf2872c214d640fa66e60288b46f1d2ef5f77d4b6"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/observation-v1.json",
+      "bytes": 1907,
+      "sha256": "843c5e08e17aa3025a6e12b4e5e1a11badba06516067686ba82050d1f6601c7d"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1491,
+      "sha256": "a5fc06931202f422a1f577c14fd7a22b4c294ce49a0071f02069e1a9aa528c82"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/save-response-v1.json",
+      "bytes": 12200,
+      "sha256": "a5b39ac40d2a94117f298867aebff8b052be6bd7b3e4aa92323f886b0bdbe43c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 24410,
+      "sha256": "118b8d18279987e9627be733092f5db2d8d3151a498eca03c4c4f3a0dad25632"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6491,
+      "sha256": "cf40239ac2cae1d3c35248a4490939e53ed75f4b9814156a6f77fb9ea0af5633"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 5472,
+      "sha256": "8befa8286778e84d22df30e03565ceba185231f5c9714425a74e46f30f96db44"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 134964,
+      "sha256": "7c26dbc8725c2291d2e0e9a4f4dc3958e6d218a600b1e2b83b946ab8d2dce81e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46980,
+      "sha256": "7a69afa2a4e7a00d4ca09aff53cbe39c9bc75a5ac43cd4bcef2e1575f4c0d4d9"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30624,
+      "sha256": "6d80e003ada9253f8bed25bbabaf34dbcc893e6ee115bbe47049a0bb546f092c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/add-response-v1.json",
+      "bytes": 11869,
+      "sha256": "7cf6ee70e86d94fdd4a2686041c84dfc402a0fad064eeb9d294bb0c5573f0b7f"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2446,
+      "sha256": "d5983a4d51b9679c3880e13b1ff9f75c9c40a374aa73ef6c31368cce3c793786"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1330,
+      "sha256": "c81a14013dcf79c42805adc0acdf26a7c2fe6b9aee06322fd2858f45153b9d4c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/observation-v1.json",
+      "bytes": 1907,
+      "sha256": "adf51681fd4d028a20698146220323479bca520620f8b9922bf18c6e6191aecd"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1491,
+      "sha256": "a8e1af7493bb0e4e9f5bc71e84edec7fed455e63095b2782f1f999fe1742a33e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/save-response-v1.json",
+      "bytes": 11869,
+      "sha256": "79040986e1af0c1743adab33f27f391203f6d56acd1d619c0cc9f71192d288fc"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 24567,
+      "sha256": "c7744e6ae5a2a033f1b95bb974f057c8c47f99fc5d7b9fe89dc522f646891fb3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6489,
+      "sha256": "2d6f26d446dde61dd386387b7f7d053e057c6fefa710d8672c8730a581361566"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 5472,
+      "sha256": "883b60088ae04a7252c97cb83e83cc3d616fb12b436596588608bd77de86eb28"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 137618,
+      "sha256": "730c91cf629052cb480d3aa9382111eccf41f1cd8e90238e8dff15852cd9680a"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 47286,
+      "sha256": "6fc97e53db168aa6b62216c997b9ccd50004d040a1518b81da5801ee341beed3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-groups-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30807,
+      "sha256": "5503b1d3b10a7cd7ffd39b60368e6c0670d665732f27468616ca51bfb0a852b3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/add-response-v1.json",
+      "bytes": 6596,
+      "sha256": "942485e9dd27fc36d26826d9f7129fd7e3a54b52f7693430fdbd08954a9e2e5a"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2436,
+      "sha256": "81b392e6f3664655baf934f8e177665d4d95a201699cacd9761dc22a269d1f3c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/executed-v1.pine",
+      "bytes": 603,
+      "sha256": "3739cfc2ef3bfdf02a1c163329d8483e0e700eb8c82236c0bac595ea33101412"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/observation-v1.json",
+      "bytes": 1892,
+      "sha256": "a55af1ca7773c95fb7726fd3bc0b27f8ea82f266f7fda5850d83a1d8c85774fe"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 752,
+      "sha256": "606ce6cae27951dc5aa76d6de9f92201e21000fb7273435cd9b7a3e70131ee95"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/save-response-v1.json",
+      "bytes": 6596,
+      "sha256": "cfcba366f813a3b8c22cbb657c1da96018d73959cdf46e06c62f3ba848f502b6"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 23552,
+      "sha256": "4b24aca4946242f71aceed0ad1b6bc5e307c000e55727e10ea3d3800c27c746c"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6153,
+      "sha256": "722350d676fcf780287ad21c53e6dc37e0cbce0249e87f14c2720e8d7c9819a3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 3242,
+      "sha256": "a721fdfc93c52659d8ebd26b3df3bcf84005f43fad77e1ea2138ec423ec08031"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 132050,
+      "sha256": "1e240ae1b6e9c147630da5cd6f086dd48f60a1ac8adadb2ebc1b7c3929e1e61e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46521,
+      "sha256": "4e0347df695a33376aab5a4a99ed30eeb761ef832976f86475ec1f30eae97387"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30311,
+      "sha256": "9f73262d21e9298d044557bccdd3849e14c87dcf48dcbc94c2e9da47e0595db5"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/add-response-v1.json",
+      "bytes": 6135,
+      "sha256": "f87851aa9c643bb11c33fc1c4aa58c400e6f79ed841c954cc68f4ba5fc5ea73e"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2436,
+      "sha256": "6da82fdfd9faec10c1e01771018caafc7a1779a55a4b3612b8a07b0ecdc9282b"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/executed-v1.pine",
+      "bytes": 603,
+      "sha256": "c3c686a65f8c8639a0258bccb95c8f6cf318a1465c065011a5ab7a9d7bf070d9"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/observation-v1.json",
+      "bytes": 1892,
+      "sha256": "e9fba41a416119a65742d3caad9577339f104902da4637155cbf074b55f43ee9"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 752,
+      "sha256": "f52043439e2835661def4a6b5a49b976dcc222c15eae6cc156732342409f35d8"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/save-response-v1.json",
+      "bytes": 6135,
+      "sha256": "ca90ecaf6f4e3e41608b915eeb9fbb6fdd9ee3efedd2cc8af15c1a7121555509"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 23710,
+      "sha256": "a20aca6079de3084b4da54b3bfe48137cab96c0736d53570646eba8ab292c767"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6153,
+      "sha256": "4d01fc90f57c8343d548b29c80f3d7d6bcff30fe15f759ab81d4838d13b591f8"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/derived-region-map-v1.json",
+      "bytes": 3242,
+      "sha256": "9fc2aa151d5c51a244af53bd9f57290b3df630ed360867cca6799b7d825a9aa8"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 130514,
+      "sha256": "395ac3258cd2f433fffdfe56f0797468fe74b126ddd90769503eb2fc25005248"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 46827,
+      "sha256": "e6a11665ea7692e0f663888b6f41354f66c2b2e45fe77483acb87da3480306c3"
+    },
+    {
+      "path": "v93/captures/v93/v93-zorder-true-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 30501,
+      "sha256": "472073d15661259d9913c3bbc1d29cc83eaab4bfce35fe357fbc9a6c25cf2126"
+    },
+    {
+      "path": "v93/captures/v93/validation-result-v1.json",
+      "bytes": 399,
+      "sha256": "fefa2f9f5358ecf070a2a78982d83704c2f211f1f8a62184647a170f8d02bf25"
     }
   ]
 }

@@ -21,6 +21,7 @@ import {
   TRADE_LINE_DOTTED_DASH_PATTERN,
 } from './constants';
 import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from './debug/plotDebug';
+import { orderTealScriptPlots } from './rendering/tealScriptPlotOrder';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import {
@@ -2120,33 +2121,9 @@ export class TealchartRenderer {
     viewport: Viewport,
     explicitPlotZOrder = false,
   ): void {
-    if (explicitPlotZOrder) {
-      for (const plot of this.sortedByZOrder(scriptPlots)) {
-        if (this.shouldRenderPlot(plot)) {
-          this.renderPlotInMainPane(plot, scriptPlots, bars, viewport);
-        }
-      }
-      return;
+    for (const plot of orderTealScriptPlots(scriptPlots, explicitPlotZOrder)) {
+      if (this.shouldRenderPlot(plot)) this.renderPlotInMainPane(plot, scriptPlots, bars, viewport);
     }
-
-    for (const plot of scriptPlots) {
-      if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
-        this.renderFill(plot, scriptPlots, bars, viewport, (value, paneHeight) =>
-          this.priceToY(value, viewport, paneHeight),
-        );
-      }
-    }
-
-    for (const plot of scriptPlots) {
-      if (!this.shouldRenderPlot(plot)) continue;
-      if (plot.type === 'fill') continue;
-
-      this.renderPlotInMainPane(plot, scriptPlots, bars, viewport);
-    }
-  }
-
-  private sortedByZOrder(plots: PlotOutput[]): PlotOutput[] {
-    return [...plots].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0));
   }
 
   private renderPlotInMainPane(plot: PlotOutput, scriptPlots: PlotOutput[], bars: Bar[], viewport: Viewport): void {
@@ -4208,16 +4185,9 @@ export class TealchartRenderer {
 
     for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
       const explicitPlotZOrder = indicatorPaneInfo[scriptId]?.explicitPlotZOrder;
-      // hlines normally draw in the earlier price pass, but that hoists them
-      // past a script's declared order. Keep explicit z-order scripts whole in
-      // the later pass so zOrder decides, not the pass split.
-      const renderPlots = explicitPlotZOrder
-        ? domain === 'time'
-          ? scriptPlots
-          : []
-        : domain === 'price'
-          ? scriptPlots.filter((plot) => plot.type === 'hline')
-          : scriptPlots.filter((plot) => plot.type !== 'hline');
+      // Keep each script's fills, plots and levels together. An earlier price
+      // pass would put default hlines beneath plots and split explicit order.
+      const renderPlots = domain === 'time' ? scriptPlots : [];
       if (renderPlots.length === 0) continue;
 
       this.renderPlotsInComputedPane(
@@ -4547,10 +4517,8 @@ export class TealchartRenderer {
     }
 
     for (const [scriptId, scriptPlots] of plotsByScript) {
-      const renderPlots =
-        domain === 'price'
-          ? scriptPlots.filter((plot) => plot.type === 'hline')
-          : scriptPlots.filter((plot) => plot.type !== 'hline');
+      // Plot-group precedence is independent of the price/time cache split.
+      const renderPlots = domain === 'time' ? scriptPlots : [];
       if (renderPlots.length === 0) continue;
 
       if (isTealchartPlotDebugEnabled()) {
@@ -5225,21 +5193,10 @@ export class TealchartRenderer {
     explicitPlotZOrder = false,
     plotStyleOverrides?: Map<string, PlotStyleOverride>,
   ): void {
-    if (!explicitPlotZOrder) {
-      for (const plot of plots) {
-        if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
-          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
-        }
-      }
-    }
-
-    const orderedPlots = explicitPlotZOrder ? this.sortedByZOrder(plots) : plots;
-    for (const plot of orderedPlots) {
+    for (const plot of orderTealScriptPlots(plots, explicitPlotZOrder)) {
       if (!this.shouldRenderPlot(plot)) continue;
       if (plot.type === 'fill') {
-        if (explicitPlotZOrder) {
-          this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
-        }
+        this.renderFill(plot, referencePlots, bars, viewport, (value) => this.valueToY(value, pane));
         continue;
       }
       this.renderPlotInPane(plot, bars, viewport, pane, plotStyleOverrides);
@@ -5985,16 +5942,7 @@ export class TealchartRenderer {
     ctx.rect(margins.left, paneOffset.top, options.width - margins.left, paneOffset.height);
     ctx.clip();
 
-    if (!explicitPlotZOrder) {
-      for (const plot of plots) {
-        if (plot.type === 'fill' && this.shouldRenderPlot(plot)) {
-          this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
-        }
-      }
-    }
-
-    const orderedPlots = explicitPlotZOrder ? this.sortedByZOrder(plots) : plots;
-    for (const plot of orderedPlots) {
+    for (const plot of orderTealScriptPlots(plots, explicitPlotZOrder)) {
       if (!this.shouldRenderPlot(plot)) continue;
 
       switch (plot.type) {
@@ -6022,9 +5970,7 @@ export class TealchartRenderer {
           );
           break;
         case 'fill':
-          if (explicitPlotZOrder) {
-            this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
-          }
+          this.renderFill(plot, plots, bars, viewport, (value) => this.valueToPaneY(value, paneOffset));
           break;
       }
     }
