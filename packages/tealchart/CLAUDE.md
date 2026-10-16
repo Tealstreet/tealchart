@@ -383,6 +383,12 @@ box and table text use 8/10/14/20/36px. Positive integer strings are pixel sizes
 Do not share the label map with table measurement or box wrapping; their font
 and line-height calculations must agree with the font used to paint text.
 
+Native v93 v5/v6 box-text controls continue oversized wrapped words across
+lines and clip wrapped text at its own box boundary. The shared painter uses
+host text measurements for character breaks and a box-local clip; unwrapped
+sentinels retain pane clipping. Local constructor/setter agreement does not
+certify complete clipped strings, resolved OS fonts or native pixel spacing.
+
 **Table dimensions:** A cell width or height of zero selects automatic text
 measurement, just like omission. Positive dimensions are percentages of the
 pane's drawable space; explicit columns/rows still take precedence over auto
