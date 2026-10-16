@@ -103,7 +103,8 @@ export async function measureVisualSnapshotDriftFromBuffers(
 }
 
 export function assertVisualSnapshotHasNoCommittedDrift(name: string, platform = process.platform): void {
-  if (getDriftBaseline(name, platform)) {
+  const baseline = getDriftBaseline(name, platform);
+  if (baseline && baseline.differingPixels > 0) {
     throw new Error(
       `Visual snapshot "${name}" now matches its PNG baseline, but committed drift data still lists it. ` +
       'Run yarn workspace @tealstreet/tealchart visual:snapshot:drift after reviewing the rendered change.',

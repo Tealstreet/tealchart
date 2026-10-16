@@ -32,6 +32,19 @@ function makeMeasurement(name: string): VisualSnapshotDriftMeasurement {
 }
 
 describe('visual snapshot drift baseline platform handling', () => {
+  it('accepts an exact PNG match when the committed ceiling is zero', () => {
+    expect(linuxBaseline.differingPixels).toBe(0);
+    expect(() => {
+      assertVisualSnapshotHasNoCommittedDrift(linuxBaseline.name, 'linux');
+    }).not.toThrow();
+  });
+
+  it('still rejects a stale nonzero drift entry when the PNG matches exactly', () => {
+    expect(() => {
+      assertVisualSnapshotHasNoCommittedDrift(linuxBaselineWithDrift.name, 'linux');
+    }).toThrow(/now matches its PNG baseline/);
+  });
+
   it('requires a committed drift baseline on platforms with recorded baseline data', () => {
     expect(() => {
       assertVisualSnapshotDriftMatchesBaseline(makeMeasurement('new-drift'), baseline.platform);
