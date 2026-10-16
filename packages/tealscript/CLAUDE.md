@@ -1,3 +1,11 @@
+V95 UDF-state captures pin four complete 16-phase reset blocks per v5/v6 source:
+written and nested calls retain independent persistent state, and skipped gated
+calls export actual blanks. The unchanged-source replay translates the selected
+native index23344 reset to local index0; only reset/phase-dependent values and
+presence earn credit. LOCAL_FIRST initialized values remain OBSERVED/excluded
+from startup scoring because the source's own index-zero prefix was not exported.
+Developing rows and other closed rows outside the four blocks remain excluded.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
