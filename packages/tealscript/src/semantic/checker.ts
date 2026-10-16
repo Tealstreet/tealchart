@@ -7513,6 +7513,7 @@ class SemanticChecker {
     if (scope.executionMayBeSkipped || this.conditionalExpressionDepth > 0) {
       this.conditionalHistoryCalls.add(expression);
     }
+    this.checkConditionalAverageWarning(expression, scope);
     this.checkUserMethodReceiverType(expression, scope);
     const legacySecurityExpression = expression.callee.type === 'Identifier'
       && expression.callee.name === 'security'
@@ -13549,6 +13550,17 @@ class SemanticChecker {
       call.loc,
       'warning',
     );
+  }
+
+  private checkConditionalAverageWarning(expression: CallExpression, scope: SemanticScope): void {
+    if (this.currentPineVersion < 5 || !scope.executionMayBeSkipped || this.conditionalExpressionDepth > 0
+      || scope.lookup('ta') || this.userFunctionCallDeclarations.has(expression)) return;
+    const name = this.memberPath(expression.callee).join('.');
+    if (name !== 'ta.sma' && name !== 'ta.ema') return;
+    const quotedName = this.currentPineVersion === 5 ? `'${name}'` : `"${name}"`;
+    this.addDiagnostic('conditional-average-history',
+      `The function ${quotedName} should be called on each calculation for consistency. It is recommended to extract the call from this scope`,
+      expression.loc, 'warning', this.currentPineVersion === 6 ? 'CW10003' : undefined);
   }
 
   private checkCapturedConditionalTaWarnings(): void {

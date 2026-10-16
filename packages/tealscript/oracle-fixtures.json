@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "2bb7aa930f38ec94fe9a6298599bc6486568f735",
+  "revision": "e3e1e5bdbb1861fec868f74a3a0f2285a58162d0",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -11348,9 +11348,19 @@
       "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
     },
     {
+      "path": "v95/REQUEST-v95-v1.md",
+      "bytes": 53504,
+      "sha256": "e57421e259f56f2dd95344a96e893114d7d78ebb11b99da8c643afbaf1ab59e0"
+    },
+    {
       "path": "v95/captures/v95/RESPONSE-v95-v1.md",
       "bytes": 3456,
       "sha256": "d76519e0e2a70d672ac3f0a23833317317fee32451ca677be9ac34679495fa10"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v2.md",
+      "bytes": 3914,
+      "sha256": "9aa80559ae6e4783c9baf45bb3b920971eab4c8e08bbb7fd9bc48b8af6ca5670"
     },
     {
       "path": "v95/captures/v95/artifact-integrity-v1.json",
@@ -11358,9 +11368,19 @@
       "sha256": "cdbf66e7963ab92aa318df71c75fc9b3e09784573dfca01d5808943201c6953d"
     },
     {
+      "path": "v95/captures/v95/artifact-integrity-v2.json",
+      "bytes": 41326,
+      "sha256": "33ae2ebebfa4a1f385780de6a487bb1e988b76da2d43bd5c014f95c22c40f31d"
+    },
+    {
       "path": "v95/captures/v95/attempt-inventory-v1.json",
       "bytes": 123993,
       "sha256": "26824f5ee939b9f36c8392b38e8f6aceb45ea4cba905426432157ece512c4cd1"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v2.json",
+      "bytes": 233121,
+      "sha256": "e189632272e632a511919476ddc1ccd99872818aa65b48a11ea92dd45d35454b"
     },
     {
       "path": "v95/captures/v95/facet-capabilities-v1.json",
@@ -11368,9 +11388,139 @@
       "sha256": "2ff8f5e054daee9efe734bed2ec17a6186f499f1f93baabaf7939f9bfbb850e2"
     },
     {
+      "path": "v95/captures/v95/facet-capabilities-v2.json",
+      "bytes": 930634,
+      "sha256": "25a45e4a596bd2282c14bca271b64944fe79f64fe8f20500f839c7f19c246f90"
+    },
+    {
       "path": "v95/captures/v95/numeric-controls-v1.json",
       "bytes": 19265883,
       "sha256": "5af4254e48162ba352c34ac0b16bab35ef9d1c1e9c4adf6445ed64892519151d"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v2.json",
+      "bytes": 917939,
+      "sha256": "21439c21ad4fa71c076632dde942a51cfa66695f0c975a44a5d7b3b4ac389084"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/add-response-v1.json",
+      "bytes": 10073,
+      "sha256": "46eb1ea48996cba16ab625ee5292809043ca61cf4a05498ff9bd0b2dc2acc089"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2632,
+      "sha256": "178f467faf5df0a100222da423d43e8270bc37078df7dc70ba74e3f9e2e41cad"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 3690,
+      "sha256": "8cc1ebb98186cb3575cb7a870fcf2aafe0296dfbe1ca960e27551eb2c1e3ba98"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/executed-v1.pine",
+      "bytes": 949,
+      "sha256": "c30debb150d9e350027bb89bf8997026175721fc6fc00343b1a68dbedd9c5ed9"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 585518,
+      "sha256": "bc806bf176992e2b10c7e306699a24ee7e6c038aed2082d175098659e6820c03"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/observation-v1.json",
+      "bytes": 8664,
+      "sha256": "d5f13b81cc7cdbf96756f470578b36a65d3dd4183559baf768647e20d5c25b5c"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/save-response-v1.json",
+      "bytes": 10073,
+      "sha256": "53bd3db38d590dac5931e28fef5039c03d91b3352b296024fc986661c148fe08"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 47004,
+      "sha256": "c5fd536a65b20aa74c709bea74ab6cfbe5274591b6cd6965a286c7298385f7ca"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8327,
+      "sha256": "95870aa794bb1b06593a5444607c080257b3295dfa98ab47afff366a6d82094e"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 47778,
+      "sha256": "6a7ceb464fc4190348f14e06c2b2bc51f4a93314f4abf0689f5c368a7ee5597f"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31157,
+      "sha256": "94a4072a1f7c9c4af5d45b4b72403eef493c33c49d32bf23fb51ebb8c605960d"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 926,
+      "sha256": "9a537c84f1314cb0273fc27989feef32097d917e0e63630301d8b4c8db2e61e4"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/add-response-v1.json",
+      "bytes": 10441,
+      "sha256": "66468122a0fe5d07c0d1674fb125b9c2798ee75f74cc8f205add0097b614819b"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2632,
+      "sha256": "d8fcd0b9f07463896bc54954fd46583a40b5fd55a661694c48679aa9ef835b7c"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 4778,
+      "sha256": "49e3c6242ee02cd85c75963de9e8a8f65f863989f922979ccaf77f74e50ed813"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/executed-v1.pine",
+      "bytes": 949,
+      "sha256": "a3a05e1fb4656b39de2b4d8acf0676c618f8614f87b8f11cf031aa0093e35174"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 585518,
+      "sha256": "e505b6ec56fd5635e795e57aaae73fc53abda6d14d306c58ab6ee50e67811f05"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/observation-v1.json",
+      "bytes": 8775,
+      "sha256": "1ed95df938b2c2dcdc388ba0244daf7c21551cd4189b7b6958c2b807ef5445a0"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/save-response-v1.json",
+      "bytes": 10441,
+      "sha256": "6de4a624a37a95298b77565a9e650e4731e16b1f6b7b59fe87e15db461a0e63e"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 47300,
+      "sha256": "ec136e3539954ddf75fa73ac864a44fbb2d41d2933cede0943ce6c551cf56f08"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8327,
+      "sha256": "f176788a68ee85ec2bc29871ba1c921af4e99e1cc560883471b458409d96696e"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 48091,
+      "sha256": "7c907803c7a92ccda7a8272b8752b95a4f732ecc6030a65b364c84d2b50666b2"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 31348,
+      "sha256": "04fece32deb51b5ed9bc3d76cfb07b6a94158d40462a796bc0d7b5512c4ccd4a"
+    },
+    {
+      "path": "v95/captures/v95/v95-conditional-clock-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 926,
+      "sha256": "be425106fd4af8e686bf21cf98f8c64e073daa29d13c1ef4b8dcd5ea6d09fbf0"
     },
     {
       "path": "v95/captures/v95/v95-ltf-tuples-v5/attempt-v1/add-response-v1.json",
@@ -11486,6 +11636,21 @@
       "path": "v95/captures/v95/validation-result-v1.json",
       "bytes": 622,
       "sha256": "dc5101793e9e01aa6b418d51846c9f4d2f0db47e1ec54527519ebde6f7d1eae5"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v2.json",
+      "bytes": 651,
+      "sha256": "5a24022173ede7578c3369380fe6a01f37b203d4a840bf8c24790b271cbb3dbe"
+    },
+    {
+      "path": "v95/sources/v95-conditional-clock-v5.pine",
+      "bytes": 949,
+      "sha256": "c30debb150d9e350027bb89bf8997026175721fc6fc00343b1a68dbedd9c5ed9"
+    },
+    {
+      "path": "v95/sources/v95-conditional-clock-v6.pine",
+      "bytes": 949,
+      "sha256": "a3a05e1fb4656b39de2b4d8acf0676c618f8614f87b8f11cf031aa0093e35174"
     },
     {
       "path": "v95/sources/v95-ltf-tuples-v5.pine",
