@@ -19,6 +19,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 import { appendPlotFillQuad, getPlotFillSample, plotFillGradientKey } from '../../rendering/plotFillGeometry';
 import { appendPlotAreaBaseline } from '../../rendering/plotGeometry';
 import { plotArrowHeight, plotMarkerSize, plotMarkerTextLineOffset } from '../../rendering/plotMarkerGeometry';
+import { orderTealScriptPlots } from '../../rendering/tealScriptPlotOrder';
 import { getNativeFillPaints } from './nativeFillPaints';
 import { getNativeFillTargetBars } from './nativeFillTargetBars';
 import { applyNativeIndicatorTailToPoints, getNativeIndicatorPlotKey } from './nativeIndicatorTail';
@@ -2622,9 +2623,7 @@ export function NativeIndicatorPlotLayerImpl({
     scriptGroups.set(scriptId, group);
   }
   const orderedPlots = [...scriptGroups].flatMap(([scriptId, group]) =>
-    indicatorPaneInfo[scriptId]?.explicitPlotZOrder
-      ? [...group].sort((a, b) => (a.zOrder ?? 0) - (b.zOrder ?? 0))
-      : [...group.filter((p) => p.type === 'fill'), ...group.filter((p) => p.type !== 'fill')],
+    orderTealScriptPlots(group, indicatorPaneInfo[scriptId]?.explicitPlotZOrder),
   );
 
   return (

@@ -1,3 +1,11 @@
+Native v93 z-order captures require default fills below plots and hlines above
+both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
+passes must keep each script together, and native plots share the same ordering.
+Background stripes remain beneath fills. Shared drawing paint puts lines after
+linefills and boxes after lines, then labels. Captured tables cover intersected
+fill only: table-vs-label/box/line/linefill intersections remain unobserved.
+Screenshot/region bindings certify these bounded precedence checks, not pixel parity.
+
 Pine Style controls on web retain coded plots separately from display overrides.
 Reselecting a plot sets all display locations; Defaults resets coded inputs and
 clears Style overrides. Omitted percent precision uses two decimal places in the
