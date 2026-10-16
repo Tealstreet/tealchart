@@ -11,7 +11,7 @@ import { checkProgram } from '../../src/semantic/checker';
 
 const directory = 'v91/captures/v91/';
 // Checkout pin advances with oracle-fixtures.json; all v91 artifact hashes remain unchanged.
-const revision = 'b190ede52a57f1105cc5ff55a06f268d8d05e4df';
+const revision = '72c761048bceb27f99090fdcdfa8a71b8a9eeb35';
 const read = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url), 'utf8');
 const hash = (raw: string) => createHash('sha256').update(raw).digest('hex');
 const json = <T,>(path: string): T => JSON.parse(read(directory + path)) as T;
