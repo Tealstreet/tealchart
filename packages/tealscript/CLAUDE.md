@@ -1,3 +1,9 @@
+Native v95 item 19 locks all 19 literal-matrix outputs to exported strings and binary64
+values, including eigenvalue order and vector signs. The symmetric eigenvector tuple
+cannot settle row/column orientation; generic solver and cutoff claims stay held.
+Scaled Jacobi singular norms use the square root of the compensated squared norm;
+iterated hypot introduces observable pseudoinverse rounding residue on rank-one B.
+
 V93 linefill locks cover same-execution counts/parent identities and endpoint tracking.
 PNG-bound output fields cover red/blue and source-line deletion; no native color
 getter, recalculation identity, all-object deletion, or pixel parity is claimed.
