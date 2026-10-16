@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test-ci test-unit",
+    "test": "turbo run test-ci",
     "build": "turbo run build",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
   },

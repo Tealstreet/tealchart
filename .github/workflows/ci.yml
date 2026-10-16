@@ -36,3 +36,21 @@ jobs:
           node --test scripts/oracle-fixtures.test.mjs
           node scripts/oracle-fixtures.mjs fetch
       - run: yarn test
+      # Moved here from the monorepo's CI on 2026-10-16: tealchart and tealscript
+      # are gated ONLY on this mirror now; the monorepo ignores their paths.
+      - run: yarn workspace @tealstreet/tealchart typecheck:native
+      - name: Test scoped TealScript performance thresholds
+        working-directory: packages/tealscript
+        env:
+          TEALSCRIPT_PERF_ASSERT: '1'
+          TEALSCRIPT_PERF_LOG: '1'
+        run: |
+          mapfile -d '' perf_files < <(git -C ../.. grep -lz 'TEALSCRIPT_PERF_ASSERT' -- 'packages/tealscript/**/*.test.ts')
+          test "${#perf_files[@]}" -gt 0
+          yarn vitest run --no-file-parallelism --maxWorkers=1 "${perf_files[@]#packages/tealscript/}"
+      - name: Test TealScript opt-in semantic sweeps
+        working-directory: packages/tealscript
+        run: |
+          TEALSCRIPT_ARITY_SWEEP=1 yarn vitest run src/semantic/array-from-arity-reference-contracts.test.ts tests/compat/pine-ledger-gaps-13-arity.test.ts
+          TEALSCRIPT_GRAMMAR_DIFF_SOAK=1 yarn vitest run tests/compat/pine-grammar-coverage.test.ts
+          TEALSCRIPT_REALTIME_SWEEP=1 yarn vitest run tests/compat/pine-external-corpus-classifier.test.ts tests/compat/pine-composite-indicators.test.ts tests/compat/pine-composite-performance.test.ts tests/strategy-parity/strategy-parity.test.ts
