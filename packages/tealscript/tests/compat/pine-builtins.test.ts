@@ -1652,6 +1652,10 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       67.937983,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
+    // V94 RSI v5/v6 (oracle ac491fdc) adjudicates premultiplied RGB, floor
+    // byte conversion and quantized transparency for this gradient idiom.
+    // These arrays project that model onto local fixture RSI values; they are
+    // not native observations of this fixture or its RSI calculation frontier.
     expect(getPlot(result, 'Prefix Signal').color).toEqual([
       null,
       null,
@@ -1661,10 +1665,10 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       '#0A141EBC',
-      '#0A141EC0',
+      '#0A141EBF',
       '#0A141EBA',
-      '#0A141EBE',
-      '#0A141EBA',
+      '#0A141EBD',
+      '#0A141EB9',
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
@@ -1674,11 +1678,11 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       null,
-      '#59A600AC',
-      '#619E00B0',
-      '#53AC00A9',
-      '#5CA300AE',
-      '#52AD00A9',
+      '#837B00AC',
+      '#8C7200B0',
+      '#7C8200A9',
+      '#867800AD',
+      '#7B8300A8',
     ]);
   });
 

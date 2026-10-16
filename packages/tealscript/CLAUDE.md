@@ -4434,7 +4434,22 @@ two-state bool cast. Valuewhen receives the preserved v5 source directly.
 
 A missing lower colour in `color.from_gradient` fades the upper colour alpha by the clamped interpolation ratio while preserving its RGB.
 V93's D/E tuples require premultiplied-alpha RGB interpolation; zero opacity gives nonmissing transparent black.
-All captured E cells stay hypothesis-UNDECIDED; exact tuple locks do not certify unobserved colors or pixels.
+V94 complete clamp/RSI/discriminator adjudication at oracle f40d6258 keeps that model and requires floor
+conversion of unpremultiplied RGB and interpolated alpha bytes. Constructor alpha
+packing retains its existing nearest-byte rule (T50 supplies opacity128/255).
+`color.t` rounds the resulting byte-derived transparency to integer percent;
+continuous-alpha hypotheses remain archived as REFUTED. Preserve equal RGB
+channels through the algebraic interpolation form; do not add epsilons or
+source/version/phase exceptions. The finite evidence fits all 12,960 v93 closed
+cells and 5,824 v94 scored nonidentity plot cells (including 2,624 discriminator
+cells across all seven phases and 24 endpoint controls). V94 RSI uses observed scalar
+input projection, not an RSI seed/frontier replay. Native hidden packed alpha,
+half-byte opaque midpoint prediction and missing-upper routes receive no
+new certificate. The discriminator opaque control has integer RGB results and
+does not distinguish byte conversions. Existing v52 getter assertions remain; its
+local packed hexadecimal and opaque-control expectations follow this inferred
+single byte-floor model. All captured v93 E hypotheses stay UNDECIDED. No pixel
+claim or historical hold closure follows.
 
 ### Native string overload admission
 

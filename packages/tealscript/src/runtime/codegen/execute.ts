@@ -7991,12 +7991,15 @@ function executeCompiledPass(
         const topWeight = topColor.alpha * ratio;
         const alpha = bottomWeight + topWeight;
         if (alpha === 0) return formatRuntimeColorAlpha(0, 0, 0, 0);
-        const interpolate = (from: number, to: number): number => (from * bottomWeight + to * topWeight) / alpha;
+        // V94 clamp/RSI adjudication: floor the unpremultiplied RGB and alpha
+        // bytes. color.t then rounds byte-derived transparency to integer percent.
+        // This algebraic form preserves equal channels exactly without an epsilon.
+        const interpolate = (from: number, to: number): number => Math.floor(from + (to - from) * (topWeight / alpha));
         return formatRuntimeColorAlpha(
           interpolate(bottomColor?.red ?? 0, topColor.red),
           interpolate(bottomColor?.green ?? 0, topColor.green),
           interpolate(bottomColor?.blue ?? 0, topColor.blue),
-          alpha,
+          Math.floor(alpha),
         );
       },
       mathCall(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string) {

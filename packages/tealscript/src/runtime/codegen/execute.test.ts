@@ -2123,7 +2123,9 @@ plot(1, "No Color", color=color.new(na, 40))`;
     expect(findPlot(result!, 'Float Blue').color).toEqual(['#2962FFDF']);
     expect(findPlot(result!, 'Olive Forty').color).toEqual(['#80800099']);
     expect(findPlot(result!, 'RGB Float').color).toEqual(['#2196F3DF']);
-    expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F734BDF']);
+    // V94 supports floor conversion for gradient RGB bytes; this equal-alpha
+    // fixture is a model consistency check, not an additional native capture.
+    expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F724ADF']);
     expect(findPlot(result!, 'No Color').color).toEqual([null]);
   });
 

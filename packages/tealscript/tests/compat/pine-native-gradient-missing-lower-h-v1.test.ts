@@ -32,11 +32,17 @@ plot(close, "Colored", color=x)`,
         expect(getPlot(result, title).values).toEqual([expected, expected, expected]);
       }
       expect(getPlot(result, 'Colored').values).toEqual(bars.map((bar) => bar.close));
-      expect(getPlot(result, 'Colored').color).toEqual(['#FF000080', '#FF000080', '#FF000080']);
+      // V94's byte-floor model changes this local packed-alpha representation
+      // to 127. V52 native R/G/B/T/NA assertions above (including T50) stay exact;
+      // that capture does not certify the engine's packed hexadecimal alpha.
+      expect(getPlot(result, 'Colored').color).toEqual(['#FF00007F', '#FF00007F', '#FF00007F']);
     });
   }
   for (const [name, expression, expected] of [
-    ['finite midpoint', 'color.from_gradient(5,0,10,#000000,#FFFFFF)', 128],
+    // Local opaque consistency control for the single V94 floor-byte model.
+    // This predicts 127; the integer-channel V94 opaque control does not
+    // independently certify this half-byte midpoint.
+    ['finite midpoint', 'color.from_gradient(5,0,10,#000000,#FFFFFF)', 127],
     ['finite lower clamp', 'color.from_gradient(-5,0,10,#000000,#FFFFFF)', 0],
     ['finite upper clamp', 'color.from_gradient(15,0,10,#000000,#FFFFFF)', 255],
     ['degenerate finite range', 'color.from_gradient(5,5,5,#FF0000,#FFFFFF)', 0],
