@@ -2112,6 +2112,13 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   extrema-barsago-v1 capture rather than a last-N-non-na interpretation of the
   reference's ignore-na remark. `extrema-behavior.test.ts` pins small synthetic
   discriminators, including endpoint Aroon and rollback/snapshot behavior.
+- V95 item6 additionally binds both v5/v6 finite dynamic pivot plateaus to
+  RIGHTMOST selection at the current confirmation row (96 high/low/NA rows each).
+  Its suffix replay adapts only the captured phase input; no index-zero seed or
+  original startup credit. Fixed-anchor invariance and exact rational controls
+  stay separate from 2586 held target/precision records per version. Only the
+  two finite plateau value-vector goldens are reconciled; missing-source vector
+  holds and the shared native missing-flank policy remain unchanged.
 - Pivot candidates still need the full physical left/right window and a finite
   candidate. Each flank scans outward from the candidate and stops at its first
   `na`; equality is allowed on the older (left) side and rejected on the newer
