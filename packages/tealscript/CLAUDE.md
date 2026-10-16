@@ -2486,6 +2486,13 @@ hex-looking strings remain strings. Integral-valued Pine float defaults also ret
 float widgets, including decimal literals, casts, aliases, arithmetic, and color
 channels; JavaScript integer values do not determine their Pine type.
 
+Native v95 item13 binds unchanged v5/v6 input defaults on 32 closed rows per
+version, including the default source's current chart close. Exact source replay
+uses chart OHLCV only and supplies no input overrides or omitted native seed.
+String/enum equality flags identify their declared candidates only; passive
+metadata and the capture cleanup-name quirk do not certify options/range/UI
+enforcement or external source selection.
+
 Input behavior compatibility is pinned by
 `tests/compat/pine-input-behavior.test.ts`, covering all official input
 functions. `options`, `minval`, and
