@@ -187,6 +187,11 @@ Conditional calls to resolved local UDFs that read parameter or local history
 emit a consistency warning. Callable binding, admission and generated code stay
 unchanged; unconditional calls and no-history or shadowed callables stay silent.
 
+V95 conditional statement-scope `ta.sma`/`ta.ema` calls warn in source order:
+v5 quotes the function with apostrophes; v6 uses double quotes and `CW10003`.
+Namespace shadows and ternary-specific wording remain separate. The captured
+suffix proves bounded three-call SMA windows, never recursive EMA startup.
+
 Numeric timestamp calls in requested contexts default to the requested symbol's
 exchange timezone. Pass requestSyminfo into both evaluators; explicit zones
 and date-string UTC defaults remain independent of that numeric default.
