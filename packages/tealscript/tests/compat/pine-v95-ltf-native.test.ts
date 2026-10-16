@@ -10,7 +10,7 @@ import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 import { checkProgram } from '../../src/semantic/checker';
 
-const pin = 'e3e1e5bdbb1861fec868f74a3a0f2285a58162d0';
+const pin = '07b0e564c1f8fc25f1f0c6ceb5c7c6f9aadef85f';
 const directory = 'v95/captures/v95/';
 const root = new URL('../../oracle-probes/', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root));
