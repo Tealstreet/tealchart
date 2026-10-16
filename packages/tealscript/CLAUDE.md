@@ -16,6 +16,15 @@ six actual preceding rows. The first TSI witness has insufficient local warmup
 and is checked only as a native scalar presence projection. Native Supertrend
 direction transitions remain observed, without a prefix-independent replay claim.
 
+V95 calendar controls certify conversions of four frozen UTC literals, not
+market bars on DST dates. The observed NY overnight-session block is outside;
+inside/outside transitions and day/week boundaries remain NOT OBSERVED.
+V95 anchored VWAP has six complete 16-bar windows: a phase5 source hole poisons
+the mean and both bands through phase15, recovering only at the next anchor.
+MULT0 bands equal their own mean. Fractional means and mathematical square-root
+references remain precision-held; no tolerance or hidden binary64 model is fitted.
+Missing/nonpositive volume and original unanchored startup remain separate holds.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable
