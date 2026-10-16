@@ -64,6 +64,10 @@ Native capture requests and evidence belong in the public `Tealstreet/tealscript
 repository. Read [ORACLE.md](ORACLE.md) for pinned sparse test fixtures, capture
 handoffs and promotion. Missing fixtures fail explicitly; tests are never skipped.
 
+Native v95 item7's `rec.copy()` shares its `array<float>` field while retaining
+independent scalar slots and per-bar object history. Dynamic lags and prior references
+require witnessed dependencies; the suffix capture gives no pre-origin credit.
+
 Witnessed coded v6 tuple parse refusals carry a structured singleton diagnostic
 through parser errors, worker parseError messages and compatibility stages.
 V84-covered v4/v5 two-slot tuple refusals carry the version advisory first, then
