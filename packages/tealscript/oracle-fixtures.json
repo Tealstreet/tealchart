@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
+  "revision": "2cd3ce9c10108bb48664e722001e731c636583ba",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -11346,6 +11346,386 @@
       "path": "v93/sources/v93-overlay-table-polyline-v6.pine",
       "bytes": 1369,
       "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
+    },
+    {
+      "path": "v95/REQUEST-v95-v1.md",
+      "bytes": 53504,
+      "sha256": "e57421e259f56f2dd95344a96e893114d7d78ebb11b99da8c643afbaf1ab59e0"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v13.md",
+      "bytes": 4460,
+      "sha256": "5d2ab46eab11677efca52c383cdb19660640e41324f004987f1cdf014f0172d1"
+    },
+    {
+      "path": "v95/captures/v95/account-actions-v13.json",
+      "bytes": 902,
+      "sha256": "2efb530352835e25c1ccf1678e3f36796e077b6a4162d332f7694094f6d3d763"
+    },
+    {
+      "path": "v95/captures/v95/artifact-integrity-v13.json",
+      "bytes": 225346,
+      "sha256": "9b82ed42477801689219a3e2e8a527eea815e303903bc7c7ece2b258ec604788"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v13.json",
+      "bytes": 1721727,
+      "sha256": "833d2a87744aae21f7a3e2348b7395096618f2e13834520f3e0baf8f8b60279c"
+    },
+    {
+      "path": "v95/captures/v95/facet-capabilities-v13.json",
+      "bytes": 1578858,
+      "sha256": "0eda1a02f994ff3077c056af6b868190d2d85e8d71eee35c9bfbcd5a5ae0d290"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v13.json",
+      "bytes": 1525447,
+      "sha256": "8a80513f21388dc1cc3bb0e9141dbc4dd530477cd023e1be8d870c89c46eac60"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/add-response-v1.json",
+      "bytes": 14061,
+      "sha256": "d1574f8d624a1553d22bdfa722b81fe3695e8bc3d433ebec864c4e6be970782d"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "8c982d3b30c688f69cc9c19ee029079873536a91c4ed6e92ec45f1ae8594b727"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "50513aa2df763addfa6aa850454d9d2df9c6e4b7750b2901c4cbd03a19ddfb1b"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/attempt-start-v1.json",
+      "bytes": 278,
+      "sha256": "a7c1278ec417d5195f94151533fa2348ea59866674e1110fc171a9542e4b2e6e"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2612,
+      "sha256": "4d038464539741dc786d2146c894f61fba98fde10a3256527c44ee20f3226c2c"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1551,
+      "sha256": "07b276cb425e8c97f37d56057123300d66426df3604efcefae3d077c0db095e6"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/context-before-v1.txt",
+      "bytes": 6950,
+      "sha256": "1120b84669832e771ed712e70beca405671ebecdf10b594acc83cc14cec801fe"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1391,
+      "sha256": "eafeca9e8e26af07794c54c1664ecfbc0acdd8eeec5e82ef5fda0dbee400d40b"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 860933,
+      "sha256": "c6ce75cec9f82016a61915eb42035109e1d80e49a743f906aae2ca3e486da5ab"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/observation-v1.json",
+      "bytes": 11746,
+      "sha256": "3d5f3fc3b60a3b09cf5735f33ba66d8ce294170faa09f77cf4e67b200f4e24f4"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8457,
+      "sha256": "592e1f0d5ce600feaabc67eb0ba2d91592dceda6a406b7698bceed66ad90b23d"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 9516,
+      "sha256": "c1e661ad32fdf03685dca899b4a717611a709de03f7e6d772ef23b11f9775354"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-remove-v1.txt",
+      "bytes": 6760,
+      "sha256": "b84feb4efaf1736440e1178fe247d7d7074398d35ff43710eb9e2bf83ccbeb0b"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 8026,
+      "sha256": "9da50adf2b5952868a814370168b49b13ab5d4e778123d891999269506aa4feb"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 221866,
+      "sha256": "7257fa5d05bd992e1c81b65f0650f860a387645b06d2d78972dabcf278b6ad33"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 8085,
+      "sha256": "e1d797729699bdf03a0dff263b9ec0c2ee4a91545e6b52d585c610033c3d229e"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/pre-add-v1.jpg",
+      "bytes": 221716,
+      "sha256": "c0b46f54451e7b266314076eb2517c7cb8c43463bda5e36c5dd449b69233d294"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/pre-add-v1.txt",
+      "bytes": 8085,
+      "sha256": "e1d797729699bdf03a0dff263b9ec0c2ee4a91545e6b52d585c610033c3d229e"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1565,
+      "sha256": "fa2b825eb41116d3713adecd7a9fb8bf9a57464f0b84baffe6048bfe9dfb39e1"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/save-response-v1.json",
+      "bytes": 14061,
+      "sha256": "2ceb4c3edc54ad945e6586a668534b9a8f3d711f5f570e2d1774bbbaa50dd056"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "280bc2077ae135b7b4f0aa0e6531fc3489eb95562fee9088c70e676c7a9816fe"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 8338,
+      "sha256": "6d8776684fe0204d3e6e9680441d243d101d1e36f976650fb0fcf7f37596a2e6"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1947,
+      "sha256": "dac46b56497d96f764618f35b178cd1bcd98d624e77807bba3afd3c9f18a8bfb"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 9108,
+      "sha256": "cbcf53281e65df276369dd78d4a23f5c908ee4606d2ccb32f5a9d90acf2cd023"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "c806b9275ce0eed93841215d58e10b5b55f403a69cdc8c05e585f3d14ecc4afa"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 93103,
+      "sha256": "0dabf96fc057beafdc2b0a0738fa22f2daf51f80ff7750655d4f9197f5ca0c55"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8346,
+      "sha256": "ef83296cb0ec39de66124fd7535683fe4914eb7387b1dba66156b28a94b89005"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/chart-post-export-v1.jpg",
+      "bytes": 178615,
+      "sha256": "e25c611c972483204d7ef6e79792609062af18b38ea38fe2f7dcb6be04cd764d"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 13237,
+      "sha256": "bfd2d80bd5607cf9bca8980dfa9da10b51f9824b7cb6721ba1cf32d551fe97f6"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8346,
+      "sha256": "5d9e515216816c16093fdf6a1724c0933522133d0b657bcf4eb23b486afc14c4"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 54783,
+      "sha256": "4526a4795985355e913ee396521a48967f82d2678b4d55b6033be1700729e055"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 36353,
+      "sha256": "af403522e8b7acf9db887f76d07cb4cab162e8b45b45dd53eb5bd630d45593e2"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 916,
+      "sha256": "04c69eb343b6e5b8e7453400a2f33a6fd288422848747b1ded30252bcb466eff"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/add-response-v1.json",
+      "bytes": 13891,
+      "sha256": "ce585f63f6bc08819d59617069e653c1d51785639f6558dab79372bf82574348"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "335899e0978dfe1ad9a925daa584eb779fb43b08fd57ca5dfbfe07f8e41995e9"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "fc5e7d3b4ab5ef274405a2af67d890e8010f6c927d09c50fc082bc807fbaa89d"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 278,
+      "sha256": "92de9ae1b198d2c2c96f54294857cd10ff39a4919bce183e583b2c1983ea7ce1"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2612,
+      "sha256": "0eab3dcc7deeabef98332e4e5f485a8ec96dd696da66a793ca8c750ec04e65a7"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1551,
+      "sha256": "e4577b00386667a01b9742fbff09e124cdc6be4cab0825b60f9a578d37f10530"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6760,
+      "sha256": "b84feb4efaf1736440e1178fe247d7d7074398d35ff43710eb9e2bf83ccbeb0b"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1391,
+      "sha256": "e0f211b6db5ab1cfe86872ceecb9d042ea5e0d7ef0da3e09ba47813b4cb809d5"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 860933,
+      "sha256": "9ea081a9dd07c26fdf6c886dcfeda579f097f22f2216d9cd3ada0d8fe2cd50df"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/observation-v1.json",
+      "bytes": 11317,
+      "sha256": "9c2d078054813674adf365b6415d6646623336ce49ae13b3391e4c49a6adab42"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8386,
+      "sha256": "a76e741c41b8cfb6bb2324cc87af0c3b099c61ee2534626157f965eeffdfcf6c"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8408,
+      "sha256": "63babb7611ce2d8c270477136cfb2d5d57b9ff783bce1b44dd837b5efab81252"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6762,
+      "sha256": "8aef8d94c37675aacb217dddc02d2fe62e43a5693336beb5ba0b5e0c89924d1f"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7913,
+      "sha256": "a6c99a942a1a4d4e5e2d343f3e80efab6404c977691dff83c0eec8fd2d7aaf40"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 217698,
+      "sha256": "604e9be56e418c742bcf17302998ebe9321557f0156533eff36e66003335e229"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7972,
+      "sha256": "2fafde03447e5c214ccbf5fa18fc2fa1b60f457e12dbfffe33cab1ed131b0332"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 217704,
+      "sha256": "056248f5dff8ca857ec29f8b02dab232032343c6c4a3c2edccd35412447a7bd9"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7972,
+      "sha256": "d57ad6ab17c4e525f3c45e46fde43958eb2ecfe26f8a638781f222547abf374b"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1565,
+      "sha256": "78bd7f827d3d23c286eae5a4accf5a77d2ff45af4e5913a6c830c9f999498f39"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/save-response-v1.json",
+      "bytes": 13891,
+      "sha256": "a1dff5c68d8a25e65b0cd7f109f9e89a3c9ba8d88bd1ba10373bbb508ec11baa"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "a74171bf067e1a3857f6fdbf7af2f5ac6408dbb8d26e2d0a7ab247ef83fa7102"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 8367,
+      "sha256": "b348eb6024d922193c4cd2071f222122563933b7f817584ce2f8266471400b74"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1932,
+      "sha256": "cc8dcf95859747ab454119ffe80f0facfe599fa084df78aeca0cb9d71456cf38"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 9137,
+      "sha256": "9e72280d5c068db7188f17c0b1f7480b42d63c89ab7907c3b1e7713e0698a978"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "cd8de9983a60abb091083d4d7bf3f9f8035bfaabf5cfa4740ec4742e998ba817"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 93607,
+      "sha256": "bd16d1271c688ed11c5ccc0bec9b2a3a49a215a0e06988c470c68b932c22fa71"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8925,
+      "sha256": "7e789a0504b03f81a36f193d716b5e831c2f7eccb39ef890a92f5157f10c758a"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/chart-post-export-v1.jpg",
+      "bytes": 178835,
+      "sha256": "8d2fcba387048d62eac94aebf587cce5a217241d63c745f02a6df28723d8939a"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 13237,
+      "sha256": "3ec209179e07ab49f2661828a004737b684cdcf0065ef05348a43a7f07302496"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8375,
+      "sha256": "d038c5bdb3b898a47433d43031f8c4117d855f632c3e8557636c3a3bb2cbfe74"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 55089,
+      "sha256": "9d92477d2ca4bfb9e8eac423fe2afb28d07dec592c8ed6523130b4091f495da6"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 36527,
+      "sha256": "c3fc7d50bdf1bcdc5c07c6baa9e34e5389e945808d7f72ebf7cbf912dd853b61"
+    },
+    {
+      "path": "v95/captures/v95/v95-math-vectors-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 916,
+      "sha256": "2baae3b0465ff050153d8cc9adea03e98e2d668dea6edfd09ab53e6b99a8039b"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v13.json",
+      "bytes": 661,
+      "sha256": "423cf40fe0275cf585785a7985cc4f5c2f7fa0bf0d8c1b7284c9abff571c7479"
+    },
+    {
+      "path": "v95/sources/v95-math-vectors-v5.pine",
+      "bytes": 1391,
+      "sha256": "eafeca9e8e26af07794c54c1664ecfbc0acdd8eeec5e82ef5fda0dbee400d40b"
+    },
+    {
+      "path": "v95/sources/v95-math-vectors-v6.pine",
+      "bytes": 1391,
+      "sha256": "e0f211b6db5ab1cfe86872ceecb9d042ea5e0d7ef0da3e09ba47813b4cb809d5"
     }
   ]
 }

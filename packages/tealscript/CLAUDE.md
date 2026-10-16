@@ -4689,3 +4689,8 @@ after namespaces. Explicit namespace calls retain their ID argument.
 V93 overlay=false preserves the visible PANE table when a later force_overlay table
 uses the same position: replacement and cell capacity share effective pane ownership.
 Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.
+
+Native v95 item14 negative half-tick outputs require math.round_to_mintick to
+round magnitudes and restore the sign, retaining nearest-tick compensation guards.
+Only the selected closed suffix is credited; random cells are observed/excluded
+with seed identity held, and raw decimal strings do not expose signed-zero bits.

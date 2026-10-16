@@ -2862,16 +2862,17 @@ function createRuntimeMathEvaluator(
       return (args, named) => {
         const value = toRuntimeNumber(orderedRuntimeArg(args, named, ['number'], 0));
         if (!Number.isFinite(value) || !Number.isFinite(mintick) || mintick <= 0) return Number.NaN;
-        const quotient = value / mintick;
+        const magnitude = Math.abs(value);
+        const quotient = magnitude / mintick;
         const epsilon = Number.EPSILON * Math.max(1, Math.abs(quotient));
         const nearest = Math.round(quotient);
         let rounded = Math.round(quotient + epsilon);
         if (rounded !== nearest) {
-          const distanceDifference = Math.abs(value - rounded * mintick) - Math.abs(value - nearest * mintick);
+          const distanceDifference = Math.abs(magnitude - rounded * mintick) - Math.abs(magnitude - nearest * mintick);
           // Decimal half-tick compensation must not move an exact tick or a clear non-tie.
           if (Number.isInteger(quotient) || distanceDifference > Number.EPSILON * Math.abs(value)) rounded = nearest;
         }
-        return Number((rounded * mintick).toFixed(runtimeDecimalPlacesForTick(mintick)));
+        return Number((Math.sign(value) * rounded * mintick).toFixed(runtimeDecimalPlacesForTick(mintick)));
       };
     case 'math.sum':
       return (args, named) => {
