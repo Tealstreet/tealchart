@@ -4689,3 +4689,8 @@ after namespaces. Explicit namespace calls retain their ID argument.
 V93 overlay=false preserves the visible PANE table when a later force_overlay table
 uses the same position: replacement and cell capacity share effective pane ownership.
 Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.
+
+Native v95 item16 locks only its bounded ASCII literals: occurrence1 replaces the
+second match, split a,,b retains the empty middle field, and no-match pos has a raw
+blank with NA flag1. Preserve its UNDECIDED hypothesis metadata while asserting the
+observed missing result; Unicode-wide and all-overload behavior is not certified.
