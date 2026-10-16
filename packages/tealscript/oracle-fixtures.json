@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "0e05c926111511f8d151ff3ca1fb27420a948516",
+  "revision": "3e69c4fcb4a3a438b1242de49962ec1b5a9a353e",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -11346,6 +11346,166 @@
       "path": "v93/sources/v93-overlay-table-polyline-v6.pine",
       "bytes": 1369,
       "sha256": "cd5efd5e7d511efc38821ffb0a0e0cf48cced3abfc5fbf2f2b25c94d5d7dccf0"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v5.md",
+      "bytes": 5405,
+      "sha256": "5a4fba3812e5fa42f2277ab9ed188eb8464596d2f8bcc5e24ee79949e917f8a5"
+    },
+    {
+      "path": "v95/captures/v95/artifact-integrity-v5.json",
+      "bytes": 101567,
+      "sha256": "c69f8f6bc3c652a0186a13d4b5ee1c9a1d0746418ccd626dab9dfde5b8416989"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v5.json",
+      "bytes": 708095,
+      "sha256": "48b25d2a82ccc10348767be26b8c117ef3463b6bdf8728a44a161c6425e1d9ba"
+    },
+    {
+      "path": "v95/captures/v95/facet-capabilities-v5.json",
+      "bytes": 1043115,
+      "sha256": "e7333f1603bd159b1256ed78714e111fd927aca078d3d4366b75f296583706ce"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v5.json",
+      "bytes": 1016847,
+      "sha256": "4d02ac13e03c74312eaba604ed29f86ff832c7f09173750de51ab1d033a9f0aa"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/add-response-v1.json",
+      "bytes": 22388,
+      "sha256": "549d381fa2fe0b9a6d58e39ba64589e512683df02ce3f7d0ed0bb708ecb8f06a"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2616,
+      "sha256": "694ec8cb6bda57284533bb305c8527f95801405b3e327db0c594cf0460cf402e"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/executed-v1.pine",
+      "bytes": 2239,
+      "sha256": "b399465c9f980adf3747ce6493f730c048347c85e65063fe4c943fd3f2dd25bc"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 4818573,
+      "sha256": "2a789d5cb3d148b34e0e75246233c684943e98057386bb0da9b9924448a50937"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/observation-v1.json",
+      "bytes": 17361,
+      "sha256": "08dc60de005c6352b712d3f0a7183bf7ad18b54f645b74f0f51fd96fead7de63"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 2436,
+      "sha256": "2885833fb3a5dd3ca53d47d0ac8bcf98b0ec47c3c2da04fbbb536c5a16c84d42"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/save-response-v1.json",
+      "bytes": 22388,
+      "sha256": "c3a4212fe0fb77a82cd392413df8214db5b736dcd1485eca4de2eb2e175f65ac"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 163874,
+      "sha256": "26f0ea0717a8c2365046608659257dcff55a98350e55375876a44d998a37c23f"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 20315,
+      "sha256": "34d82e99787bb8bbf2b1c80ab2302ad31d693287d14d5fdb52177c5776e06e2d"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 52797,
+      "sha256": "5072d0bd2396bc4debaf02e5f9cb76565f13616ea9f07d5fe2eec894b49cc915"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33616,
+      "sha256": "16c52a4d25d83e6482d1ff0702710f813a77f0bc8c255217ff3dfd0f3d3dde54"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 918,
+      "sha256": "b0b8009456b651fdaa345d98adbc840536781f6bf5ffcc69ab0c7ab791e1daa0"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/add-response-v1.json",
+      "bytes": 22305,
+      "sha256": "5dc94f68313fb8d9ca918020f50db96a86fd29fd65fe3a6e32760712810c1445"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2616,
+      "sha256": "761804171284b0edd9bb9364d54780cd84eada443a19cd0316257c86d6a5c4fa"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/executed-v1.pine",
+      "bytes": 2239,
+      "sha256": "a275be0f87a9422b177045379f36c590b4290d7bba7ee359e1f814867a1c9011"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 4818573,
+      "sha256": "acece51d90c230c48754ea5b3e7686d3a551ad3a995eb9bb9cbfce1519edef83"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/observation-v1.json",
+      "bytes": 16729,
+      "sha256": "0945f1f12a33d6553c4e41b0b13e94cdfd1d3982d04c2e527c8afbc249fd847b"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 2436,
+      "sha256": "9748a9ae2d2f785eed4cdea0b354f6385e91c01fa8ddfcaf9ca1fc6b640d10bf"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/save-response-v1.json",
+      "bytes": 22305,
+      "sha256": "87960d4cb9607416ccdc505c0777e6c57f8dede9282d0ffa60eaabad093b01e8"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 164952,
+      "sha256": "b09aa4621e1bf149f36c45fe974bcde24283e4d9ccd715a62e590caef1073ca7"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 20315,
+      "sha256": "2618b712fbc4a15cc9fe0e28d9724a5e3a8350797bc67faf23134ecfa44a5b33"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 53120,
+      "sha256": "455345ee8fb09e1c00a0e2c5c544a0be4b8b3448a2371c8be92d7cc385433b24"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 33837,
+      "sha256": "c49fd9aea344c6ce887d270304def43255ef8fe884700c313d13cc77a811c033"
+    },
+    {
+      "path": "v95/captures/v95/v95-pivots-levels-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 918,
+      "sha256": "78b785c36e54bfb620c1f934ec46a8916115c7ebfc318ad3923ab2928a84ccc4"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v5.json",
+      "bytes": 659,
+      "sha256": "609ef01229f4c93f6f552d9de058b249639cd2198a5d11f2d3aed8ef2c9c87d7"
+    },
+    {
+      "path": "v95/sources/v95-pivots-levels-v5.pine",
+      "bytes": 2239,
+      "sha256": "b399465c9f980adf3747ce6493f730c048347c85e65063fe4c943fd3f2dd25bc"
+    },
+    {
+      "path": "v95/sources/v95-pivots-levels-v6.pine",
+      "bytes": 2239,
+      "sha256": "a275be0f87a9422b177045379f36c590b4290d7bba7ee359e1f814867a1c9011"
     }
   ]
 }
