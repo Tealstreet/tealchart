@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "2d17969a034022dd152b1a4840774bfd56846dfa",
+  "revision": "9b09e201ded714141fbcb8de348c8c00cf66da0d",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -13206,6 +13206,386 @@
       "path": "v93/sources/v93-table-setters-v6.pine",
       "bytes": 1126,
       "sha256": "e5f5adf950e89a72dcbce78a1bc7943875a1dadad1eb287572d1d7a1a1808aa6"
+    },
+    {
+      "path": "v95/REQUEST-v95-v1.md",
+      "bytes": 53504,
+      "sha256": "e57421e259f56f2dd95344a96e893114d7d78ebb11b99da8c643afbaf1ab59e0"
+    },
+    {
+      "path": "v95/captures/v95/RESPONSE-v95-v19.md",
+      "bytes": 4407,
+      "sha256": "263a3e1d8c644bd7ad722d60c0b81a8f290ab8fb62a83e1aceb87dde17cb374f"
+    },
+    {
+      "path": "v95/captures/v95/account-actions-v19.json",
+      "bytes": 902,
+      "sha256": "00ac3799529b4632e7b1c8fe15f0e24bb2bd84c3ca8a5799412cb7fd7bbeb391"
+    },
+    {
+      "path": "v95/captures/v95/artifact-integrity-v19.json",
+      "bytes": 275695,
+      "sha256": "2819f5ecddd2106e2f55245a2b2aa82ce8408d8d09b9c8a0c4fc6b07e6273f89"
+    },
+    {
+      "path": "v95/captures/v95/attempt-inventory-v19.json",
+      "bytes": 2149934,
+      "sha256": "3225519e7d77143f4ee1dedb17ad6aeb1362d8106afd13071b329c88eee79e0c"
+    },
+    {
+      "path": "v95/captures/v95/facet-capabilities-v19.json",
+      "bytes": 3468663,
+      "sha256": "6b4edb58ba1852345c40ff2f1d75546cb07d4dc62418c60466de34318d01fb19"
+    },
+    {
+      "path": "v95/captures/v95/numeric-controls-v19.json",
+      "bytes": 3405015,
+      "sha256": "9a2b16c150e1ec5380b321a2f9d62b4a95503be66129b59b0756a1a820e266e5"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/add-response-v1.json",
+      "bytes": 19035,
+      "sha256": "de080d9afc41e37d5866ca6958b255ce752a03ccdd8ff05b41464eacec3d2daf"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "b06fa9825bcf8401d5fa1e563d01feb9ae759ed57e4a2251baa4d1567ddbe52a"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "af1777f09c32ebf350d792fff09e2b668ed5323111cd6576a11e041c7d3c64b2"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/attempt-start-v1.json",
+      "bytes": 280,
+      "sha256": "1d036266aafe94959c49e48759801adb180fc509c2d8de6c62a9238411591055"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2616,
+      "sha256": "3cf8da73ad5d6fb1b80b91d52fe6de3a721f9cc5cc7157912a80979e40da69b7"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1554,
+      "sha256": "fcecf5c2ad5bc7fe19e490e616a3ece2d691740d0ae18ae0ba6b943d66d72084"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/context-before-v1.txt",
+      "bytes": 6727,
+      "sha256": "b8d655cd31450b3717fa3fb923dc45499a12a6ed16508b7b7f0d620ebf1dfddf"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1870,
+      "sha256": "a46784a307efbf5a2e5615b390e33598916e0dac3a4cf1d65730c039a7d32976"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 257134,
+      "sha256": "2e2299f222ecf78718642ebde9aa169e94ff40946406fa5e445515f66e4ac3f1"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/observation-v1.json",
+      "bytes": 13812,
+      "sha256": "a6a834a03d31850d3c76e09f296b6e96849db378ccaf161e174ae44207c2b2df"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8346,
+      "sha256": "7925f9490de16e6741faa24a04bf2aaa8788094c58a0099d674607ddc9b9d45b"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8364,
+      "sha256": "70b6e0983f5d8f82c461ef38c26163ae2febd6922798eec083a58060dfe28de2"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-remove-v1.txt",
+      "bytes": 6741,
+      "sha256": "d8477b9589ba0ee78e7db1e5e9fd126db9a850ce37efc3fa0ef33ac213bfbea7"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7881,
+      "sha256": "9a034b01ffd71dea90b80ec813a48e0f41776e414ac329c319df76a73273b1de"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 247026,
+      "sha256": "defc47dc68aefba315237b6a06146f46066859a063f1b501639f4ada644c800b"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7935,
+      "sha256": "6d339fef7fcab8d77054de75b89eed8052379bd004a3d6a3daea234642be14fc"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/pre-add-v1.jpg",
+      "bytes": 246903,
+      "sha256": "736e87aea126fe22baea3b185a57e8f36991f2ab3c32bfd397725f237e87fc4f"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/pre-add-v1.txt",
+      "bytes": 7935,
+      "sha256": "6d339fef7fcab8d77054de75b89eed8052379bd004a3d6a3daea234642be14fc"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 2060,
+      "sha256": "d06d061d5ad728c8b7b86abf8885bed628d64251e2c6c23c3700cd03655b4f8d"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/save-response-v1.json",
+      "bytes": 19035,
+      "sha256": "f7b3603e0f11b5209b901b9397a0d9b68014ae7545bd4c87f8c0e97d8b805e06"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "8ee0e2a8d02406cb89245b162efeb0092660810264b056f21e2f5d730ef5de00"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 8082,
+      "sha256": "0069bd2a8650079e74e4ef69ec2981755928549bf6abd9f3576e418e7fe339d6"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1579,
+      "sha256": "4ee34a4a87a6c16c2f44e930bb836fbe9493d3a851da57fa3d2c699585f2fc87"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 8852,
+      "sha256": "0889684cda8c155d837d04e8aed469a7749c4a72114bac7027700573757e0980"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "2cc5a685e2a919f3959e53b7c3d25118fe6718fea09e4ef41bcb68b8749c857d"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 49462,
+      "sha256": "f1bdca5720fdac5a06e080280bf503ad86f159a1494a422002d91adced457de8"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8090,
+      "sha256": "7d3855fae86446f8d734d394f24ebfdb9d7d93b5dd2a1b818901c261e9b38c38"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/chart-post-export-v1.jpg",
+      "bytes": 174882,
+      "sha256": "452d68e19e3b0015d214b42aa6b246607965a6f41f5ad5208e28fd09a34a28dd"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11215,
+      "sha256": "dc73cff5357bfcffd67c123c0b30a4aa16259f863a2c39ac231cba8bda7037f0"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8090,
+      "sha256": "3feb3f3efcb9823e66ff3714606b4139e9919e4fb4357aa9f93ef73511605474"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 57384,
+      "sha256": "9cd84868c04f3652f06c4d7271f266575fabec5aba6d98e7549fec6ae8b84569"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 37631,
+      "sha256": "45f5ebaeaee57bbe3243d59cd7d132a5072a82f3f7aa305061fef6c69c19d91c"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 918,
+      "sha256": "069c35e2da932300f24b3e7f78ccbeb3072c4cac65fd9ba61567058f1086fcd6"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/add-response-v1.json",
+      "bytes": 19006,
+      "sha256": "938947ab9cddc48995a1fa1f92095b53ac9b0d09db92901587dd67b85bb98504"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "3112adc2fa133c3bc344e3a3e533e13fd2034678bc2cbfca68d5d6594f7441fe"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "78214c045bfa7c46579377521d23701d9528433b2c108acedc992332ce64abad"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 280,
+      "sha256": "667b4519d7ca9f8c0b3cd8a797bd952b0a747733e0584b8e660e6cb2e7f4aded"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2616,
+      "sha256": "2ba5bcaa9dab159581ca7f6f33a332c270c1df5900c191e74961902c575b930c"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1554,
+      "sha256": "2e0862abda6f3d4cfe6f2183814f17445cbfa6ca09221451a2a1276b0a7db444"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6741,
+      "sha256": "3ebbf3c2b4c8a555698b9cecef3c1803260af31d17ff4a2eb15041fe8bfe5461"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1870,
+      "sha256": "598f34b8e285af167545fdea1ab17c1623aa001dee5eaf030f0023d9b75847b5"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 257134,
+      "sha256": "37d99a1fe1332846eef55ae48394e46ac1f8ab94b8095e4a273009755b630c29"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/observation-v1.json",
+      "bytes": 13526,
+      "sha256": "f245fcb291b4771f4c88466c7179df9c55305e653c42959e4569f387c0e2c469"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8403,
+      "sha256": "33c6429fd38eca450d67f14144072b07f00b19d42a715459d0f086bd8acc20bd"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 9220,
+      "sha256": "f35cdb0d86b8c37301cdf75fb5ea80e2938520cdaa4d55ebab69da441d5e701b"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6722,
+      "sha256": "90307a7074bc7b81d7adaab6cfe4d933e0978773690814a78798d3aee9662581"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7859,
+      "sha256": "f6faed4ccd035e1a96e378589b22b67027e2f29c13bbb6ace2abe50efc70e3b2"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 247183,
+      "sha256": "71e5102ccc44b06aa21887e401b98f7186db9424462070325fbe59e580df9060"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7919,
+      "sha256": "930d508974957fda3e2083d693c26af82705939d89732ab202293d59aed55718"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 246522,
+      "sha256": "e623860c31a85b1a033426fcc1093b96f686605eb99048685f5f36cf79bf7157"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7919,
+      "sha256": "930d508974957fda3e2083d693c26af82705939d89732ab202293d59aed55718"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 2060,
+      "sha256": "7a0b06c6597dde58f1a4e0f164c7d99480b19ff5809383e45305c8300428ab65"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/save-response-v1.json",
+      "bytes": 19006,
+      "sha256": "2f9fbb4b92eda5689f5e34308acfa24c2c2b181408df92d4416651f7a9853bb8"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "5c036121a8f1aabcc42613783c5f98f40149ffc711a8ee876801a05d2d4de3e5"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 8032,
+      "sha256": "728f15d8efd2aca421ce04c573c6cab896378b092b30a132e95635093c778821"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1582,
+      "sha256": "9f6422cec3c8795cbd62378a3b805304d0cb3f1a53f728e519d51c015bf2250f"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 8835,
+      "sha256": "38f558a3bf3e3985cfcd32be2d43457e4e9c80653e46598cf641d22cc31950e4"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "ec2ec194584ef6ff2dfa35d469a7e31e2849cc96c171565cba55edd1de62c858"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 49729,
+      "sha256": "2fb89f91d8ab59c0715ea377b5ee7f29a255b8a43334aa6de9cf75ae457d3b9e"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8073,
+      "sha256": "8046e228e23882773bafe8385399b73d69ec79016779077504b3ad456b395589"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/chart-post-export-v1.jpg",
+      "bytes": 177071,
+      "sha256": "0de9492560590a6bbdee4c10acd91ec2afe61d2685164c234cae9cc473b3e27d"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 11215,
+      "sha256": "88feb53543d3eaaa58d084a74ad537347e8ca043f97f1ed8dd8d9ab9d6dfcaef"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 8073,
+      "sha256": "2293256583a88d9a6513c3dc422b8831249a0b1fc14acde8a2eb08b11c0bae1f"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 57690,
+      "sha256": "de1a8b660995c0de5dba93c57762734ad77047be0e45923bf865305113b21b6d"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 37824,
+      "sha256": "e42690d22ef95f41e27664079fdefcb87d7542ee73537124e3052f8086fe6a6d"
+    },
+    {
+      "path": "v95/captures/v95/v95-map-mutations-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 918,
+      "sha256": "0e1bc0960a0b48638ff4d98850d074213663f82ad1042e7929df694f8b9dfb05"
+    },
+    {
+      "path": "v95/captures/v95/validation-result-v19.json",
+      "bytes": 663,
+      "sha256": "57feddae913dec7149c158ee466364234b1b7ac0cd86b603a404b047883cfa8e"
+    },
+    {
+      "path": "v95/sources/v95-map-mutations-v5.pine",
+      "bytes": 1870,
+      "sha256": "a46784a307efbf5a2e5615b390e33598916e0dac3a4cf1d65730c039a7d32976"
+    },
+    {
+      "path": "v95/sources/v95-map-mutations-v6.pine",
+      "bytes": 1870,
+      "sha256": "598f34b8e285af167545fdea1ab17c1623aa001dee5eaf030f0023d9b75847b5"
     }
   ]
 }

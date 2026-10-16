@@ -4717,3 +4717,8 @@ after namespaces. Explicit namespace calls retain their ID argument.
 V93 overlay=false preserves the visible PANE table when a later force_overlay table
 uses the same position: replacement and cell capacity share effective pane ownership.
 Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.
+
+Native v95 item17 pins final B/C/A map order and shallow sharing of the copied
+map's Cell value for its exact merge/remove/reinsert/clear sequence. Only three
+earlier MERGED slots are exposed; their array count stays NOT OBSERVED/HELD.
+No Cell.copy call, arbitrary key/value kinds or generic iteration policy is certified.
