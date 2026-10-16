@@ -206,6 +206,10 @@ export function paintTealScriptDrawings(
         const font = fontForDrawing(box.textSize, box.textFontFamily, box.textFormatting);
         ctx.font = font;
         if (box.textColor && box.textWrap === 'auto') {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(rect.x, rect.y, rect.width, rect.height);
+          ctx.clip();
           ctx.fillStyle = box.textColor;
           const textLayout = resolveWrappedBoxTextLayout(box, rect, fontSize, font);
           ctx.textAlign = textLayout.align;
@@ -213,6 +217,7 @@ export function paintTealScriptDrawings(
           for (let index = 0; index < textLayout.lines.length; index++) {
             ctx.fillText(textLayout.lines[index]!, textLayout.x, textLayout.y + index * textLayout.lineHeight);
           }
+          ctx.restore();
         } else if (box.textColor) {
           ctx.fillStyle = box.textColor;
           const textLines = splitDrawingTextLines(box.text);
@@ -305,6 +310,23 @@ export function paintTealScriptDrawings(
 
       let currentLine = '';
       for (const word of words) {
+        // Native v93 continues oversized words (EPSIL / ON) on the next line.
+        // Use host measurements; this does not assume native glyph widths.
+        if (getTextWidth(ctx, word, font) > maxWidth) {
+          if (currentLine) wrappedLines.push(currentLine);
+          let fragment = '';
+          for (const character of word) {
+            const candidate = fragment + character;
+            if (fragment && getTextWidth(ctx, candidate, font) > maxWidth) {
+              wrappedLines.push(fragment);
+              fragment = character;
+            } else {
+              fragment = candidate;
+            }
+          }
+          currentLine = fragment;
+          continue;
+        }
         const candidate = currentLine ? `${currentLine} ${word}` : word;
         if (currentLine && getTextWidth(ctx, candidate, font) > maxWidth) {
           wrappedLines.push(currentLine);
