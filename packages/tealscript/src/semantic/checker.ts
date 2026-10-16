@@ -7657,16 +7657,23 @@ class SemanticChecker {
 
   private checkMemberExpression(expression: MemberExpression, scope: SemanticScope): void {
     // v93 item 8: these constants and the plot() linestyle slot are unavailable
-    // in v5. Local/imported plot receivers retain their own member resolution.
+    // in v5. Actual local fields, enum types, and imported members retain their
+    // own resolution; a same-name callable/scalar cannot enable the namespace.
     if (this.currentPineVersion === 5 && expression.object.type === 'Identifier'
-      && expression.object.name === 'plot' && !scope.lookup('plot')
+      && expression.object.name === 'plot'
       && PLOT_LINESTYLE_CONSTANT_VALUES.has(`plot.${expression.property.name}`)) {
-      if (!this.reportedV5PlotLineStyleNamespace) {
-        this.addDiagnostic('plot-linestyle-version', "Undeclared identifier 'plot'", expression.object.loc);
-        this.reportedV5PlotLineStyleNamespace = true;
+      const symbol = scope.lookup('plot');
+      const receiver = symbol ? this.inferExpressionType(expression.object, scope) : undefined;
+      const localField = receiver?.kind === 'udt' && receiver.name
+        && this.findUdtField(receiver.name, expression.property.name);
+      if (!localField && symbol?.kind !== 'import' && symbol?.kind !== 'type') {
+        if (!this.reportedV5PlotLineStyleNamespace) {
+          this.addDiagnostic('plot-linestyle-version', "Undeclared identifier 'plot'", expression.object.loc);
+          this.reportedV5PlotLineStyleNamespace = true;
+        }
+        this.addDiagnostic('plot-linestyle-version', `Undeclared identifier 'plot.${expression.property.name}'`, expression.loc);
+        return;
       }
-      this.addDiagnostic('plot-linestyle-version', `Undeclared identifier 'plot.${expression.property.name}'`, expression.loc);
-      return;
     }
 
     if (this.checkImportedEnumMemberExpression(expression, scope)) {

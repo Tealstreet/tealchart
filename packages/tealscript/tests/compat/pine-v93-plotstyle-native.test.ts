@@ -231,3 +231,31 @@ log.info(str.tostring(plot(10, linestyle="local")))
   expect(checkProgram(ast).diagnostics.filter(d => d.severity === 'error')).toEqual([]);
   expect(compile(ast).success).toBe(true);
 });
+
+
+it('does not let a local callable named plot enable the unavailable builtin constants', () => {
+  const ast = parse(`//@version=5
+indicator("Local plot namespace")
+plot(float value) => value
+s = plot.linestyle_solid
+log.info(str.tostring(plot(10)))
+`);
+  expect(checkProgram(ast).diagnostics.filter(d => d.severity === 'error').map(d => d.message)).toEqual([
+    "Undeclared identifier 'plot'", "Undeclared identifier 'plot.linestyle_solid'",
+  ]);
+  expect(compile(ast).success).toBe(false);
+});
+
+
+it('does not let a scalar named plot enable the unavailable builtin constants', () => {
+  const ast = parse(`//@version=5
+indicator("Scalar plot namespace")
+plot = 1
+s = plot.linestyle_dashed
+log.info(str.tostring(plot))
+`);
+  expect(checkProgram(ast).diagnostics.filter(d => d.severity === 'error').map(d => d.message)).toEqual([
+    "Undeclared identifier 'plot'", "Undeclared identifier 'plot.linestyle_dashed'",
+  ]);
+  expect(compile(ast).success).toBe(false);
+});
