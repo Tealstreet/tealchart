@@ -1,3 +1,7 @@
+import { fastGeneralPow, fastHalfPow, fastIntegerPow } from './nativePowFast.ts';
+
+const powerCandidate = Math.pow;
+
 interface Dyadic {
   coefficient: bigint;
   exponent: number;
@@ -154,16 +158,34 @@ function exponential(interval: Interval, precision: number): readonly [Interval,
 }
 
 export function nativePow(base: number, exponent: number): number {
-  if (!Number.isFinite(base) || !Number.isFinite(exponent) || base === 0 || exponent === 0 || Math.abs(base) === 1) {
-    return Math.pow(base, exponent);
-  }
-  if (base < 0 && !Number.isInteger(exponent)) return NaN;
-  const negative = base < 0 && Math.abs(exponent % 2) === 1;
-  const magnitude = Math.abs(base);
+  if (exponent === 2) return base * base;
   if (exponent === 1) return base;
   if (exponent === -1) return 1 / base;
-  if (exponent === 2) return base * base;
-  if (exponent === 0.5) return Math.sqrt(base);
+  if (exponent === 0) return 1;
+  if (exponent === 0.5 && base > 0) return Math.sqrt(base);
+  if (!Number.isFinite(base) || !Number.isFinite(exponent) || base === 0 || Math.abs(base) === 1) {
+    return Math.pow(base, exponent);
+  }
+  if (base < 0) {
+    if (!Number.isInteger(exponent)) return NaN;
+    const result = positivePow(-base, exponent);
+    return Math.abs(exponent % 2) === 1 ? -result : result;
+  }
+  return positivePow(base, exponent);
+}
+
+function positivePow(base: number, exponent: number): number {
+  const absolute = Math.abs(exponent);
+  const fast =
+    Number.isInteger(exponent) && absolute <= 64
+      ? fastIntegerPow(base, exponent)
+      : absolute === 0.5 || absolute === 1.5 || absolute === 2.5
+        ? fastHalfPow(base, exponent)
+        : fastGeneralPow(base, exponent, powerCandidate(base, exponent));
+  return Number.isNaN(fast) ? exactPow(base, exponent) : fast;
+}
+
+function exactPow(magnitude: number, exponent: number): number {
   const x = dyadic(magnitude),
     y = dyadic(Math.abs(exponent));
   const signedNumerator = exponent < 0 ? -y.coefficient : y.coefficient;
@@ -203,5 +225,5 @@ export function nativePow(base: number, exponent: number): number {
       }
     }
   }
-  return negative ? -result : result;
+  return result;
 }

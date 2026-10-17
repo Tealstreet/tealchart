@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { parse } from '../../parser';
 import { executeCompiled, tryCompile } from './execute';
 import { nativePow } from './nativePow';
+import { fastGeneralPow, fastIntegerPow } from './nativePowFast';
 
 const binary64 = (value: number) => {
   const raw = new DataView(new ArrayBuffer(8));
@@ -33,6 +34,40 @@ const vectors: [number, number, string][] = [
 ];
 
 describe('deterministic binary64 power', () => {
+  it('keeps common changing general, integer and half-integer calls out of BigInt', () => {
+    const integer = vi.spyOn(globalThis, 'BigInt');
+    try {
+      let sum = 0;
+      for (let i = 0; i < 32; i++) {
+        const base = 0.75 + (i + 1) / 32;
+        for (const exponent of [0.37, 3, -2.5, 2.5]) sum += nativePow(base, exponent);
+      }
+      expect(Number.isFinite(sum)).toBe(true);
+      expect(integer).not.toHaveBeenCalled();
+    } finally {
+      integer.mockRestore();
+    }
+  });
+
+  it('corrects adjacent host candidates and rejects unavailable candidates', () => {
+    const expected = '40000abbdb22bbdf';
+    for (const offset of [-1n, 0n, 1n]) {
+      const raw = new DataView(new ArrayBuffer(8));
+      raw.setBigUint64(0, BigInt('0x' + expected) + offset);
+      expect(binary64(fastGeneralPow(1.1, 7.3, raw.getFloat64(0)))).toBe(expected);
+    }
+    for (const candidate of [NaN, Infinity, 0, -1, 100]) {
+      expect(fastGeneralPow(1.1, 7.3, candidate)).toBeNaN();
+    }
+  });
+
+  it('leaves exact midpoint decisions to the exact path', () => {
+    expect(fastIntegerPow(220003, 3)).toBeNaN();
+    expect(fastGeneralPow(220003, 3, Math.pow(220003, 3))).toBeNaN();
+    expect(fastGeneralPow(191 ** 4, 7 / 4, Math.pow(191 ** 4, 7 / 4))).toBeNaN();
+    expect(binary64(nativePow(220003, 3))).toBe('4342ea590eda539e');
+  });
+
   it.each(vectors)('rounds %s ** %s to bits %s', (base, exponent, expected) => {
     expect(binary64(nativePow(base, exponent))).toBe(expected);
   });
