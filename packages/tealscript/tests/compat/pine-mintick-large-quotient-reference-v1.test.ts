@@ -5,7 +5,7 @@ import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 const citation = 'https://www.tradingview.com/pine-script-reference/v6/#fun_math.round_to_mintick';
 const openDefect = 'math-round-to-mintick-epsilon-crosses-tick-boundary';
 
-// functions161: nearest mintick multiple, with ties rounding up and na preserved.
+// Native v95 item14 supersedes reference ties-up with half-away; na stays missing.
 // Binary-exact quarter/half fractions distinguish ties from padding-induced ties.
 const cases = [
   { name: 'positive value below halfway', value: 1_000_000_000_000_000.25, tick: 1, expected: 1_000_000_000_000_000 },
@@ -25,7 +25,7 @@ const cases = [
     name: 'negative quarter-tick tie',
     value: -1_000_000_000_000_000.125,
     tick: 0.25,
-    expected: -1_000_000_000_000_000,
+    expected: -1_000_000_000_000_000.25,
   },
 ];
 
@@ -60,8 +60,8 @@ for (const testCase of cases) {
   });
 }
 
-it('ordinary finite values choose nearest tick with positive and negative ties up [functions:161]', () => {
-  expect(evaluate([2.25, 2.5, -2.5, -2.75], 1), citation).toEqual([2, 3, -2, -3]);
+it('ordinary finite values choose nearest tick with positive and negative half-ties away from zero [functions:161]', () => {
+  expect(evaluate([2.25, 2.5, -2.5, -2.75], 1), citation).toEqual([2, 3, -3, -3]);
 });
 
 it('missing number remains missing [functions:161]', () => {

@@ -681,8 +681,6 @@ export const EXPECTED_VALUE_VECTOR_FAILURES: Record<string, ExpectedValueVectorF
     ["hostile.rma.synthetic.multi-middle-na", "b8a0698ef3bdeccd05ded7d74239a607e3881efae72c4c92b9509d3aa468fa2b"],
     ["hostile.highestbars.plateau", "7b3349d1651871323f27e42d53e1053e11b49fed01dd35f48b3a29b20ddfb23c"],
     ["hostile.lowestbars.plateau", "57cf400639b4e5b0b33cc4b82ee42ec575cf9b68ff222e0b6b73184992afdf27"],
-    ["hostile.pivothigh.plateau", "325ddda50568f274949f4354699e42aeb6e8ae5aad1be00c8f87cc140356e5bc"],
-    ["hostile.pivotlow.plateau", "b382632bc17330f0ee34997c2a0700a54ef68b1a39a62a7a657aac22f81e6934"],
     ["hostile.ema.long-middle-na", "016ff74ae353749dd6a5e00937ade7363965fe7b52910d938ee425775e15e5f8"],
     ["hostile.rma.long-middle-na", "9550dac2c618e79380eb15be9b34a10bd4b8c894821993edfa1fb8fba50c9c2c"],
     ["hostile.wma.middle-na", "7214c76cd2d2642440d2f69b2fae03f3e93cd3e177def8651e5fc9d42703942c"],
@@ -2076,6 +2074,20 @@ function percentileLinear(bars: Bar[], length: number, percentage: number): Vect
     const lower = Math.floor(position);
     const upper = Math.ceil(position);
     return ordered[lower]! + (ordered[upper]! - ordered[lower]!) * (position - lower);
+  });
+}
+
+// V95 item6, oracle3e69c4fc: v5/v6 CSV row17 col17 has high3 with
+// X rows14..17=3/3/3/2; row9 col18 has low0 with X rows5..9=0/0/0/0/1.
+// Older equality is admitted; newer equality rejects. This local finite1/1
+// projection adds no native rows and does not adjudicate missing-source vectors.
+const V95_FINITE_PIVOT_TIE_RULE = 'Native v95 item6 RIGHTMOST plateau at the current confirmation row; oracle3e69c4fcb4a3a438b1242de49962ec1b5a9a353e, v5/v6 high row17 col17 and low row9 col18. Local finite1/1 projection, no extra native credit. https://github.com/Tealstreet/tealscript-oracle/blob/3e69c4fcb4a3a438b1242de49962ec1b5a9a353e/v95/captures/v95/RESPONSE-v95-v5.md https://www.tradingview.com/pine-script-reference/v6/#fun_ta.pivothigh https://www.tradingview.com/pine-script-reference/v6/#fun_ta.pivotlow';
+function finiteRightmostPivot(bars: Bar[], high: boolean): VectorValue[] {
+  if (bars.some(bar => !Number.isFinite(bar.close))) throw new Error('Finite pivot projection requires finite inputs');
+  return bars.map((_bar, i) => {
+    if (i < 2) return null;
+    const older = bars[i - 2]!.close, candidate = bars[i - 1]!.close, newer = bars[i]!.close;
+    return (high ? candidate >= older && candidate > newer : candidate <= older && candidate < newer) ? candidate : null;
   });
 }
 
@@ -7826,8 +7838,8 @@ plot(na(value) or na(lo) or na(hi) or (value >= lo and value <= hi) ? 1 : 0)`,
   { id: 'hostile.range.length1-plateau', namespace: 'ta', pine: pine('ta.range(close, 1)'), expected: (bars) => bars.map(() => 0), bars: PLATEAU_BARS },
   { id: 'hostile.highestbars.plateau', namespace: 'ta', pine: pine('ta.highestbars(close, 3)'), rule: EXTREMA_BARS_OFFSET_RULE, expected: (bars) => extremaBars(bars, 3, (values) => values.lastIndexOf(Math.max(...values))), bars: PLATEAU_BARS },
   { id: 'hostile.lowestbars.plateau', namespace: 'ta', pine: pine('ta.lowestbars(close, 3)'), rule: EXTREMA_BARS_OFFSET_RULE, expected: (bars) => extremaBars(bars, 3, (values) => values.lastIndexOf(Math.min(...values))), bars: PLATEAU_BARS },
-  { id: 'hostile.pivothigh.plateau', namespace: 'ta', pine: pine('ta.pivothigh(close, 1, 1)'), expected: (bars) => pivotHigh(bars, 1, 1), bars: PLATEAU_BARS },
-  { id: 'hostile.pivotlow.plateau', namespace: 'ta', pine: pine('ta.pivotlow(close, 1, 1)'), expected: (bars) => pivotLow(bars, 1, 1), bars: PLATEAU_BARS },
+  { id: 'hostile.pivothigh.plateau', namespace: 'ta', pine: pine('ta.pivothigh(close, 1, 1)'), rule: V95_FINITE_PIVOT_TIE_RULE, expected: (bars) => finiteRightmostPivot(bars, true), bars: PLATEAU_BARS },
+  { id: 'hostile.pivotlow.plateau', namespace: 'ta', pine: pine('ta.pivotlow(close, 1, 1)'), rule: V95_FINITE_PIVOT_TIE_RULE, expected: (bars) => finiteRightmostPivot(bars, false), bars: PLATEAU_BARS },
   {
     id: 'hostile.ema.long-middle-na',
     namespace: 'ta',
