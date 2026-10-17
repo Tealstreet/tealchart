@@ -1,3 +1,12 @@
+V97 unchanged recursive-hole sources now have native own-index0..127 inputs.
+The captured EMA/RMA SMA3 seeds, all eight EMA/RMA/RSI/TSI clean/hole vectors,
+leading holes and two complete64-bar hole cycles match exact strings and blanks.
+Replay the unchanged source from index0 without native-output seeds or index rebinding.
+RSI/TSI finite trajectory equality does not identify a universal algorithm; frozen
+fractional candidate verdicts and generic consume-slot holds remain unchanged.
+Original v95 suffix captures still lack their own prefix, and historical holds
+1/2/7/8/13/14/21 receive no retroactive closure from this separate execution.
+
 Native v95 item 19 locks all 19 literal-matrix outputs to exported strings and binary64
 values, including eigenvalue order and vector signs. The symmetric eigenvector tuple
 cannot settle row/column orientation; generic solver and cutoff claims stay held.
@@ -19,6 +28,15 @@ native index23344 reset to local index0; only reset/phase-dependent values and
 presence earn credit. LOCAL_FIRST initialized values remain OBSERVED/excluded
 from startup scoring because the source's own index-zero prefix was not exported.
 Developing rows and other closed rows outside the four blocks remain excluded.
+
+V97 item5 supplies separate v5/v6 own-index-zero OHLC prefixes. The unchanged
+implicit-TA sources replay own0..127 with strict exported-number equality for
+TR/ATR/DI/ADX/Supertrend/direction, startup blanks and context/NA controls. This
+is a regression lock: the batch73 engine already matches. No native target
+seeds the replay. All later closed rows and developing rows stay observed with
+zero score; fractional rational-model residuals retain arithmetic/export
+precision uncertainty. This does not recover the original v95 frontier or
+certify the archive's undecided algorithm hypotheses.
 
 V95 recursive/implicit TA suffix exports lack their own index0..127 prefix.
 EMA/RMA/RSI/TSI and ATR/DMI/Supertrend numeric targets remain OBSERVED/excluded
@@ -4834,3 +4852,12 @@ Native v95 item17 pins final B/C/A map order and shallow sharing of the copied
 map's Cell value for its exact merge/remove/reinsert/clear sequence. Only three
 earlier MERGED slots are exposed; their array count stays NOT OBSERVED/HELD.
 No Cell.copy call, arbitrary key/value kinds or generic iteration policy is certified.
+
+V97 items7/10/14 replay their separate complete own0..127 prefixes. Prior UDT
+references are missing only at own0; alias/scalar copy independence and shallow
+array fields retain the v95 behavior. This source has lag0 at own0 and no
+index<lag opportunity, so negative dynamic-history missingness remains unwitnessed.
+Own-origin Boolean history encodes -1 in v5 and 0 in v6; fixnan is missing
+until own1. Both literal-seed7 random calls independently match all128 native
+strings from own0 exactly. These bounded fresh-prefix locks do not recover the
+old v95 suffix frontier, unseeded/changing-seed behavior or realtime updates.
