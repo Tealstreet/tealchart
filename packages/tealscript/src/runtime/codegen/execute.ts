@@ -13,6 +13,7 @@ import { TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS } from '../types';
 import { RUNTIME_HELPERS } from './emitter';
 import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import { nativeMathLog } from '../mathPrecision';
+import { nativePow } from './nativePow';
 import type { ExecutionError, ExecutionResult, IndicatorDeclarationMetadata, RuntimeApproximationSummary, RuntimeProfile, RuntimeSwallowedErrorSummary, TealscriptRuntimeOptions } from '../types';
 import type { BuiltinFunction, BuiltinRegistry } from '../builtins/registry';
 import { pineVersionListDescription, pineVersionRules, pineVersionsWhere } from '../../pineVersionRules';
@@ -2853,7 +2854,7 @@ function createRuntimeMathEvaluator(
     case 'math.pow':
       return (args, named) => {
         const names = ['base', 'exponent'] as const;
-        return Math.pow(
+        return nativePow(
           toRuntimeNumber(orderedRuntimeArg(args, named, names, 0)),
           toRuntimeNumber(orderedRuntimeArg(args, named, names, 1)),
         );
