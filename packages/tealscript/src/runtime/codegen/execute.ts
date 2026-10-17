@@ -161,7 +161,7 @@ function throwCompiledRuntimeError(message: string): never {
   throw new CompiledRuntimeErrorException(message);
 }
 
-function attachBoxRuntimeSource(error: PineRuntimeArgumentError, compiled: CompiledScript): void {
+function attachRuntimeArgumentSource(error: PineRuntimeArgumentError, compiled: CompiledScript): void {
   const code = compiled.generatedCode;
   if (!code || !error.stack) return;
   const helperLines = RUNTIME_HELPERS.split('\n').length;
@@ -7889,7 +7889,7 @@ function executeCompiledPass(
           return builtin(args, namedRecordToMap(named), ctx, builtinScope, callId ?? name);
         } catch (error) {
           if (error instanceof PineRuntimeArgumentError && error.runtimeErrorCode === 'RE10026') {
-            attachBoxRuntimeSource(error, compiled);
+            attachRuntimeArgumentSource(error, compiled);
           }
           throw error;
         }
@@ -8006,16 +8006,21 @@ function executeCompiledPass(
         if (range === 0) return bottomColor ? formatRuntimeColorAlpha(0, 0, 0, 0) : Number.NaN;
         if (!isFiniteRuntimeNumber(value)) return Number.NaN;
         const ratio = Math.min(1, Math.max(0, (value - bottomValue) / range));
-        if (!bottomColor) {
-          if (ratio === 0) return Number.NaN;
-          return formatRuntimeColorAlpha(topColor.red, topColor.green, topColor.blue, topColor.alpha * ratio);
-        }
-        const interpolate = (from: number, to: number): number => from + (to - from) * ratio;
+        const bottomAlpha = (bottomColor?.alpha ?? 0) / 255;
+        const topAlpha = topColor.alpha / 255;
+        const alpha = bottomAlpha + (topAlpha - bottomAlpha) * ratio;
+        if (alpha === 0) return formatRuntimeColorAlpha(0, 0, 0, 0);
+        const interpolate = (from: number, to: number): number => {
+          if (bottomAlpha === 0) return to;
+          if (topAlpha === 0) return from;
+          const bottom = from * bottomAlpha;
+          return Math.floor((bottom + (to * topAlpha - bottom) * ratio) / alpha);
+        };
         return formatRuntimeColorAlpha(
-          interpolate(bottomColor.red, topColor.red),
-          interpolate(bottomColor.green, topColor.green),
-          interpolate(bottomColor.blue, topColor.blue),
-          interpolate(bottomColor.alpha, topColor.alpha),
+          interpolate(bottomColor?.red ?? 0, topColor.red),
+          interpolate(bottomColor?.green ?? 0, topColor.green),
+          interpolate(bottomColor?.blue ?? 0, topColor.blue),
+          Math.floor(alpha * 255),
         );
       },
       mathCall(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string) {
@@ -8171,6 +8176,9 @@ function executeCompiledPass(
       } catch (error) {
         if (isHistoryBufferResize(error)) throw error;
         if (error instanceof CompiledRuntimeErrorException || isKnownPineRuntimeError(error)) {
+          if (error instanceof PineRuntimeArgumentError && error.runtimeErrorCode === 'RE10094') {
+            attachRuntimeArgumentSource(error, compiled);
+          }
           errors.push(createCompiledExecutionError(error, barIndex));
           return true;
         }

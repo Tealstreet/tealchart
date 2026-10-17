@@ -1602,7 +1602,7 @@ plot(showSignalsInput, title="Show Signals")
     expect(getPlot(result, 'Show Signals').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
   });
 
-  it('matches documented Pine calculated color idioms', () => {
+  it('retains synthetic RSI/color integration expectations without native fixture credit', () => {
     const result = runCompatScript(`
 indicator("Color docs smoke", overlay=true)
 baseColor = color.rgb(255, 0, 0)
@@ -1652,6 +1652,9 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       67.937983,
     ]);
     expect(getPlot(result, 'Named Signal').color).toEqual(getPlot(result, 'Signal').color);
+    // Synthetic fixture expectations only: neither these RSI inputs nor the
+    // Prefix gradient were captured. Native parity is asserted separately in
+    // pine-v94-color-native.test.ts; these arrays receive no native credit.
     expect(getPlot(result, 'Prefix Signal').color).toEqual([
       null,
       null,
@@ -1661,10 +1664,10 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       '#0A141EBC',
-      '#0A141EC0',
+      '#0A141EBF',
       '#0A141EBA',
-      '#0A141EBE',
-      '#0A141EBA',
+      '#0A141EBD',
+      '#0A141EB9',
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
       null,
@@ -1674,11 +1677,11 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       null,
-      '#59A600AC',
-      '#619E00B0',
-      '#53AC00A9',
-      '#5CA300AE',
-      '#52AD00A9',
+      '#837B00AC',
+      '#8C7200B0',
+      '#7C8200A9',
+      '#867800AD',
+      '#7B8300A8',
     ]);
   });
 

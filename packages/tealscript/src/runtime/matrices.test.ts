@@ -113,9 +113,11 @@ describe('PineMatrix', () => {
     expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
+  // Native v95 item18 v6, e09e8def, runtime-error-expanded-v1.txt: RE10094.
+  // Replaces the original engine-authored diagnostic from a71fc41a.
   it('rejects matrix concat with mismatched columns', () => {
     expect(() => concatMatrix(createPineMatrix<number>(1, 2, 0), createPineMatrix<number>(1, 3, 0))).toThrow(
-      'Matrix concat requires matching column counts. Left has 2, right has 3',
+      "In the 'matrix.concat()' function. The number of columns in both matrices must be identical.",
     );
   });
 

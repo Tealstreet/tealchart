@@ -1,3 +1,9 @@
+Native v95 item 19 locks all 19 literal-matrix outputs to exported strings and binary64
+values, including eigenvalue order and vector signs. The symmetric eigenvector tuple
+cannot settle row/column orientation; generic solver and cutoff claims stay held.
+Scaled Jacobi singular norms use the square root of the compensated squared norm;
+iterated hypot introduces observable pseudoinverse rounding residue on rank-one B.
+
 V95 per-bar array literals pin shared slice windows, independent copied slots
 and missing-ID box/table containers without creating drawing objects. For the
 captured [1,na,3,3] array, ascending sort places NA last and keeps this equal-key
@@ -1574,6 +1580,11 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   built-in indicator values; with negative offsets, a `length`-only window
   cannot reach the 0 endpoint. Do not compensate by flipping the sign again in
   Aroon or corpus-facing helpers.
+- Native v95 item18 unchanged v5/v6 programs compile, then fail with RE10094
+  before any plot. V6 exposes the concat column-mismatch message on bar0 and
+  #main():16; emitted concat call metadata supplies the source frame. V5's code
+  is observed but its detail/stack wording stays unobserved. All25 native plot
+  fields are blank in every exported row: zero numeric or earlier-getter credit.
 - `matrix.concat(id1, id2)` appends the rows of `id2` into `id1` and returns
   `id1`, matching array-style left mutation. Do not "fix" corpus rows by
   returning a detached combined copy; scripts that need an unmutated left matrix
@@ -4533,8 +4544,21 @@ two-state bool cast. Valuewhen receives the preserved v5 source directly.
 
 ### Gradient missing lower endpoint
 
-A missing lower colour in `color.from_gradient` fades the upper colour alpha by the clamped interpolation ratio while preserving its RGB.
-The v52 midpoint observers pin this route; finite endpoints and missing numeric bounds retain their existing behaviour.
+V93/v94 captures require premultiplied RGB, floored gradient bytes and integer
+transparency getters. V96 G12 directly matches #214263DF and rejects #214263E0;
+G22 also selects its floor literal. G32 is NEITHER_LITERAL with native blue98,
+refuting the former claim that equal RGB channels are always preserved exactly.
+Normalize endpoint opacity before interpolating premultiplied channels and alpha;
+preserve the sole nonzero-opacity endpoint's RGB when the other opacity is zero.
+Do not add epsilon rounding or source/version/phase exceptions. These operations
+fit the bounded captures; they do not certify a universal native implementation.
+V96 CLAMP and positional MISSING distinguish alpha127 from128 by ordinary literal
+equality, without a hidden-storage decoder. Constructor/missingness control
+contradictions are retained as observations and excluded from gradient credit.
+The synthetic RSI/Prefix, opaque midpoint, equal-alpha named-color and red-upper
+boundary integration checks retain every assertion with zero native certificate.
+V94 RSI projects captured scalar inputs and does not replay its calculation prefix.
+All v93 E broad hypotheses remain UNDECIDED; no pixel claim or historic hold closes.
 
 ### Native string overload admission
 
