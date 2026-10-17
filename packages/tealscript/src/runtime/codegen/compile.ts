@@ -384,7 +384,7 @@ export interface CompiledBarContext {
   tickerLinebreak(args: unknown[], named?: Record<string, unknown>): string;
   tickerPointfigure(args: unknown[], named?: Record<string, unknown>): string;
   colorNew(args: unknown[], named?: Record<string, unknown>, truncateTransparency?: boolean): unknown;
-  colorRgb(args: unknown[], named?: Record<string, unknown>, truncateTransparency?: boolean): unknown;
+  colorRgb(args: unknown[], named?: Record<string, unknown>): unknown;
   colorR(args: unknown[], named?: Record<string, unknown>): unknown;
   colorG(args: unknown[], named?: Record<string, unknown>): unknown;
   colorB(args: unknown[], named?: Record<string, unknown>): unknown;

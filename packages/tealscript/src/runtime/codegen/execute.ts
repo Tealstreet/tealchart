@@ -7942,7 +7942,7 @@ function executeCompiledPass(
           ? formatRuntimeColor(parsedColor.red, parsedColor.green, parsedColor.blue, colorTransparency)
           : color;
       },
-      colorRgb(args: unknown[], named?: Record<string, unknown>, truncateTransparency = false) {
+      colorRgb(args: unknown[], named?: Record<string, unknown>) {
         const transparency = named && Object.prototype.hasOwnProperty.call(named, 'transp')
           ? named.transp
           : named && Object.prototype.hasOwnProperty.call(named, 'transparency')
@@ -7974,8 +7974,7 @@ function executeCompiledPass(
         const rgb = Math.round(toRuntimeNumber(red))
           | (Math.round(toRuntimeNumber(green)) << 8)
           | (Math.round(toRuntimeNumber(blue)) << 16);
-        return formatRuntimeColor(rgb & 0xff, (rgb >>> 8) & 0xff, (rgb >>> 16) & 0xff,
-          truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency);
+        return formatRuntimeColor(rgb & 0xff, (rgb >>> 8) & 0xff, (rgb >>> 16) & 0xff, transparency);
       },
       colorR(args: unknown[], named?: Record<string, unknown>) {
         return parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0))?.red ?? Number.NaN;

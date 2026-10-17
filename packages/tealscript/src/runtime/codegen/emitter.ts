@@ -1336,7 +1336,6 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const pendingRootShadows = new WeakMap<Map<string, string>, Set<string>>();
   const functionNameStack: string[] = [];
   const versionRules = pineVersionRules(ctx.pineVersion);
-  let constantColorComparison = false;
   let literalTimestampCount: number | undefined;
   const loopResultTypes = ctx.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
   let recordedExpressionTypes = ctx.recordedExpressionTypes;
@@ -2204,19 +2203,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         }
         return emitIdentifier(expr);
       case 'BinaryExpression': {
-        const previousColorComparison = constantColorComparison;
-        constantColorComparison ||= ctx.pineVersion === 5 && (expr.operator === '==' || expr.operator === '!=')
-          && [expr.left, expr.right].every(operand => {
-            const type = expressionType(operand);
-            return type?.kind === 'color' && type.qualifier === 'const';
-          });
-        let left: string, right: string;
-        try {
-          left = emitExpr(expr.left);
-          right = emitExpr(expr.right);
-        } finally {
-          constantColorComparison = previousColorComparison;
-        }
+        const left = emitExpr(expr.left);
+        const right = emitExpr(expr.right);
         if (expr.operator === '-') subtractionOperands.set(expr, { left, right });
         switch (expr.operator) {
           case '+':
@@ -2999,7 +2987,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       }
       if (expr.arguments.length <= 1 || expr.arguments.some((argument) => argument.name?.name === 'x')) {
         const castArg = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
-        if (castArg) return castArg;
+        if (castArg) return ctx.pineVersion === 5
+          ? `((_color) => _isNa(_color) ? "#00000000" : _color)(${castArg})`
+          : castArg;
       }
       const legacyColorTransparencyCall = expr.arguments.length <= 2
         || expr.arguments.some((argument) => argument.name?.name === 'color' || argument.name?.name === 'transp');
@@ -3008,10 +2998,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         : `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
     if (fullName === 'color.new' || fullName === 'color.rgb') {
-      // Native v98 separates v5 constant NEW and constant color comparisons
-      // from series constructors and switch-selected RGB calls.
-      const truncateTransparency = ctx.pineVersion === 5 && expressionType(expr)?.qualifier === 'const'
-        && (fullName === 'color.new' || constantColorComparison);
+      // Native v98 separates v5 constant NEW from its series constructor route.
+      const truncateTransparency = ctx.pineVersion === 5 && fullName === 'color.new'
+        && expressionType(expr)?.qualifier === 'const';
       const method = fullName === 'color.new' ? 'colorNew' : 'colorRgb';
       return `ctx.${method}([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}${truncateTransparency ? ', true' : ''})`;
     }

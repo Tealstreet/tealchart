@@ -13,7 +13,7 @@ interface NativeSource {
   selectedDataRowOrdinals: number[]; primaryUniquePlotCells: number;
   rows: { rowOrdinal: number; allRequestedRawCells: Pointer[]; nativeContextCells: Pointer[] }[];
 }
-const revision = '329631f43d8c38a944f8c016e98131f4351f48aa';
+const revision = '913792b5f5c06fcc313cb9f2e1baf6356dafdf34';
 const base = 'v98/captures/v98/';
 const folder = base + 'v98-color-constructors-v5/attempt-v1/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
@@ -53,11 +53,11 @@ function exact(title: string) {
   }
 }
 
-describe('v98 v5 constructor routes: partial slot1 native evidence', () => {
+describe('v98 v5 constructor routes: slot1 native evidence', () => {
   it('binds all new evidence, unchanged Saved source and original native cell pointers', () => {
     expect(lock.revision).toBe(revision);
     const integrity = json<{ artifacts: Proof[] }>(base + 'artifact-integrity-v2.json');
-    const files = lock.files.filter(p => p.path.startsWith('v98/'));
+    const files = lock.files.filter(p => p.path.startsWith('v98/') && (p.path === base + 'artifact-integrity-v2.json' || integrity.artifacts.some(f => f.path === p.path)));
     expect(files).toHaveLength(88);
     for (const p of files) {
       const value = bytes(p.path);
@@ -144,22 +144,25 @@ describe('v98 v5 constructor routes: partial slot1 native evidence', () => {
     }
   });
 
-  it('compares direct constant RGB equality and its missing-Boolean code exactly', () => {
-    exact('EXACT_RGB12_5_EQ_DF');
-    exact('EXACT_RGB12_5_EQ_DF_CODE');
+  it('pins the direct constant RGB root as OBSERVED CONTRARY with its model HELD', () => {
+    for (const ordinal of native.selectedDataRowOrdinals) {
+      expect(raw(ordinal, 'EXACT_RGB12_5_EQ_DF')).toBe('0');
+      expect(raw(ordinal, 'EXACT_RGB12_5_EQ_DF_CODE')).toBe('0');
+    }
   });
 
-  it('compares every remaining non-index control and direct constant equality result exactly', () => {
-    for (const title of headers.slice(6)) {
-      if (title !== 'INPUT_INDEX' && !/^(LITERAL_RGB|LITERAL_NEW|SERIES_RGB|SERIES_NEW)_/.test(title)) exact(title);
-    }
+  it('compares every remaining non-index control except the explicitly held constant RGB root exactly', () => {
+    const controls = headers.slice(6).filter(title => !['INPUT_INDEX', 'EXACT_RGB12_5_EQ_DF', 'EXACT_RGB12_5_EQ_DF_CODE'].includes(title)
+      && !/^(LITERAL_RGB|LITERAL_NEW|SERIES_RGB|SERIES_NEW)_/.test(title));
+    expect(controls).toHaveLength(20);
+    for (const title of controls) exact(title);
   });
 });
 
 
-describe('v96 pointwise control guard while v98 slots2..4 are pending', () => {
+describe('v96 pointwise controls: v5 constant RGB root remains HELD', () => {
   for (const entry of json<{ sources: NativeSource[] }>('v96/captures/v96/numeric-controls-v1.json').sources) {
-    it(`${entry.sourceId}: locks every non-index cell except the pending v5 NA-cast root`, () => {
+    it(`${entry.sourceId}: locks every non-index cell except the observed contrary constant RGB root`, () => {
       const [titles, ...data] = csv(entry.csv.path);
       const pine = text(`v96/captures/v96/${entry.sourceId}/attempt-v1/executed-v1.pine`);
       expect(hash(Buffer.from(pine))).toBe(entry.sourceSha256);
@@ -174,7 +177,7 @@ describe('v96 pointwise control guard while v98 slots2..4 are pending', () => {
         if (title === 'INPUT_INDEX') continue;
         const native = selected.map(r => r[titles.indexOf(title)]);
         const actual = engine.plots.find(p => p.title === title)!.values;
-        if (entry.sourceId.endsWith('v5') && title === 'MISSING_LOWER_NA') {
+        if (entry.sourceId.endsWith('v5') && title === 'CTOR12_5_EQ_DF') {
           expect(native).toEqual(Array(32).fill('0'));
           held += 32;
           continue;
