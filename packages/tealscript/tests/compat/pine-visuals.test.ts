@@ -292,7 +292,8 @@ fill(topLine, bottomLine, color.new(color.blue, 90), "Range Fill", true, true, d
     expect(rangeFill.type).toBe('fill');
     expect(rangeFill.plot1Id).toBe('hline_Top');
     expect(rangeFill.plot2Id).toBe('hline_Bottom');
-    expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2962FF1A'));
+    // Oracle b23c3d71, v100 materialized-NEW-v6 row34: alpha25 for constant NEW90.
+    expect(rangeFill.color).toEqual(Array(compatibilityBars.length).fill('#2962FF19'));
     expect(rangeFill.editable).toBe(true);
     expect(rangeFill.showLast).toBeUndefined();
     expect(rangeFill.fillgaps).toBe(true);

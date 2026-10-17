@@ -3,6 +3,8 @@ import { resolveDependencyMember } from './importedDependencies';
 import { POSITIONAL_DRAWING_GETTERS } from '../drawings/singleIdGetters';
 import { PINE_EXP_RUNTIME_HELPER } from './pineExp';
 import { comparisonEqual } from './float-comparison';
+import { constantColorAlpha, constantColorsEqual } from './constantColor';
+import type { ConstantColor } from './constantColor';
 import type {
   Program, Statement, Expression,
   BinaryExpression,
@@ -2224,6 +2226,32 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     return udtArrayExpressions.has(expr) ? `deps._arr.withUdtElementType(${value})` : value;
   }
 
+  function constantColorValue(expr: Expression): ConstantColor | undefined {
+    if (expr.type === 'ColorLiteral') {
+      const hex = expr.value.slice(1);
+      if (!/^[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) return undefined;
+      return { red: parseInt(hex.slice(0, 2), 16), green: parseInt(hex.slice(2, 4), 16), blue: parseInt(hex.slice(4, 6), 16), alpha: hex.length === 8 ? parseInt(hex.slice(6), 16) : 255, kind: 'literal' };
+    }
+    if (expr.type !== 'CallExpression' || expressionType(expr)?.qualifier !== 'const') return undefined;
+    const name = resolvedBuiltinNamespaceCallName(expr);
+    if (name !== 'color.rgb' && name !== 'color.new') return undefined;
+    const names = name === 'color.rgb' ? ['red', 'green', 'blue', 'transp'] : ['color', 'transp'];
+    const transparencyExpr = orderedArgExpression(expr.arguments, names, 'transp', names.length - 1);
+    const transparency = transparencyExpr ? extractStaticNumber(transparencyExpr) : 0;
+    if (transparency === null || !Number.isFinite(transparency) || transparency < 0 || transparency > 100) return undefined;
+    if (name === 'color.new') {
+      const baseExpr = orderedArgExpression(expr.arguments, names, 'color', 0);
+      const base = baseExpr ? constantColorValue(baseExpr) : undefined;
+      return base ? { ...base, kind: 'new', alpha: constantColorAlpha(Math.trunc(transparency)) } : undefined;
+    }
+    const channels = names.slice(0, 3).map((channel, index) => {
+      const arg = orderedArgExpression(expr.arguments, names, channel, index);
+      return arg ? extractStaticNumber(arg) : null;
+    });
+    if (channels.some(c => c === null || !Number.isFinite(c) || c < 0 || c > 255)) return undefined;
+    return { red: Math.round(channels[0]!), green: Math.round(channels[1]!), blue: Math.round(channels[2]!), alpha: constantColorAlpha(transparency), kind: 'rgb' };
+  }
+
   function emitExprValue(expr: Expression): string {
     const comparisonHelpers = ctx.pineVersion === 5
       ? { eq: '_eqLegacyNa', neq: '_neqLegacyNa', cmp: '_cmpLegacyNa' }
@@ -2247,6 +2275,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         }
         return emitIdentifier(expr);
       case 'BinaryExpression': {
+        if (ctx.pineVersion === 5 && (expr.operator === '==' || expr.operator === '!=')) {
+          const a = constantColorValue(expr.left);
+          const b = constantColorValue(expr.right);
+          if (a && b && (a.kind !== 'literal' || b.kind !== 'literal')) {
+            const equal = constantColorsEqual(a, b);
+            return String(expr.operator === '==' ? equal : !equal);
+          }
+        }
         const left = emitExpr(expr.left);
         const right = emitExpr(expr.right);
         if (expr.operator === '-') subtractionOperands.set(expr, { left, right });
@@ -3041,8 +3077,12 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         : `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
     if (fullName === 'color.new' || fullName === 'color.rgb') {
-      // Native v98 separates v5 constant NEW from its series constructor route.
-      const truncateTransparency = ctx.pineVersion === 5 && fullName === 'color.new'
+      const constantRgb = ctx.pineVersion === 5 && fullName === 'color.rgb' ? constantColorValue(expr) : undefined;
+      if (constantRgb) {
+        return JSON.stringify('#' + [constantRgb.red, constantRgb.green, constantRgb.blue, constantRgb.alpha].map(c => c.toString(16).padStart(2, '0')).join('').toUpperCase());
+      }
+      // Native v98/v99/v100 separate constant NEW from the series constructor route.
+      const truncateTransparency = ctx.pineVersion >= 5 && fullName === 'color.new'
         && expressionType(expr)?.qualifier === 'const';
       const method = fullName === 'color.new' ? 'colorNew' : 'colorRgb';
       return `ctx.${method}([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}${truncateTransparency ? ', true' : ''})`;

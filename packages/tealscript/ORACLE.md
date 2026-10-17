@@ -24,15 +24,53 @@ The v91 cumulative regression compares each v5/v6 full export's 23,085 common cl
 
 Old monorepo and mirror Git history still contains prior captures. This cutover prevents new capture growth and removes archive bytes from fresh application trees; it does not rewrite history. Development clones should use `--filter=blob:none` without `--depth`, retaining the commit graph while fetching historical file contents on demand. Historical checkouts, diffs and file reads may need network access. Existing full clones retain their downloaded packs; changing the filter does not reclaim them. Vendored source snapshots can keep `--depth=1` with `--filter=blob:none`. Retain Docker/EAS/mirror archive exclusions.
 
-## V5 color controls v4
+## Constant color controls v5
 
 The [v98 partial constructor return](https://github.com/Tealstreet/tealscript-oracle/blob/329631f43d8c38a944f8c016e98131f4351f48aa/v98/captures/v98/RESPONSE-v98-v2.md) distinguishes v5 literal-argument `color.new` from series constructors. Literal NEW matches truncating transparency before byte conversion across the sixteen captured cases. Its four case13 nonmatches at T22.9 remain actual all-zero equality vectors: truncation predicts alpha199 outside the supplied194..198 palette, but equality to that predicted literal was not exported. All four original frozen NEW hypotheses remain refuted; matching the getter/equality vector does not recover hidden storage.
 
-The engine applies integer transparency to v5 constant NEW; switch-selected RGB and series constructors retain byte rounding. The direct constant RGB12.5/DF=false and RGB50/80=true comparisons do not distinguish truncation from percent-rounding. Its internal quantizer and the direct RGB census root remain HELD. A prototype constant-comparison conversion was removed because this evidence cannot select it. The native flags remain pinned as observed contrary cells, with zero parity credit.
+The engine now uses the CM-B arithmetic witness on the observed constructor surface. Constant RGB and NEW share `Math.round(255 * (1 - t / 100))`, with NEW first truncating transparency. V5 immediate constant comparisons retain separate constructor/literal float32 normalization, GBAR packing and exact one-decimal comparison keys; materialized colors retain byte storage. V6 changes only constant NEW's byte conversion. Series constructors and missing-color paths retain their behavior. The primitive operations apply to values, with no probe names or literal palettes in production code.
 
-The [complete v98 return](https://github.com/Tealstreet/tealscript-oracle/blob/913792b5f5c06fcc313cb9f2e1baf6356dafdf34/v98/captures/v98/RESPONSE-v98-v6.md) supplies the missing v5 cast discriminator: `color(na)` has finite0/0/0/100 getters, NA0 and equality to transparent black. Var/array/history transfers retain it, and nz retains the present value. The v5 cast now produces transparent black; typed color NA retains its own missingness. The v5 NA-cast census predicate and every v96 non-index control outside the held v5 direct RGB root compare exactly.
+The [complete v98 return](https://github.com/Tealstreet/tealscript-oracle/blob/b23c3d71f00e83cb40c4ab3d65be269788605f89/v98/captures/v98/RESPONSE-v98-v6.md) supplies the missing v5 cast discriminator: `color(na)` has finite0/0/0/100 getters, NA0 and equality to transparent black. Var/array/history transfers retain it, and nz retains the present value. The v5 cast now produces transparent black; typed color NA retains its own missingness. The v5 NA-cast census predicate remains independently locked; the constant-color regression now also covers the v96 direct RGB root.
 
-The original v98 constructor-v6 slot remains consumed/UNOBSERVED after entry failure. A separate v99 execution of the same source supplies a new control vector. Its 144 LITERAL_NEW cells differ from the existing engine and remain observed/held with zero parity credit; all 3,824 matching non-index controls and the complete engine vector are retained. Cast work does not select a new constructor policy or close the independent v5 RGB hold.
+The original v98 constructor-v6 slot remains consumed/UNOBSERVED after entry failure. Its later v99 retry is a separate capture; batch78 now reproduces all3,968 non-index constructor cells, including the144 cells previously held by batch77. The v96 v6 controls remain exact.
+
+### V99 direct v5 constructor evidence
+
+The1273152e return binds both unchanged v5 direct-comparison probes and all8,064
+primary plot cells. All five frozen comparison policies, including both prior
+v96/v98 RGB candidates, are REFUTED. The observation-only regression preserves
+native getter/equality/calibration values. At that v99 frontier, finite
+equality-relation completions disagreed on an unqueried immediate RGB/NEW
+comparison; v100 now observes it. Those completions are not storage algorithms. The v100-bound engine regression now scores all23,448 selected closed non-index cells across nine constant-color source executions. Both the v96 v5 direct-RGB root and the144 v99 v6 constant-NEW discrepancies match native exactly. Its comparisons assert the original numeric strings and binary64 values without tolerance.
+
+The v6 constructor return supplies3,968 exact non-index cells and64 excluded absolute-index cells after this change. Native direct RGB12.5/DF controls remain1 in v6 versus0 in v5. The composed batch77 cast implementation is documented below and retains its independent source/presence contracts.
+
+The managed `oracle-probes/` checkout is external evidence and is excluded from
+package source linting. Fixture guard/verify still check its pinned bytes; native
+capture-tool JavaScript is not application JavaScript.
+
+V100's three native slots retain the exact accepted sources and frozen predictions.
+Its direct scalar projection supports SC213 (258 representatives); all 108 packing
+representative signatures are refuted. Both materialization versions support BC2
+(B:104/106/512/514). These independent projections do not identify a full model.
+The RGB tuple changes direct equality, so alpha-only scalar storage is insufficient.
+Previously grouped packing members must be checked separately from their rejected
+representatives. At v100, CM-A and CM-B reproduced every observed constant-color
+cell and disagreed on direct RGB-vs-NEW at transparency90. Their alternate-order
+mutation stayed GREEN only on that older captured surface.
+
+The [v101 return](https://github.com/Tealstreet/tealscript-oracle/blob/56abd808d88595bab7808c063d065ce2bcd7dc55/v101/captures/v101/RESPONSE-v101-v1.md)
+now exports `DIRECT_RGB_NEW_90_EQ=1` on all64 selected owned physically closed
+rows. CM-A is REFUTED and implemented CM-B is SUPPORTED on the finite frozen
+37-code vector. The new lock compares all2,368 code cells and128 reproducible
+context outputs exactly against original CSV strings;64 absolute indices remain
+excluded. The CM-A swap now goes RED. The previous23,448 comparisons stay exact.
+
+The source's false/Boolean-NA encoding limit remains; no universal native algorithm,
+hidden color identity, missing-color behavior or unqueried input is established.
+Other2m closed rows/developing snapshots and prior holds retain their exclusions.
+
+### V6 missing-color cast controls
 
 The [complete v99 return](https://github.com/Tealstreet/tealscript-oracle/blob/bc913c6cc44b40611f84fabc362975df0aa73574/v99/captures/v99/RESPONSE-v99-v6.md) resolves batch77's frozen cast discriminator: ARRAY_EQ_SELF is0 on all64 rows, refuting copied-token identity and supporting stable-initializer folding for the captured sources. Direct literal `color(na)` pairs and unchanged root cast/var aliases compare true. Array/history missing values still compare false at runtime, including to themselves. Equality follows the source's actual previous branch, preserving ordinary DF equality and missing-branch refusal; no row-parity outcome is fitted. The emitter folds only proven stable root cast initializers and pure direct casts in root execution, guarding reassignments, user calls and local/function shadowing. It does not make NaN reflexively equal globally.
 

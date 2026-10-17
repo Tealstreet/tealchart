@@ -216,12 +216,13 @@ const colorContracts = [
     rejects: 'rounding transparency before 8-bit alpha conversion',
   },
   {
-    name: 'new supports fractional transparency',
+    // Oracle b23c3d71, v99 constructor-v6 row14: constant NEW12.5 equals E0; RGB remains DF.
+    name: 'constant new uses native fractional-transparency conversion',
     entry: 9,
     member: 'color.new',
     expression: 'color.new(#112B5B, 12.5)',
-    expected: '#112B5BDF',
-    rejects: 'rounding transparency before alpha conversion and discarding RGB',
+    expected: '#112B5BE0',
+    rejects: 'using the series constructor conversion for a constant NEW or discarding RGB',
   },
   {
     name: 'gradient clamps below bottom',

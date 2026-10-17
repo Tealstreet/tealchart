@@ -67,8 +67,8 @@ b = hline(100)
 fill(a, b, color.new(color.blue, 90), "Levels", false, true, display.none)`), bars);
     expect(result.plots.find((plot) => plot.type === 'fill')).toMatchObject({
       title: 'Levels', editable: false, fillgaps: true, display: 0,
-      // TV-native CF009 settles v6 color.blue; preserve the 90% alpha.
-      color: ['#2962FF1A', '#2962FF1A', '#2962FF1A'],
+      // CF009 pins RGB; b23c3d71 v100 materialized-NEW-v6 row34 pins alpha25.
+      color: ['#2962FF19', '#2962FF19', '#2962FF19'],
     });
     expect(result.plots.find((plot) => plot.type === 'fill')?.showLast).toBeUndefined();
   });
