@@ -2987,7 +2987,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       }
       if (expr.arguments.length <= 1 || expr.arguments.some((argument) => argument.name?.name === 'x')) {
         const castArg = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
-        if (castArg) return castArg;
+        if (castArg) return ctx.pineVersion === 5
+          ? `((_color) => _isNa(_color) ? "#00000000" : _color)(${castArg})`
+          : castArg;
       }
       const legacyColorTransparencyCall = expr.arguments.length <= 2
         || expr.arguments.some((argument) => argument.name?.name === 'color' || argument.name?.name === 'transp');
@@ -2995,8 +2997,13 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         ? `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`
         : `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
-    if (fullName === 'color.new') return `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
-    if (fullName === 'color.rgb') return `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.new' || fullName === 'color.rgb') {
+      // Native v98 separates v5 constant NEW from its series constructor route.
+      const truncateTransparency = ctx.pineVersion === 5 && fullName === 'color.new'
+        && expressionType(expr)?.qualifier === 'const';
+      const method = fullName === 'color.new' ? 'colorNew' : 'colorRgb';
+      return `ctx.${method}([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}${truncateTransparency ? ', true' : ''})`;
+    }
     if (fullName === 'color.r') return `ctx.colorR([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'color.g') return `ctx.colorG([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'color.b') return `ctx.colorB([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;

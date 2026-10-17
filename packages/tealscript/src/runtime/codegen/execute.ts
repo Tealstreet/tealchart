@@ -7920,7 +7920,7 @@ function executeCompiledPass(
         if (!builtin) return NaN;
         return builtin([receiver, ...args], namedRecordToMap(named), ctx, builtinScope, callId ?? `${namespace}.${name}`);
       },
-      colorNew(args: unknown[], named?: Record<string, unknown>) {
+      colorNew(args: unknown[], named?: Record<string, unknown>, truncateTransparency = false) {
         const color = orderedRuntimeArg(args, named, ['color', 'transp'], 0);
         const transparency = named && Object.prototype.hasOwnProperty.call(named, 'transp')
           ? named.transp
@@ -7936,7 +7936,8 @@ function executeCompiledPass(
           );
         }
         const parsedColor = parseRuntimeColorInput(color);
-        const colorTransparency = isRuntimeNa(transparency) ? 100 : transparency;
+        const colorTransparency = isRuntimeNa(transparency) ? 100
+          : truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency;
         return parsedColor
           ? formatRuntimeColor(parsedColor.red, parsedColor.green, parsedColor.blue, colorTransparency)
           : color;
