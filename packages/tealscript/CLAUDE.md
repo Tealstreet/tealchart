@@ -1,3 +1,11 @@
+V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
+Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
+literal-cast/root-initializer comparisons fold separately from runtime missing
+array/history equality, whose self comparisons remain false. Preserve scope,
+reassignment and version guards; never make scalar NaN globally reflexive.
+Stable-root proofs reject both ordinary and persistent lexical shadows. Register
+persistent bindings in statement and expression blocks, including switch arms.
+
 V97 unchanged recursive-hole sources now have native own-index0..127 inputs.
 The captured EMA/RMA SMA3 seeds, all eight EMA/RMA/RSI/TSI clean/hole vectors,
 leading holes and two complete64-bar hole cycles match exact strings and blanks.

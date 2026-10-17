@@ -1,4 +1,5 @@
 import { createPineArray, pushArrayValue, type PineArray } from './arrays';
+import { MISSING_COLOR } from './codegen/missingColor';
 
 type PineMapKey = string | number | boolean;
 
@@ -112,6 +113,7 @@ function assertMapCapacity(map: PineMap, key: unknown): void {
 }
 
 function normalizeMapKey(key: unknown): PineMapKey {
+  if (key === MISSING_COLOR) return Number.NaN;
   if (typeof key === 'number') {
     return key;
   }

@@ -32,7 +32,7 @@ The engine now uses the CM-B arithmetic witness on the observed constructor surf
 
 The [complete v98 return](https://github.com/Tealstreet/tealscript-oracle/blob/b23c3d71f00e83cb40c4ab3d65be269788605f89/v98/captures/v98/RESPONSE-v98-v6.md) supplies the missing v5 cast discriminator: `color(na)` has finite0/0/0/100 getters, NA0 and equality to transparent black. Var/array/history transfers retain it, and nz retains the present value. The v5 cast now produces transparent black; typed color NA retains its own missingness. The v5 NA-cast census predicate remains independently locked; the constant-color regression now also covers the v96 direct RGB root.
 
-V98 constructor v6 was consumed/UNOBSERVED after entry failure; v99 captures its unchanged retry below. Existing v96 v6 controls remain exact. The v98 v6 cast has NA1 with finite0/0/0/100 getters and distinct self/var versus array equality. Its four frozen alternatives are all refuted. The v6 cast replay remains byte-identical to the batch76 base on this branch, with1,280 cast cells observed contrary: blank getters and false self/var equality differ from native. Those cells are pinned with zero parity credit;2,688 other cast cells and1,888 v96 v6 controls compare exactly. This is an actual unresolved v6 divergence, not export-precision uncertainty or an unobserved state. No v6 storage model or historical hold is closed by the v5 changes.
+The original v98 constructor-v6 slot remains consumed/UNOBSERVED after entry failure. Its later v99 retry is a separate capture; batch78 now reproduces all3,968 non-index constructor cells, including the144 cells previously held by batch77. The v96 v6 controls remain exact.
 
 ### V99 direct v5 constructor evidence
 
@@ -43,7 +43,7 @@ native getter/equality/calibration values. At that v99 frontier, finite
 equality-relation completions disagreed on an unqueried immediate RGB/NEW
 comparison; v100 now observes it. Those completions are not storage algorithms. The v100-bound engine regression now scores all23,448 selected closed non-index cells across nine constant-color source executions. Both the v96 v5 direct-RGB root and the144 v99 v6 constant-NEW discrepancies match native exactly. Its comparisons assert the original numeric strings and binary64 values without tolerance.
 
-The v6 constructor return supplies3,968 exact non-index cells and64 excluded absolute-index cells after this change. Native direct RGB12.5/DF controls remain1 in v6 versus0 in v5. Missing-color implementation and its independent batch77 work remain separate.
+The v6 constructor return supplies3,968 exact non-index cells and64 excluded absolute-index cells after this change. Native direct RGB12.5/DF controls remain1 in v6 versus0 in v5. The composed batch77 cast implementation is documented below and retains its independent source/presence contracts.
 
 The managed `oracle-probes/` checkout is external evidence and is excluded from
 package source linting. Fixture guard/verify still check its pinned bytes; native
@@ -69,3 +69,9 @@ excluded. The CM-A swap now goes RED. The previous23,448 comparisons stay exact.
 The source's false/Boolean-NA encoding limit remains; no universal native algorithm,
 hidden color identity, missing-color behavior or unqueried input is established.
 Other2m closed rows/developing snapshots and prior holds retain their exclusions.
+
+### V6 missing-color cast controls
+
+The [complete v99 return](https://github.com/Tealstreet/tealscript-oracle/blob/bc913c6cc44b40611f84fabc362975df0aa73574/v99/captures/v99/RESPONSE-v99-v6.md) resolves batch77's frozen cast discriminator: ARRAY_EQ_SELF is0 on all64 rows, refuting copied-token identity and supporting stable-initializer folding for the captured sources. Direct literal `color(na)` pairs and unchanged root cast/var aliases compare true. Array/history missing values still compare false at runtime, including to themselves. Equality follows the source's actual previous branch, preserving ordinary DF equality and missing-branch refusal; no row-parity outcome is fitted. The emitter folds only proven stable root cast initializers and pure direct casts in root execution, guarding reassignments, user calls and local/function shadowing. It does not make NaN reflexively equal globally.
+
+V6 literal-cast and explicit typed-color NA origins publish0/0/0/100 independently of NA1, including the newly captured typed-color NA getters. A private engine marker preserves that provenance through arrays/history; it is not a proposed native payload and runtime equality still rejects it as missing. Gradient failures, fixnan warmup and explicit missing nz replacements retain their prior missing-result transport and blank getters. This leaves missingness, NZ fallback, gradients and v5 behavior separate. Every non-index cell of the complete v98 cast and both v99 cast sources compares exactly. Absolute indices and uncaptured own-origin initialization remain excluded. Replay uses captured context rows and rebases phase/index; v99 startup guards stay local on the unscored first bar so an absent prior array is not fabricated. This establishes the bounded cast behavior, not universal optimizer/storage identity or historical-hold closure. The older observation-only countermodels remain frozen v98 evidence; they are not production adapters.

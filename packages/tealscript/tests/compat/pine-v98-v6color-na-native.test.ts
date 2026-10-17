@@ -41,7 +41,7 @@ const result = executeCompiled(compiled, rows.slice(0, 67).map(r => ({
 const raw = (ordinal: number, title: string) => rows[ordinal - 1][headers.indexOf(title)];
 const output = (title: string) => result.plots.find(p => p.title === title)!.values.slice(3);
 const bits = (value: number) => { const buffer = Buffer.alloc(8); buffer.writeDoubleBE(value); return buffer.toString('hex'); };
-describe('v98 v6 NA color cast: bounded controls and observed contrary cells', () => {
+describe('v98 v6 NA color cast: complete native cast regression', () => {
   it('binds all new evidence, unchanged Saved source and original native cell pointers', () => {
     expect(lock.revision).toBe(revision);
     const integrity = json<{ artifacts: Proof[] }>(base + 'artifact-integrity-v6.json');
@@ -89,6 +89,7 @@ describe('v98 v6 NA color cast: bounded controls and observed contrary cells', (
       nativeSaves: 3, nativeAdds: 3, csvs: 3, dataRows: 918, independentlyClosedRows: 915, primaryRows: 192, uniquePrimaryPlotCells: 12096, nativeSourceEntryStops: 1,
     } });
     expect(result.errors).toEqual([]);
+    expect(result.profile.compiledBarErrors?.count ?? 0).toBe(0);
   });
 
   it('keeps physical closure, the three original context rows and all64 selected phases', () => {
@@ -122,19 +123,18 @@ describe('v98 v6 NA color cast: bounded controls and observed contrary cells', (
     expect(output('CASE_ID')).toEqual(Array.from({ length: 64 }, (_, i) => i % 4));
   });
 
-  it('asserts matching native controls and pins every contrary v6 getter/equality without parity credit', () => {
-    let exactCells = 0, contraryCells = 0;
+  it('matches all non-index cells, including every formerly contrary getter/equality', () => {
+    let exactCells = 0, repairedCells = 0;
     for (const ordinal of native.selectedDataRowOrdinals) {
       const phase = Number(raw(ordinal, 'CASE_ID'));
       for (const title of headers.slice(6)) {
         if (title === 'INPUT_INDEX') continue;
-        const contraryGetter = /^(CAST|VAR|ARRAY|CAST_HISTORY)_[RGBT]$/.test(title)
+        const repairedGetter = /^(CAST|VAR|ARRAY|CAST_HISTORY)_[RGBT]$/.test(title)
           || (phase % 2 === 1 && /^HISTORY_[RGBT]$/.test(title));
-        const contraryEquality = title === 'CAST_EQ_SELF' || title === 'VAR_EQ_CAST';
-        if (contraryGetter || contraryEquality) {
-          expect(raw(ordinal, title)).toBe(contraryEquality ? '1' : title.endsWith('_T') ? '100' : '0');
-          contraryCells++;
-          continue;
+        const repairedEquality = title === 'CAST_EQ_SELF' || title === 'VAR_EQ_CAST';
+        if (repairedGetter || repairedEquality) {
+          expect(raw(ordinal, title)).toBe(repairedEquality ? '1' : title.endsWith('_T') ? '100' : '0');
+          repairedCells++;
         }
         const valueRaw = raw(ordinal, title), actual = output(title)[ordinal - 4];
         expect(actual, `${title}:original row${ordinal}`).toBe(Number(valueRaw));
@@ -143,7 +143,7 @@ describe('v98 v6 NA color cast: bounded controls and observed contrary cells', (
         exactCells++;
       }
     }
-    expect({ exactCells, contraryCells, indexContextExcluded: 64 }).toEqual({ exactCells: 2688, contraryCells: 1280, indexContextExcluded: 64 });
+    expect({ exactCells, repairedCells, indexContextExcluded: 64 }).toEqual({ exactCells: 3968, repairedCells: 1280, indexContextExcluded: 64 });
     for (const ordinal of native.selectedDataRowOrdinals) {
       expect(raw(ordinal, 'CAST_NA')).toBe('1');
       expect(raw(ordinal, 'CAST_EQ_TYPED_NA')).toBe('0');

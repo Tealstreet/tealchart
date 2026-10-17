@@ -1,3 +1,4 @@
+import { MISSING_COLOR, MISSING_COLOR_KEY } from './missingColor';
 import { roundRuntimeNumber } from '../mathRounding';
 import { createLiteralTimestampCache } from './literalTimestampCache';
 import type { LiteralTimestampCache } from './literalTimestampCache';
@@ -734,7 +735,7 @@ function normalizeRuntimePlotLineStyle(value: unknown): PlotOutput['lineStyle'] 
 }
 
 function isRuntimeNa(value: unknown): boolean {
-  return typeof value === 'number' && Number.isNaN(value);
+  return value === MISSING_COLOR || typeof value === 'number' && Number.isNaN(value);
 }
 
 function toRuntimeNumber(value: unknown): number {
@@ -3005,6 +3006,14 @@ function parseRuntimeColor(value: unknown): RuntimeColorChannels | null {
 
 function parseRuntimeColorInput(value: unknown): { red: number; green: number; blue: number; alpha: number } | null {
   return parseRuntimeColor(toPlotColor(value) ?? value);
+}
+
+function runtimeColorChannel(value: unknown, channel: 'red' | 'green' | 'blue' | 'alpha', pineVersion: number): number {
+  const parsed = parseRuntimeColorInput(value);
+  if (parsed) return channel === 'alpha' ? alphaToRuntimeTransparency(parsed.alpha) : parsed[channel];
+  // V99 includes typed color NA as well as direct, collection and history casts.
+  // This getter representation does not make the value present or equal to black.
+  return pineVersion === 6 && value === MISSING_COLOR ? channel === 'alpha' ? 100 : 0 : Number.NaN;
 }
 
 function runtimeColorTupleFromArgs(args: unknown[], named: Map<string, unknown>, names: string[]): [number, number, number, number] {
@@ -5495,6 +5504,10 @@ function runtimeSourceDescriptorKey(value: unknown): string {
   return `expression:${id}:${runtimeCapturesKey(value.captures)}`;
 }
 
+function serializeRuntimeCapture(value: unknown): string | undefined {
+  return JSON.stringify(value, (_key, entry: unknown) => entry === MISSING_COLOR ? { [MISSING_COLOR_KEY]: true } : entry);
+}
+
 function runtimeCapturesKey(value: unknown, scopeIdentity?: (scope: object) => number): string {
   if (!value || typeof value !== 'object') return '';
   const entries = Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right));
@@ -5505,9 +5518,9 @@ function runtimeCapturesKey(value: unknown, scopeIdentity?: (scope: object) => n
       }
       const sourceKey = runtimeSourceDescriptorKey(descriptor.source);
       if (sourceKey) return `${name}:${sourceKey}`;
-      return `${name}:${JSON.stringify(descriptor.value)}`;
+      return `${name}:${serializeRuntimeCapture(descriptor.value)}`;
     }
-    return `${name}:${JSON.stringify(descriptor)}`;
+    return `${name}:${serializeRuntimeCapture(descriptor)}`;
   }).join('|');
 }
 
@@ -5534,12 +5547,12 @@ export function captureDispatchMatcher(captures: Record<string, unknown> | undef
       const hasSource = isRuntimeSourceDescriptor(descriptor.source) || isRuntimeExpressionSource(descriptor.source);
       const primitive = descriptor.value === null || typeof descriptor.value !== 'object';
       const capturedValue = descriptor.value;
-      const serialized = hasSource || primitive ? undefined : JSON.stringify(capturedValue);
+      const serialized = hasSource || primitive ? undefined : serializeRuntimeCapture(capturedValue);
       return (value: unknown) => isRuntimeCaptureDescriptor(value) && value.scope === scope
-        && matchesSource(value.source) && (hasSource || (primitive ? Object.is(value.value, capturedValue) : JSON.stringify(value.value) === serialized));
+        && matchesSource(value.source) && (hasSource || (primitive ? Object.is(value.value, capturedValue) : serializeRuntimeCapture(value.value) === serialized));
     }
-    const serialized = JSON.stringify(descriptor);
-    return (value: unknown) => !isRuntimeCaptureDescriptor(value) && JSON.stringify(value) === serialized;
+    const serialized = serializeRuntimeCapture(descriptor);
+    return (value: unknown) => !isRuntimeCaptureDescriptor(value) && serializeRuntimeCapture(value) === serialized;
   });
   return value => {
     if (!value) return false;
@@ -6935,7 +6948,8 @@ function executeCompiledPass(
               : inputSimpleArgs));
       const defaultValue = inputArg(metadataNames, 0);
       const title = toRuntimeString(inputArg(metadataNames, 1, named.__tealscriptInputDefaultTitle ?? type));
-      const inputDefaultValue = type === 'color' ? toPlotColor(defaultValue) ?? defaultValue : defaultValue;
+      const inputDefaultValue = defaultValue === MISSING_COLOR ? Number.NaN
+        : type === 'color' ? toPlotColor(defaultValue) ?? defaultValue : defaultValue;
       const metadata: Partial<InputDefinition> = {
         tooltip: optionalString(metadataNames, metadataNames.indexOf('tooltip')),
         inline: optionalString(metadataNames, metadataNames.indexOf('inline')),
@@ -7980,17 +7994,16 @@ function executeCompiledPass(
         return formatRuntimeColor(rgb & 0xff, (rgb >>> 8) & 0xff, (rgb >>> 16) & 0xff, transparency);
       },
       colorR(args: unknown[], named?: Record<string, unknown>) {
-        return parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0))?.red ?? Number.NaN;
+        return runtimeColorChannel(orderedRuntimeArg(args, named, ['color'], 0), 'red', compiled.analysis.pineVersion);
       },
       colorG(args: unknown[], named?: Record<string, unknown>) {
-        return parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0))?.green ?? Number.NaN;
+        return runtimeColorChannel(orderedRuntimeArg(args, named, ['color'], 0), 'green', compiled.analysis.pineVersion);
       },
       colorB(args: unknown[], named?: Record<string, unknown>) {
-        return parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0))?.blue ?? Number.NaN;
+        return runtimeColorChannel(orderedRuntimeArg(args, named, ['color'], 0), 'blue', compiled.analysis.pineVersion);
       },
       colorT(args: unknown[], named?: Record<string, unknown>) {
-        const parsedColor = parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0));
-        return parsedColor ? alphaToRuntimeTransparency(parsedColor.alpha) : Number.NaN;
+        return runtimeColorChannel(orderedRuntimeArg(args, named, ['color'], 0), 'alpha', compiled.analysis.pineVersion);
       },
       colorFromGradient(args: unknown[], named?: Record<string, unknown>) {
         const names = ['value', 'bottom_value', 'top_value', 'bottom_color', 'top_color'] as const;

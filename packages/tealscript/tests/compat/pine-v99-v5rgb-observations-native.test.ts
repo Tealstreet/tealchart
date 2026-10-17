@@ -42,7 +42,8 @@ function nominalAlpha(t: number, policy: string) {
 describe('v99 direct v5 RGB/NEW: historical observations and refuted frozen policies', () => {
   it('binds the immutable complete two-slot return, dependencies and native raw pointers', () => {
     expect(lock.revision).toBe(revision);
-    expect(lock.files.filter(f => f.path.startsWith('v99/'))).toHaveLength(178);
+    // The append-only union also retains batch 77's 73 v99 cast artifacts.
+    expect(lock.files.filter(f => f.path.startsWith('v99/'))).toHaveLength(251);
     const integrity = json<{ artifacts: Proof[] }>(base + 'artifact-integrity-v3.json');
     for (const proof of integrity.artifacts) {
       expect(lock.files.find(f => f.path === proof.path)).toEqual(proof);

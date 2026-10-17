@@ -1,3 +1,4 @@
+import { MISSING_COLOR_KEY } from './missingColor';
 import { resolveDependencyMember } from './importedDependencies';
 import { POSITIONAL_DRAWING_GETTERS } from '../drawings/singleIdGetters';
 import { PINE_EXP_RUNTIME_HELPER } from './pineExp';
@@ -1365,6 +1366,49 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   function expressionKind(expression: Expression | IfStatement): SemanticType['kind'] | undefined {
     return expressionType(expression)?.kind;
   }
+  // V99 distinguishes stable literal cast comparisons from runtime missing
+  // comparisons (including array/history self comparisons). Keep this proof
+  // at the source boundary; NaN itself must retain ordinary runtime equality.
+  const stableMissingColorCasts = new Set<string>();
+  const writtenNames = new Set<string>();
+  const collectWrites = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    const node = value as Statement;
+    if (node.type === 'AssignmentStatement' && node.left.type === 'Identifier') writtenNames.add(node.left.name);
+    if (node.type === 'TupleAssignment') node.names.forEach(name => writtenNames.add(name.name));
+    for (const [key, child] of Object.entries(value)) {
+      if (key === 'loc') continue;
+      if (Array.isArray(child)) child.forEach(collectWrites);
+      else collectWrites(child);
+    }
+  };
+  function literalMissingColorCast(expression: Expression | IfStatement): boolean {
+    return expression.type === 'CallExpression' && expression.callee.type === 'Identifier'
+      && expression.callee.name === 'color' && !ctx.resolvedUserFunctionCalls.has(expression)
+      && expression.arguments.length === 1
+      && (!expression.arguments[0].name || expression.arguments[0].name.name === 'x')
+      && expression.arguments[0].value.type === 'NaExpression';
+  }
+  const rootCastDeclarations = ctx.pineVersion === 6 ? ast.body.flatMap(statement =>
+    statement.type === 'MultiDeclaration' ? statement.declarations
+      : statement.type === 'VariableDeclaration' ? [statement] : []) : [];
+  if (rootCastDeclarations.some(declaration => literalMissingColorCast(declaration.init))) {
+    collectWrites(ast);
+    for (const declaration of rootCastDeclarations) {
+      if (declaration.names.type !== 'VariableDeclarator' || declaration.kind === 'varip') continue;
+      const name = declaration.names.name.name;
+      if (!writtenNames.has(name) && (literalMissingColorCast(declaration.init)
+        || (declaration.init.type === 'Identifier' && stableMissingColorCasts.has(declaration.init.name)))) {
+        stableMissingColorCasts.add(name);
+      }
+    }
+  }
+  function stableMissingColorCast(expression: Expression): boolean {
+    return functionNameStack.length === 0 && (literalMissingColorCast(expression)
+      || (expression.type === 'Identifier' && !currentLocalName(expression.name)
+        && !currentPersistentLocalName(expression.name)
+        && stableMissingColorCasts.has(expression.name)));
+  }
   const divisionSites = new Map<BinaryExpression, number>();
   const additionSites = new Map<BinaryExpression, number>();
   const subtractionOperands = new WeakMap<BinaryExpression, { left: string; right: string }>();
@@ -2267,6 +2311,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
               ? `(_isTruthy(${left}) ? true : _isTruthy(${right}))`
               : `_or(${left}, ${right})`;
           case '==':
+            if (ctx.pineVersion === 6 && stableMissingColorCast(expr.left) && stableMissingColorCast(expr.right)) return 'true';
             return `${comparisonHelpers.eq}(${left}, ${right})`;
           case '!=':
             return `${comparisonHelpers.neq}(${left}, ${right})`;
@@ -2593,24 +2638,22 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     rootBlockPersistentInitByValue.set(value, init);
   }
 
-  function registerRootBlockPersistentDeclarations(stmts: Statement[], inLocalScope = false): void {
-    for (const stmt of stmts) {
-      if (stmt.type === 'FunctionDeclaration') continue;
-      if (stmt.type === 'VariableDeclaration') {
-        if (inLocalScope) registerRootBlockPersistent(stmt);
-        if (stmt.init.type === 'IfStatement') registerRootBlockPersistentDeclarations([stmt.init], inLocalScope);
-      } else if (stmt.type === 'MultiDeclaration') {
-        for (const declaration of stmt.declarations) {
-          if (inLocalScope) registerRootBlockPersistent(declaration);
-          if (declaration.init.type === 'IfStatement') registerRootBlockPersistentDeclarations([declaration.init], inLocalScope);
-        }
-      } else if (stmt.type === 'IfStatement') {
-        registerRootBlockPersistentDeclarations(stmt.consequent, true);
-        if (Array.isArray(stmt.alternate)) registerRootBlockPersistentDeclarations(stmt.alternate, true);
-        else if (stmt.alternate) registerRootBlockPersistentDeclarations([stmt.alternate], true);
-      } else if (stmt.type === 'OnceStatement' || stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
-        registerRootBlockPersistentDeclarations(stmt.body, true);
-      }
+  function registerRootBlockPersistentDeclarations(node: unknown, inLocalScope = false): void {
+    if (!node || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      node.forEach(child => registerRootBlockPersistentDeclarations(child, inLocalScope));
+      return;
+    }
+    const statement = node as Statement | SwitchExpression;
+    if (statement.type === 'FunctionDeclaration') return;
+    if (statement.type === 'VariableDeclaration' && inLocalScope) registerRootBlockPersistent(statement);
+    for (const [key, child] of Object.entries(node)) {
+      if (key === 'loc') continue;
+      const localScope = inLocalScope
+        || (statement.type === 'IfStatement' && (key === 'consequent' || key === 'alternate'))
+        || (statement.type === 'SwitchExpression' && key === 'cases')
+        || (['OnceStatement', 'ForStatement', 'WhileStatement'].includes(statement.type) && key === 'body');
+      registerRootBlockPersistentDeclarations(child, localScope);
     }
   }
 
@@ -3025,7 +3068,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         const castArg = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
         if (castArg) return ctx.pineVersion === 5
           ? `((_color) => _isNa(_color) ? "#00000000" : _color)(${castArg})`
-          : castArg;
+          : ctx.pineVersion === 6 ? `((_color) => _isNa(_color) ? _colorNa : _color)(${castArg})` : castArg;
       }
       const legacyColorTransparencyCall = expr.arguments.length <= 2
         || expr.arguments.some((argument) => argument.name?.name === 'color' || argument.name?.name === 'transp');
@@ -4562,7 +4605,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const retName = `_block_ret_${lines.length}`;
     const start = lines.length;
     const blockLocals = collectFunctionLocalNames(stmts);
+    const rootPersistentLocals = functionNameStack.length === 0 ? rootBlockPersistentNames(stmts) : undefined;
     localNameStack.push(blockLocals);
+    if (rootPersistentLocals?.size) persistentLocalStack.push(rootPersistentLocals);
     lines.push(`let ${retName} = NaN;`);
     for (let i = 0; i < stmts.length - 1; i++) emitStmt(stmts[i], 0);
     if (lastStmt.type === 'AssignmentStatement') {
@@ -4570,6 +4615,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       lines.push(`${retName} = ${emitExpr(lastStmt.left)};`);
     } else if (!emitTailAssignment(lastStmt, 0, retName)) emitStmt(lastStmt, 0);
     lines.push(`return ${retName};`);
+    if (rootPersistentLocals?.size) persistentLocalStack.pop();
     localNameStack.pop();
     return `(() => { ${lines.splice(start).join(' ')} })()`;
   }
@@ -4714,6 +4760,11 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     if (localName) localNameStack[localNameStack.length - 1].set(name, localName);
   }
 
+  function emitVariableInitializer(stmt: VariableDeclaration): string {
+    if (ctx.pineVersion === 6 && stmt.typeAnnotation?.baseType === 'color' && stmt.init.type === 'NaExpression') return '_colorNa';
+    return emitExpr(stmt.init as Expression);
+  }
+
   function emitVarDecl(stmt: VariableDeclaration, depth: number): string | undefined {
     registerEnumVariable(stmt);
     const pad = indent(depth);
@@ -4721,7 +4772,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       if (stmt.init.type === 'IfStatement') emitIf(stmt.init, depth);
       else if (stmt.init.type === 'ForStatement') emitFor(stmt.init, depth);
       else if (stmt.init.type === 'WhileStatement') emitWhile(stmt.init, depth);
-      else lines.push(`${pad}${emitExpr(stmt.init)};`);
+      else lines.push(`${pad}${emitVariableInitializer(stmt)};`);
       return;
     }
     if (stmt.names.type === 'TupleDeclarator') {
@@ -4736,7 +4787,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         lines.push(`${pad}let ${tmpVar} = [];`);
         emitWhile(stmt.init, depth, tmpVar);
       } else {
-        lines.push(`${pad}const ${tmpVar} = ${emitExpr(stmt.init)};`);
+        lines.push(`${pad}const ${tmpVar} = ${emitVariableInitializer(stmt)};`);
       }
       for (let i = 0; i < stmt.names.names.length; i++) {
         const name = stmt.names.names[i].name;
@@ -4806,7 +4857,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
           lines.push(`${pad}  ${localPersistent} = NaN;`);
           emitWhile(stmt.init, depth + 1, localPersistent, true);
         } else {
-          lines.push(`${pad}  ${localPersistent} = ${emitExpr(stmt.init)};`);
+          lines.push(`${pad}  ${localPersistent} = ${emitVariableInitializer(stmt)};`);
         }
         lines.push(`${pad}  ctx.markPersistentRuntimeValue(${localPersistent});`);
         lines.push(`${pad}  ${initFlag} = true;`);
@@ -4845,7 +4896,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       } else {
         lines.push(`${pad}if (!this.${jsInitMember(name)}) {`);
         lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
-        lines.push(`${pad}  this.${jsVarMember(name)} = ${emitExpr(stmt.init)};`);
+        lines.push(`${pad}  this.${jsVarMember(name)} = ${emitVariableInitializer(stmt)};`);
         lines.push(`${pad}  ctx.markPersistentRuntimeValue(this.${jsVarMember(name)});`);
         lines.push(`${pad}  this.${jsInitMember(name)} = true;`);
         lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
@@ -4902,7 +4953,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     }
 
     const rhs = ctx.pineVersion >= 5 && stmt.typeAnnotation?.baseType === 'string' && stmt.init.type === 'NaExpression'
-      ? '""' : emitExpr(stmt.init);
+      ? '""' : emitVariableInitializer(stmt);
     bindRootBlockDeclaration(name, blockLocal);
         activateLocalDeclaration(name);
 
@@ -6342,7 +6393,8 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
 export const RUNTIME_HELPERS = `
 ${PINE_EXP_RUNTIME_HELPER}
 function _divisionDenominator(v) { const n = Number(v); return n === 0 ? NaN : n; }
-function _isNa(v) { return v !== v || v === undefined || v === null; }
+const _colorNa = Symbol.for(${JSON.stringify(MISSING_COLOR_KEY)});
+function _isNa(v) { return v !== v || v === undefined || v === null || v === _colorNa; }
 function _string(v) { return _isNa(v) ? NaN : String(v); }
 function _boolHistory(v, sourceIsBool = true) { return sourceIsBool && _isNa(v) ? false : v; }
 function _isTruthy(v) { return v !== false && v !== 0 && !_isNa(v); }
@@ -6377,7 +6429,7 @@ function _mod(a, b) {
   if (_isNa(a) || _isNa(b)) return NaN;
   return a - b * Math.floor(a / b);
 }
-function _nz(v, repl) { return _isNa(v) ? (repl !== undefined ? repl : 0) : v; }
+function _nz(v, repl) { return _isNa(v) ? (repl === _colorNa ? NaN : repl !== undefined ? repl : 0) : v; }
 function _and(a, b) { return _isTruthy(a) && _isTruthy(b); }
 function _or(a, b) { return _isTruthy(a) || _isTruthy(b); }
 function _idx(obj, i) {

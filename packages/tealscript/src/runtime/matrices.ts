@@ -1,3 +1,4 @@
+import { MISSING_COLOR } from './codegen/missingColor';
 import { PineRuntimeArgumentError } from './runtimeArgumentError';
 import { decomposeSingularValues } from './singular-value-decomposition';
 import {
@@ -1144,8 +1145,8 @@ function approxEqual(left: number, right: number): boolean {
 }
 
 function compareMatrixValues(left: unknown, right: unknown): number {
-  const leftMissing = left === '' || (typeof left === 'number' && Number.isNaN(left));
-  const rightMissing = right === '' || (typeof right === 'number' && Number.isNaN(right));
+  const leftMissing = left === MISSING_COLOR || left === '' || (typeof left === 'number' && Number.isNaN(left));
+  const rightMissing = right === MISSING_COLOR || right === '' || (typeof right === 'number' && Number.isNaN(right));
   if (leftMissing || rightMissing) {
     if (leftMissing && rightMissing) return 0;
     return leftMissing ? 1 : -1;
