@@ -1984,12 +1984,7 @@ function colorHex(red: number, green: number, blue: number, transparency = 0): s
   return `#${[red, green, blue, alpha].map((channel) => channel.toString(16).padStart(2, '0').toUpperCase()).join('')}`;
 }
 
-function colorGradientMidpointHex(red: number, green: number, blue: number, bottomTransparency: number, topTransparency: number): string {
-  const bottomAlpha = Math.round(255 * (100 - bottomTransparency) / 100);
-  const topAlpha = Math.round(255 * (100 - topTransparency) / 100);
-  const alpha = Math.round((bottomAlpha + topAlpha) / 2);
-  return `#${[red, green, blue, alpha].map((channel) => channel.toString(16).padStart(2, '0').toUpperCase()).join('')}`;
-}
+
 
 function constantVector(bars: Bar[], value: number): VectorValue[] {
   return bars.map(() => value);
@@ -5413,7 +5408,9 @@ plot(close, title="gradient12_5", color=color.from_gradient(1, 0, 2, color.rgb(3
       { type: 'plot', title: 'new13', color: bars.map(() => colorHex(41, 98, 255, 13)) },
       { type: 'plot', title: 'olive40', color: bars.map(() => colorHex(128, 128, 0, 40)) },
       { type: 'plot', title: 'rgb12_5', color: bars.map(() => colorHex(33, 66, 99, 12.5)) },
-      { type: 'plot', title: 'gradient12_5', color: bars.map(() => colorGradientMidpointHex(33, 66, 99, 10, 15)) },
+      // Oracle 03fbfca3, v96-gradient-alpha-v6 CSV rows1..32, columns13/14:
+      // exact T10→T15 midpoint equals #214263DF and rejects #214263E0.
+      { type: 'plot', title: 'gradient12_5', color: bars.map(() => '#214263DF') },
     ], /* Authority entry SHA256 df48cf1653397f8058ce3d258f43021bdb06ede5d06f699130b3b2908e6a6868 */
     bars: HOSTILE_BARS,
   },

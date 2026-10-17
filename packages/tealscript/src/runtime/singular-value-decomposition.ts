@@ -57,7 +57,7 @@ export function decomposeSingularValues(rows: number[][]): ScaledSingularValueDe
       }
     }
     if (!rotated) {
-      const singularValues = columns.map((column) => column.reduce((norm, value) => Math.hypot(norm, value), 0));
+      const singularValues = columns.map((column) => Math.sqrt(innerProduct(column, column)));
       return { scale, columns, rightVectors, singularValues };
     }
   }

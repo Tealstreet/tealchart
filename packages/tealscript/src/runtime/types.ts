@@ -127,7 +127,7 @@ export interface ExecutionError {
   runtimeError?: RuntimeErrorPayload;
 }
 
-export type RuntimeErrorCode = 'runtime.error' | 'RE10026' | 'RE10127' | 'RE10039' | 'RE10001' | 'RE10002' | 'RE10045' | 'RE10073' | 'RE10029' | 'RE10145' | 'RE10007' | 'RE10090';
+export type RuntimeErrorCode = 'runtime.error' | 'RE10026' | 'RE10127' | 'RE10039' | 'RE10001' | 'RE10002' | 'RE10045' | 'RE10073' | 'RE10029' | 'RE10145' | 'RE10007' | 'RE10090' | 'RE10094';
 export type RuntimeInfrastructureErrorCode =
   | 'mobile-tealscript-webview-required'
   | 'request-data-unavailable';
