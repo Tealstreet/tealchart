@@ -65,7 +65,7 @@ const black100 = present(0, 0, 0, 100, 0);
 
 describe('v98 v6 cast: observation-only non-identifiability witnesses', () => {
   it('binds the exact source, native inputs and existing complete evidence pin', () => {
-    expect(lock.revision).toBe('913792b5f5c06fcc313cb9f2e1baf6356dafdf34');
+    expect(lock.revision).toBe('bc913c6cc44b40611f84fabc362975df0aa73574');
     for (const path of [
       base + 'numeric-controls-v6.json',
       native.csv.path,
@@ -156,7 +156,7 @@ describe('v98 v6 cast: observation-only non-identifiability witnesses', () => {
     expect(equal(arrayValue, arrayValue, 'stable-folding')).toBe(false);
     expect(equal(arrayValue, arrayValue, 'copied-identity')).toBe(true);
     expect(headers).not.toContain('ARRAY_EQ_SELF');
-    // One added native predicate would separate these two witnesses. No query was run.
+    // Frozen v98-only predictions; the separate v99 regression binds the later native discriminator.
     const query = 'plot(f_code(fromArray == fromArray), title="ARRAY_EQ_SELF", display=display.data_window)';
     expect(query).toContain('fromArray == fromArray');
   });
