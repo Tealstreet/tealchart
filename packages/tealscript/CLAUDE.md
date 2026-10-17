@@ -4819,3 +4819,12 @@ Native v95 item17 pins final B/C/A map order and shallow sharing of the copied
 map's Cell value for its exact merge/remove/reinsert/clear sequence. Only three
 earlier MERGED slots are exposed; their array count stays NOT OBSERVED/HELD.
 No Cell.copy call, arbitrary key/value kinds or generic iteration policy is certified.
+
+V97 items7/10/14 replay their separate complete own0..127 prefixes. Prior UDT
+references are missing only at own0; alias/scalar copy independence and shallow
+array fields retain the v95 behavior. This source has lag0 at own0 and no
+index<lag opportunity, so negative dynamic-history missingness remains unwitnessed.
+Own-origin Boolean history encodes -1 in v5 and 0 in v6; fixnan is missing
+until own1. Both literal-seed7 random calls independently match all128 native
+strings from own0 exactly. These bounded fresh-prefix locks do not recover the
+old v95 suffix frontier, unseeded/changing-seed behavior or realtime updates.
