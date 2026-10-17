@@ -7920,7 +7920,7 @@ function executeCompiledPass(
         if (!builtin) return NaN;
         return builtin([receiver, ...args], namedRecordToMap(named), ctx, builtinScope, callId ?? `${namespace}.${name}`);
       },
-      colorNew(args: unknown[], named?: Record<string, unknown>) {
+      colorNew(args: unknown[], named?: Record<string, unknown>, truncateTransparency = false) {
         const color = orderedRuntimeArg(args, named, ['color', 'transp'], 0);
         const transparency = named && Object.prototype.hasOwnProperty.call(named, 'transp')
           ? named.transp
@@ -7936,12 +7936,13 @@ function executeCompiledPass(
           );
         }
         const parsedColor = parseRuntimeColorInput(color);
-        const colorTransparency = isRuntimeNa(transparency) ? 100 : transparency;
+        const colorTransparency = isRuntimeNa(transparency) ? 100
+          : truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency;
         return parsedColor
           ? formatRuntimeColor(parsedColor.red, parsedColor.green, parsedColor.blue, colorTransparency)
           : color;
       },
-      colorRgb(args: unknown[], named?: Record<string, unknown>) {
+      colorRgb(args: unknown[], named?: Record<string, unknown>, truncateTransparency = false) {
         const transparency = named && Object.prototype.hasOwnProperty.call(named, 'transp')
           ? named.transp
           : named && Object.prototype.hasOwnProperty.call(named, 'transparency')
@@ -7973,7 +7974,8 @@ function executeCompiledPass(
         const rgb = Math.round(toRuntimeNumber(red))
           | (Math.round(toRuntimeNumber(green)) << 8)
           | (Math.round(toRuntimeNumber(blue)) << 16);
-        return formatRuntimeColor(rgb & 0xff, (rgb >>> 8) & 0xff, (rgb >>> 16) & 0xff, transparency);
+        return formatRuntimeColor(rgb & 0xff, (rgb >>> 8) & 0xff, (rgb >>> 16) & 0xff,
+          truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency);
       },
       colorR(args: unknown[], named?: Record<string, unknown>) {
         return parseRuntimeColorInput(orderedRuntimeArg(args, named, ['color'], 0))?.red ?? Number.NaN;

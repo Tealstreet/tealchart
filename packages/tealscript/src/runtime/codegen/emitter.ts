@@ -1336,6 +1336,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   const pendingRootShadows = new WeakMap<Map<string, string>, Set<string>>();
   const functionNameStack: string[] = [];
   const versionRules = pineVersionRules(ctx.pineVersion);
+  let constantColorComparison = false;
   let literalTimestampCount: number | undefined;
   const loopResultTypes = ctx.loopResultTypes ?? new WeakMap<ForStatement | WhileStatement, SemanticType[]>();
   let recordedExpressionTypes = ctx.recordedExpressionTypes;
@@ -2203,8 +2204,19 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         }
         return emitIdentifier(expr);
       case 'BinaryExpression': {
-        const left = emitExpr(expr.left);
-        const right = emitExpr(expr.right);
+        const previousColorComparison = constantColorComparison;
+        constantColorComparison ||= ctx.pineVersion === 5 && (expr.operator === '==' || expr.operator === '!=')
+          && [expr.left, expr.right].every(operand => {
+            const type = expressionType(operand);
+            return type?.kind === 'color' && type.qualifier === 'const';
+          });
+        let left: string, right: string;
+        try {
+          left = emitExpr(expr.left);
+          right = emitExpr(expr.right);
+        } finally {
+          constantColorComparison = previousColorComparison;
+        }
         if (expr.operator === '-') subtractionOperands.set(expr, { left, right });
         switch (expr.operator) {
           case '+':
@@ -2995,8 +3007,14 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
         ? `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`
         : `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
-    if (fullName === 'color.new') return `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
-    if (fullName === 'color.rgb') return `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.new' || fullName === 'color.rgb') {
+      // Native v98 separates v5 constant NEW and constant color comparisons
+      // from series constructors and switch-selected RGB calls.
+      const truncateTransparency = ctx.pineVersion === 5 && expressionType(expr)?.qualifier === 'const'
+        && (fullName === 'color.new' || constantColorComparison);
+      const method = fullName === 'color.new' ? 'colorNew' : 'colorRgb';
+      return `ctx.${method}([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}${truncateTransparency ? ', true' : ''})`;
+    }
     if (fullName === 'color.r') return `ctx.colorR([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'color.g') return `ctx.colorG([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     if (fullName === 'color.b') return `ctx.colorB([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;

@@ -394,6 +394,18 @@ const ACCOUNTED_SITES: readonly AccountedSite[] = [
   },
   {
     file: 'packages/tealscript/src/runtime/codegen/execute.ts',
+    source: ': truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency;',
+    category: 'documented-pine-normalization',
+    reason: 'Native v98 at 329631f4 pins sixteen v5 constant NEW getter/equality vectors to integer-transparency conversion. Case13 has no matching exported literal; its hidden byte remains unobserved. Series and v6 routes are guarded separately.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/execute.ts',
+    source: 'truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency);',
+    category: 'trace-undetermined-normalization',
+    reason: 'Native v98 at 329631f4 and v96 pin constant RGB comparison flags at T12.5/DF and T50/80. Reusing the constant NEW integer conversion matches those flags; the internal RGB quantizer remains underdetermined and is not certified by them.',
+  },
+  {
+    file: 'packages/tealscript/src/runtime/codegen/execute.ts',
     source: 'const column = Math.trunc(toRuntimeNumber(orderedRuntimeArg(args, named, names, 2, 0)));',
     category: 'loud-runtime-refusal',
     reason: 'table cell coordinates are passed to drawing helpers that throw classified Pine runtime errors.',

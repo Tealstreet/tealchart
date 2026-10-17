@@ -33,7 +33,7 @@ interface Source {
     comparisons: { model: string; property: string; verdict: string }[];
   }[];
 }
-const revision = '962bbf90b269e98f26af84d86f7cb83972c11f44';
+const revision = '329631f43d8c38a944f8c016e98131f4351f48aa';
 const base = 'v96/captures/v96/';
 const raw = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => raw(path).toString();
