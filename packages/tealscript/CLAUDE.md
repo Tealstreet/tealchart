@@ -14,6 +14,15 @@ presence earn credit. LOCAL_FIRST initialized values remain OBSERVED/excluded
 from startup scoring because the source's own index-zero prefix was not exported.
 Developing rows and other closed rows outside the four blocks remain excluded.
 
+V97 item5 supplies separate v5/v6 own-index-zero OHLC prefixes. The unchanged
+implicit-TA sources replay own0..127 with strict exported-number equality for
+TR/ATR/DI/ADX/Supertrend/direction, startup blanks and context/NA controls. This
+is a regression lock: the batch73 engine already matches. No native target
+seeds the replay. All later closed rows and developing rows stay observed with
+zero score; fractional rational-model residuals retain arithmetic/export
+precision uncertainty. This does not recover the original v95 frontier or
+certify the archive's undecided algorithm hypotheses.
+
 V95 recursive/implicit TA suffix exports lack their own index0..127 prefix.
 EMA/RMA/RSI/TSI and ATR/DMI/Supertrend numeric targets remain OBSERVED/excluded
 from startup scoring. Only input controls, NA witnesses and the ten exact-rational
