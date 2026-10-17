@@ -4471,8 +4471,21 @@ two-state bool cast. Valuewhen receives the preserved v5 source directly.
 
 ### Gradient missing lower endpoint
 
-A missing lower colour in `color.from_gradient` fades the upper colour alpha by the clamped interpolation ratio while preserving its RGB.
-The v52 midpoint observers pin this route; finite endpoints and missing numeric bounds retain their existing behaviour.
+V93/v94 captures require premultiplied RGB, floored gradient bytes and integer
+transparency getters. V96 G12 directly matches #214263DF and rejects #214263E0;
+G22 also selects its floor literal. G32 is NEITHER_LITERAL with native blue98,
+refuting the former claim that equal RGB channels are always preserved exactly.
+Normalize endpoint opacity before interpolating premultiplied channels and alpha;
+preserve the sole nonzero-opacity endpoint's RGB when the other opacity is zero.
+Do not add epsilon rounding or source/version/phase exceptions. These operations
+fit the bounded captures; they do not certify a universal native implementation.
+V96 CLAMP and positional MISSING distinguish alpha127 from128 by ordinary literal
+equality, without a hidden-storage decoder. Constructor/missingness control
+contradictions are retained as observations and excluded from gradient credit.
+The synthetic RSI/Prefix, opaque midpoint, equal-alpha named-color and red-upper
+boundary integration checks retain every assertion with zero native certificate.
+V94 RSI projects captured scalar inputs and does not replay its calculation prefix.
+All v93 E broad hypotheses remain UNDECIDED; no pixel claim or historic hold closes.
 
 ### Native string overload admission
 

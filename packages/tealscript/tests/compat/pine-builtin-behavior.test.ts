@@ -1057,10 +1057,12 @@ plot(color.t(above), title="Above T")
 `,
       expectedPlots: {
         'Below R': 0,
-        'Middle G': 100,
-        'Middle B': 25,
+        // Native v94 gradient-clamp v5/v6, oracle ac491fdc: premultiplied
+        // midpoint black and transparent-black upper clamp, not straight RGB.
+        'Middle G': 0,
+        'Middle B': 0,
         'Middle T': 50,
-        'Above R': 100,
+        'Above R': 0,
         'Above T': 100,
       },
     },
