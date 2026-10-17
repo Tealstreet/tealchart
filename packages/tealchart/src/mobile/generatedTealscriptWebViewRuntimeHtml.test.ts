@@ -109,7 +109,13 @@ plot(fromArray == fromArray ? 1 : 0, "ARRAY")
 plot(array.includes(slot, cast) ? 1 : 0, "INCLUDES")
 plot(array.indexof(slot, cast), "INDEX")
 plot(array.lastindexof(slot, cast), "LASTINDEX")
-plot(color.r(configured), "INPUT_R", color=configured)`,
+plot(color.r(configured), "INPUT_R", color=configured)
+float shadowed = 7
+if bar_index == 0
+    var color cast = na
+    shadowed := cast == cast ? 1 : 0
+plot(shadowed, "PERSISTENT_SHADOW")
+plot(cast == cast ? 1 : 0, "ROOT_AFTER_SHADOW")`,
     },
   });
   expect(messages.filter(({ type }) => type === 'error' || type === 'parseError' || type === 'semanticError')).toEqual(
@@ -127,7 +133,9 @@ plot(color.r(configured), "INPUT_R", color=configured)`,
     ['INDEX', [-1]],
     ['LASTINDEX', [-1]],
     ['INPUT_R', [0]],
+    ['PERSISTENT_SHADOW', [0]],
+    ['ROOT_AFTER_SHADOW', [1]],
   ]);
   expect(result.output.inputs[0].defval).toBeNaN();
-  expect(result.output.plots.at(-1)?.color).toEqual([null]);
+  expect(result.output.plots.find((plot) => plot.title === 'INPUT_R')?.color).toEqual([null]);
 });

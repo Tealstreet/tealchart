@@ -1404,6 +1404,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
   function stableMissingColorCast(expression: Expression): boolean {
     return functionNameStack.length === 0 && (literalMissingColorCast(expression)
       || (expression.type === 'Identifier' && !currentLocalName(expression.name)
+        && !currentPersistentLocalName(expression.name)
         && stableMissingColorCasts.has(expression.name)));
   }
   const divisionSites = new Map<BinaryExpression, number>();
@@ -2601,24 +2602,22 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     rootBlockPersistentInitByValue.set(value, init);
   }
 
-  function registerRootBlockPersistentDeclarations(stmts: Statement[], inLocalScope = false): void {
-    for (const stmt of stmts) {
-      if (stmt.type === 'FunctionDeclaration') continue;
-      if (stmt.type === 'VariableDeclaration') {
-        if (inLocalScope) registerRootBlockPersistent(stmt);
-        if (stmt.init.type === 'IfStatement') registerRootBlockPersistentDeclarations([stmt.init], inLocalScope);
-      } else if (stmt.type === 'MultiDeclaration') {
-        for (const declaration of stmt.declarations) {
-          if (inLocalScope) registerRootBlockPersistent(declaration);
-          if (declaration.init.type === 'IfStatement') registerRootBlockPersistentDeclarations([declaration.init], inLocalScope);
-        }
-      } else if (stmt.type === 'IfStatement') {
-        registerRootBlockPersistentDeclarations(stmt.consequent, true);
-        if (Array.isArray(stmt.alternate)) registerRootBlockPersistentDeclarations(stmt.alternate, true);
-        else if (stmt.alternate) registerRootBlockPersistentDeclarations([stmt.alternate], true);
-      } else if (stmt.type === 'OnceStatement' || stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
-        registerRootBlockPersistentDeclarations(stmt.body, true);
-      }
+  function registerRootBlockPersistentDeclarations(node: unknown, inLocalScope = false): void {
+    if (!node || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      node.forEach(child => registerRootBlockPersistentDeclarations(child, inLocalScope));
+      return;
+    }
+    const statement = node as Statement | SwitchExpression;
+    if (statement.type === 'FunctionDeclaration') return;
+    if (statement.type === 'VariableDeclaration' && inLocalScope) registerRootBlockPersistent(statement);
+    for (const [key, child] of Object.entries(node)) {
+      if (key === 'loc') continue;
+      const localScope = inLocalScope
+        || (statement.type === 'IfStatement' && (key === 'consequent' || key === 'alternate'))
+        || (statement.type === 'SwitchExpression' && key === 'cases')
+        || (['OnceStatement', 'ForStatement', 'WhileStatement'].includes(statement.type) && key === 'body');
+      registerRootBlockPersistentDeclarations(child, localScope);
     }
   }
 
@@ -4566,7 +4565,9 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
     const retName = `_block_ret_${lines.length}`;
     const start = lines.length;
     const blockLocals = collectFunctionLocalNames(stmts);
+    const rootPersistentLocals = functionNameStack.length === 0 ? rootBlockPersistentNames(stmts) : undefined;
     localNameStack.push(blockLocals);
+    if (rootPersistentLocals?.size) persistentLocalStack.push(rootPersistentLocals);
     lines.push(`let ${retName} = NaN;`);
     for (let i = 0; i < stmts.length - 1; i++) emitStmt(stmts[i], 0);
     if (lastStmt.type === 'AssignmentStatement') {
@@ -4574,6 +4575,7 @@ export function emit(ast: Program, ctx: AnalysisContext, libraries?: Map<string,
       lines.push(`${retName} = ${emitExpr(lastStmt.left)};`);
     } else if (!emitTailAssignment(lastStmt, 0, retName)) emitStmt(lastStmt, 0);
     lines.push(`return ${retName};`);
+    if (rootPersistentLocals?.size) persistentLocalStack.pop();
     localNameStack.pop();
     return `(() => { ${lines.splice(start).join(' ')} })()`;
   }
