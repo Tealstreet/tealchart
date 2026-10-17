@@ -10,7 +10,7 @@ interface NativeSource {
   selectedDataRowOrdinals: number[]; primaryUniquePlotCells: number;
   rows: { allRequestedRawCells: Pointer[]; nativeContextCells: Pointer[] }[];
 }
-const revision = '1273152e44a024bbf5b3d6830a4bbd1e7be55f63';
+const revision = 'b23c3d71f00e83cb40c4ab3d65be269788605f89';
 const base = 'v99/captures/v99/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString('utf8');
@@ -42,7 +42,7 @@ function nominalAlpha(t: number, policy: string) {
 describe('v99 direct v5 RGB/NEW: observed evidence, model HELD, zero new engine parity credit', () => {
   it('binds the immutable complete two-slot return, dependencies and native raw pointers', () => {
     expect(lock.revision).toBe(revision);
-    expect(lock.files.filter(f => f.path.startsWith('v99/'))).toHaveLength(177);
+    expect(lock.files.filter(f => f.path.startsWith('v99/'))).toHaveLength(178);
     const integrity = json<{ artifacts: Proof[] }>(base + 'artifact-integrity-v3.json');
     for (const proof of integrity.artifacts) {
       expect(lock.files.find(f => f.path === proof.path)).toEqual(proof);

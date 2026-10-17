@@ -20,7 +20,7 @@ describe('v93 item 8 plot-dash: versioned admission, constants, and native evide
   it('binds all 54 item-8 dash/common artifacts to the immutable pin and v6 integrity inventory', () => {
     const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8')) as {
       revision: string; files: Binding[] };
-    expect(lock.revision).toBe('1273152e44a024bbf5b3d6830a4bbd1e7be55f63');
+    expect(lock.revision).toBe('b23c3d71f00e83cb40c4ab3d65be269788605f89');
     const common = ['RESPONSE-v93-v6.md', 'attempt-inventory-v6.json', 'numeric-controls-v6.json',
       'facet-capabilities-v6.json', 'artifact-integrity-v6.json', 'validation-result-v6.json'];
     const files = lock.files.filter(f => f.path.includes('/v93-plot-dash-v')

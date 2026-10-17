@@ -21,7 +21,7 @@ interface Numeric {
   nativeVectorPresenceSummary: { property: string; firstFiniteClosedCell: Cell; firstFiniteOwnIndex: string; primary128BlankOwnIndices: number[] }[];
 }
 const base = 'v97/captures/v97/';
-const revision = '1273152e44a024bbf5b3d6830a4bbd1e7be55f63';
+const revision = 'b23c3d71f00e83cb40c4ab3d65be269788605f89';
 const readBytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const read = (path: string) => readBytes(path).toString('utf8');
 const json = <T>(path: string): T => JSON.parse(read(path)) as T;
