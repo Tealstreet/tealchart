@@ -1,14 +1,14 @@
 // @vitest-environment node
 
+import type { FromWorkerMessage, InitMessage } from '../../../tealscript/src/worker/protocol';
+
 import { readFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
 import { runInNewContext } from 'node:vm';
 
 import { version as esbuildVersion } from 'esbuild';
-
 import { beforeAll, expect, it } from 'vitest';
 
-import type { FromWorkerMessage, InitMessage } from '../../../tealscript/src/worker/protocol';
 import { buildMobileTealscriptWebViewRuntime } from '../../scripts/build-mobile-tealscript-webview-runtime';
 
 let generated: Awaited<ReturnType<typeof buildMobileTealscriptWebViewRuntime>>;
@@ -79,4 +79,63 @@ it('executes omitted-anchor VWAP source holes in the committed mobile worker', (
 it('ships the current advisory and historical box-creation guard', () => {
   expect(workerScript).toContain('PINE_VERSION_OUTDATED');
   expect(workerScript).toContain('validateBoxCreationHistory');
+});
+
+it('executes v99 missing-color getters and keeps direct versus array equality separate in the committed worker', () => {
+  const messages: FromWorkerMessage[] = [];
+  const self = {
+    postMessage: (message: FromWorkerMessage) => messages.push(structuredClone(message)),
+    onmessage: undefined as undefined | ((event: { data: InitMessage }) => void),
+  };
+  runInNewContext(workerScript, { self, console, performance });
+  self.onmessage!({
+    data: {
+      type: 'init',
+      scriptId: 'v99-color-cast',
+      inputs: {},
+      bars: [{ time: 1700000000000, open: 1, high: 1, low: 1, close: 1, volume: 1 }],
+      script: `//@version=6
+indicator("v99 color boundary")
+cast = color(na)
+color typedNa = na
+slot = array.from(cast)
+fromArray = array.get(slot, 0)
+configured = input.color(color(na), "Missing")
+plot(color.r(cast), "R")
+plot(color.t(typedNa), "T")
+plot(na(cast) ? 1 : 0, "NA")
+plot(cast == cast ? 1 : 0, "DIRECT")
+plot(fromArray == fromArray ? 1 : 0, "ARRAY")
+plot(array.includes(slot, cast) ? 1 : 0, "INCLUDES")
+plot(array.indexof(slot, cast), "INDEX")
+plot(array.lastindexof(slot, cast), "LASTINDEX")
+plot(color.r(configured), "INPUT_R", color=configured)
+float shadowed = 7
+if bar_index == 0
+    var color cast = na
+    shadowed := cast == cast ? 1 : 0
+plot(shadowed, "PERSISTENT_SHADOW")
+plot(cast == cast ? 1 : 0, "ROOT_AFTER_SHADOW")`,
+    },
+  });
+  expect(messages.filter(({ type }) => type === 'error' || type === 'parseError' || type === 'semanticError')).toEqual(
+    [],
+  );
+  const result = messages.find((message) => message.type === 'result');
+  if (result?.type !== 'result') throw new Error('Mobile worker did not produce a result');
+  expect(result.output.plots.map((plot) => [plot.title, plot.values])).toEqual([
+    ['R', [0]],
+    ['T', [100]],
+    ['NA', [1]],
+    ['DIRECT', [1]],
+    ['ARRAY', [0]],
+    ['INCLUDES', [0]],
+    ['INDEX', [-1]],
+    ['LASTINDEX', [-1]],
+    ['INPUT_R', [0]],
+    ['PERSISTENT_SHADOW', [0]],
+    ['ROOT_AFTER_SHADOW', [1]],
+  ]);
+  expect(result.output.inputs[0].defval).toBeNaN();
+  expect(result.output.plots.find((plot) => plot.title === 'INPUT_R')?.color).toEqual([null]);
 });
