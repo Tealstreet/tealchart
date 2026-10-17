@@ -201,6 +201,35 @@ describe('v97 own-origin conditional clocks and UDF first reach', () => {
       }
     });
 
+    it('matches every primary native number, original string and binary64 encoding exactly', () => {
+      const bits = (value: number) => {
+        const buffer = Buffer.alloc(8);
+        buffer.writeDoubleBE(value);
+        return buffer.toString('hex');
+      };
+      let finite = 0, blank = 0;
+      for (const title of s.headers.slice(6)) {
+        const values = s.output(title);
+        expect(values).toHaveLength(128);
+        for (let i = 0; i < 128; i++) {
+          const raw = s.cell(i, title), actual = values[i], key = `${title} own${i}`;
+          if (raw === '') {
+            expect(actual, key).toBeNull();
+            blank++;
+          } else {
+            const native = Number(raw);
+            expect(Number.isFinite(native), key).toBe(true);
+            expect(actual, key).toBe(native);
+            expect(String(actual), key).toBe(raw);
+            expect(bits(actual!), key).toBe(bits(native));
+            finite++;
+          }
+        }
+      }
+      expect({ finite, blank }).toEqual(s.kind === 'conditional-clock'
+        ? { finite: 1816, blank: 104 } : { finite: 1688, blank: 104 });
+    });
+
     if (s.kind === 'udf-state') it('locks all 1792 exact cells including first-reach5 retained across eight branch visits', () => {
       const expected = Array.from({ length: 128 }, (_, i) => {
         const p = i % 16;
@@ -225,9 +254,9 @@ describe('v97 own-origin conditional clocks and UDF first reach', () => {
       }
     });
 
-    if (s.kind === 'conditional-clock') it('locks seed/clock/presence and exact decidable cells; fractional values remain observed UNDECIDED', () => {
+    if (s.kind === 'conditional-clock') it('checks seed/clock rational models separately from the exact native vector', () => {
       const all = ema('SMA3_FINITE', false), branch = ema('SMA3_FINITE', true);
-      const counts = { exact: 0, heldFractional: 0 };
+      const counts = { rationalDecidable: 0, rationalGuarded: 0 };
       const samples: Rational[] = [];
       for (let i = 0; i < 128; i++) {
         const gate = (i % 16) % 3 !== 0, x = i % 11 - 5;
@@ -238,7 +267,7 @@ describe('v97 own-origin conditional clocks and UDF first reach', () => {
           IS_FIRST: Number(i === 0), FIRST_INDEX: 0, FIRST_TIME: Number(s.cell(0, 'time')) * 1000, PHASE: i % 16, X: x, GATE: Number(gate),
           BRANCH_SMA_NA: Number(smaBranch === null), BRANCH_EMA_NA: Number(branch[i].value === null) };
         for (const [title, value] of Object.entries(controls)) {
-          expect(s.cell(i, title)).toBe(String(value)); expect(s.output(title)[i], `${title} own${i}`).toBe(value); counts.exact++;
+          expect(s.cell(i, title)).toBe(String(value)); expect(s.output(title)[i], `${title} own${i}`).toBe(value); counts.rationalDecidable++;
         }
         for (const [title, candidate] of [
           ['SMA_ALL', { value: smaAll, exact: !smaAll || smaAll[1] === 1n }],
@@ -248,18 +277,18 @@ describe('v97 own-origin conditional clocks and UDF first reach', () => {
           const raw = s.cell(i, title), output = s.output(title)[i], { value, exact } = candidate;
           if (value === null || exact) {
             expect(raw, `${title} own${i}`).toBe(value === null ? '' : String(Number(value[0]) / Number(value[1])));
-            expect(output, `${title} own${i}`).toBe(value === null ? null : Number(value[0]) / Number(value[1])); counts.exact++;
+            expect(output, `${title} own${i}`).toBe(value === null ? null : Number(value[0]) / Number(value[1])); counts.rationalDecidable++;
           } else {
-            expect(raw).not.toBe(''); expect(output).not.toBeNull(); expect(Number.isFinite(output)).toBe(true); counts.heldFractional++;
+            expect(raw).not.toBe(''); expect(output).not.toBeNull(); expect(Number.isFinite(output)).toBe(true); counts.rationalGuarded++;
           }
         }
       }
-      expect(counts).toEqual({ exact: 1648, heldFractional: 272 });
+      expect(counts).toEqual({ rationalDecidable: 1648, rationalGuarded: 272 });
       expect(s.output('EMA_ALL').findIndex((v) => v !== null)).toBe(2);
       expect(s.output('EMA_ALL')[2]).toBe(-4);
       expect(s.output('EMA_BRANCH').findIndex((v) => v !== null)).toBe(4);
       expect(s.cell(4, 'EMA_BRANCH')).toBe('-2.6666666666666665');
-      // Binary64 startup consistency lock only; this fractional seed receives no exact parity credit.
+      // The native vector is exact above; rational-model precision remains a separate question.
       expect(s.output('EMA_BRANCH')[4]).toBe(Number(s.cell(4, 'EMA_BRANCH')));
       for (const seed of ['FIRST_FINITE', 'SMA3_FINITE'] as const) for (const gated of [false, true]) {
         const trajectory = ema(seed, gated), model = `EMA3_ALPHA_1_2/${seed}/${gated ? 'GATED_CALL_CLOCK' : 'EVERY_CHART_BAR_CLOCK'}`;
