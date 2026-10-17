@@ -39,7 +39,7 @@ function nominalAlpha(t: number, policy: string) {
   return policy === 'BYTE_FLOOR' ? Math.floor(alpha) : Math.round(alpha);
 }
 
-describe('v99 direct v5 RGB/NEW: observed evidence, model HELD, zero new engine parity credit', () => {
+describe('v99 direct v5 RGB/NEW: historical observations and refuted frozen policies', () => {
   it('binds the immutable complete two-slot return, dependencies and native raw pointers', () => {
     expect(lock.revision).toBe(revision);
     expect(lock.files.filter(f => f.path.startsWith('v99/'))).toHaveLength(178);

@@ -11,6 +11,7 @@ import { ExecutionContext, mergeChartInfo } from '../context';
 import { CALCULATED_BARS_INPUT_ID, projectCalculatedBarOutputs } from '../calculatedBars';
 import { TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS } from '../types';
 import { RUNTIME_HELPERS } from './emitter';
+import { constantColorAlpha } from './constantColor';
 import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import { nativeMathLog } from '../mathPrecision';
 import { nativePow } from './nativePow';
@@ -7939,7 +7940,9 @@ function executeCompiledPass(
         const colorTransparency = isRuntimeNa(transparency) ? 100
           : truncateTransparency ? Math.trunc(toRuntimeNumber(transparency)) : transparency;
         return parsedColor
-          ? formatRuntimeColor(parsedColor.red, parsedColor.green, parsedColor.blue, colorTransparency)
+          ? truncateTransparency
+            ? formatRuntimeColorAlpha(parsedColor.red, parsedColor.green, parsedColor.blue, constantColorAlpha(clampRuntimeChannelFloat(colorTransparency, 0, 100)))
+            : formatRuntimeColor(parsedColor.red, parsedColor.green, parsedColor.blue, colorTransparency)
           : color;
       },
       colorRgb(args: unknown[], named?: Record<string, unknown>) {

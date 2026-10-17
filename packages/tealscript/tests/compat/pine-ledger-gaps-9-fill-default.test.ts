@@ -23,7 +23,8 @@ describe('V4-FILL-DEFAULT-TRANSPARENCY', () => {
     expect(getPlot(explicitZero, 'band').color).toEqual(Array(12).fill('#336699FF'));
     const migrated = run(5, 'color.new(#336699, 90)');
     expect(migrated.errors).toEqual([]);
-    expect(getPlot(migrated, 'band').color).toEqual(getPlot(legacy, 'band').color);
+    // Oracle b23c3d71, v100 materialized-NEW-v5 row34: alpha25, unlike v4 default26.
+    expect(getPlot(migrated, 'band').color).toEqual(Array(12).fill('#33669919'));
     const modern = run(5, '#336699');
     expect(modern.errors).toEqual([]);
     expect(getPlot(modern, 'band').color).toEqual(Array(12).fill('#336699'));

@@ -2120,13 +2120,14 @@ plot(1, "No Color", color=color.new(na, 40))`;
     expect(result?.errors).toEqual([]);
     expect(findPlot(result!, 'Opaque Blue').color).toEqual(['#2962FFFF']);
     expect(findPlot(result!, 'Half Blue').color).toEqual(['#2962FF80']);
-    expect(findPlot(result!, 'Float Blue').color).toEqual(['#2962FFDF']);
+    // Oracle b23c3d71, v99 v98-color-constructors-v6 row14: LITERAL_NEW_EQ_C3=1 (E0).
+    expect(findPlot(result!, 'Float Blue').color).toEqual(['#2962FFE0']);
     expect(findPlot(result!, 'Olive Forty').color).toEqual(['#80800099']);
     expect(findPlot(result!, 'RGB Float').color).toEqual(['#2196F3DF']);
     // This equal-alpha named-color fixture is synthetic. No native capture
     // witnesses this exact midpoint; retain this strict integration check with
     // zero native parity credit.
-    expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F724ADF']);
+    expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F724AE0']);
     expect(findPlot(result!, 'No Color').color).toEqual([null]);
   });
 

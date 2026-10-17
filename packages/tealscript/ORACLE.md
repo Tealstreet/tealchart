@@ -24,15 +24,15 @@ The v91 cumulative regression compares each v5/v6 full export's 23,085 common cl
 
 Old monorepo and mirror Git history still contains prior captures. This cutover prevents new capture growth and removes archive bytes from fresh application trees; it does not rewrite history. Development clones should use `--filter=blob:none` without `--depth`, retaining the commit graph while fetching historical file contents on demand. Historical checkouts, diffs and file reads may need network access. Existing full clones retain their downloaded packs; changing the filter does not reclaim them. Vendored source snapshots can keep `--depth=1` with `--filter=blob:none`. Retain Docker/EAS/mirror archive exclusions.
 
-## V5 color controls v4
+## Constant color controls v5
 
 The [v98 partial constructor return](https://github.com/Tealstreet/tealscript-oracle/blob/329631f43d8c38a944f8c016e98131f4351f48aa/v98/captures/v98/RESPONSE-v98-v2.md) distinguishes v5 literal-argument `color.new` from series constructors. Literal NEW matches truncating transparency before byte conversion across the sixteen captured cases. Its four case13 nonmatches at T22.9 remain actual all-zero equality vectors: truncation predicts alpha199 outside the supplied194..198 palette, but equality to that predicted literal was not exported. All four original frozen NEW hypotheses remain refuted; matching the getter/equality vector does not recover hidden storage.
 
-The engine applies integer transparency to v5 constant NEW; switch-selected RGB and series constructors retain byte rounding. The direct constant RGB12.5/DF=false and RGB50/80=true comparisons do not distinguish truncation from percent-rounding. Its internal quantizer and the direct RGB census root remain HELD. A prototype constant-comparison conversion was removed because this evidence cannot select it. The native flags remain pinned as observed contrary cells, with zero parity credit.
+The engine now uses the CM-B arithmetic witness on the observed constructor surface. Constant RGB and NEW share `Math.round(255 * (1 - t / 100))`, with NEW first truncating transparency. V5 immediate constant comparisons retain separate constructor/literal float32 normalization, GBAR packing and exact one-decimal comparison keys; materialized colors retain byte storage. V6 changes only constant NEW's byte conversion. Series constructors and missing-color paths retain their behavior. The primitive operations apply to values, with no probe names or literal palettes in production code.
 
-The [complete v98 return](https://github.com/Tealstreet/tealscript-oracle/blob/b23c3d71f00e83cb40c4ab3d65be269788605f89/v98/captures/v98/RESPONSE-v98-v6.md) supplies the missing v5 cast discriminator: `color(na)` has finite0/0/0/100 getters, NA0 and equality to transparent black. Var/array/history transfers retain it, and nz retains the present value. The v5 cast now produces transparent black; typed color NA retains its own missingness. The v5 NA-cast census predicate and every v96 non-index control outside the held v5 direct RGB root compare exactly.
+The [complete v98 return](https://github.com/Tealstreet/tealscript-oracle/blob/b23c3d71f00e83cb40c4ab3d65be269788605f89/v98/captures/v98/RESPONSE-v98-v6.md) supplies the missing v5 cast discriminator: `color(na)` has finite0/0/0/100 getters, NA0 and equality to transparent black. Var/array/history transfers retain it, and nz retains the present value. The v5 cast now produces transparent black; typed color NA retains its own missingness. The v5 NA-cast census predicate remains independently locked; the constant-color regression now also covers the v96 direct RGB root.
 
-V98 constructor v6 is consumed/UNOBSERVED after entry failure; existing v96 v6 controls remain its numeric guard. The v98 v6 cast has NA1 with finite0/0/0/100 getters and distinct self/var versus array equality. Its four frozen alternatives are all refuted. The engine remains byte-identical to the base on both complete v6 replay vectors, but1,280 new cast cells are observed contrary: blank getters and false self/var equality differ from native. Those cells are pinned with zero parity credit;2,688 other cast cells and1,888 v96 v6 controls compare exactly. This is an actual unresolved v6 divergence, not export-precision uncertainty or an unobserved state. No v6 storage model or historical hold is closed by the v5 changes.
+V98 constructor v6 was consumed/UNOBSERVED after entry failure; v99 captures its unchanged retry below. Existing v96 v6 controls remain exact. The v98 v6 cast has NA1 with finite0/0/0/100 getters and distinct self/var versus array equality. Its four frozen alternatives are all refuted. The v6 cast replay remains byte-identical to the batch76 base on this branch, with1,280 cast cells observed contrary: blank getters and false self/var equality differ from native. Those cells are pinned with zero parity credit;2,688 other cast cells and1,888 v96 v6 controls compare exactly. This is an actual unresolved v6 divergence, not export-precision uncertainty or an unobserved state. No v6 storage model or historical hold is closed by the v5 changes.
 
 ### V99 direct v5 constructor evidence
 
@@ -41,17 +41,9 @@ primary plot cells. All five frozen comparison policies, including both prior
 v96/v98 RGB candidates, are REFUTED. The observation-only regression preserves
 native getter/equality/calibration values. At that v99 frontier, finite
 equality-relation completions disagreed on an unqueried immediate RGB/NEW
-comparison; v100 now observes it. Those completions are not storage algorithms. No replacement is selected or
-installed, no new engine parity credit is claimed, and the v96 RGB root remains
-HELD. Existing v5/v6 engine behavior and prior capture holds remain unchanged.
+comparison; v100 now observes it. Those completions are not storage algorithms. The v100-bound engine regression now scores all23,448 selected closed non-index cells across nine constant-color source executions. Both the v96 v5 direct-RGB root and the144 v99 v6 constant-NEW discrepancies match native exactly. Its comparisons assert the original numeric strings and binary64 values without tolerance.
 
-The same v99 return captures the unchanged v98 v6 constructor source. Its engine
-replay has144 observed contrary cells in literal NEW transparency/equalities and
-related cross-route comparisons, plus3,824 exact non-index cells and64 excluded
-absolute-index cells. Complete engine vectors equal the assigned batch76 base on
-Node24 and22; no v6 behavior is changed. Native direct RGB12.5/DF controls are1,
-unlike the v5 root's0. These are separate version/context observations, with no
-new constructor parity credit or closure of the pre-existing v6 cast hold.
+The v6 constructor return supplies3,968 exact non-index cells and64 excluded absolute-index cells after this change. Native direct RGB12.5/DF controls remain1 in v6 versus0 in v5. Missing-color implementation and its independent batch77 work remain separate.
 
 The managed `oracle-probes/` checkout is external evidence and is excluded from
 package source linting. Fixture guard/verify still check its pinned bytes; native
@@ -63,7 +55,11 @@ representative signatures are refuted. Both materialization versions support BC2
 (B:104/106/512/514). These independent projections do not identify a full model.
 The RGB tuple changes direct equality, so alpha-only scalar storage is insufficient.
 Previously grouped packing members must be checked separately from their rejected
-representatives. Two concrete arithmetic aliases still reproduce every captured
-constant-color cell and differ on direct RGB-vs-NEW at transparency90. That query
-remains uncaptured; no production algorithm or additional parity credit is selected.
-V5 ternary zero still merges false/Boolean NA; missing-color work remains separate.
+representatives. Two concrete arithmetic aliases reproduce every captured
+constant-color cell. CM-B shares the opacity pipeline between constructors;
+CM-A computes RGB as `Math.round((100 - t) * 255 / 100)` instead. Swapping to
+CM-A stays GREEN on every observed cell; all five old frozen policies go RED.
+`DIRECT_RGB_NEW_90_EQ` remains NOT OBSERVED: CM-A predicts0 and CM-B predicts1.
+The implementation choice earns no native credit for that unqueried expression;
+v101 requests it. V5 ternary zero still merges false/Boolean NA, and all prior
+missing-color and uncaptured-state holds remain separate.

@@ -18,7 +18,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('ledger gaps 192–197: background metadata and replacement', () => {
   // Native v4 drawing-default-blue-v5-v1-attempt1-grid-v2.png: color.blue matches #2962FF.
-  it('197: v4 default transp90 matches explicit literal transparency across palettes', () => {
+  it('197: preserves v4 default transp90 and native v5 constant-NEW bytes', () => {
     const run = (version: number, expression: string) =>
       executeScript(
         parse(`//@version=${version}\n${version === 4 ? 'study' : 'indicator'}("bg")\nbgcolor(${expression})`),
@@ -30,8 +30,9 @@ describe('ledger gaps 192–197: background metadata and replacement', () => {
     expect(v4.errors).toEqual([]);
     expect(v4.plots[0].color).toEqual(['#2196F31A', '#2196F31A']);
     expect(v5.plots[0].color).toEqual(['#2962FF', '#2962FF']);
-    expect(run(5, 'color.new(color.blue, 90)').plots[0].color).toEqual(['#2962FF1A', '#2962FF1A']);
-    expect(v4.plots[0].color).toEqual(explicit.plots[0].color);
+    // Oracle b23c3d71, v100 materialized-NEW-v5 row34: C0=25 matches; C1=26 does not.
+    expect(run(5, 'color.new(color.blue, 90)').plots[0].color).toEqual(['#2962FF19', '#2962FF19']);
+    expect(explicit.plots[0].color).toEqual(['#2196F319', '#2196F319']);
     expect(run(4, 'color.blue, transp=0').plots[0].color).toEqual(['#2196F3FF', '#2196F3FF']);
     expect(run(4, 'color.new(color.blue, 50)').plots[0].color).toEqual(['#2196F380', '#2196F380']);
     expect(run(4, 'color.new(color.blue, 50), transp=0').plots[0].color).toEqual(['#2196F380', '#2196F380']);

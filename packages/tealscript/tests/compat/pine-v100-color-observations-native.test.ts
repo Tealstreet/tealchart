@@ -32,7 +32,7 @@ function survivors(scope: Scope, block: Block, phase: boolean) {
   })));
 }
 
-describe('v100 constant colors: native observations and frozen projections, complete engine model HELD', () => {
+describe('v100 constant colors: native observations and frozen projections, unobserved arithmetic-order ambiguity HELD', () => {
   it('binds all immutable dependencies, exact proposal bytes and original source ownership', () => {
     expect(lock.revision).toBe('b23c3d71f00e83cb40c4ab3d65be269788605f89');
     const integrity = json<{ artifacts: Proof[] }>(root + 'captures/v100/artifact-integrity-v3.json');
