@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { parse } from '../../parser';
 import { executeCompiled, tryCompile } from './execute';
 import { nativePow } from './nativePow';
-import { fastGeneralPow, fastIntegerPow } from './nativePowFast';
+import { fastGeneralPow, fastHalfPow, fastIntegerPow } from './nativePowFast';
 
 const binary64 = (value: number) => {
   const raw = new DataView(new ArrayBuffer(8));
@@ -66,6 +66,16 @@ describe('deterministic binary64 power', () => {
     expect(fastGeneralPow(220003, 3, Math.pow(220003, 3))).toBeNaN();
     expect(fastGeneralPow(191 ** 4, 7 / 4, Math.pow(191 ** 4, 7 / 4))).toBeNaN();
     expect(binary64(nativePow(220003, 3))).toBe('4342ea590eda539e');
+  });
+
+  it('rejects inputs outside the proved floating preconditions', () => {
+    for (const exponent of [0, 0.5, 65, NaN, Infinity]) expect(fastIntegerPow(1.1, exponent)).toBeNaN();
+    for (const exponent of [0, 1, 3, NaN, Infinity]) expect(fastHalfPow(1.1, exponent)).toBeNaN();
+    for (const exponent of [Number.MIN_VALUE, 1e-210, -1e-210]) {
+      expect(fastGeneralPow(1.5, exponent, 1)).toBeNaN();
+      expect(nativePow(1.5, exponent)).toBe(1);
+    }
+    expect(binary64(nativePow(2, -2.5))).toBe('3fc6a09e667f3bcd');
   });
 
   it.each(vectors)('rounds %s ** %s to bits %s', (base, exponent, expected) => {

@@ -1,7 +1,7 @@
 import { LOG_TABLE } from './nativePowTables.ts';
 
 const SPLITTER = 134217729;
-const ERROR = 7.888609052210118e-31;
+const ERROR = 3.2311742677852644e-27;
 const LN2_HI = 0.6931471805599453;
 const LN2_LO = 2.3190468138462996e-17;
 const view = new DataView(new ArrayBuffer(8));
@@ -29,19 +29,19 @@ function productError(a: number, b: number, product: number): number {
 
 function certify(high: number, low: number, relativeError: number): number {
   const rounded = high + low;
-  if (!(rounded > 1e-250 && rounded < 1e250)) return NaN;
+  if (!(rounded > 1e-250 && rounded < 1e250 && Math.abs(low) <= high * 2.842170943040401e-14)) return NaN;
   const residual = high - rounded + low;
   view.setFloat64(0, rounded);
   const upper = view.getUint32(0);
   let exponent = (upper >>> 20) & 2047;
-  if (residual < 0 && (upper & 0xfffff) === 0 && view.getUint32(4) === 0) exponent--;
+  if ((upper & 0xfffff) === 0 && view.getUint32(4) === 0) exponent--;
   const halfUlp = powers[exponent - 53];
   return halfUlp - Math.abs(residual) > rounded * (2 * relativeError) ? rounded : NaN;
 }
 
 export function fastIntegerPow(base: number, exponent: number): number {
-  if (!(base > 1e-30 && base < 1e30)) return NaN;
   const count = Math.abs(exponent);
+  if (!(base > 1e-30 && base < 1e30 && Number.isInteger(exponent) && count >= 1 && count <= 64)) return NaN;
   let high: number, low: number;
   if (count === 3) {
     const square = base * base,
@@ -82,11 +82,11 @@ export function fastIntegerPow(base: number, exponent: number): number {
 }
 
 export function fastHalfPow(base: number, exponent: number): number {
-  if (!(base > 1e-30 && base < 1e30)) return NaN;
+  const absolute = Math.abs(exponent);
+  if (!(base > 1e-30 && base < 1e30 && (absolute === 0.5 || absolute === 1.5 || absolute === 2.5))) return NaN;
   const root = Math.sqrt(base),
     square = root * root;
   const rootLow = (base - square - productError(root, root, square)) / (2 * root);
-  const absolute = Math.abs(exponent);
   let high = root,
     low = rootLow;
   if (absolute > 0.5) {
@@ -154,10 +154,11 @@ export function fastGeneralPow(base: number, exponent: number, candidate: number
     }
     logarithm = high;
     baseLow = low;
-    baseError = ERROR * (1 + Math.abs(k)) + 4 * Number.EPSILON * square;
+    baseError = ERROR * (1 + Math.abs(k)) + 8 * Number.EPSILON * square;
   }
-  const th = logarithm * exponent,
-    tl = productError(logarithm, exponent, th) + baseLow * exponent;
+  const th = logarithm * exponent;
+  if (!(Math.abs(th) > 1e-200)) return NaN;
+  const tl = productError(logarithm, exponent, th) + baseLow * exponent;
   let reference: number,
     referenceLow: number,
     referenceError: number,
@@ -211,15 +212,15 @@ export function fastGeneralPow(base: number, exponent: number, candidate: number
     referenceLow = low;
     referenceExponent = k;
     referenceMantissa = m;
-    referenceError = ERROR * (1 + Math.abs(k)) + 4 * Number.EPSILON * square;
+    referenceError = ERROR * (1 + Math.abs(k)) + 8 * Number.EPSILON * square;
   }
   const difference = th - reference;
   const delta = difference + (sumError(th, -reference, difference) + tl - referenceLow);
   if (!(Math.abs(delta) < 8.881784197001252e-16)) return NaN;
-  const bound = Math.abs(exponent) * baseError + referenceError + ERROR * (1 + Math.abs(th)) + delta * delta;
+  const bound = 4 * (Math.abs(exponent) * baseError + referenceError + ERROR * (1 + Math.abs(th)) + delta * delta);
   const correction = candidate * delta;
   const resultExponent = referenceExponent - (referenceMantissa < 1 ? 1 : 0);
-  const halfUlp = powers[resultExponent + 970] * (correction < 0 && referenceMantissa === 1 ? 0.5 : 1);
+  const halfUlp = powers[resultExponent + 970] * (referenceMantissa === 1 ? 0.5 : 1);
   if (halfUlp - Math.abs(correction) > candidate * (2 * bound)) return candidate;
   const rounded = certify(candidate, correction, bound);
   return Number.isNaN(rounded) ? refinedGeneralPow(base, exponent, candidate) : rounded;
@@ -292,8 +293,9 @@ function refinedGeneralPow(base: number, exponent: number, candidate: number): n
     baseLow = low;
     baseError = ERROR * (1 + Math.abs(k)) * 4;
   }
-  const th = logarithm * exponent,
-    tl = productError(logarithm, exponent, th) + baseLow * exponent;
+  const th = logarithm * exponent;
+  if (!(Math.abs(th) > 1e-200)) return NaN;
+  const tl = productError(logarithm, exponent, th) + baseLow * exponent;
   let reference: number, referenceLow: number, referenceError: number;
   {
     let m = candidate,
@@ -361,7 +363,7 @@ function refinedGeneralPow(base: number, exponent: number, candidate: number): n
   const difference = th - reference;
   const delta = difference + (sumError(th, -reference, difference) + tl - referenceLow);
   if (!(Math.abs(delta) < 8.881784197001252e-16)) return NaN;
-  const bound = Math.abs(exponent) * baseError + referenceError + ERROR * (1 + Math.abs(th)) + delta * delta;
+  const bound = 4 * (Math.abs(exponent) * baseError + referenceError + ERROR * (1 + Math.abs(th)) + delta * delta);
   const rounded = certify(candidate, candidate * delta, bound);
   return rounded;
 }
