@@ -84,7 +84,7 @@ it('ships the current advisory and historical box-creation guard', () => {
 it('executes v99 missing-color getters and keeps direct versus array equality separate in the committed worker', () => {
   const messages: FromWorkerMessage[] = [];
   const self = {
-    postMessage: (message: FromWorkerMessage) => messages.push(message),
+    postMessage: (message: FromWorkerMessage) => messages.push(structuredClone(message)),
     onmessage: undefined as undefined | ((event: { data: InitMessage }) => void),
   };
   runInNewContext(workerScript, { self, console, performance });
@@ -100,11 +100,16 @@ cast = color(na)
 color typedNa = na
 slot = array.from(cast)
 fromArray = array.get(slot, 0)
+configured = input.color(color(na), "Missing")
 plot(color.r(cast), "R")
 plot(color.t(typedNa), "T")
 plot(na(cast) ? 1 : 0, "NA")
 plot(cast == cast ? 1 : 0, "DIRECT")
-plot(fromArray == fromArray ? 1 : 0, "ARRAY")`,
+plot(fromArray == fromArray ? 1 : 0, "ARRAY")
+plot(array.includes(slot, cast) ? 1 : 0, "INCLUDES")
+plot(array.indexof(slot, cast), "INDEX")
+plot(array.lastindexof(slot, cast), "LASTINDEX")
+plot(color.r(configured), "INPUT_R", color=configured)`,
     },
   });
   expect(messages.filter(({ type }) => type === 'error' || type === 'parseError' || type === 'semanticError')).toEqual(
@@ -118,5 +123,11 @@ plot(fromArray == fromArray ? 1 : 0, "ARRAY")`,
     ['NA', [1]],
     ['DIRECT', [1]],
     ['ARRAY', [0]],
+    ['INCLUDES', [0]],
+    ['INDEX', [-1]],
+    ['LASTINDEX', [-1]],
+    ['INPUT_R', [0]],
   ]);
+  expect(result.output.inputs[0].defval).toBeNaN();
+  expect(result.output.plots.at(-1)?.color).toEqual([null]);
 });

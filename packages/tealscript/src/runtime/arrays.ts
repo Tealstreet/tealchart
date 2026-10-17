@@ -1,6 +1,7 @@
 import type { PineUdtObject } from './objects';
 
 import { getUdtField, isPineUdtObject } from './objects';
+import { MISSING_COLOR } from './codegen/missingColor';
 import { PineRuntimeArgumentError } from './runtimeArgumentError';
 
 const arraySearchState = Symbol('arraySearchState');
@@ -339,11 +340,19 @@ export function lastArrayValue<T = unknown>(array: PineArray<T>): T | undefined 
 }
 
 export function includesArrayValue<T = unknown>(array: PineArray<T>, value: T): boolean {
+  if (value === MISSING_COLOR) {
+    getArraySize(array);
+    return false;
+  }
   if (!array.view) return arrayStorage(array).indexOf(value) >= 0;
   return getArrayValues(array).indexOf(value) >= 0;
 }
 
 export function indexOfArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
+  if (value === MISSING_COLOR) {
+    getArraySize(array);
+    return -1;
+  }
   if (!array.view) {
     const state = array[arraySearchState];
     const values = arrayStorage(array);
@@ -370,6 +379,10 @@ export function indexOfArrayValue<T = unknown>(array: PineArray<T>, value: T): n
 }
 
 export function lastIndexOfArrayValue<T = unknown>(array: PineArray<T>, value: T): number {
+  if (value === MISSING_COLOR) {
+    getArraySize(array);
+    return -1;
+  }
   if (!array.view) {
     if (value === undefined) {
       for (let index = arrayStorage(array).length - 1; index >= 0; index -= 1) {
@@ -562,7 +575,7 @@ export function selectNumericArrayRanks(values: number[], ranks: number[]): numb
 }
 
 function isMissingArraySortValue(value: unknown): boolean {
-  return value === '' || (typeof value === 'number' && Number.isNaN(value));
+  return value === MISSING_COLOR || value === '' || (typeof value === 'number' && Number.isNaN(value));
 }
 
 function compareArrayValues(left: unknown, right: unknown): number {

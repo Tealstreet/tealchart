@@ -1,4 +1,4 @@
-import { MISSING_COLOR } from './missingColor';
+import { MISSING_COLOR, MISSING_COLOR_KEY } from './missingColor';
 import { roundRuntimeNumber } from '../mathRounding';
 import { createLiteralTimestampCache } from './literalTimestampCache';
 import type { LiteralTimestampCache } from './literalTimestampCache';
@@ -5503,6 +5503,10 @@ function runtimeSourceDescriptorKey(value: unknown): string {
   return `expression:${id}:${runtimeCapturesKey(value.captures)}`;
 }
 
+function serializeRuntimeCapture(value: unknown): string | undefined {
+  return JSON.stringify(value, (_key, entry: unknown) => entry === MISSING_COLOR ? { [MISSING_COLOR_KEY]: true } : entry);
+}
+
 function runtimeCapturesKey(value: unknown, scopeIdentity?: (scope: object) => number): string {
   if (!value || typeof value !== 'object') return '';
   const entries = Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right));
@@ -5513,9 +5517,9 @@ function runtimeCapturesKey(value: unknown, scopeIdentity?: (scope: object) => n
       }
       const sourceKey = runtimeSourceDescriptorKey(descriptor.source);
       if (sourceKey) return `${name}:${sourceKey}`;
-      return `${name}:${JSON.stringify(descriptor.value)}`;
+      return `${name}:${serializeRuntimeCapture(descriptor.value)}`;
     }
-    return `${name}:${JSON.stringify(descriptor)}`;
+    return `${name}:${serializeRuntimeCapture(descriptor)}`;
   }).join('|');
 }
 
@@ -5542,12 +5546,12 @@ export function captureDispatchMatcher(captures: Record<string, unknown> | undef
       const hasSource = isRuntimeSourceDescriptor(descriptor.source) || isRuntimeExpressionSource(descriptor.source);
       const primitive = descriptor.value === null || typeof descriptor.value !== 'object';
       const capturedValue = descriptor.value;
-      const serialized = hasSource || primitive ? undefined : JSON.stringify(capturedValue);
+      const serialized = hasSource || primitive ? undefined : serializeRuntimeCapture(capturedValue);
       return (value: unknown) => isRuntimeCaptureDescriptor(value) && value.scope === scope
-        && matchesSource(value.source) && (hasSource || (primitive ? Object.is(value.value, capturedValue) : JSON.stringify(value.value) === serialized));
+        && matchesSource(value.source) && (hasSource || (primitive ? Object.is(value.value, capturedValue) : serializeRuntimeCapture(value.value) === serialized));
     }
-    const serialized = JSON.stringify(descriptor);
-    return (value: unknown) => !isRuntimeCaptureDescriptor(value) && JSON.stringify(value) === serialized;
+    const serialized = serializeRuntimeCapture(descriptor);
+    return (value: unknown) => !isRuntimeCaptureDescriptor(value) && serializeRuntimeCapture(value) === serialized;
   });
   return value => {
     if (!value) return false;
@@ -6943,7 +6947,8 @@ function executeCompiledPass(
               : inputSimpleArgs));
       const defaultValue = inputArg(metadataNames, 0);
       const title = toRuntimeString(inputArg(metadataNames, 1, named.__tealscriptInputDefaultTitle ?? type));
-      const inputDefaultValue = type === 'color' ? toPlotColor(defaultValue) ?? defaultValue : defaultValue;
+      const inputDefaultValue = defaultValue === MISSING_COLOR ? Number.NaN
+        : type === 'color' ? toPlotColor(defaultValue) ?? defaultValue : defaultValue;
       const metadata: Partial<InputDefinition> = {
         tooltip: optionalString(metadataNames, metadataNames.indexOf('tooltip')),
         inline: optionalString(metadataNames, metadataNames.indexOf('inline')),

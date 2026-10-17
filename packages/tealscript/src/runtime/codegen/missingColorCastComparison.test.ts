@@ -12,6 +12,15 @@ function values(body: string, version = 6) {
 }
 
 describe('missing-color cast comparison proof boundaries', () => {
+  it('erases root initializer folding proof inside functions, including direct literal casts', () => {
+    expect(values(`rootColor=color(na)
+f()=>rootColor==rootColor
+g()=>color(na)==color(na)
+plot(rootColor==rootColor?1:0)
+plot(f()?1:0)
+plot(g()?1:0)`)).toEqual([1, 0, 0]);
+  });
+
   it('folds pure direct casts and unchanged root aliases without changing numeric/typed missing equality', () => {
     expect(
       values(`cast = color(na)
