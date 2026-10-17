@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "9b09e201ded714141fbcb8de348c8c00cf66da0d",
+  "revision": "962bbf90b269e98f26af84d86f7cb83972c11f44",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -17121,6 +17121,441 @@
       "path": "v95/sources/v95-vwap-bands-v6.pine",
       "bytes": 1312,
       "sha256": "c32346e960702bc47be27fa2bf78ece89167ca402849fd5054900e48adb4a78b"
+    },
+    {
+      "path": "v97/REQUEST-v97-v1.md",
+      "bytes": 24003,
+      "sha256": "ed7305f0c5c0ecec8fcb009294ef348d9971e3690420db128c99962acd8bf420"
+    },
+    {
+      "path": "v97/captures/v97/RESPONSE-v97-v14.md",
+      "bytes": 7622,
+      "sha256": "caa8ca2f3da4f7cb6b4ced10ed6ab9e17b8bb78e4ad0e28dc43c11d6a13cb8fd"
+    },
+    {
+      "path": "v97/captures/v97/account-actions-v14.json",
+      "bytes": 1215,
+      "sha256": "4fc13dfbbcd5078156d90ba1dc6a213b2e7ea85707565f6b41c628ddb65bbc75"
+    },
+    {
+      "path": "v97/captures/v97/artifact-integrity-v14.json",
+      "bytes": 162220,
+      "sha256": "7ed17bb818990bf86f1d5c4990692c026dc64892441eb15924cd18e242a4b50c"
+    },
+    {
+      "path": "v97/captures/v97/attempt-inventory-v14.json",
+      "bytes": 6252652,
+      "sha256": "174e363fb2893d929a2125569108abb05fd44afc43bbd065411b671ad64618bd"
+    },
+    {
+      "path": "v97/captures/v97/facet-capabilities-v14.json",
+      "bytes": 206536,
+      "sha256": "b2c52dde4c429e8a4c42174cba1db7a99c37a4553f18f7949dbebd97dcb5c967"
+    },
+    {
+      "path": "v97/captures/v97/numeric-controls-v14.json",
+      "bytes": 4910096,
+      "sha256": "b578abc785be496d8a2a2678c448039190ba9bbdff0c9a16fb90b1160fdfe600"
+    },
+    {
+      "path": "v97/captures/v97/selection-inventory-v1.json",
+      "bytes": 96970,
+      "sha256": "22d81d171a5b865f26407a50e322d06aa0f497f839dbcd33a3120b46668834be"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/add-response-v1.json",
+      "bytes": 12512,
+      "sha256": "8900b6f974c72372dd843767afa08ff7760d36db3ccb359c08af605b1024f067"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4260,
+      "sha256": "d8e48599d1c61703829c4c9901fb586b7e2b1f4c5fc308b7c4f3dd35c54450e0"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1524,
+      "sha256": "cc574daffc837d659869d7998c1ba8aaae104b31301d1e0cac9f5ca7f0f5537e"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1203,
+      "sha256": "b5153b93c6cfa524ad71439213419f8f418ff87179d54ed4ddbf1f05a763117c"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 1986717,
+      "sha256": "e9afeb02c29fd175694dfe0d0d16981e7b29fdc80bc0c2fdbe281521f00947b1"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/observation-v1.json",
+      "bytes": 1599,
+      "sha256": "e78bb867ff2d87d529e76919a4f3872dde80eb1df369e626f810a070fccaa3bb"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1379,
+      "sha256": "b5e6e06c42f32c4ee5fd38104c02744ef51546935a7677e9501b498eb15858d0"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/save-response-v1.json",
+      "bytes": 12512,
+      "sha256": "36abcd702c98f0eaa20ec28a3bff2c0d98a783d045dcfbf573d81fcd1de64b0b"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 3080686,
+      "sha256": "789724cf2724b7a1ea607ead2c4a3c689194fb7ad7e8b8c2eeb2b8a95d340b93"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 9279,
+      "sha256": "a035e3ea7da98e1b04b4c2e53ad12ee2fd28be76f1df472fe56cb6c8af3a9a8e"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3662095,
+      "sha256": "b576612bd43d6ce8db76d1f881bc3caa4a53d0fa034b16f2a3b8807ad2e4fdef"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2276,
+      "sha256": "e7894c12821413c0037ac36eda0f847daa73d092be56a6772af14427a1b2d031"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v5/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 255907,
+      "sha256": "00420af21fa36d5881ff37f81f2faf905e23f2e6a1728f5054ea06ca1137feba"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/add-response-v1.json",
+      "bytes": 12455,
+      "sha256": "46337ad4c19adec25f8a82958861260303c8cd28c7009965f37cbe5694293e50"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4260,
+      "sha256": "ee21d176c324036daf7ba4599cde3b8f766fc990c4b6a4afb2002d201c223c1e"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1524,
+      "sha256": "2522d3e089cd49fbb5a21916890808c8e53f9521802dc03d39d534010b43be0f"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1203,
+      "sha256": "86cfd167dddb421bba4079615c0d62dd6e833f1b0edbc2943ef0ab282c36e3b2"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 1986717,
+      "sha256": "0508d731fac34472a972ba2bb59ec5d4afa991c43f0e072fa3e98ac3ecb0bd7d"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/observation-v1.json",
+      "bytes": 1599,
+      "sha256": "684455d894a58275017a98169ffb44b50210c2654e0b25dd6bce327e47a1af85"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1379,
+      "sha256": "e14ef86516c634dcdd0054724cba79bf17826a259497ed152886835d98db15f3"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/save-response-v1.json",
+      "bytes": 12455,
+      "sha256": "f702f5d336e08acd248f21b7821ccc82e235b14de5fb390a73ba20fb0c1ae26e"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 3080938,
+      "sha256": "649702890f05b0c89f1fe79ffd15ad7281b846f3f453be11e21cd684accaa482"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 9279,
+      "sha256": "4881728da28909a85c9f691b94463c2b0f79b45199b4f37f8cd17e206cbfb90c"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3662405,
+      "sha256": "c47d06e4f589347cd55eee0ce0771db7f9a715455f1d61a07aa89724f329919c"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2276,
+      "sha256": "f7ebc2e42570e49e449839a6e3dcda68a1dce39802791ce69d07ee0764e87900"
+    },
+    {
+      "path": "v97/captures/v97/v97-history-udt-v6/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 255930,
+      "sha256": "352b704625499eef7ae122cf01e9ade665adcec852239465d6aac4c912cff8af"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/add-response-v1.json",
+      "bytes": 14061,
+      "sha256": "8574c7f06cc50ce758f8c43ad3762903bbe2e2e828cf5fe134c8f3253455dae0"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4410,
+      "sha256": "9d112649421c840f315bd1fdd87ef2f05696cc90a02abb40bc2eedc9e68cd9a7"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1527,
+      "sha256": "4873e1c8a0ba72ba2407a1ed786297982e5a857242604f70dd4cdd115239c4d0"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1391,
+      "sha256": "eafeca9e8e26af07794c54c1664ecfbc0acdd8eeec5e82ef5fda0dbee400d40b"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 3461723,
+      "sha256": "5ddd9501bba1ea711c7ce3f13d810cfce0bed4d93f4bb993a2505311ce735dbb"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/observation-v1.json",
+      "bytes": 1608,
+      "sha256": "61376649655caaf9215ee1da7724a522ada35a7c1c845e4f7778d1e11713442f"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1565,
+      "sha256": "0f1daf571805f80282a69d3e32b9c4b327564544f9ff46650ae892a6aa243e9d"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/save-response-v1.json",
+      "bytes": 14061,
+      "sha256": "93653bd862e32fc4b40bc7f5aa12cf4c4742b0df5ccc8477643da839da2d15a8"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 6163189,
+      "sha256": "586b609e6412a90c15b44f61a99c01d21f080fc9d2835d1215d816313a8ece1f"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 12963,
+      "sha256": "400255d7a40f777988984af568437208b838122f666bb7ef5958fd6a1dfb9060"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3663332,
+      "sha256": "b72163c0fc7c8840bfb0f0a23628d09bd45434a3b4dd5467ee30ff845dbee432"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2388,
+      "sha256": "204c4d0414c32269e20b0db85deed9c7cb22abd5ae766c14105ae18b264c6577"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v5/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256410,
+      "sha256": "77cc24072f7aea97f8db6cf0160cb4a1802acee943bac2520bc02a375c76aac1"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/add-response-v1.json",
+      "bytes": 13891,
+      "sha256": "3b6b809f8662975dc6fff7c717e0d9b9a99daa9ee255dcefb8e04069e200979d"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4410,
+      "sha256": "8eba2ffd4fea402fcb7765bfb35fc5a39c44826ed03f86a3f8b9efe0edcaec1e"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1527,
+      "sha256": "8a0e46ba3943aadb54e90373e9889428117a6d3d533272cb5cb18287cf73ea91"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1391,
+      "sha256": "e0f211b6db5ab1cfe86872ceecb9d042ea5e0d7ef0da3e09ba47813b4cb809d5"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 3461723,
+      "sha256": "f7ceb8bccef804a028d93323f1764f790466eb409dc80dd5ccd6317c14feacf7"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/observation-v1.json",
+      "bytes": 1608,
+      "sha256": "19d1557379661b05eac81a453da1bbcd496dc3cbe70509d909f4fe1f3c9322a5"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1565,
+      "sha256": "202d41596dd813484e38fc05dc8e759298181e95189505124352f9e2f0906622"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/save-response-v1.json",
+      "bytes": 13891,
+      "sha256": "a47619e73e430c5834ff0522aa14b2c1ed61b21a8015af470db72285ab521ef0"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 6163720,
+      "sha256": "c218594a5ee074a0885b6e066b4e722bdd2a49651ac1ce917ba1f52178aba808"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 12963,
+      "sha256": "c2fa24d1534d458948b40d6b15d93f084569943e07f739bde6dd9fafce466dbe"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3663642,
+      "sha256": "c3e5cc8257b48ed612859f8b1b960b9e70fd1d69591e149e703d98c93cc110ac"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2388,
+      "sha256": "0ae7e45b364de2f43617d070c3d5febd70ef23af5d1357dabc7d81a73c1cfa81"
+    },
+    {
+      "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256460,
+      "sha256": "d7880d24a36ca263accbe385951c507af1f93b0a8d8493db53b98101138a6242"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/add-response-v1.json",
+      "bytes": 11913,
+      "sha256": "956bee9f7213538f90d25a2f3a7cc501f1bc5ff6243ee893b2cbaf9d15c1058a"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4334,
+      "sha256": "74ff6b0416945bbeb2fa74ea6b16e9653138295b1647e39a12fc31b80ea81bc0"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1515,
+      "sha256": "a93efcb38fb6fe8e5dbc69e171c3b6c8fbb50fd695fcc2c32998e9f15700bacb"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1205,
+      "sha256": "09dc2c71bea35af54d527d923eec7c1e5ef1f388ba56fe4cc413732001e76c3a"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 2260072,
+      "sha256": "d6e7b67b0138f64deaaf9530d03a05078d3f623ef15dbc98592dd65918684b9e"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/observation-v1.json",
+      "bytes": 1576,
+      "sha256": "fe92868c8b7584d76529e01432bd24afc69fc6b7e3b46863033aef5940a67ae5"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1374,
+      "sha256": "4187c9373d8a952aa74ea1c788b74d2dedf768310cdab47540bc9158019d30e3"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/save-response-v1.json",
+      "bytes": 11913,
+      "sha256": "25f0fb32ce412a07722b26bebd3a708d5b3ad33a40ed20b68532979f6efa51c7"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 3099098,
+      "sha256": "1ff2d54e5885ada3d18253c254b50d695e0feea5833ed027722053247cc2cab7"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 10541,
+      "sha256": "4fee9a516b065abd918884ba0b388405da0ea0d8fd92b17916dee8f1c87bb970"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3722141,
+      "sha256": "03f9b31105c9f507edd534b7b32cb9b697e02775490cf18e5d8d3d45de2c82aa"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2344,
+      "sha256": "b83a6a71920bfb8689733edf4050f5c4bbf4e3bd64bc79202c456b3a6988395a"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256002,
+      "sha256": "e7eb052dc46381811e0d0ee30ec8db3b7f688e50bcdf1ce448ec7b73cbd3a103"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/add-response-v1.json",
+      "bytes": 11701,
+      "sha256": "246d6bc135043fe3d473d801c3c8a2b848b1dfb7283dbf995b81ccaecc03b862"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4334,
+      "sha256": "e5fb451adac5f4d371e6d293688d9c26bc274e3c0f9f13233411be3ed54dda03"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1515,
+      "sha256": "a2e16c8cd3ea3181b72faca6a0c27acad53ead03df3e0a87b8032709dc08efad"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1169,
+      "sha256": "cab1e72c2a713ee435a307214c588f7c9e16fc48b788ebb98e85d8edbe9018c3"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 2259971,
+      "sha256": "c81dde9f9eefb19c21e6878a280a8d64ac7e6072e820c85b98f4a2cde91254ab"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/observation-v1.json",
+      "bytes": 1576,
+      "sha256": "c39950bfe418030e9ea7083cc0d9f052065c32cb6089bbae2696db2f6e56b8b6"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1338,
+      "sha256": "be1debcabb753f042acba4cd8cbe28716d399800a3abae1ef7620c486803128e"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/save-response-v1.json",
+      "bytes": 11701,
+      "sha256": "ac38286939b0d2ee5216273a659d0b8777cbb7c75c8bb6cee2d65058e5eb8884"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 3093423,
+      "sha256": "8e33211ab659dfd55b5a18964dff96f64c8906e4ce88e777e103730c6660dba3"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 10541,
+      "sha256": "60cbd7cd8a120df6fbfb3bc15fe3cf1f4e5d3b2bf53995b352c0f10c25817d33"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3722461,
+      "sha256": "c94797ef9671487a316ffcd5f14f68441098906115889c22175470338f51a319"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2344,
+      "sha256": "0b1393ca954b1a584e500bf80a421c2d47265e7b5bf7874a68c5b36b16d40995"
+    },
+    {
+      "path": "v97/captures/v97/v97-typed-na-v6/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256027,
+      "sha256": "d3751c93a6b64b2a6bac273b0cbd56056d5addfd3e1965146f04c10cfaa61228"
+    },
+    {
+      "path": "v97/captures/v97/validation-result-v14.json",
+      "bytes": 1066,
+      "sha256": "ca81ab05198d762ddef0e65282cad71464abd55a3e4be713c026cdf5808896f9"
     }
   ]
 }
