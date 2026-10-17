@@ -32,9 +32,9 @@ function survivors(scope: Scope, block: Block, phase: boolean) {
   })));
 }
 
-describe('v100 constant colors: native observations and frozen projections, unobserved arithmetic-order ambiguity HELD', () => {
+describe('v100 constant colors: native observations and frozen projections, historical frozen projections before the v101 discriminator', () => {
   it('binds all immutable dependencies, exact proposal bytes and original source ownership', () => {
-    expect(lock.revision).toBe('b23c3d71f00e83cb40c4ab3d65be269788605f89');
+    expect(lock.revision).toBe('56abd808d88595bab7808c063d065ce2bcd7dc55');
     const integrity = json<{ artifacts: Proof[] }>(root + 'captures/v100/artifact-integrity-v3.json');
     expect(integrity.artifacts).toHaveLength(195);
     for (const p of integrity.artifacts) {

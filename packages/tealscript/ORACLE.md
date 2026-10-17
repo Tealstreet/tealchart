@@ -55,11 +55,17 @@ representative signatures are refuted. Both materialization versions support BC2
 (B:104/106/512/514). These independent projections do not identify a full model.
 The RGB tuple changes direct equality, so alpha-only scalar storage is insufficient.
 Previously grouped packing members must be checked separately from their rejected
-representatives. Two concrete arithmetic aliases reproduce every captured
-constant-color cell. CM-B shares the opacity pipeline between constructors;
-CM-A computes RGB as `Math.round((100 - t) * 255 / 100)` instead. Swapping to
-CM-A stays GREEN on every observed cell; all five old frozen policies go RED.
-`DIRECT_RGB_NEW_90_EQ` remains NOT OBSERVED: CM-A predicts0 and CM-B predicts1.
-The implementation choice earns no native credit for that unqueried expression;
-v101 requests it. V5 ternary zero still merges false/Boolean NA, and all prior
-missing-color and uncaptured-state holds remain separate.
+representatives. At v100, CM-A and CM-B reproduced every observed constant-color
+cell and disagreed on direct RGB-vs-NEW at transparency90. Their alternate-order
+mutation stayed GREEN only on that older captured surface.
+
+The [v101 return](https://github.com/Tealstreet/tealscript-oracle/blob/56abd808d88595bab7808c063d065ce2bcd7dc55/v101/captures/v101/RESPONSE-v101-v1.md)
+now exports `DIRECT_RGB_NEW_90_EQ=1` on all64 selected owned physically closed
+rows. CM-A is REFUTED and implemented CM-B is SUPPORTED on the finite frozen
+37-code vector. The new lock compares all2,368 code cells and128 reproducible
+context outputs exactly against original CSV strings;64 absolute indices remain
+excluded. The CM-A swap now goes RED. The previous23,448 comparisons stay exact.
+
+The source's false/Boolean-NA encoding limit remains; no universal native algorithm,
+hidden color identity, missing-color behavior or unqueried input is established.
+Other2m closed rows/developing snapshots and prior holds retain their exclusions.
