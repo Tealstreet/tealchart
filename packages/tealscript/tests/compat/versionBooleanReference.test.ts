@@ -35,8 +35,9 @@ function plots(version: number, body: string): (number | null)[][] {
 }
 
 describe('documented Pine version boolean boundaries', () => {
-  // Reference bool(x): zero/na/false are false; negative and fractional nonzero
-  // values are true. Rejects JS Boolean(NaN), positive-only and int-truncation.
+  // These ternaries take the false arm for zero/na/false and the true arm for
+  // either nonzero sign. Native v95 item10 separately witnesses v5 bool(na) as
+  // missing; the ternary output alone cannot distinguish it from false.
   it.each([5, 6])('casts all numeric truth states explicitly in v%i [bool]', (version) => {
     expect(plots(version, `plot(bool(close) ? 7 : -2)
 plot(bool(close[1]) ? 7 : -2)

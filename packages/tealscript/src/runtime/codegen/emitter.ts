@@ -112,7 +112,7 @@ const DISPLAY_CONSTANTS: Record<string, number> = {
 
 const MATH_FUNCS: Record<string, string> = {
   'math.abs': 'Math.abs', 'math.ceil': 'Math.ceil', 'math.floor': 'Math.floor',
-  'math.sqrt': 'Math.sqrt', 'math.pow': 'Math.pow',
+  'math.sqrt': 'Math.sqrt',
   'math.exp': '_exp',
 
 

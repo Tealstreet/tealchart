@@ -4,6 +4,41 @@ cannot settle row/column orientation; generic solver and cutoff claims stay held
 Scaled Jacobi singular norms use the square root of the compensated squared norm;
 iterated hypot introduces observable pseudoinverse rounding residue on rank-one B.
 
+V95 per-bar array literals pin shared slice windows, independent copied slots
+and missing-ID box/table containers without creating drawing objects. For the
+captured [1,na,3,3] array, ascending sort places NA last and keeps this equal-key
+pair in forward order; missing searches find no match. AVG/VARIANCE/STDEV native
+decimal outputs compare exactly to engine binary64, separately from unresolved
+mathematical7/3,8/9,sqrt(8/9) candidate comparisons. The exact percentile call is
+an observed blank. No universal stability, arbitrary slice or rendering claim.
+
+V95 UDF-state captures pin four complete 16-phase reset blocks per v5/v6 source:
+written and nested calls retain independent persistent state, and skipped gated
+calls export actual blanks. The unchanged-source replay translates the selected
+native index23344 reset to local index0; only reset/phase-dependent values and
+presence earn credit. LOCAL_FIRST initialized values remain OBSERVED/excluded
+from startup scoring because the source's own index-zero prefix was not exported.
+Developing rows and other closed rows outside the four blocks remain excluded.
+
+V95 recursive/implicit TA suffix exports lack their own index0..127 prefix.
+EMA/RMA/RSI/TSI and ATR/DMI/Supertrend numeric targets remain OBSERVED/excluded
+from startup scoring. Only input controls, NA witnesses and the ten exact-rational
+TR native cells per version earn credit; fractional TR residues remain held.
+TR integer-cent input projections check all previous-close formulas separately.
+Recursive-hole presence replay rebinds bar_index to captured INPUT_INDEX and uses
+six actual preceding rows. The first TSI witness has insufficient local warmup
+and is checked only as a native scalar presence projection. Native Supertrend
+direction transitions remain observed, without a prefix-independent replay claim.
+
+V95 calendar controls certify conversions of four frozen UTC literals, not
+market bars on DST dates. The observed NY overnight-session block is outside;
+inside/outside transitions and day/week boundaries remain NOT OBSERVED.
+V95 anchored VWAP has six complete 16-bar windows: a phase5 source hole poisons
+the mean and both bands through phase15, recovering only at the next anchor.
+MULT0 bands equal their own mean. Fractional means and mathematical square-root
+references remain precision-held; no tolerance or hidden binary64 model is fitted.
+Missing/nonpositive volume and original unanchored startup remain separate holds.
+
 V93 linefill locks cover same-execution counts/parent identities and endpoint tracking.
 PNG-bound output fields cover red/blue and source-line deletion; no native color
 getter, recalculation identity, all-object deletion, or pixel parity is claimed.
@@ -73,6 +108,10 @@ retain their existing policy; accepted generated programs are unchanged.
 Native capture requests and evidence belong in the public `Tealstreet/tealscript-oracle`
 repository. Read [ORACLE.md](ORACLE.md) for pinned sparse test fixtures, capture
 handoffs and promotion. Missing fixtures fail explicitly; tests are never skipped.
+
+Native v95 item7's `rec.copy()` shares its `array<float>` field while retaining
+independent scalar slots and per-bar object history. Dynamic lags and prior references
+require witnessed dependencies; the suffix capture gives no pre-origin credit.
 
 Witnessed coded v6 tuple parse refusals carry a structured singleton diagnostic
 through parser errors, worker parseError messages and compatibility stages.
@@ -196,6 +235,11 @@ color/title fills retain their existing overload.
 Conditional calls to resolved local UDFs that read parameter or local history
 emit a consistency warning. Callable binding, admission and generated code stay
 unchanged; unconditional calls and no-history or shadowed callables stay silent.
+
+V95 conditional statement-scope `ta.sma`/`ta.ema` calls warn in source order:
+v5 quotes the function with apostrophes; v6 uses double quotes and `CW10003`.
+Namespace shadows and ternary-specific wording remain separate. The captured
+suffix proves bounded three-call SMA windows, never recursive EMA startup.
 
 Numeric timestamp calls in requested contexts default to the requested symbol's
 exchange timezone. Pass requestSyminfo into both evaluators; explicit zones
@@ -385,6 +429,14 @@ Missing switch results in v6 must use `false` when the scope-aware semantic
 expression kind is boolean. Both discriminant and predicate switches use the
 same typed fallback; v5 booleans and numeric results retain `NaN`. Reuse the
 emitter's semantic expression map rather than guessing from branch syntax.
+
+V95 item1 regression replays 606 closed 2m rows from separate v5/v6 suffix
+exports: all eight lower-timeframe arrays have two ordered, physically closed 1m
+slots and LX=2*LC+1. Source-owned tuple OHLCV are replay inputs; the native target
+vectors retain UNDECIDED provider hypotheses. INPUT_INDEX starts at 23338, so no
+omitted prefix, startup seed, FIRST_* or native phase parity is claimed. Both
+developing N1 rows remain OBSERVED/excluded; closed N0/N1/N>2 are unobserved.
+
 Lower-timeframe array requests share the cached scalar selector's timeline
 validation and binary interval bounds. Ordered finite timestamps visit only
 the chart interval; unordered or nonfinite datasets retain the original full
@@ -2103,6 +2155,13 @@ their own return types. Insert index omission is also unpinned: absent requiredn
   extrema-barsago-v1 capture rather than a last-N-non-na interpretation of the
   reference's ignore-na remark. `extrema-behavior.test.ts` pins small synthetic
   discriminators, including endpoint Aroon and rollback/snapshot behavior.
+- V95 item6 additionally binds both v5/v6 finite dynamic pivot plateaus to
+  RIGHTMOST selection at the current confirmation row (96 high/low/NA rows each).
+  Its suffix replay adapts only the captured phase input; no index-zero seed or
+  original startup credit. Fixed-anchor invariance and exact rational controls
+  stay separate from 2586 held target/precision records per version. Only the
+  two finite plateau value-vector goldens are reconciled; missing-source vector
+  holds and the shared native missing-flank policy remain unchanged.
 - Pivot candidates still need the full physical left/right window and a finite
   candidate. Each flank scans outward from the candidate and stops at its first
   `na`; equality is allowed on the older (left) side and rejected on the newer
@@ -2498,6 +2557,13 @@ documented representations.
 `math.random()` uses fresh randomness when seed is omitted. Explicit seeds retain
 repeatable per-call-site streams; both paths exclude the minimum and maximum.
 
+Native v95 item15 independently captures v5/v6 `str.format("{0,number,0.0}",
+1.25)` as `"1.2"`. Decimal masks in `str.format` use ties-even for exact binary
+half-ties, without rounding the value through a decimal scale first. This path
+is separate from `str.tostring` and `math.round`; neither inherits this rounding
+mode. The capture covers four literal inputs and the one-decimal mask, not a
+universal native rounding certification for other patterns or negative ties.
+
 `str.format()` removes apostrophe delimiters around literal text and leaves quoted
 placeholders uninterpreted. Two adjacent apostrophes emit one literal apostrophe.
 
@@ -2507,6 +2573,13 @@ Color defaults produce color widgets and an `input color` return qualifier;
 hex-looking strings remain strings. Integral-valued Pine float defaults also retain
 float widgets, including decimal literals, casts, aliases, arithmetic, and color
 channels; JavaScript integer values do not determine their Pine type.
+
+Native v95 item13 binds unchanged v5/v6 input defaults on 32 closed rows per
+version, including the default source's current chart close. Exact source replay
+uses chart OHLCV only and supplies no input overrides or omitted native seed.
+String/enum equality flags identify their declared candidates only; passive
+metadata and the capture cleanup-name quirk do not certify options/range/UI
+enforcement or external source selection.
 
 Input behavior compatibility is pinned by
 `tests/compat/pine-input-behavior.test.ts`, covering all official input
@@ -4741,3 +4814,23 @@ after namespaces. Explicit namespace calls retain their ID argument.
 V93 overlay=false preserves the visible PANE table when a later force_overlay table
 uses the same position: replacement and cell capacity share effective pane ownership.
 Red MAIN table routing remains NOT OBSERVED; routing metadata locks do not certify pixels.
+
+Native v95 item10 locks only the selected closed suffix: v5 numeric bool NA encodes
+-1 while v6 encodes 0; fixnan carries a witnessed previous finite input. Raw cast
+blanks stay missing. Missing-string outputs are exact targets with archive model
+UNDECIDED retained; own-origin Boolean/fixnan startup remains held.
+
+Native v95 item14 negative half-tick outputs require math.round_to_mintick to
+round magnitudes and restore the sign, retaining nearest-tick compensation guards.
+Only the selected closed suffix is credited; random cells are observed/excluded
+with seed identity held, and raw decimal strings do not expose signed-zero bits.
+
+Native v95 item16 locks only its bounded ASCII literals: occurrence1 replaces the
+second match, split a,,b retains the empty middle field, and no-match pos has a raw
+blank with NA flag1. Preserve its UNDECIDED hypothesis metadata while asserting the
+observed missing result; Unicode-wide and all-overload behavior is not certified.
+
+Native v95 item17 pins final B/C/A map order and shallow sharing of the copied
+map's Cell value for its exact merge/remove/reinsert/clear sequence. Only three
+earlier MERGED slots are exposed; their array count stays NOT OBSERVED/HELD.
+No Cell.copy call, arbitrary key/value kinds or generic iteration policy is certified.

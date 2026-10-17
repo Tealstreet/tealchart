@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, getPlot, runCompatScript } from './fixtures';
 
 // https://www.tradingview.com/pine-script-reference/v6/#fun_math.round_to_mintick
-// The nearest tick is selected, with ties rounding up.
+// Native v95 item14 supersedes the old ties-up interpretation with half-away.
+// Other tick sizes below are derived regression controls, not new native cells.
 describe('documented mintick nearest selection', () => {
   it.each([
     { value: '1000000000000000.25', expected: 1000000000000000 },
@@ -13,7 +14,7 @@ describe('documented mintick nearest selection', () => {
     { value: '1000000000000000.75', expected: 1000000000000001 },
     { value: '-1000000000000000.25', expected: -1000000000000000 },
     { value: '0.5', expected: 1 },
-    { value: '-0.5', expected: 0 },
+    { value: '-0.5', expected: -1 },
     { value: 'na', expected: null },
   ])('rounds $value to the closest integer tick', ({ value, expected }) => {
     const result = runCompatScript(
@@ -35,7 +36,7 @@ plot(math.round_to_mintick(number=${value}), title="Named")`,
     for (const [tick, value, expected] of [
       [0.01, 1.005, 1.01],
       [0.25, 1.125, 1.25],
-      [0.25, -1.125, -1],
+      [0.25, -1.125, -1.25],
     ]) {
       const result = runCompatScript(
         `//@version=6\nindicator("Tick controls")\nplot(math.round_to_mintick(${value}), title="Value")`,
