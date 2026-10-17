@@ -1,3 +1,12 @@
+V97 unchanged recursive-hole sources now have native own-index0..127 inputs.
+The captured EMA/RMA SMA3 seeds, all eight EMA/RMA/RSI/TSI clean/hole vectors,
+leading holes and two complete64-bar hole cycles match exact strings and blanks.
+Replay the unchanged source from index0 without native-output seeds or index rebinding.
+RSI/TSI finite trajectory equality does not identify a universal algorithm; frozen
+fractional candidate verdicts and generic consume-slot holds remain unchanged.
+Original v95 suffix captures still lack their own prefix, and historical holds
+1/2/7/8/13/14/21 receive no retroactive closure from this separate execution.
+
 V95 per-bar array literals pin shared slice windows, independent copied slots
 and missing-ID box/table containers without creating drawing objects. For the
 captured [1,na,3,3] array, ascending sort places NA last and keeps this equal-key

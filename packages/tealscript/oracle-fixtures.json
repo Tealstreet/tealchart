@@ -17128,6 +17128,21 @@
       "sha256": "ed7305f0c5c0ecec8fcb009294ef348d9971e3690420db128c99962acd8bf420"
     },
     {
+      "path": "v97/SHA256SUMS",
+      "bytes": 4068,
+      "sha256": "4cca58561a33798d3216356aa8267cb0cdb0ae2fcc4b609fc1620a7903d2bfc9"
+    },
+    {
+      "path": "v97/SOURCE-INVENTORY-v1.md",
+      "bytes": 5434,
+      "sha256": "3cb1a911c0ba08b774cc059775189373e7f3ea4791cef7984615778a35ed1961"
+    },
+    {
+      "path": "v97/bundle-manifest-v1.json",
+      "bytes": 115171,
+      "sha256": "31c878711b061ae30bc9329ae1ed83ce299c6c645323f7479b46083997d266fe"
+    },
+    {
       "path": "v97/captures/v97/CAPTURE-TOOLING-LICENSE-v1.md",
       "bytes": 411,
       "sha256": "01be238e3c77cdcc99eeb6931ceccd497ac135f35686c832f87c045caf847c00"
@@ -17806,6 +17821,386 @@
       "path": "v97/captures/v97/v97-math-vectors-v6/attempt-v1/session-initial-v1/source-frontier-v1.json",
       "bytes": 256460,
       "sha256": "d7880d24a36ca263accbe385951c507af1f93b0a8d8493db53b98101138a6242"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/add-response-v1.json",
+      "bytes": 12445,
+      "sha256": "06063fe08c9f48c062160449be72f742c898799456defcc13dab3674fcc90384"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "c77506b11db1becc896db5b86085715c7d54ee97726f4f407a3e950960ffe053"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "04d2f49b5b116aaf5364d30bb9869ea5d970f7605733cac767e2cae7746d8c3e"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/attach-receipt-v1.json",
+      "bytes": 1586,
+      "sha256": "3a389c6f89917db880247b283576b69f4228724d338599cb10b26777282958e6"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/attempt-start-v1.json",
+      "bytes": 284,
+      "sha256": "9746dc6a779d6b806d6c31260c12782ab3d0128ed7cff0ba91bafc0bfdaa3e28"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4398,
+      "sha256": "2c021de44e82633fff8835c0d3cbff492eca3879647aa30e6e44bddb54e449f5"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1536,
+      "sha256": "8b2a71ee1230bb63371eb4e18dd055d30eaa148ec858f594951befe060e29ff9"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/context-before-v1.txt",
+      "bytes": 6757,
+      "sha256": "75f6da4ac35d3046d2de753cb2042f43e9add90b23ccd6c77ad88f52b72017e0"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/executed-v1.pine",
+      "bytes": 1399,
+      "sha256": "f964228f035a4d4824654fcb116cb6dc07086ace2534638b257a58fbdc41f8ec"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/numeric-results-v1.json",
+      "bytes": 5451611,
+      "sha256": "2e8196997e6298c287384e2dd1d83d2e4b5321639cdcc01d4f1784375b908303"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/observation-v1.json",
+      "bytes": 1631,
+      "sha256": "2fb4a21b2959dcdcd4d46f8ec6ffaf869cf1e2f24a3d4e735cf074fbc15c5916"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8145,
+      "sha256": "82e676b26abe0a01e9f73878362de238185f33442c615d83bf3a1a5fa18758ae"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8223,
+      "sha256": "6dfffa6c5d2f62b285bff969a480748ae1207d476e8953c7ec703fc73a7ee926"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-remove-v1.txt",
+      "bytes": 6762,
+      "sha256": "de05dc33557395494330759e5c323d3c79c27d3d8932956bfd9f47a23305ff19"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7664,
+      "sha256": "92c3ea0ec9528f811a61e8a8f3b822564f9333d97a50977cf376afd3a18762f7"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 223005,
+      "sha256": "55eef7d9e47bde4b733d8d2bd7ffdf6c30d0912e9519ab918dd467ba17f0f0ff"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7726,
+      "sha256": "403c6883d80cf27abb80a81a5ec0dd41710bb48444bba1f74545000403599c50"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/pre-add-v1.jpg",
+      "bytes": 222884,
+      "sha256": "f460799c96a4569efdd70774acefde448ea8daaced49eb8403403a0a10dee80b"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/pre-add-v1.txt",
+      "bytes": 7726,
+      "sha256": "83e7f8206580fe5bcc491e596f418cb203e75db544f25fd3ce0a0e48063cc092"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 8013,
+      "sha256": "4fcaa98eac7b4a68f9d01cfc526963ab1d90a3cb05dc69a79aba95bee8412fbc"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 1577,
+      "sha256": "5f7172c5c91233eadddc437c714cf32145a11ce47f2cb84320ee739c72e31e66"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/save-response-v1.json",
+      "bytes": 12445,
+      "sha256": "604eb77622b12678c0d2af181d0d911e6000ab257d2abfbabdd30416806fb615"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "bc82ac883c84eda6899b8ee61d9c7aa451041df5f6be64af2992204dac0e3197"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/after-export-v1.jpg",
+      "bytes": 159417,
+      "sha256": "46aade29a205e6635f9f0752916d4405df4c12e0016d623b81a6a1b3330b0e47"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/after-export-v1.txt",
+      "bytes": 8054,
+      "sha256": "a80dbcbcfd01f59e085093ac6c13505881c91f79df5c8c8cff1391e7045bd3b1"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/before-export-v1.txt",
+      "bytes": 8013,
+      "sha256": "e78695be9bb5e65538f1935b39f527400f8047bbec928ae610ef2d9caf576562"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/capture-frontier-inspection-v1.json",
+      "bytes": 1434,
+      "sha256": "1f6ce8acc487b69ee84fb801de3c4d5dc69329f4470f67cdd97ac0996254d2b4"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-download-v1.json",
+      "bytes": 1760,
+      "sha256": "334e0cd97bd83f3ae0afa5bbcb59603dc4b57632eea03d20497c3233976c5c5d"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-export-dialog-v1.txt",
+      "bytes": 8816,
+      "sha256": "12c3e0d30a8a555ebb362d20f9757287359fe1795493d931e9f25f1406e42b15"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "325fa3759d5f16b57cd7e752ebe44dea777dbad45c12816038f5800911be226d"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 6151958,
+      "sha256": "92ea3c38d4be4fb4cba65b84888694dc85f23d2418ce7bd29fc277df554c04f5"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8054,
+      "sha256": "a80dbcbcfd01f59e085093ac6c13505881c91f79df5c8c8cff1391e7045bd3b1"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/chart-post-export-v1.jpg",
+      "bytes": 159459,
+      "sha256": "eb3c90b8ce4fdc11c261b389d2cf429e1d3132c618dfd142017391e5b6c99002"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 11370,
+      "sha256": "2a3097753c9ff64b32fc7229d44d4f7567e1dc7785f9025aaa91c91310f80c53"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3696049,
+      "sha256": "0eefb955333353ece0836525f40d151a7e9e00d0e854801a418d6c8de9a031b3"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2386,
+      "sha256": "c72015567703f97bc9effd10798907affc49b6ddbbc9968523d727106a64b74e"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/session-start-v1.json",
+      "bytes": 265,
+      "sha256": "83ddac99afeebf439dbfc71bd41b5a98ebbd60a6ab5963cded58f45a2f32e4f1"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v5/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256089,
+      "sha256": "dda3e66419efb817c579633ebee345985706b3dc4e7ecda0a3d5468986ccdfe3"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/add-response-v1.json",
+      "bytes": 12311,
+      "sha256": "42b02e2bf796267807b1f45ffa3694de4594b99c48adccb7b8c0c71119787305"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "f4586c7561e951b66cec217f43eaf2107263eaa44ae6c54fa604819190d2562f"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "8a05f1e58ef56ed287cd562caf33a70147445029ad546e3280d6bc2742b2eb75"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/attach-receipt-v1.json",
+      "bytes": 1586,
+      "sha256": "1845071262c3d4d8eaa351e09f3e6475d01e7012ef94ca992e5255df46e763cb"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 284,
+      "sha256": "00dbba2525e3ff426595294e0dd6183310824d0cbf116ae3060456a0ee9fcf87"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 4398,
+      "sha256": "a7bedcbeebfce71eca5850d645d4fd048f6500d473d75430bcda9b347372118d"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/compiler-diagnostics-v1.json",
+      "bytes": 1536,
+      "sha256": "5d6e9a771a2ca78f8db324149281ab529da80466f1a4a3bd9ebee1c08255faba"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6762,
+      "sha256": "de05dc33557395494330759e5c323d3c79c27d3d8932956bfd9f47a23305ff19"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1399,
+      "sha256": "b1a5aefe9200c6077be710ad31f1461856f0579d2313748e2a98288541dedacc"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/numeric-results-v1.json",
+      "bytes": 5451611,
+      "sha256": "67d3ddbb3380c8d3c8494fa61911784c8f408de609293076064bc6f68ee12810"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/observation-v1.json",
+      "bytes": 1631,
+      "sha256": "55f9e62dd8cf1de83f7d68a61afa119f390d79b4c18036a78e04b0b577289b6e"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8181,
+      "sha256": "1cfde8dfad77d0a3ba8f4bd2bcbbf09fb7e60a875a490d4c5dc3e305fb177067"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8181,
+      "sha256": "cd2211f641d2dc0f35d378724131cec3be5c0ffac642321887562c72e606b99d"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6767,
+      "sha256": "137bc78a27d9be60a54400411318f413ef28a65e301b3aca677904d2b7797f98"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7702,
+      "sha256": "0d4d89e8e5bb30ce0681769ca030be1c74295c24722fd3a47cea32bec14daf64"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 222381,
+      "sha256": "2d0fdc05f0546a7a9da1c7b6a3272be06292c9aee5076974aa5d626f685bf08e"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7764,
+      "sha256": "d7a36a88820129a93f0118477435ba51152ca7361ca1e6eee35a8accc2184336"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 222261,
+      "sha256": "320422389de5d1e846e2aa7d8260bc474188df3a88b0c289522b37a0c5a5cdb3"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7764,
+      "sha256": "d7a36a88820129a93f0118477435ba51152ca7361ca1e6eee35a8accc2184336"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 8038,
+      "sha256": "28402b57d0c88f4d1e60b95e475dbda0386468653901845357ba35aa83772c38"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1577,
+      "sha256": "ec4ecad29c8a8bb688efa92f1de0a72152128bf8d2cce84e37f19e233149695d"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/save-response-v1.json",
+      "bytes": 12311,
+      "sha256": "d2ea2e137c89c8e95e03ca4d162d52bd44383ebea1337a10913885a633f82edd"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "562f28d2e220eaa9c1e6a5706b14d2a5528d689f07f34dc4d416bc453d19ab29"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/after-export-v1.jpg",
+      "bytes": 158770,
+      "sha256": "6f4cdeeab2a8e3f7ec498077cb1184fd0ad970f0b033c1f6636e70bb106093be"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/after-export-v1.txt",
+      "bytes": 8079,
+      "sha256": "e3c05177619ec75c60fc96095fb04e77638869fd55f935d59cf4649445caf538"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/before-export-v1.txt",
+      "bytes": 8038,
+      "sha256": "28402b57d0c88f4d1e60b95e475dbda0386468653901845357ba35aa83772c38"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/capture-frontier-inspection-v1.json",
+      "bytes": 1434,
+      "sha256": "d33a204459bba3bc711f24d30cb3a74bcfbbfdd43d798d0786258ae0a1f51773"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-download-v1.json",
+      "bytes": 1752,
+      "sha256": "acb3c92d5cdb5126f866c8e43d506d46a2bd72d47aa04a91af3f14d2f212913c"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-export-dialog-v1.txt",
+      "bytes": 8841,
+      "sha256": "862ab86790d03afd8223cab1d9f7e5be1bc284b000b005e833fb3d4d85e1e4ac"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "41d6ad1483c41e6afd26abd6ff3d2761a67cb2d513cbe16f4c3eb00f863a9f31"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-native-v1.csv",
+      "bytes": 6152499,
+      "sha256": "c0cc90f1b6480ac557f374bedfb404108ac03036e59969e8b0629c691a3e852a"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 8079,
+      "sha256": "e3c05177619ec75c60fc96095fb04e77638869fd55f935d59cf4649445caf538"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/chart-post-export-v1.jpg",
+      "bytes": 158788,
+      "sha256": "5de6ec1d9dc19da221142d49ed598b60558f6a17df4b7fec4e7671f95ef21986"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/column-bindings-v1.json",
+      "bytes": 11370,
+      "sha256": "7fed5b58a32262f047577e75b0dc1fdb6fd43a560da80a714538eb7129c2df00"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/row-closure-mask-v1.csv",
+      "bytes": 3696359,
+      "sha256": "dcd32f8e765dc75ec30821c580b142f3a8fafae0868ce26bd458508f1dd63ec6"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/session-receipt-v1.json",
+      "bytes": 2386,
+      "sha256": "8466987bc5a92f3400e088592676e94d478b7941e7c596b22e2124f66a8de8d5"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/session-start-v1.json",
+      "bytes": 265,
+      "sha256": "bc5445aa8394538404c5c28f2108e9d27f86645014880c7b35a8d4a50599815e"
+    },
+    {
+      "path": "v97/captures/v97/v97-recursive-holes-v6/attempt-v1/session-initial-v1/source-frontier-v1.json",
+      "bytes": 256103,
+      "sha256": "07b5f9ea67a6bbd514f9a6c0a7e0f6ec70876f91670c2496cbdca6af147092a4"
     },
     {
       "path": "v97/captures/v97/v97-typed-na-v5/attempt-v1/add-response-v1.json",
