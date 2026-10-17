@@ -21,7 +21,7 @@ interface Numeric {
   facets: { facet: string; captureStatus: string; hypothesisVerdict: string; cause: string | null; details: unknown }[];
 }
 interface NativeInput { id: string; name: string; type: string; defval: unknown }
-const pin = '913792b5f5c06fcc313cb9f2e1baf6356dafdf34';
+const pin = '1273152e44a024bbf5b3d6830a4bbd1e7be55f63';
 const directory = 'v95/captures/v95/';
 const folder = (v: number) => `${directory}v95-input-defaults-v${v}/attempt-v1/`;
 const sourcePath = (v: number) => `v95/sources/v95-input-defaults-v${v}.pine`;
