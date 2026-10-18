@@ -212,7 +212,7 @@ for (const entry of entries)
       expect(regions.exposedAppearanceMetadata).toMatchObject({ zoom: null, dpi: null, resolvedFont: null });
     });
     it('native: prepares captured box fonts and passes them through the Skia text context', () => {
-      const { drawings, bars, viewport, pane, margins, paneWidthPx: width } = boxTextScene(entry);
+      const { drawings, bars, viewport, pane, margins, nativeWidth: width } = boxTextScene(entry);
       const templateFont = matchFont({ fontSize: 18 });
       const descriptors = new Map<SkFont, Parameters<typeof matchFont>[0]>();
       vi.mocked(matchFont).mockImplementation((descriptor) => {
@@ -289,3 +289,30 @@ for (const entry of entries)
         }
       });
   });
+
+it('keeps web and native box-text projection aligned with a nonzero pane left margin', () => {
+  for (const entry of entries) {
+    const registration = entry.regions.registration;
+    const [left, top, right, bottom] = registration.paneInteriorBoundsPx;
+    const shifted = {
+      ...entry,
+      regions: {
+        ...entry.regions,
+        registration: {
+          ...registration,
+          paneInteriorBoundsPx: [left + 37, top, right + 37, bottom],
+          anchorXPx: registration.anchorXPx + 37,
+        },
+      },
+    };
+    const web = paintBoxText(shifted, 'web');
+    const native = paintBoxText(shifted, 'native');
+    expect(web.texts.length).toBeGreaterThan(0);
+    expect(native.texts).toHaveLength(web.texts.length);
+    for (const [index, { x, ...text }] of native.texts.entries()) {
+      const { x: webX, ...webText } = web.texts[index];
+      expect(text).toEqual(webText);
+      expect(x).toBeCloseTo(webX, 12);
+    }
+  }
+});

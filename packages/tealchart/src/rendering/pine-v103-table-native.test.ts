@@ -5,6 +5,25 @@ import { entries, json, raw } from '../../../tealscript/tests/fixtures/v103Table
 import { countClass, nativeTablePixels, paintTable } from '../test/v103TablePaint';
 import type { PixelClass } from '../test/v103TablePaint';
 
+describe('table pixel window bounds', () => {
+  const pixels = new Uint8ClampedArray(4 * 3 * 4);
+  pixels.set([0, 0, 255, 255], (1 * 4 + 0) * 4);
+  pixels.set([0, 0, 255, 255], (1 * 4 + 3) * 4);
+  it.each([
+    ['right overflow', [4, 0, 5, 1]],
+    ['left overflow', [-1, 2, 0, 3]],
+    ['above image', [0, -1, 4, 0]],
+    ['below image', [0, 3, 4, 4]],
+    ['empty window', [2, 1, 2, 2]],
+  ])('does not borrow pixels for %s', (_, rect) => {
+    expect(countClass(pixels, 4, rect as number[], 'blue')).toBe(0);
+  });
+  it('counts only the clipped image and preserves fractional window rounding', () => {
+    expect(countClass(pixels, 4, [-2, -2, 6, 5], 'blue')).toBe(2);
+    expect(countClass(pixels, 4, [0.1, 0.1, 4.1, 1.1], 'blue')).toBe(1);
+  });
+});
+
 for (const entry of entries) describe(`${entry.id} original PNG table certificate`, () => {
   it('re-derives registered windows and native colored controls, without font/frame-identity credit', async () => {
     const { regions } = entry;

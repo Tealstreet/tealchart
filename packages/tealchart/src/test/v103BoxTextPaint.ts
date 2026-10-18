@@ -87,11 +87,12 @@ export function boxTextScene(entry: BoxTextEntry) {
     viewport,
     drawings,
     paneWidthPx,
+    nativeWidth: left + paneWidthPx,
   };
 }
 export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
   const scene = boxTextScene(entry);
-  const { width, height, left, scale, valueScale, calibration, pane, margins, viewport, drawings, paneWidthPx, bars } =
+  const { width, height, left, scale, valueScale, calibration, pane, margins, viewport, drawings, paneWidthPx, nativeWidth, bars } =
     scene;
   const { startTime } = viewport;
   const canvas = createCanvas(width, height),
@@ -126,6 +127,6 @@ export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
         return context.measureText(text).width;
       },
     }).render(partitionTealScriptDrawings(drawings), bars, viewport, pane);
-  else paintNativeTealScriptDrawings({ ctx, drawings, bars, viewport, panes: [pane], width: paneWidthPx, margins });
+  else paintNativeTealScriptDrawings({ ctx, drawings, bars, viewport, panes: [pane], width: nativeWidth, margins });
   return { ...scene, texts, width, height, pixels: active.getImageData(0, 0, width, height).data };
 }

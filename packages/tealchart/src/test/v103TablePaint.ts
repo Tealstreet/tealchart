@@ -20,7 +20,10 @@ export function colored(rgba: Uint8ClampedArray, offset: number, color: PixelCla
 }
 export function countClass(pixels: Uint8ClampedArray, width: number, rect: number[], color: PixelClass) {
   let count = 0;
-  for (let y = Math.ceil(rect[1]); y < rect[3]; y++) for (let x = Math.ceil(rect[0]); x < rect[2]; x++) if (colored(pixels, (y * width + x) * 4, color)) count++;
+  const height = pixels.length / (4 * width);
+  const x0 = Math.max(0, Math.ceil(rect[0])), x1 = Math.min(width, rect[2]);
+  const y0 = Math.max(0, Math.ceil(rect[1])), y1 = Math.min(height, rect[3]);
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) if (colored(pixels, (y * width + x) * 4, color)) count++;
   return count;
 }
 export async function nativeTablePixels(entry: TableEntry) {

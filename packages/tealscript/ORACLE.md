@@ -136,7 +136,8 @@ contains one event and 31 intentional blanks. These counts include time, phase,
 scale and presence controls; they are not new numeric drawing getter observations.
 
 The shared v102 loader and independent v103 revision literal use the append-only
-1aad8cc2 pin. V102's occluded polyline-label/table cases retain their original
+287ebfc1 pin. The v13 captures first landed at 1aad8cc2.
+V102's occluded polyline-label/table cases retain their original
 UNDECIDED verdicts. V5 table precedence, polyline arrow
 topology, universal raster/font metrics and historical context holds receive no
 credit from these seven captures. The table-over-label PNG leaves its middle label
