@@ -260,3 +260,27 @@ compares 351 numeric/blank cells exactly, including 186 intentional blanks;
 contribute one build observation, not 32 repeated getters. Original predecessors
 remain context; developing rows are excluded. Native font identity, fractional
 advances, padding, DPI/frame/zoom and universal raster claims stay held.
+
+## V104 v5 box wrapping and alignment
+
+The [v104 return](https://github.com/Tealstreet/tealscript-oracle/blob/1faebe5ac656714b4177c9acbdb5e1e411e8e9b2/v104/captures/v104/RESPONSE-v104-v2.md)
+binds two unchanged sources, each with one retained closed build and its fixed
+A−31..A block. Exact replay scores 638 cells, including 310 intentional blanks;
+66 absolute-index cells remain observed exclusions. Three span getters per source
+are one build event each, not 32 independent getter observations.
+
+Original PNG and region-map bindings retain complete wrapped/nowrap captions and
+three position-bound EDGE alternatives. Real web/native painters additionally
+match an independent local canvas reference at the frozen source coordinates.
+Local line choices use active font measurement, tested with system and DejaVu-only
+fonts. Exact native glyph/DPI/padding metrics, hidden frame identity, unrelated v104
+slots and universal composition remain held with zero added credit.
+
+The [v104 vertical delta](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v104/captures/v104/RESPONSE-v104-v11.md)
+adds the separate v5 top/center/bottom plate: 319 exact cells (155 intentional
+blanks), 33 excluded absolute-index cells and one retained build. Its original
+PNG certifies each complete EDGE caption and six box top/bottom boundaries;
+the third box is seven bars wide, while the first two are eight. Independent
+web/native local raster references bind those same identities across host fonts.
+The combined three-source score is 957 exact cells, 465 blanks and 99 excluded
+index cells. No other v11 source earns credit here; native raster metrics stay held.

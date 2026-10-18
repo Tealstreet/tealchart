@@ -11,7 +11,7 @@ import { PivotHigh, PivotLow } from '../../src/runtime/codegen/ta-classes';
 import { checkProgram } from '../../src/semantic/checker';
 
 const directory = 'v95/captures/v95/';
-const pin = '5c8a503d7b6cc1c161f75d484b5340ebc459a55b';
+const pin = '04a6378c310ef405448e5eea719bf4bc0e699e1a';
 const read = (path: string) => readFileSync(new URL(path, new URL('../../oracle-probes/', import.meta.url)));
 const json = <T,>(path: string): T => JSON.parse(read(path).toString()) as T;
 const hash = (b: Buffer) => createHash('sha256').update(b).digest('hex');

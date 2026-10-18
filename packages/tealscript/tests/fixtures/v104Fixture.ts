@@ -17,7 +17,7 @@ export const lock = JSON.parse(readFileSync(resolve(oracleRoot, '../oracle-fixtu
   revision: string;
   files: FixtureProof[];
 };
-export const revision = '5c8a503d7b6cc1c161f75d484b5340ebc459a55b';
+export const revision = '04a6378c310ef405448e5eea719bf4bc0e699e1a';
 if (lock.revision !== revision) {
   throw new Error(`V104 fixture revision mismatch: expected ${revision}, received ${lock.revision}`);
 }

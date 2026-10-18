@@ -12,7 +12,7 @@ const oracleRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../oracl
 export const lock = JSON.parse(readFileSync(resolve(oracleRoot, '../oracle-fixtures.json'), 'utf8')) as {
   revision: string; files: FixtureProof[];
 };
-export const revision = '5c8a503d7b6cc1c161f75d484b5340ebc459a55b';
+export const revision = '04a6378c310ef405448e5eea719bf4bc0e699e1a';
 if (lock.revision !== revision) {
   throw new Error(`V102 fixture revision mismatch: expected ${revision}, received ${lock.revision}`);
 }

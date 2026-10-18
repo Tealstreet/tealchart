@@ -21,7 +21,7 @@ interface Numeric {
   records: RecordCell[]; comparisonCounts: { SUPPORTED: number; REFUTED: number; UNDECIDED: number };
 }
 interface NativeWarning { message: string; start: { line: number; column: number }; end: { line: number; column: number }; code?: string; ctx?: { functionName: string } }
-const revision = '5c8a503d7b6cc1c161f75d484b5340ebc459a55b';
+const revision = '04a6378c310ef405448e5eea719bf4bc0e699e1a';
 const base = 'v95/captures/v95/';
 const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8')) as {
   revision: string; files: Proof[];

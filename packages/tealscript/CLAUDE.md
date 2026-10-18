@@ -4925,3 +4925,11 @@ COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay 
 V103 styles replay seven unchanged sources at their own closed retained anchors.
 Exact non-index cells include intentional blanks; one build event is not32 getter
 observations. PNG-bound topology remains separate from plotarrow sign-direction held.
+
+V104 v5 box wrap/alignment replay preserves each build's three getter values
+and intentional blanks. Absolute indices are observed exclusions; four modulo8
+cycles use original closed bars without synthesizing an own-origin prefix.
+
+V104 v5 vertical alignment adds one retained build with 8/8/7 span getters.
+Its 319 exact cells include 155 intentional blanks; the 33 absolute-index cells
+stay observed exclusions, and unrelated v11 slots receive no credit.

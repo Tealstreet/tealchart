@@ -10,7 +10,7 @@ const absoluteIndexCause =
 
 describe('v103 original box text layout and formatting', () => {
   it('binds an independent immutable revision, all v17 integrity dependencies and validation', () => {
-    expect(revision).toBe('5c8a503d7b6cc1c161f75d484b5340ebc459a55b');
+    expect(revision).toBe('04a6378c310ef405448e5eea719bf4bc0e699e1a');
     expect(lock.revision).toBe(revision);
     const path = capture + 'artifact-integrity-v17.json';
     for (const proof of [...json(path).artifacts, { path, bytes: raw(path).length, sha256: hash(raw(path)) }]) {

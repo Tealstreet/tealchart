@@ -1724,3 +1724,11 @@ stroke recipe by its width, including native Skia effects and serialized drawing
 worklets. Dotted styles, boxes, polylines, plots and hlines extend the shared rule
 by inference, with separate regression gates; this capture credits only v6 lines.
 Exact native pixel periods, phase resets, clipping and universal dash ratios stay held.
+
+V104 v5 wrap/alignment locks bind each of three boxes to its source position,
+complete caption and independently painted local raster. Whole-word wrap counts
+use active font measurements; native glyph metrics remain unobserved.
+
+V104 v5 vertical alignment binds complete EDGE ink to left/top, middle/center
+and right/bottom equal-height boxes. Compare complete per-object local rasters
+under system and DejaVu-only fonts; exact native font/padding metrics stay held.
