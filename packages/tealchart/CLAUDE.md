@@ -65,6 +65,9 @@ Serialized native worklet tests must materialize the closure shape emitted by
 the installed mobile Babel plugin: Worklets 0.13 uses arrays, while older
 versions used objects. Preserve array captures recursively instead of forcing
 object closures, so these gates execute the actual serialized UI function body.
+Both serialized loaders use `src/test/transformNativeWorklet.ts`. Babel 7 core
+emits legacy type-argument fields that the Babel 8 TypeScript plugin no longer
+erases; remove them before Worklets serializes bodies. JSX uses its own plugin.
 
 ## Architecture
 
