@@ -3,7 +3,7 @@ import { createCanvas } from '@napi-rs/canvas';
 import type { CanvasContext } from './CanvasContext';
 
 import { entries } from '../../../tealscript/tests/fixtures/v103Styles';
-import { segments, traceStyles, type StyleChannel, type StylePaint } from '../test/v103StylesPaint';
+import { segments, stylePaintGlyphs, traceStyles, type StyleChannel, type StylePaint } from '../test/v103StylesPaint';
 import { DEFAULT_RENDER_OPTIONS } from '../types';
 import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScriptDrawings';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
@@ -14,14 +14,33 @@ const entry = (name: string) => entries.find(e => e.id === `v103-${name}`)!;
 const color = (paints: StylePaint[], hex: string) => paints.filter(p => p.color?.slice(0, 7).toLowerCase() === hex);
 const blue = (paints: StylePaint[]) => color(paints, '#2962ff');
 const near = (a: number, b: number) => Math.abs(a - b) < 1e-8;
+const replayRows = (e: typeof entries[number]) => Array.from({ length: e.anchor - e.first + 1 }, (_, i) => e.first + i);
+const recipeValue = (e: typeof entries[number], row: number, title: string) => {
+  const phase = Number(e.csv.raw(row, 'INPUT_INDEX')) % 8;
+  if (title === 'JOIN' || title === 'NOJOIN') return phase % 4 < 2 ? (title === 'JOIN' ? 15 : 45) + 2 * phase : null;
+  if (title === 'SMALL_SQUARE') return phase === 0 ? 80 : null;
+  if (title === 'LARGE_SQUARE') return phase === 4 ? 60 : null;
+  return phase === 2 ? 30 : null;
+};
+const inkCache = new Map<string, boolean>();
 const expectVisiblePaint = (paint: StylePaint) => {
+  const key = JSON.stringify(paint);
+  const cached = inkCache.get(key);
+  if (cached === true) return;
+  if (cached !== undefined) {
+    expect(cached, key).toBe(true);
+    return;
+  }
   expect(paint.color).toMatch(/^#[0-9a-f]{6}([0-9a-f]{2})?$/i);
   const colorAlpha = Number.parseInt(paint.color.slice(7) || 'ff', 16) / 255;
   expect(paint.globalAlpha).toBeGreaterThan(0);
   expect(paint.globalAlpha).toBeLessThanOrEqual(1);
   expect(colorAlpha * paint.globalAlpha!).toBeGreaterThan(0);
   if (paint.kind === 'stroke') expect(paint.lineWidth).toBeGreaterThan(0);
-  // Rasterize each emitted primitive independently; another subject cannot supply its ink.
+  for (const command of paint.commands) {
+    if (command.op === 'R' || command.op === 'C') expect(command.w).toBeGreaterThan(0);
+    if (command.op === 'R') expect(command.h).toBeGreaterThan(0);
+  }
   const padding = 32;
   const minX = Math.floor(Math.min(...paint.commands.map(c => c.x - (c.w ?? 0))) - padding);
   const minY = Math.floor(Math.min(...paint.commands.map(c => c.y - (c.h ?? c.w ?? 0))) - padding);
@@ -47,11 +66,40 @@ const expectVisiblePaint = (paint: StylePaint) => {
   if (paint.kind === 'stroke') ctx.stroke();
   else if (paint.kind === 'fill') ctx.fill();
   const pixels = ctx.getImageData(0, 0, maxX - minX, maxY - minY).data;
-  expect(pixels.some((value, i) => i % 4 === 3 && value > 0), JSON.stringify(paint)).toBe(true);
+  const visible = pixels.some((value, i) => i % 4 === 3 && value > 0);
+  inkCache.set(key, visible);
+  expect(visible, key).toBe(true);
 };
 const expectVisibleColors = (trace: ReturnType<typeof traceStyles>, ...hexes: string[]) => {
   for (const hex of hexes) for (const paint of color(trace.paints, hex)) {
-    if (paint.commands.some(c => ['L', 'C', 'R', 'T'].includes(c.op))) expectVisiblePaint(paint);
+    for (const glyph of stylePaintGlyphs(paint)) expectVisiblePaint(glyph);
+  }
+};
+const bandCache = new Map<string, Uint8ClampedArray>();
+const expectBandCoverage = (trace: ReturnType<typeof traceStyles>, e: typeof entries[number], hex: string, y: number, title?: string, fillgaps = false) => {
+  const paints = color(trace.paints, hex).filter(p => p.kind === 'fill');
+  const key = JSON.stringify(paints);
+  let pixels = bandCache.get(key);
+  if (!pixels) {
+    const ctx = createCanvas(1000, 100).getContext('2d');
+    for (const paint of paints) {
+      ctx.fillStyle = paint.color; ctx.globalAlpha = paint.globalAlpha!; ctx.beginPath();
+      for (const c of paint.commands) {
+        if (c.op === 'M') ctx.moveTo(c.x, c.y);
+        else if (c.op === 'L') ctx.lineTo(c.x, c.y);
+        else if (c.op === 'Z') ctx.closePath();
+        else if (c.op === 'R') ctx.rect(c.x, c.y, c.w!, c.h!);
+      }
+      ctx.fill();
+    }
+    pixels = ctx.getImageData(0, 0, 1000, 100).data;
+    bandCache.set(key, pixels);
+  }
+  const finite = title ? Array.from({ length: e.anchor - e.first + 1 }, (_, i) => i + e.first).filter(row => e.csv.raw(row, title) !== '') : [];
+  for (const row of replayRows(e).filter(row => row < e.anchor)) {
+    const expected = !title || (fillgaps ? row >= finite[0] && row < finite.at(-1)! : e.csv.raw(row, title) !== '' && e.csv.raw(row + 1, title) !== '');
+    const x = Math.floor((trace.x(row) + trace.x(row + 1)) / 2);
+    expect(pixels[(y * 1000 + x) * 4 + 3] > 0, `${hex} closed interval ${row}`).toBe(expected);
   }
 };
 const drawingInk = (trace: ReturnType<typeof traceStyles>, channel: StyleChannel) => {
@@ -182,6 +230,12 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       for (const id of ['plot-fill-false', 'plot-fill-true', 'hline-fill-positive']) facet(name, id);
       const e = entry(name), trace = traceStyles(e, channel);
       expectVisibleColors(trace, '#fdd835', '#00bcd4', '#9c27b0');
+      for (const paint of trace.paints.filter(p => p.kind === 'fill').flatMap(stylePaintGlyphs)) {
+        const ys = paint.commands.filter(c => c.op === 'M' || c.op === 'L').map(c => c.y);
+        for (const [low, high, hex] of [[60, 80, '#fdd835'], [20, 40, '#00bcd4'], [4, 10, '#9c27b0']] as const) {
+          if (near(Math.min(...ys), low) && near(Math.max(...ys), high)) expect(paint.color.slice(0, 7).toLowerCase()).toBe(hex);
+        }
+      }
       const polygons = (hex: string) => color(trace.paints, hex).filter(p => p.kind === 'fill').flatMap(p => {
         const islands: { x: number; y: number }[][] = [];
         for (const c of p.commands) {
@@ -200,6 +254,9 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
         expect(covers(yellow, x)).toBe(false); expect(covers(aqua, x)).toBe(true); expect(covers(purple, x)).toBe(true);
       }
       expect(purple.flat().every(c => near(c.y, 4) || near(c.y, 10))).toBe(true);
+      expectBandCoverage(trace, e, '#fdd835', 70, 'P20');
+      expectBandCoverage(trace, e, '#00bcd4', 30, 'P60', true);
+      expectBandCoverage(trace, e, '#9c27b0', 7);
     });
     it('joins adjacent blue circles without crossing holes, leaving aqua isolated', () => {
       facet('plot-controls-v6', 'circle-join');
@@ -208,13 +265,18 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       const joins = segments(blue(trace.paints).filter(p => p.kind === 'stroke'));
       for (const [title, hex] of [['JOIN', '#2962ff'], ['NOJOIN', '#00bcd4']]) {
         const circles = color(trace.paints, hex).flatMap(p => p.commands.filter(c => c.op === 'C'));
-        for (const row of e.primary) {
-          const raw = e.csv.raw(row, title), points = circles.filter(c => near(c.x, trace.x(row)));
-          expect(points).toHaveLength(raw === '' ? 0 : 1);
-          if (raw !== '') expect(near(points[0].y, 100 - Number(raw))).toBe(true);
+        const expectedRows = replayRows(e).filter(row => recipeValue(e, row, title) !== null);
+        expect(circles).toHaveLength(expectedRows.length);
+        for (const row of replayRows(e)) {
+          const value = recipeValue(e, row, title), points = circles.filter(c => near(c.x, trace.x(row)));
+          expect(points).toHaveLength(value === null ? 0 : 1);
+          if (value !== null) expect(near(points[0].y, 100 - value)).toBe(true);
         }
       }
       expect(joins.length).toBeGreaterThan(0);
+      const joinedRows = replayRows(e).filter(row => row < e.anchor && recipeValue(e, row, 'JOIN') !== null && recipeValue(e, row + 1, 'JOIN') !== null);
+      expect(joins).toHaveLength(joinedRows.length);
+      for (const row of joinedRows) expect(joins.filter(([a, b]) => near(a.x, trace.x(row)) && near(b.x, trace.x(row + 1)) && near(a.y, 100 - recipeValue(e, row, 'JOIN')!) && near(b.y, 100 - recipeValue(e, row + 1, 'JOIN')!))).toHaveLength(1);
       for (const row of e.primary) {
         const phase = Number(e.csv.raw(row, 'CASE_ID'));
         if (phase % 4 === 0 && row < e.anchor) expect(joins.some(([a, b]) => near(a.x, trace.x(row)) && near(b.x, trace.x(row + 1)) && near(a.y, 100 - Number(e.csv.raw(row, 'JOIN'))) && near(b.y, 100 - Number(e.csv.raw(row + 1, 'JOIN'))))).toBe(true);
@@ -232,6 +294,8 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       for (let row = e.anchor - 3; row <= e.anchor; row++) expect(orange.some(c => near(c.x, trace.x(row)))).toBe(true);
       const tracker = segments(color(trace.paints, '#f23645').filter(p => p.kind === 'stroke'));
       expect(tracker.some(([a, b]) => a.x < trace.x(e.anchor - 95) && b.x > trace.x(e.anchor - 10) && near(a.y, 10) && near(b.y, 10))).toBe(true);
+      expect(tracker).toHaveLength(1);
+      expect(tracker[0].map(p => ({ x: p.x, y: p.y }))).toEqual([{ x: 0, y: 10 }, { x: 1000, y: 10 }]);
     });
     it('places upper squares at value80, makes the lower squares larger and paints the literal X', () => {
       for (const id of ['shape-size', 'shape-absolute-location', 'literal-char']) facet('markers-v6', id);
@@ -243,24 +307,47 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       expect(small.length).toBeGreaterThan(4); expect(large.length).toBeGreaterThan(4);
       expect(Math.min(...large.map(c => c.w!))).toBeGreaterThan(Math.max(...small.map(c => c.w!)));
       for (const [title, rectangles] of [['SMALL_SQUARE', small], ['LARGE_SQUARE', large]] as const) {
-        for (const row of e.primary) {
+        expect(rectangles).toHaveLength(replayRows(e).filter(row => recipeValue(e, row, title) !== null).length);
+        for (const row of replayRows(e)) {
           const match = rectangles.filter(c => near(c.x + c.w! / 2, trace.x(row)));
-          expect(match).toHaveLength(e.csv.raw(row, title) === '' ? 0 : 1);
+          expect(match).toHaveLength(recipeValue(e, row, title) === null ? 0 : 1);
         }
       }
       const chars = color(trace.paints, '#ff9800').filter(p => p.kind === 'text').flatMap(p => p.commands);
       expect(chars.length).toBeGreaterThan(4); expect(chars.every(c => c.text === 'X')).toBe(true);
-      for (const row of e.primary) {
-        const match = chars.filter(c => c.anchorX !== undefined && near(c.anchorX, trace.x(row)));
-        expect(match).toHaveLength(e.csv.raw(row, 'CHAR_X') === '' ? 0 : 1);
-        if (match.length) expect(near(match[0].anchorY!, 100 - Number(e.csv.raw(row, 'CHAR_X')))).toBe(true);
+      expect(chars).toHaveLength(replayRows(e).filter(row => recipeValue(e, row, 'CHAR_X') !== null).length);
+      for (const row of replayRows(e)) {
+        const match = chars.filter(c => c.anchorOffsetX !== undefined && near(c.x + c.anchorOffsetX, trace.x(row)));
+        expect(match).toHaveLength(recipeValue(e, row, 'CHAR_X') === null ? 0 : 1);
+        if (match.length) expect(near(match[0].y + match[0].anchorOffsetY!, 100 - recipeValue(e, row, 'CHAR_X')!)).toBe(true);
       }
     });
     it('varies positive plotarrow heights with magnitude while sign-direction remains held', () => {
       const name = 'plotarrow-height-v6', e = entry(name), trace = traceStyles(e, channel);
       facet(name, 'relative-height');
-      expectVisibleColors(trace, '#2962ff');
+      expectVisibleColors(trace, '#2962ff', '#ff9800');
       expect(e.regions.facets.find((f: any) => f.facetId.endsWith(':sign-direction')).verdict).toBe('UNDECIDED');
+      for (const [hex, negative] of [['#2962ff', false], ['#ff9800', true]] as const) {
+        const glyphs = color(trace.paints, hex).flatMap(stylePaintGlyphs);
+        const rows = replayRows(e).filter(row => {
+          const phase = Number(e.csv.raw(row, 'INPUT_INDEX')) % 32;
+          return negative ? phase === 24 : phase === 0 || phase === 8 || phase === 16;
+        });
+        expect(glyphs).toHaveLength(rows.length);
+        for (const row of rows) {
+          const matches = glyphs.filter(glyph => {
+            const points = glyph.commands.filter(c => c.op !== 'Z');
+            return near((Math.min(...points.map(c => c.x)) + Math.max(...points.map(c => c.x))) / 2, trace.x(row));
+          });
+          expect(matches).toHaveLength(1);
+          const points = matches[0].commands.filter(c => c.op !== 'Z');
+          const low = Math.min(...points.map(c => c.y)), high = Math.max(...points.map(c => c.y));
+          const bar = trace.bars[row - e.first];
+          const anchor = (trace.viewport.priceMax - (negative ? bar.high : bar.low)) / (trace.viewport.priceMax - trace.viewport.priceMin) * trace.height;
+          // Constructor-to-painter placement is a local control; negative head direction stays held.
+          expect(near((low + high) / 2, anchor + (negative ? -1 : 1) * (high - low + 4))).toBe(true);
+        }
+      }
       const height = (row: number) => {
         const x = trace.x(row);
         const islands: typeof trace.paints[number]['commands'][] = [];

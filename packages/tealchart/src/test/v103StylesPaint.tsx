@@ -18,7 +18,7 @@ import { nativePrimitives, resolved } from './nativePlotPaintHarness';
 import { DEFAULT_RENDER_OPTIONS } from '../types';
 
 export type StyleChannel = 'web' | 'web-pane' | 'web-unified' | 'native' | 'native-static';
-export interface StyleCommand { op: string; x: number; y: number; w?: number; h?: number; text?: string; anchorX?: number; anchorY?: number }
+export interface StyleCommand { op: string; x: number; y: number; w?: number; h?: number; text?: string; anchorX?: number; anchorY?: number; anchorOffsetX?: number; anchorOffsetY?: number }
 export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; commands: StyleCommand[]; dash: number[]; globalAlpha?: number; lineWidth?: number; font?: string; textAlign?: CanvasTextAlign; textBaseline?: CanvasTextBaseline }
 export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
   const { result, bars } = executeStyle(entry);
@@ -40,7 +40,7 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
     stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), commands: [...commands], dash: [...dash], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
     rect: (x, y, w, h) => { commands.push({ op: 'R', x, y, w, h }); }, roundRect: noop, quadraticCurveTo: noop, bezierCurveTo: noop, clip: noop, scale: noop, translate: noop,
     fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [{ op: 'R', x, y, w, h }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }), strokeRect: noop,
-    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
+    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined, anchorOffsetX: ctx.textAlign === 'center' ? 0 : undefined, anchorOffsetY: ctx.textBaseline === 'middle' ? 0 : undefined }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
     save: () => { states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline, dash: [...dash] }); },
     restore: () => { const state = states.pop(); if (state) { Object.assign(ctx, state); dash = state.dash; } },
     setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash], measureText: s => ({ width: s.length * 7 }) as TextMetrics,
@@ -75,7 +75,8 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
         const text = resolved<string>(node.props.text), font = node.props.font, metrics = font.getMetrics();
         const x = resolved<number>(node.props.x), y = resolved<number>(node.props.y);
         paints.push({ kind: 'text', color: resolved(node.props.color), commands: [{ op: 'T', x, y, text,
-          anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2 }], dash: [], globalAlpha: node.opacity, font: '12px sans-serif', textAlign: 'left', textBaseline: 'alphabetic' });
+          anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2,
+          anchorOffsetX: font.measureText(text).width / 2, anchorOffsetY: -(-metrics.ascent - metrics.descent) / 2 }], dash: [], globalAlpha: node.opacity, font: `${font.getSize()}px sans-serif`, textAlign: 'left', textBaseline: 'alphabetic' });
       }
       if (node.type !== Path) continue;
       const path = resolved<any>(node.props.path);
@@ -92,4 +93,24 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
 }
 export function segments(paints: StylePaint[]) {
   return paints.flatMap(p => p.commands.flatMap((point, i) => point.op === 'L' && i ? [[p.commands[i - 1], point]] : []));
+}
+
+export function stylePaintGlyphs(paint: StylePaint): StylePaint[] {
+  const glyphs: StylePaint[] = [];
+  let commands: StyleCommand[] = [];
+  const flush = () => {
+    if (commands.some(c => c.op === 'L')) glyphs.push({ ...paint, commands });
+    commands = [];
+  };
+  for (const command of paint.commands) {
+    if (['C', 'R', 'T'].includes(command.op)) {
+      flush();
+      glyphs.push({ ...paint, commands: [command] });
+    } else if (command.op === 'M') {
+      flush();
+      commands.push(command);
+    } else commands.push(command);
+  }
+  flush();
+  return glyphs;
 }
