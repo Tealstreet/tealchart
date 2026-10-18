@@ -27,7 +27,7 @@ export function linefillTable(path: string) {
 export interface LinefillEntry {
   id: string; report: any; block: any; csv: ReturnType<typeof linefillTable>; sourcePath: string; regions: any;
 }
-export const linefillEntries: LinefillEntry[] = linefillJson(linefillCapture + 'numeric-controls-v12.json').sources.filter((entry: { sourceId: string }) => /^v102-(linefill-sloped|line-price|line-price-vertical)-v[56]$/.test(entry.sourceId)).map((entry: { sourceId: string; report: { path: string } }) => {
+export const linefillEntries: LinefillEntry[] = linefillJson(linefillCapture + 'numeric-controls-v26.json').sources.filter((entry: { sourceId: string }) => /^v102-(linefill-sloped|line-price|line-price-vertical)-v[56]$/.test(entry.sourceId)).map((entry: { sourceId: string; report: { path: string } }) => {
   const report = linefillJson(entry.report.path);
   const block = linefillJson(report.nativeBlock.path);
   return { id: entry.sourceId, report, block, csv: linefillTable(block.csv.path),

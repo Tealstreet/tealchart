@@ -37,7 +37,7 @@ interface Region {
     yTicks: { value: number; yPx: number }[]; coordinateUncertaintyPx: { x: number; y: number } };
 }
 const capture = 'v102/captures/v102/';
-const versions = [5];
+const versions = [5, 6];
 const raw = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => raw(path).toString('utf8');
 const json = <T,>(path: string): T => JSON.parse(text(path)) as T;
@@ -57,6 +57,7 @@ function sameRaw(value: number | null, expected: string) {
 
 for (const version of versions) {
   const id = `v102-coordinate-render-v${version}`, prefix = capture + id + '/', attempt = prefix + 'attempt-v1/';
+  const round = version === 6 ? 'v26' : 'v6';
   const block = json<Block>(prefix + 'native-cell-block-v1.json');
   const numeric = json<Numeric>(prefix + 'numeric-results-v1.json');
   const region = json<Region>(prefix + 'derived-region-map-v1.json');
@@ -104,13 +105,13 @@ for (const version of versions) {
   describe(`${id}: bounded native coordinate and final-geometry evidence`, () => {
     it('binds the original source, native bodies, CSV/closure, PNG, contracts and derived verdicts', () => {
       expect(lock.revision).toBe('f47a4e34ce33441ad37add124d9572119826138d');
-      const integrity = json<{ artifacts: Proof[] }>(capture + 'artifact-integrity-v6.json');
-      const shared = ['CAPTURE-TOOLING-LICENSE-v1.md', 'RESPONSE-v102-v6.md', 'account-actions-v6.json',
-        'attempt-inventory-v6.json', 'facet-capabilities-v6.json', 'numeric-contracts-v1.json',
-        'numeric-controls-v6.json', 'validation-result-v6.json'].map(path => capture + path);
+      const integrity = json<{ artifacts: Proof[] }>(capture + `artifact-integrity-${round}.json`);
+      const shared = ['CAPTURE-TOOLING-LICENSE-v1.md', `RESPONSE-v102-${round}.md`, `account-actions-${round}.json`,
+        `attempt-inventory-${round}.json`, `facet-capabilities-${round}.json`, 'numeric-contracts-v1.json',
+        `numeric-controls-${round}.json`, `validation-result-${round}.json`].map(path => capture + path);
       const paths = [...integrity.artifacts.filter(f => f.path.startsWith(prefix) || f.path === `v102/sources/${id}.pine`
-        || shared.includes(f.path) || ['v102/REQUEST-v102-v1.md', 'v102/CASE-MATRIX-v1.json'].includes(f.path)), proof(capture + 'artifact-integrity-v6.json')];
-      expect(paths).toHaveLength(50);
+        || shared.includes(f.path) || ['v102/REQUEST-v102-v1.md', 'v102/CASE-MATRIX-v1.json'].includes(f.path)), proof(capture + `artifact-integrity-${round}.json`)];
+      expect(paths).toHaveLength(version === 6 ? 51 : 50);
       for (const entry of paths) {
         expect(proof(entry.path)).toEqual(entry);
         expect(lock.files.find(f => f.path === entry.path)).toEqual(entry);
@@ -141,7 +142,7 @@ for (const version of versions) {
       const dx = (right.xPx - left.xPx) / (Number(right.originalOwnIndex.valueRaw) - Number(left.originalOwnIndex.valueRaw));
       expect(region.derivedCalibration.pixelsPerOwnIndex).toBe(dx);
       expect(region.derivedCalibration.anchorXPx).toBe(left.xPx + dx * (Number(cell(region.visualAnchor.INPUT_INDEX)) - Number(left.originalOwnIndex.valueRaw)));
-      expect(json<{ status: string }>(capture + 'validation-result-v6.json').status).toBe('PASS');
+      expect(json<{ status: string }>(capture + `validation-result-${round}.json`).status).toBe('PASS');
     });
 
     it('re-derives every closure/phase/mask and preserves all excluded raw observations', () => {
@@ -168,7 +169,7 @@ for (const version of versions) {
           : index + 1 === end ? 'VISUAL_ANCHOR_ROW' : block.originalClosedPredecessorRows.includes(index + 1) ? 'RESERVED_ORIGINAL_CLOSED_PREDECESSOR' : 'OUTSIDE_FIXED_PRIMARY_BLOCK'); excluded++; }
         closed += Number(isClosed);
       }
-      expect([data.rows.length, closed, primary, excluded]).toEqual([311, 310, 32, 279]);
+      expect([data.rows.length, closed, primary, excluded]).toEqual(version === 6 ? [327, 326, 32, 295] : [311, 310, 32, 279]);
       for (const ordinal of block.originalClosedPredecessorRows) expect(mask.rows[ordinal - 1][15]).toBe('RESERVED_ORIGINAL_CLOSED_PREDECESSOR');
       expect(mask.rows.at(-1)![14]).toBe('OBSERVED / EXCLUDED');
     });
@@ -233,11 +234,12 @@ for (const version of versions) {
     });
 
     it('keeps unsupported intermediate modes, coincident-setter alternatives and raster/identity claims held', () => {
-      const assessment = json<{ cases: { verdict: string; v5BoxXlocCredit?: number; unobservedIntermediateLabelTimeTransition?: string }[]; held: string[] }>(prefix + 'facet-assessment-v2.json');
+      const assessment = json<{ cases: { verdict: string; v5BoxXlocCredit?: number; unobservedIntermediateLabelTimeTransition?: string }[]; held: string[] }>(prefix + (version === 6 ? 'facet-assessment-v3.json' : 'facet-assessment-v2.json'));
       expect(assessment.cases.map(c => c.verdict)).toEqual(['SUPPORTED', 'SUPPORTED', 'SUPPORTED', 'SUPPORTED']);
-      expect(assessment.cases[1].v5BoxXlocCredit).toBe(0);
+      expect(assessment.cases[1].v5BoxXlocCredit).toBe(version === 6 ? null : 0);
       expect(assessment.cases[2].unobservedIntermediateLabelTimeTransition).toContain('No getter observes the transient label bar_time state');
-      expect(region.facets[1].notExercised).toContain('No box.set_xloc call exists');
+      if (version === 5) expect(region.facets[1].notExercised).toContain('No box.set_xloc call exists');
+      else expect(region.facets[1].notExercised).toBeUndefined();
       expect(region.facets[1].aliasLimit).toContain('ignored box-point setter is not distinguished');
       expect(region.facets[2].notObservedCause).toContain('ignored point/time setters are not separated');
       expect(assessment.held).toEqual(['Any absent/unreadable/nonintersecting/already obscured/precision-ambiguous pixel region',
@@ -248,7 +250,7 @@ for (const version of versions) {
       expect(region.nativeFrameId).toBeNull();
       expect(region.nativeFrameIdStatus).toContain('UNOBSERVED');
       expect(region.derivedCalibration.coordinateUncertaintyPx).toEqual({ x: 2, y: 3 });
-      expect(numeric.properties.find(p => p.title === 'BOX_TIME_DELTA')!.expectedRawByPhase).toEqual(Array(8).fill(''));
+      expect(numeric.properties.find(p => p.title === 'BOX_TIME_DELTA')!.expectedRawByPhase).toEqual(Array(8).fill(version === 6 ? '0' : ''));
     });
   });
 }
