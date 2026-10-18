@@ -177,3 +177,14 @@ rewrite supplies the build guard. Every other closed/developing row stays exclud
 The label's intermediate time-mode getter delta is numeric only; its final index-mode
 pixels do not observe the intermediate mode flag. All historical holds remain intact.
 The engine already matches these captures; tests lock the regression with mutations.
+
+The [v103 v22 return](https://github.com/Tealstreet/tealscript-oracle/blob/ac9d6992d6d84e296c58dca98fb6b707224d55a1/v103/captures/v103/RESPONSE-v103-v22.md)
+binds the v5 extend-stroke plate and separate retained-replacement v5/v6 plates.
+Their 96 selected closed rows supply 861 exact non-index cells (489 present,
+372 intentional blanks); 99 absolute-index cells remain excluded. Each linefill
+COUNT/PARENT channel supplies one event and 31 blanks. Original PNGs and frozen
+windows distinguish row-owned extension/stroke/width classes, a single blue fill
+following moved parents, and deletion of the independent right replacement with
+positive parent/left-fill controls through both painters. Raster metrics, hidden
+handle identity and a universal alpha law remain held; v102 v5 entry stops receive
+no retroactive execution credit. This is a mutation-proven regression lock.

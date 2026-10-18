@@ -27,7 +27,7 @@ interface Frontier {
   nativeExportUtc: string; noCrossSessionStitching: boolean;
   physicalFirstRow: { raw: string[] }; physicalLastRow: { raw: string[] };
 }
-const revision = 'cd1fcda33e7bae9198823468495f6cb6feb05145';
+const revision = 'ac9d6992d6d84e296c58dca98fb6b707224d55a1';
 const base = 'v97/captures/v97/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString('utf8');

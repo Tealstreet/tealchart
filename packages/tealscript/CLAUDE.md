@@ -4917,3 +4917,7 @@ of exact numeric STEP values and supported gap/area/offset/dashed appearances.
 V103 table replay retains the rotated A-31..A block and eight original predecessors.
 Build getters supply one event plus31 blanks; absolute indices remain observed
 exclusions when replaying an original phase-aligned suffix without a fake prefix.
+
+V103 v5 extension/stroke and v5/v6 retained-linefill locks replay original phase-aligned
+suffixes through each one-time closed build. Absolute indices remain excluded.
+COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay held.
