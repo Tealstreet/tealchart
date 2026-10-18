@@ -3,6 +3,12 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { raw } from '../../../tealscript/tests/fixtures/v102Fixture';
 import { copy6 } from '../../../tealscript/tests/fixtures/v103Copy';
 import { traceEntry } from '../test/v102Paint';
+import type { CanvasContext } from './CanvasContext';
+import type { ComputedPane } from '../types';
+import { DEFAULT_RENDER_OPTIONS } from '../types';
+import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
+import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
+import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScriptDrawings';
 
 const blue = '#2962FF', red = '#F23645';
 describe('v103 v6 copy: original PNG models through the real drawing painters', () => {
@@ -13,12 +19,60 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
     const patch = ([x1, y1, x2, y2]: number[]) => Buffer.from(ctx.getImageData(x1, y1, x2 - x1, y2 - y1).data);
     for (const facet of copy6.regions.facets) {
       const subject = facet.manualFinding.actualSubjectRegionsPx[0];
-      const [control] = facet.manualFinding.actualControlRegionsPx;
+      const [control, source] = facet.manualFinding.actualControlRegionsPx;
       expect(patch(subject).equals(patch(control)), facet.facetId).toBe(true);
+      expect(patch(subject).equals(patch(source)), `${facet.facetId} native source differs`).toBe(false);
     }
   });
   for (const channel of ['web', 'native'] as const) {
     const trace = () => traceEntry(copy6.replay, channel, true);
+    for (const object of ['line', 'box', 'label'] as const) {
+      it(`${channel}: entire painted ${object} copy matches its constructor at independent positions`, () => {
+        const { result, bars } = copy6.replay;
+        const width = 2048, height = 400;
+        const canvas = createCanvas(width, height), context = canvas.getContext('2d');
+        context.fillStyle = '#0F0F0F';
+        context.fillRect(0, 0, width, height);
+        const ctx = context as unknown as CanvasContext;
+        // A dyadic viewport gives all original 2m anchors the same pixel phase.
+        const viewport = { startTime: bars[0].time, endTime: bars[0].time + 512 * 120000, priceMin: 0, priceMax: 100 };
+        expect(bars[bars.length - 1].time).toBeLessThan(viewport.endTime);
+        const margins = { left: 0, right: 0, top: 0, bottom: 0 };
+        const pane: ComputedPane = { id: 'study', type: 'indicator', indicatorIds: ['captured'], heightRatio: 1,
+          fixedRange: true, yMin: 0, yMax: 100, top: 0, bottom: height, height };
+        const drawings = result.drawings.map(drawing => ({ ...drawing, scriptId: 'captured' }));
+        if (channel === 'web') {
+          new TealScriptDrawingRenderer({ ctx, options: { ...DEFAULT_RENDER_OPTIONS, width }, margins, font: 'sans-serif',
+            coordinateResolvers: {
+              timeToX: time => (time - viewport.startTime) / (viewport.endTime - viewport.startTime) * width,
+              valueToY: value => height - value * 4,
+            },
+            getTextWidth: (active, text, font) => { active.font = font; return active.measureText(text).width; },
+          }).render(partitionTealScriptDrawings(drawings), bars, viewport, pane);
+        } else {
+          paintNativeTealScriptDrawings({ ctx, drawings, bars, viewport, panes: [pane], width, margins });
+        }
+        const anchor = copy6.rowSet.uniqueVisualAnchorRowOrdinal - copy6.startRowOrdinal;
+        const projectX = (offset: number) => (bars[anchor + offset].time - viewport.startTime) / 120000 * 4;
+        const patch = (role: 'source' | 'copy' | 'constructor') => {
+          const offset = role === 'source' ? -90 : role === 'copy' ? -60 : -30;
+          let left = projectX(offset) - 12, top = object === 'line' ? (role === 'source' ? 140 : 60) - 12 : 188;
+          let patchWidth = 84, patchHeight = object === 'line' ? 24 : 104;
+          if (object === 'label') {
+            left = projectX(offset + 8) - 50;
+            top = 324; patchWidth = 100; patchHeight = 56;
+          }
+          expect(Number.isInteger(left)).toBe(true);
+          return Buffer.from(context.getImageData(left, top, patchWidth, patchHeight).data);
+        };
+        const copied = patch('copy'), constructor = patch('constructor'), source = patch('source');
+        const background = Buffer.from([15, 15, 15, 255]);
+        expect(copied.some((value, index) => value !== background[index % 4]), `${object} copy paints visible content`).toBe(true);
+        expect(constructor.some((value, index) => value !== background[index % 4]), `${object} constructor paints visible content`).toBe(true);
+        expect(copied.equals(constructor), `${object} copy/control full RGBA patches at their own anchors`).toBe(true);
+        expect(copied.equals(source), `${object} source mutation changes its painted appearance`).toBe(false);
+      });
+    }
     const x = (offset: number) => {
       const { bars } = copy6.replay;
       const anchor = copy6.rowSet.uniqueVisualAnchorRowOrdinal - copy6.startRowOrdinal;

@@ -1670,3 +1670,8 @@ text coordinates alone do not establish centered ink.
 Copy and constructor captions compare their recorded font recipes at their own
 positions. Line dashes bind each copy to its constructor and distinguish long
 dashes from the dotted source without certifying native font sizes or dash periods.
+
+V103 copy appearance locks compare full source/copy/constructor RGBA patches at
+independent anchors through web and native painters in one viewport. Local
+copy/control equality includes executing opacity and body extents; native
+absolute glyph, alpha, DPI and raster metrics remain held.
