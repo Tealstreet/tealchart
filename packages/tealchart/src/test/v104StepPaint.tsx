@@ -1,17 +1,21 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
+import type { ReactElement, ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import type { StepEntry } from '../../../tealscript/tests/fixtures/v104Step';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { NativeViewportSharedValues } from '../mobile/render/nativeSharedViewport';
 
-import { DashPathEffect, Path, Skia } from '@shopify/react-native-skia';
+import { createCanvas } from '@napi-rs/canvas';
+import { Children, Fragment } from 'react';
+
+import { DashPathEffect, Group, Path, Skia } from '@shopify/react-native-skia';
 
 import { executeStep } from '../../../tealscript/tests/fixtures/v104Step';
 import { TealchartRenderer } from '../TealchartRenderer';
 import { createNativeChartFrameFromPanes } from '../mobile/render/nativeChartFrame';
 import { NativeIndicatorPlotLayerImpl } from '../mobile/render/NativeIndicatorPlotLayer';
 import { createNativeChartProjection } from '../mobile/render/nativeProjection';
-import { nativePrimitives, resolved } from './nativePlotPaintHarness';
+import { resolved } from './nativePlotPaintHarness';
 
 export type StepChannel = 'web' | 'web-pane' | 'web-unified' | 'web-index' | 'native' | 'native-static';
 export interface StepCommand { op: string; x: number; y: number }
@@ -21,23 +25,28 @@ export function traceStep(entry: StepEntry, channel: StepChannel, variant: Parti
   const plot = { ...result.plots.find(p => p.title === 'STEP')!, ...variant, scriptId: 's' } as PlotOutput;
   const viewport = { startTime: bars[0].time, endTime: bars[bars.length - 1].time, priceMin: 0, priceMax: 100 };
   const paints: StepPaint[] = [];
+  const canvas = createCanvas(1000, 100);
+  const ink = canvas.getContext('2d');
   if (channel.startsWith('web')) {
     let commands: StepCommand[] = [];
-    let dash: number[] = [];
-    const states: any[] = [];
-    const noop = () => {};
-    const ctx: CanvasContext = {
-      fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: 'left', textBaseline: 'top', lineDashOffset: 0, globalAlpha: 1, lineCap: 'butt', lineJoin: 'miter',
-      beginPath: () => { commands = []; }, moveTo: (x, y) => { commands.push({ op: 'M', x, y }); }, lineTo: (x, y) => { commands.push({ op: 'L', x, y }); },
-      arc: (x, y) => { commands.push({ op: 'C', x, y }); }, closePath: () => { commands.push({ op: 'Z', x: 0, y: 0 }); },
-      fill: () => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [...commands], dash: [...dash] }),
-      stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), commands: [...commands], dash: [...dash] }),
-      rect: noop, roundRect: noop, quadraticCurveTo: noop, bezierCurveTo: noop, clip: noop, scale: noop, translate: noop, fillRect: noop, strokeRect: noop, fillText: noop,
-      save: () => { states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, dash: [...dash] }); },
-      restore: () => { const state = states.pop(); if (state) { Object.assign(ctx, state); dash = state.dash; } },
-      setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash], measureText: s => ({ width: s.length * 7 }) as TextMetrics,
-    };
-    const renderer = new TealchartRenderer(ctx, { width: 1000, height: 100, showVolume: false, devicePixelRatio: 1 }, { left: 0, right: 0, top: 0, bottom: 0 });
+    const ctx = new Proxy(ink, {
+      get(target, key) {
+        const value = Reflect.get(target, key);
+        if (typeof value !== 'function') return value;
+        return (...args: any[]) => {
+          if (key === 'beginPath') commands = [];
+          if (key === 'moveTo' || key === 'lineTo') commands.push({ op: key === 'moveTo' ? 'M' : 'L', x: args[0], y: args[1] });
+          if (key === 'closePath') commands.push({ op: 'Z', x: 0, y: 0 });
+          if (key === 'stroke' || key === 'fill') paints.push({
+            kind: key, color: String(key === 'stroke' ? target.strokeStyle : target.fillStyle),
+            commands: [...commands], dash: target.getLineDash(),
+          });
+          return value.apply(target, args);
+        };
+      },
+      set(target, key, value) { return Reflect.set(target, key, value); },
+    }) as unknown as CanvasContext;
+    const renderer = new TealchartRenderer(ctx, { width: 1000, height: 100, showVolume: false, devicePixelRatio: 1, backgroundColor: '#00000000', gridColor: '#00000000', textColor: '#00000000' }, { left: 0, right: 0, top: 0, bottom: 0 });
     if (channel === 'web') renderer.renderPlots([plot], bars, viewport);
     else if (channel === 'web-pane') renderer.renderPlots([plot], bars, viewport, {
       mainPaneHeight: 0, volumePaneHeight: 0, indicatorPanes: [{ id: 'study', indicatorIds: ['s'], heightRatio: 1, fixedRange: true, yMin: 0, yMax: 100 }],
@@ -62,18 +71,68 @@ export function traceStep(entry: StepEntry, channel: StepChannel, variant: Parti
       indicatorPaneInfo: { s: { overlay: false, paneId: 'study' } }, sharedViewport,
       paneRangeOverrides: { value: {} } as SharedValue<any>, textFont: Skia.Font(undefined, 12),
       staticProjection: channel === 'native-static' ? createNativeChartProjection({ frame, viewport }) : undefined });
-    for (const node of nativePrimitives(tree).filter(p => p.type === Path)) {
-      const path = resolved<any>(node.props.path);
-      const commands = (['moveTo', 'lineTo', 'close', 'addCircle'] as const).flatMap(name =>
-        path[name].mock.calls.map((args: number[], i: number) => ({ order: path[name].mock.invocationCallOrder[i], op: { moveTo: 'M', lineTo: 'L', close: 'Z', addCircle: 'C' }[name], x: args[0] ?? 0, y: args[1] ?? 0 })))
-        .sort((a, b) => a.order - b.order);
-      const effect = nativePrimitives(node.props.children).find(p => p.type === DashPathEffect);
-      paints.push({ kind: node.props.style === 'stroke' ? 'stroke' : 'fill', color: node.props.color, commands, dash: effect?.props.intervals ?? [] });
-    }
+    const paintNode = (node: ReactNode): void => {
+      if (Array.isArray(node)) { node.forEach(paintNode); return; }
+      if (!node || typeof node !== 'object' || !('props' in node)) return;
+      const element = node as ReactElement<Record<string, any>>;
+      if (element.type === Fragment) { paintNode(element.props.children); return; }
+      if (typeof element.type === 'function' && element.type !== Group && element.type !== Path) {
+        paintNode((element.type as (props: any) => ReactNode)(element.props)); return;
+      }
+      const props = element.props;
+      const supported = ['children', 'opacity', 'clip', 'invertClip', 'transform', ...(element.type === Path
+        ? ['path', 'style', 'color', 'strokeWidth', 'strokeCap', 'strokeJoin'] : [])];
+      const unsupported = Object.keys(props).filter(key => !supported.includes(key));
+      if (unsupported.length) throw new Error(`Unsupported native step paint fields: ${unsupported.join(', ')}`);
+      ink.save();
+      ink.globalAlpha *= Number(resolved(props.opacity ?? 1));
+      for (const transform of resolved<any[]>(props.transform ?? [])) {
+        if ('translateX' in transform) ink.translate(transform.translateX, 0);
+        else if ('translateY' in transform) ink.translate(0, transform.translateY);
+        else if ('scale' in transform) ink.scale(transform.scale, transform.scale);
+        else throw new Error(`Unsupported native step transform: ${JSON.stringify(transform)}`);
+      }
+      if (props.clip) {
+        const clip = resolved<any>(props.clip);
+        if (!['x', 'y', 'width', 'height'].every(key => typeof clip[key] === 'number')) throw new Error('Unsupported native step clip');
+        ink.beginPath();
+        if (props.invertClip) ink.rect(-10000, -10000, 20000, 20000);
+        ink.rect(clip.x, clip.y, clip.width, clip.height);
+        ink.clip(props.invertClip ? 'evenodd' : 'nonzero');
+      }
+      if (element.type === Path) {
+        const path = resolved<any>(props.path);
+        const commands = (['moveTo', 'lineTo', 'close', 'addCircle'] as const).flatMap(name =>
+          path[name].mock.calls.map((args: number[], i: number) => ({ order: path[name].mock.invocationCallOrder[i], op: { moveTo: 'M', lineTo: 'L', close: 'Z', addCircle: 'C' }[name], x: args[0] ?? 0, y: args[1] ?? 0 })))
+          .sort((a, b) => a.order - b.order);
+        const effects = Children.toArray(props.children);
+        if (effects.length > 1 || effects.some(effect => typeof effect !== 'object' || !('type' in effect) || effect.type !== DashPathEffect)) throw new Error('Unsupported native step path effect');
+        const effect = effects[0] as ReactElement<Record<string, any>> | undefined;
+        if (effect && Object.keys(effect.props).some(key => !['intervals', 'phase'].includes(key))) throw new Error('Unsupported native step dash effect');
+        ink.strokeStyle = ink.fillStyle = resolved<string>(props.color);
+        ink.lineWidth = Number(resolved(props.strokeWidth ?? 1));
+        ink.lineCap = props.strokeCap ?? 'butt';
+        ink.lineJoin = props.strokeJoin ?? 'miter';
+        ink.setLineDash(resolved<number[]>(effect?.props.intervals ?? []));
+        ink.lineDashOffset = Number(resolved(effect?.props.phase ?? 0));
+        ink.beginPath();
+        for (const point of commands) {
+          if (point.op === 'M') ink.moveTo(point.x, point.y);
+          else if (point.op === 'L') ink.lineTo(point.x, point.y);
+          else if (point.op === 'Z') ink.closePath();
+          else throw new Error('Unsupported native step path command');
+        }
+        if (props.style === 'stroke') ink.stroke(); else ink.fill();
+        paints.push({ kind: props.style === 'stroke' ? 'stroke' : 'fill', color: resolved<string>(props.color), commands, dash: ink.getLineDash() });
+      } else if (element.type === Group) paintNode(props.children);
+      else throw new Error('Unsupported native step paint node');
+      ink.restore();
+    };
+    paintNode(tree);
   }
   const x = (row: number) => (Number(entry.csv.raw(row, 'time')) * 1000 - viewport.startTime) / (viewport.endTime - viewport.startTime) * 1000;
   const colors = new Set((Array.isArray(plot.color) ? plot.color : [plot.color]).filter((c): c is string => typeof c === 'string').map(c => c.slice(0, 7)));
-  return { paints: paints.filter(p => colors.has(p.color?.slice(0, 7))), x, result, bars, plot };
+  return { ink: ink.getImageData(0, 0, 1000, 100), paints: paints.filter(p => colors.has(p.color?.slice(0, 7))), x, result, bars, plot };
 }
 
 export function stepSegments(paints: StepPaint[]) {
