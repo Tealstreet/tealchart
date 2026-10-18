@@ -9,6 +9,7 @@ import { createCanvas, type Canvas } from '@napi-rs/canvas';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
+import { DEFAULT_MARGINS } from '../types';
 import { clearChartStoreCache } from '../state/chartState';
 import {
   assertVisualSnapshotDriftMatchesBaseline,
@@ -171,7 +172,20 @@ describe('visual snapshot rendering', () => {
         scriptId: 'test',
       }];
       const buffer = renderToBuffer(plots, bars, viewport);
-      await assertSnapshot('line-stepline', buffer);
+      const reference = freshCanvas();
+      const ctx = reference.getContext('2d');
+      ctx.fillStyle = '#1e222d'; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      ctx.strokeStyle = '#FF9800'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      const x = (i: number) => DEFAULT_MARGINS.left + i * (WIDTH - DEFAULT_MARGINS.left) / (bars.length - 1);
+      const y = (i: number) => DEFAULT_MARGINS.top + (viewport.priceMax - bars[i].close) /
+        (viewport.priceMax - viewport.priceMin) * (HEIGHT - DEFAULT_MARGINS.top - DEFAULT_MARGINS.bottom);
+      ctx.beginPath(); ctx.moveTo(x(0), y(0));
+      for (let i = 1; i < bars.length; i++) {
+        const boundary = (x(i - 1) + x(i)) / 2;
+        ctx.lineTo(boundary, y(i - 1)); ctx.lineTo(boundary, y(i)); ctx.lineTo(x(i), y(i));
+      }
+      ctx.stroke();
+      expect(buffer.equals(reference.toBuffer('image/png'))).toBe(true);
     });
 
     it('renders cross marker plot style', async () => {

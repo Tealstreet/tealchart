@@ -2250,9 +2250,10 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          // Step line: horizontal then vertical
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' ? x - this.getSlotWidth(bars, viewport, chartWidth) / 2 : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }
@@ -5345,8 +5346,10 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' ? x - this.getSlotWidth(bars, viewport, chartWidth) / 2 : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }
@@ -6059,8 +6062,10 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' ? x - this.getSlotWidth(bars, viewport, chartWidth) / 2 : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }

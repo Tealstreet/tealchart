@@ -1,3 +1,7 @@
+V104 plain stepline v5/v6 turns at the preceding half source slot in both painters.
+Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
+PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
+
 V103 noncoincident-point v5/v6 captures distinguish all five applied point setters
 and copied fields after later point mutation through their own original PNG/maps.
 Keep 958 exact numeric/blank cells separate from 66 translated absolute-index cells.

@@ -236,3 +236,15 @@ footprints and arrow tips, plot value lanes and CSV phase rows, and individual
 square/glyph anchors. Palette-preserving real-painter swaps go RED, including
 plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
 order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+V104 step-turn v5/v6 at oracle `735d1b50` supplies two independent PNG/CSV/certificate
+joins for phase8 and phase24: native plain stepline turns occur at X(t)-b/2.
+Both web and native painters use that half-slot boundary and retain the sample
+centre after the vertical. `steplinebr` and `stepline_diamond` remain unchanged.
+The locks score 640 exact primary values/blanks, with 128 translated absolute-index
+context cells excluded from numeric credit. Each source replays an original
+modulo32-aligned exported prefix through its own retained anchor, preserving eight
+original predecessors and giving startup/developing/other rows zero credit.
+Raw PNG samples preserve their encoded channels without ICC conversion.
+The former centre-turn synthetic PNG is replaced by an independent exact
+half-slot raster constructor; the drift tolerance is not increased.

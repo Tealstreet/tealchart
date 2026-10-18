@@ -320,13 +320,18 @@ function getNativeIndicatorLinePath({
           value: point.value,
         });
 
+    const turnX = style === 'stepline'
+      ? nativeIndicatorPointX({ frame, point: { ...point, time: point.time - point.interval / 2 }, projection, sharedViewport })
+      : x;
+
     if (colorFilter !== undefined) {
       if (point.color === colorFilter) {
         if (previousColoredPoint) {
           path.moveTo(previousColoredPoint.x, previousColoredPoint.y);
           if (isStepLine) {
-            path.lineTo(x, previousColoredPoint.y);
-            path.lineTo(x, y);
+            path.lineTo(turnX, previousColoredPoint.y);
+            path.lineTo(turnX, y);
+            if (style === 'stepline') path.lineTo(x, y);
           } else {
             path.lineTo(x, y);
           }
@@ -342,8 +347,9 @@ function getNativeIndicatorLinePath({
       path.moveTo(x, y);
       isDrawing = true;
     } else if (isStepLine) {
-      path.lineTo(x, lastY);
-      path.lineTo(x, y);
+      path.lineTo(turnX, lastY);
+      path.lineTo(turnX, y);
+      if (style === 'stepline') path.lineTo(x, y);
     } else {
       path.lineTo(x, y);
     }

@@ -1,3 +1,7 @@
+V104 plain stepline v5/v6 turns at the preceding half source slot in both painters.
+Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
+PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
+
 V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
 right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
 Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover

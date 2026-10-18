@@ -8,7 +8,7 @@ const absoluteIndexCause = 'OBSERVED / EXCLUDED: native absolute index and missi
 
 describe('v103 original table lifecycle and auto dimensions', () => {
   it('binds an independent immutable revision, all v4 integrity dependencies and validation', () => {
-    expect(revision).toBe('287ebfc19e282245be4df55fc6a9d0f5b876d817');
+    expect(revision).toBe('735d1b508a36ce359bcdfb837e995acaeb1d0af8');
     expect(lock.revision).toBe(revision);
     const path = capture + 'artifact-integrity-v4.json';
     for (const proof of [...json(path).artifacts, { path, bytes: raw(path).length, sha256: hash(raw(path)) }]) {
