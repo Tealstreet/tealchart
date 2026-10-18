@@ -1675,3 +1675,8 @@ V103 copy appearance locks compare full source/copy/constructor RGBA patches at
 independent anchors through web and native painters in one viewport. Local
 copy/control equality includes executing opacity and body extents; native
 absolute glyph, alpha, DPI and raster metrics remain held.
+
+V103 copy/control equality also requires an independent primitive appearance
+reference for each object, including body, border and caption ink. Original PNG
+component colors, areas and bounds bind the native facts; local normal-font
+metrics instantiate those recipes without claiming native font/DPI equivalence.

@@ -11,6 +11,28 @@ import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScriptDrawings';
 
 const blue = '#2962FF', red = '#F23645';
+function independentCopyPatch(object: 'line' | 'box' | 'label') {
+  const width = object === 'label' ? 100 : 84, height = object === 'line' ? 24 : object === 'box' ? 104 : 56;
+  const canvas = createCanvas(width, height), ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0F0F0F'; ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = blue; ctx.strokeStyle = blue;
+  if (object === 'line') {
+    ctx.lineWidth = 6; ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(12, 12); ctx.lineTo(72, 12); ctx.stroke();
+  } else if (object === 'box') {
+    ctx.fillStyle = '#FDD835'; ctx.fillRect(12, 12, 60, 80);
+    ctx.lineWidth = 4; ctx.strokeRect(12, 12, 60, 80);
+    ctx.font = '14px sans-serif'; ctx.fillStyle = blue;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('COPY', 42, 52);
+  } else {
+    // These local normal-font metrics instantiate the captured recipe, not native DPI.
+    ctx.font = '12px sans-serif';
+    const bodyWidth = ctx.measureText('COPY').width + 16;
+    ctx.beginPath(); ctx.roundRect(50 - bodyWidth / 2, 17, bodyWidth, 22, 4); ctx.fill();
+    ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('COPY', 50, 28);
+  }
+  return Buffer.from(ctx.getImageData(0, 0, width, height).data);
+}
 describe('v103 v6 copy: original PNG models through the real drawing painters', () => {
   it('original native PNG has identical readable copy/constructor patches for all three frozen facets', async () => {
     const image = await loadImage(raw(copy6.regions.originalPng.path));
@@ -22,6 +44,29 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       const [control, source] = facet.manualFinding.actualControlRegionsPx;
       expect(patch(subject).equals(patch(control)), facet.facetId).toBe(true);
       expect(patch(subject).equals(patch(source)), `${facet.facetId} native source differs`).toBe(false);
+      const family = copy6.regions.facets.indexOf(facet);
+      const facts = [
+        [{ color: 'blue', bounds: [2, 2, 92, 8] }],
+        [{ color: 'yellow', bounds: [4, 4, 90, 43] }, { color: 'caption', bounds: [13, 15, 82, 34] }],
+        [{ color: 'blue', bounds: [0, 1, 51, 26] }, { color: 'white', bounds: [10, 8, 41, 17] }],
+      ][family];
+      for (const [x1, y1, x2, y2] of [subject, control]) for (const fact of facts) {
+        const w = x2 - x1, h = y2 - y1, pixels = ctx.getImageData(x1, y1, w, h).data;
+        const occupied: { x: number; y: number }[] = [];
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+          const n = (y * w + x) * 4, [r, g, b] = [pixels[n], pixels[n + 1], pixels[n + 2]];
+          const blueInk = b > 100 && b > r * 1.8 && b > g * 1.25;
+          const interior = x >= 6 && x < w - 6 && y >= 6 && y < h - 6;
+          const selected = fact.color === 'white' ? Math.min(r, g, b) > 200
+            : fact.color === 'yellow' ? r > 150 && g > 130 && b < 100
+            : blueInk && (fact.color !== 'caption' || interior);
+          if (selected) occupied.push({ x, y });
+        }
+        expect(occupied.length, `${facet.facetId} native ${fact.color} visible area`).toBeGreaterThan(0);
+        expect([Math.min(...occupied.map(p => p.x)), Math.min(...occupied.map(p => p.y)),
+          Math.max(...occupied.map(p => p.x)) + 1, Math.max(...occupied.map(p => p.y)) + 1],
+        `${facet.facetId} native ${fact.color} occupied bounds`).toEqual(fact.bounds);
+      }
     }
   });
   for (const channel of ['web', 'native'] as const) {
@@ -71,6 +116,9 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
         expect(constructor.some((value, index) => value !== background[index % 4]), `${object} constructor paints visible content`).toBe(true);
         expect(copied.equals(constructor), `${object} copy/control full RGBA patches at their own anchors`).toBe(true);
         expect(copied.equals(source), `${object} source mutation changes its painted appearance`).toBe(false);
+        const independent = independentCopyPatch(object);
+        expect(copied.equals(independent), `${object} copy independently retains the native-observed body, border and caption`).toBe(true);
+        expect(constructor.equals(independent), `${object} constructor independently retains the native-observed body, border and caption`).toBe(true);
       });
     }
     const x = (offset: number) => {
