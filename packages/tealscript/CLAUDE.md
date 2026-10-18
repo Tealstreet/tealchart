@@ -75,6 +75,8 @@ V93 linefill locks cover same-execution counts/parent identities and endpoint tr
 PNG-bound output fields cover red/blue and source-line deletion; no native color
 getter, recalculation identity, all-object deletion, or pixel parity is claimed.
 
+V102 same-pair linefill references target a shared live fill, so deleting the earlier reference removes the replacement. Native internal handle/token equality remains unobserved. Vertical `line.get_price` returns `na`; nonvertical getters extrapolate independently of `extend` and read current endpoints. Original-source CSV locks exclude absolute indices and developing rows. PNG-bound live tracking and post-delete blue-fill absence are separate from the held pre-delete appearance and line-price visual facets. Mobile worker regeneration belongs to batch composition after these engine edits.
+
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
 TARGET_KEY0 conditional blanks only; row/count blanks never imply unavailable

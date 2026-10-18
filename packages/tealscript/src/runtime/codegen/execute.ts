@@ -3298,7 +3298,7 @@ function interpolateLinePrice(line: LineDrawingOutput, x: number, barIndex: numb
   ) {
     return Number.NaN;
   }
-  if (line.x1 === line.x2) return x === line.x1 ? line.y1 : Number.NaN;
+  if (line.x1 === line.x2) return Number.NaN;
   return line.y1 + ((line.y2 - line.y1) / (line.x2 - line.x1)) * (x - line.x1);
 }
 
