@@ -4894,3 +4894,10 @@ V102 v6 style locks score exact non-index primary cells with CSV offsets project
 from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
 The three exact omitted-formatting sources refuse with CE10165; they earn no
 runtime or appearance credit. Explicit formatting calls retain their old locks.
+
+V103 visible-gap v5/v6 uses retained-anchor A-31..A, not the older phase-zero
+selection. Raw OFFSET1 exports are screen-aligned; sample destination minus
+offset without changing the unchanged source or feeding native outputs. Replay
+context translates absolute indices by a multiple of eight and earns no startup
+or absolute-index credit. Step-position uncertainty remains held independently
+of exact numeric STEP values and supported gap/area/offset/dashed appearances.
