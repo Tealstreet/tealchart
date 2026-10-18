@@ -157,3 +157,23 @@ not exact native raster or dash-period equality. The two step-half-bar facets
 remain UNDECIDED because the preregistered uncertainty cannot separate the models.
 Developing, other closed and replay-context rows receive zero primary credit;
 native frame, font, DPI, zoom, unreturned slots and historical holds remain held.
+
+## V103 noncoincident point setters v1
+
+The [v18 return](https://github.com/Tealstreet/tealscript-oracle/blob/cd1fcda33e7bae9198823468495f6cb6feb05145/v103/captures/v103/RESPONSE-v103-v18.md)
+independently captures v5 and v6 line first/second points, box top-left/bottom-right
+points, label points and copied fields after subsequent point mutations. Each
+version's original PNG and frozen map separate all six model A outcomes from
+ignored setters and later live point fields. Real web and native painters replay
+the unchanged source into a canvas and check the assigned and competing locations.
+These finite position checks do not establish exact native raster or font metrics.
+
+Each 32-row block contributes 479 exact numeric/blank comparisons and 33 translated
+absolute-index context cells. The eight getter channels each contain one closed
+build event and 31 intentional blanks. Replay starts at the first actual exported
+modulo8-zero input and retains the exported prefix through the unique closed anchor,
+including its eight original predecessors; no invented bars, output seed or source
+rewrite supplies the build guard. Every other closed/developing row stays excluded.
+The label's intermediate time-mode getter delta is numeric only; its final index-mode
+pixels do not observe the intermediate mode flag. All historical holds remain intact.
+The engine already matches these captures; tests lock the regression with mutations.

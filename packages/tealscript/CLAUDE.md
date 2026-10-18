@@ -1,3 +1,9 @@
+V103 noncoincident-point v5/v6 captures distinguish all five applied point setters
+and copied fields after later point mutation through their own original PNG/maps.
+Keep 958 exact numeric/blank cells separate from 66 translated absolute-index cells.
+The transient label time-mode getter is numeric only; final pixels cannot observe
+the intermediate mode flag, native frame/font metadata or historical holds.
+
 V102 coordinate v5/v6 locks use the unchanged sources and eight original closed
 predecessors. V6 additionally witnesses the box time-mode getter delta0. Final point fields and +40 translated controls agree with the
 original PNG/map; numeric getters do not certify pixels or intermediate modes.

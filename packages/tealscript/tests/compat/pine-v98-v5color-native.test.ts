@@ -13,7 +13,7 @@ interface NativeSource {
   selectedDataRowOrdinals: number[]; primaryUniquePlotCells: number;
   rows: { rowOrdinal: number; allRequestedRawCells: Pointer[]; nativeContextCells: Pointer[] }[];
 }
-const revision = '1aad8cc2b41f53bd85b0c5558b36365d371b7244';
+const revision = 'cd1fcda33e7bae9198823468495f6cb6feb05145';
 const base = 'v98/captures/v98/';
 const folder = base + 'v98-color-constructors-v5/attempt-v1/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
