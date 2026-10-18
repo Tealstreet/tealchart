@@ -19,7 +19,7 @@ import { DEFAULT_RENDER_OPTIONS } from '../types';
 
 export type StyleChannel = 'web' | 'web-pane' | 'web-unified' | 'native' | 'native-static';
 export interface StyleCommand { op: string; x: number; y: number; w?: number; h?: number; text?: string; anchorX?: number; anchorY?: number }
-export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; commands: StyleCommand[]; dash: number[] }
+export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; commands: StyleCommand[]; dash: number[]; globalAlpha?: number; lineWidth?: number }
 export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
   const { result, bars } = executeStyle(entry);
   const plots = result.plots.map(p => ({ ...p, scriptId: 's' })) as PlotOutput[];
@@ -36,12 +36,12 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
     fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: 'left', textBaseline: 'top', lineDashOffset: 0, globalAlpha: 1, lineCap: 'butt', lineJoin: 'miter',
     beginPath: () => { commands = []; }, moveTo: (x, y) => { commands.push({ op: 'M', x, y }); }, lineTo: (x, y) => { commands.push({ op: 'L', x, y }); },
     arc: (x, y, r) => { commands.push({ op: 'C', x, y, w: r }); }, closePath: () => { commands.push({ op: 'Z', x: 0, y: 0 }); },
-    fill: () => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [...commands], dash: [...dash] }),
-    stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), commands: [...commands], dash: [...dash] }),
+    fill: () => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [...commands], dash: [...dash], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
+    stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), commands: [...commands], dash: [...dash], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
     rect: (x, y, w, h) => { commands.push({ op: 'R', x, y, w, h }); }, roundRect: noop, quadraticCurveTo: noop, bezierCurveTo: noop, clip: noop, scale: noop, translate: noop,
-    fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [{ op: 'R', x, y, w, h }], dash: [] }), strokeRect: noop,
-    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined }], dash: [] }),
-    save: () => { states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline, dash: [...dash] }); },
+    fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [{ op: 'R', x, y, w, h }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }), strokeRect: noop,
+    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
+    save: () => { states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline, dash: [...dash] }); },
     restore: () => { const state = states.pop(); if (state) { Object.assign(ctx, state); dash = state.dash; } },
     setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash], measureText: s => ({ width: s.length * 7 }) as TextMetrics,
   };
