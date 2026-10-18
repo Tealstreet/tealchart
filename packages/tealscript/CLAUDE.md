@@ -4889,3 +4889,7 @@ V102 v6 style locks score exact non-index primary cells with CSV offsets project
 from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
 The three exact omitted-formatting sources refuse with CE10165; they earn no
 runtime or appearance credit. Explicit formatting calls retain their old locks.
+
+V103 styles replay seven unchanged sources at their own closed retained anchors.
+Exact non-index cells include intentional blanks; one build event is not32 getter
+observations. PNG-bound topology remains separate from plotarrow sign-direction held.

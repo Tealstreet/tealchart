@@ -111,3 +111,44 @@ The loader rejects manifest revision drift; review and update its literal togeth
 with the manifest when adopting new captures.
 The web/native recorders share `tealchart/src/test/v102Paint.ts`; family adapters
 retain the recorded fields used by their finite paint contracts.
+
+## V103 plot and polyline style controls
+
+The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/287ebfc19e282245be4df55fc6a9d0f5b876d817/v103/captures/v103/RESPONSE-v103-v29.md)
+separately binds seven unchanged sources: v6 polyline fill/style, plot/hline
+fillgaps overloads, plot controls, markers, plotarrow height, and v5/v6 polyline
+arrows. Each uses the unique retained closed anchor A and own A-31..A, with
+eight original closed predecessors retained. Exact replay supplies real exported
+OHLC/time/volume from an earlier modulo32-aligned closed row through A; no source,
+index expression or native result seeds the engine. The two absolute-index
+columns translate only as context, yielding 2,048 exact scored cells (1,562 finite
+and486 intentional blanks), with448 index cells excluded. COUNT has one build
+event per polyline source; its31 blanks are not31 additional getter observations.
+Other closed rows and developing snapshots receive no primary score.
+
+Original PNGs and their SHA-bound region maps independently support26 finite
+visual facets. Real web/native painters lock filled closed dashed triangles,
+copied point fields and deletion; plot fill holes versus bridging and positive
+hline fill; adjacent circle joins, old-tail suppression and tracker presence;
+relative square size, absolute upper-square placement and literal X; relative
+positive arrow heights; and v5/v6 open stroked polyline chevrons on the supplied
+first/last/both endpoints. Both arrow versions earn their own native evidence;
+no line-to-polyline or version-to-version transfer is used. The26 facets are
+qualitative topology/visibility/location classes, not exact dash periods, marker
+metrics, glyph raster, color compositing or universal pixel equivalence.
+
+The plotarrow sign-direction facet remains UNDECIDED with zero visual credit;
+a direction-only painter mutation stays GREEN. Native font/DPI/zoom and hidden
+frame identity remain unobserved. Marker PNG axes are actually expanded, and
+show_last PNG tails include a developing bar: tests assert historical suppression
+and a positive tail, without treating the last-four-closed marker positions as
+native pixel witnesses. Full CSV series values remain separate from visibility.
+The existing engine and painters already match these finite observations;
+production-fault mutations establish regression coverage without an engine fix
+or mobile worker regeneration. Historic holds1/2/7/8/13/14/21 remain unchanged.
+
+Each style assertion attaches to its source-owned spatial identity: triangle
+footprints and arrow tips, plot value lanes and CSV phase rows, and individual
+square/glyph anchors. Palette-preserving real-painter swaps go RED, including
+plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
+order stays GREEN; this capture does not witness hidden creation/traversal order.
