@@ -1,5 +1,5 @@
+import { lock } from '../fixtures/v102Fixture';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
@@ -8,7 +8,6 @@ import { checkProgram } from '../../src/semantic/checker';
 import { executeStyle, styleCapture, styleEntries, styleJson, styleRaw, styleRefusedIds, styleRevision, styleStoppedIds, styleTable } from '../fixtures/v102Style';
 
 const hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
-const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8'));
 const savedSource = (path: string) => styleRaw(path).toString('utf8').replaceAll('\r\n', '\n').split('name="source"\n\n')[1].split(/\n------WebKitFormBoundary/)[0];
 
 describe('v102 style: source ownership, closure and exact screen-aligned CSV observations', () => {

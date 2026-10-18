@@ -1,12 +1,10 @@
+import { executeEntry, raw as bytes, text as read, json, lock, table, revision } from '../fixtures/v102Fixture';
 import type { BoxDrawingOutput } from '../../src/runtime/drawings/types';
 
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { parse } from '../../src/parser';
-import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
 interface Proof { path: string; bytes: number; sha256: string }
 interface Pointer { csvSha256: string; rowOrdinal: number; columnOrdinal: number; headerRaw: string; valueRaw: string }
@@ -23,16 +21,7 @@ interface Facet { caseId: string; verdict: string; supportedCandidate?: string; 
   subproperties?: { property: string; verdict: string; cause?: string; regionsPx?: number[][] }[];
   visibleLinesByRegion?: Record<string, string[]> }
 const root = 'v102/captures/v102/';
-const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
-const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
-const read = (path: string) => bytes(path).toString('utf8');
-const json = <T>(path: string): T => JSON.parse(read(path)) as T;
 const hash = (b: Uint8Array) => createHash('sha256').update(b).digest('hex');
-const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8')) as { revision: string; files: Proof[] };
-function csv(path: string) {
-  return read(path).trimEnd().split(/\r?\n/).map((l) => l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-    .map((c) => c.startsWith('"') ? c.slice(1, -1).replaceAll('""', '"') : c));
-}
 function verify(p: Proof) {
   expect(lock.files.find((f) => f.path === p.path), p.path).toEqual(p);
   expect(bytes(p.path).length, p.path).toBe(p.bytes);
@@ -42,18 +31,18 @@ const entries = ['box-text-layout', 'table-relocation'].flatMap((family) => [5, 
   const id = `v102-${family}-v${version}`, folder = root + id + '/';
   const block = json<Block>(folder + 'native-cell-block-v1.json');
   const numeric = json<Numeric>(folder + 'numeric-results-v1.json');
-  const [headers, ...rows] = csv(block.csv.path), [maskHeaders, ...mask] = csv(block.closureMask.path);
+  const data = table(block.csv.path), maskData = table(block.closureMask.path);
+  const { headers, rows } = data, { headers: maskHeaders, rows: mask } = maskData;
   const cell = (i: number, title: string) => rows[i][headers.indexOf(title)];
   const firstIndex = Number(cell(0, 'INPUT_INDEX'));
-  const source = read(folder + 'attempt-v1/executed-v1.pine');
   const start = block.primaryRowOrdinals[0] - 1;
   const origin = Number(cell(start, 'INPUT_INDEX'));
   // Replay starts on the native phase0 block; coordinates translate together without inventing a prefix.
-  const compiled = tryCompile(parse(source));
-  const result = executeCompiled(compiled, rows.slice(start).map((r) => ({ time: Number(r[0]) * 1000, open: Number(r[1]), high: Number(r[2]),
-    low: Number(r[3]), close: Number(r[4]), volume: Number(r[5]) })), undefined, { realtimeLastBar: { isNew: true },
-    runtime: { timeframe: { period: '2', multiplier: 2, isminutes: true, isintraday: true } } });
-  if (!result) throw new Error(`${id}: exact-source coordinate translation failed to compile`);
+  const { source, compiled, result } = executeEntry({ sourcePath: folder + 'attempt-v1/executed-v1.pine', csv: data, block }, {
+    startRowOrdinal: start + 1, endRowOrdinal: rows.length,
+    executionOptions: { realtimeLastBar: { isNew: true },
+      runtime: { timeframe: { period: '2', multiplier: 2, isminutes: true, isintraday: true } } },
+  });
   const output = (title: string) => result.plots.find((p) => p.title === title)!.values;
   const map = json<{ originalPng: Proof; originalCsv: Proof; sourceSha256: string; facets: Facet[];
     visualAnchor: Record<string, Pointer>; derivedCalibration: { coordinateUncertaintyPx: { x: number; y: number } } }>(folder + 'derived-region-map-v1.json');

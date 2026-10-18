@@ -1,10 +1,7 @@
+import { executeEntry, raw, text, json, lock, table, revision } from '../fixtures/v102Fixture';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import { parse } from '../../src/parser';
-import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
-import { checkProgram } from '../../src/semantic';
 
 interface Proof { path: string; bytes: number; sha256: string }
 interface Cell { csvSha256: string; rowOrdinal: number; columnOrdinal: number; headerRaw: string; valueRaw: string }
@@ -38,15 +35,7 @@ interface Region {
 }
 const capture = 'v102/captures/v102/';
 const versions = [5, 6];
-const raw = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
-const text = (path: string) => raw(path).toString('utf8');
-const json = <T,>(path: string): T => JSON.parse(text(path)) as T;
 const proof = (path: string): Proof => ({ path, bytes: raw(path).length, sha256: createHash('sha256').update(raw(path)).digest('hex') });
-const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8')) as { revision: string; files: Proof[] };
-const table = (path: string) => {
-  const [headers, ...rows] = text(path).trimEnd().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.startsWith('"') ? v.slice(1, -1).replaceAll('""', '"') : v));
-  return { headers, rows };
-};
 function pointer<T>(value: unknown, path: string): T {
   return path.slice(1).split('/').reduce((node, part) => (node as Record<string, unknown>)[part.replaceAll('~1', '/').replaceAll('~0', '~')], value) as T;
 }
@@ -68,18 +57,14 @@ for (const version of versions) {
     expect(data.rows[p.rowOrdinal - 1][p.columnOrdinal - 1]).toBe(p.valueRaw);
     return p.valueRaw;
   };
-  let replayed: ReturnType<typeof executeCompiled>;
+  let replayed: ReturnType<typeof executeEntry>['result'] | undefined;
   const start = block.originalClosedPredecessorRows[0], end = block.uniqueVisualAnchorRowOrdinal;
   const offset = Number(data.rows[start - 1][data.headers.indexOf('INPUT_INDEX')]);
   function replay() {
     if (!replayed) {
-      const program = parse(text(attempt + 'executed-v1.pine'));
-      expect(checkProgram(program).diagnostics.filter(d => d.severity === 'error')).toEqual([]);
-      const compiled = tryCompile(program);
-      expect(compiled.success, compiled.unsupported.join('\n')).toBe(true);
-      const bars = data.rows.slice(start - 1, end).map(row => ({ time: Number(row[0]) * 1000,
-        open: Number(row[1]), high: Number(row[2]), low: Number(row[3]), close: Number(row[4]), volume: Number(row[5]) }));
-      replayed = executeCompiled(compiled, bars);
+      replayed = executeEntry({ sourcePath: attempt + 'executed-v1.pine', csv: data, block }, {
+        startRowOrdinal: start, endRowOrdinal: end, executionOptions: {}, checkSemantic: true,
+      }).result;
       expect(replayed!.errors).toEqual([]);
       expect(replayed!.profile.compiledBarErrors?.count ?? 0).toBe(0);
       expect(replayed!.profile.swallowedErrors ?? []).toEqual([]);
@@ -104,7 +89,7 @@ for (const version of versions) {
 
   describe(`${id}: bounded native coordinate and final-geometry evidence`, () => {
     it('binds the original source, native bodies, CSV/closure, PNG, contracts and derived verdicts', () => {
-      expect(lock.revision).toBe('f47a4e34ce33441ad37add124d9572119826138d');
+      expect(lock.revision).toBe(revision);
       const integrity = json<{ artifacts: Proof[] }>(capture + `artifact-integrity-${round}.json`);
       const shared = ['CAPTURE-TOOLING-LICENSE-v1.md', `RESPONSE-v102-${round}.md`, `account-actions-${round}.json`,
         `attempt-inventory-${round}.json`, `facet-capabilities-${round}.json`, 'numeric-contracts-v1.json',

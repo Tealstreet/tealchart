@@ -1,13 +1,10 @@
-import type { Bar } from '../../src/runtime/context';
+import { executeEntry, raw as bytes, text, json, lock, table as csv, revision } from '../fixtures/v102Fixture';
 import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from '../../src/runtime/drawings/types';
 
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { parse } from '../../src/parser';
-import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
 interface Proof { path: string; bytes: number; sha256: string }
 interface Pointer { csvSha256: string; rowOrdinal: number; columnOrdinal: number; headerRaw: string; valueRaw: string }
@@ -37,20 +34,10 @@ interface RegionMap {
     regions: { role: string; originalPngRectPx: number[]; visible: string }[]; visibleTextLiterals?: string[] }[];
   exposedAppearanceMetadata: { zoom: null; dpi: null; resolvedFont: null }; preservedUnobserved: string[]; scope: string;
 }
-const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
 const round = 'v102/captures/v102/';
-const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
-const text = (path: string) => bytes(path).toString('utf8');
-const json = <T>(path: string): T => JSON.parse(text(path)) as T;
 const hash = (value: Uint8Array) => createHash('sha256').update(value).digest('hex');
-const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8')) as { revision: string; files: Proof[] };
 const controls = json<{ sources: { sourceId: string; report: Proof; primaryRows: number[] }[] }>(round + 'numeric-controls-v14.json');
 const sourceIds = controls.sources.filter(s => /^v102-copy-appearance-v[56]$/.test(s.sourceId) && s.primaryRows.length > 0).map(s => s.sourceId);
-function csv(path: string) {
-  const [headers, ...rows] = text(path).trimEnd().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-    .map(value => value.startsWith('"') ? value.slice(1, -1).replaceAll('""', '"') : value));
-  return { headers, rows, raw: (ordinal: number, title: string) => rows[ordinal - 1][headers.indexOf(title)] };
-}
 function assertBound(proof: Proof) {
   expect(lock.files.find(f => f.path === proof.path), proof.path).toEqual(proof);
   const raw = bytes(proof.path);
@@ -67,15 +54,16 @@ const entries = sourceIds.map(id => {
   const report = json<{ sourceSha256: string; properties: Property[]; nativeBlock: Proof; primaryInputCertificateValid: boolean;
     uniquePrimaryPlotCells: number; observedWithoutPrediction: unknown[] }>(folder + 'numeric-results-v1.json');
   const block = json<Block>(report.nativeBlock.path), data = csv(block.csv.path), mask = csv(block.closureMask.path);
-  const source = text(`v102/sources/${id}.pine`), compiled = tryCompile(parse(source));
-  if (!compiled.success) throw new Error(`${id}: ${compiled.unsupported.join('\n')}`);
-  const bars = (rows: string[][]): Bar[] => rows.map(r => ({ time: Number(r[0]) * 1000,
-    open: Number(r[1]), high: Number(r[2]), low: Number(r[3]), close: Number(r[4]), volume: Number(r[5]) }));
+  const entry = { sourcePath: `v102/sources/${id}.pine`, csv: data, block };
   const first = block.primaryRowOrdinals[0];
   // The unchanged source has no carried state; relative fields are translation invariant.
   // One actual following closed row keeps the scored block before the local history frontier.
-  const primary = executeCompiled(compiled, bars(data.rows.slice(first - 1, first + 32)))!;
-  const anchor = executeCompiled(compiled, bars(data.rows.slice(0, block.uniqueVisualAnchorRowOrdinal)))!;
+  const { result: primary, source } = executeEntry(entry, {
+    startRowOrdinal: first, endRowOrdinal: first + 32, executionOptions: {},
+  });
+  const { result: anchor } = executeEntry(entry, {
+    startRowOrdinal: 1, endRowOrdinal: block.uniqueVisualAnchorRowOrdinal, executionOptions: {},
+  });
   return { id, folder, source, report, block, data, mask, primary, anchor,
     regions: json<RegionMap>(folder + 'derived-region-map-v1.json') };
 });
