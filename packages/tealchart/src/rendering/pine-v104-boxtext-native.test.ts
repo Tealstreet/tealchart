@@ -12,6 +12,7 @@ const digest = (bytes: Uint8Array | Uint8ClampedArray) => createHash('sha256').u
 const inset = (r: number[]) => [r[0] + 4, r[1] + 4, r[2] - 4, r[3] - 4];
 function independentPlate(entry: (typeof entries)[number]) {
   const wrap = entry.id.includes('wrap');
+  const vertical = entry.id.includes('vertical');
   const { registration, originalDimensionsPx } = entry.regions;
   const { yZeroPx, yHundredPx } = json(entry.regions.manualInspection.path).axisCalibration;
   const scale = registration.pixelsPerOwnBar;
@@ -24,11 +25,17 @@ function independentPlate(entry: (typeof entries)[number]) {
         [-19, 90, -11, 25],
         [-30, 20, -1, 5],
       ]
-    : [
-        [-30, 95, -1, 70],
-        [-30, 65, -1, 40],
-        [-30, 35, -1, 10],
-      ];
+    : vertical
+      ? [
+          [-30, 95, -22, 5],
+          [-19, 95, -11, 5],
+          [-8, 95, -1, 5],
+        ]
+      : [
+          [-30, 95, -1, 70],
+          [-30, 65, -1, 40],
+          [-30, 35, -1, 10],
+        ];
   const canvas = createCanvas(originalDimensionsPx.width, originalDimensionsPx.height);
   const ctx = canvas.getContext('2d');
   ctx.font = '20px sans-serif';
@@ -51,10 +58,18 @@ function independentPlate(entry: (typeof entries)[number]) {
       }
       expect(words.length).toBeGreaterThan(1);
     }
-    const align = wrap || index === 0 ? 'left' : index === 1 ? 'center' : 'right';
-    const baseline = wrap && index < 2 ? 'top' : 'middle';
+    const align = vertical ? 'center' : wrap || index === 0 ? 'left' : index === 1 ? 'center' : 'right';
+    const baseline = vertical
+      ? index === 0
+        ? 'top'
+        : index === 1
+          ? 'middle'
+          : 'bottom'
+      : wrap && index < 2
+        ? 'top'
+        : 'middle';
     const x = align === 'left' ? left + 6 : align === 'right' ? right - 6 : (left + right) / 2;
-    const ty = baseline === 'top' ? top + 6 : (top + bottom) / 2;
+    const ty = baseline === 'top' ? top + 6 : baseline === 'bottom' ? bottom - 6 : (top + bottom) / 2;
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(left, top, right - left, bottom - top);
     ctx.strokeStyle = '#2962FF';
@@ -125,6 +140,52 @@ for (const entry of entries)
           phrase,
         ]);
         expect(nativeInk.map((v: { bands: number }) => v.bands)).toEqual([2, 1, 1]);
+      } else if (entry.id.includes('vertical')) {
+        expect(finding.visibleTextByRegion.map((v: { literal: string }) => v.literal)).toEqual([
+          'EDGE',
+          'EDGE',
+          'EDGE',
+        ]);
+        const expectedBounds = [
+          [407, 683, 456, 697],
+          [629, 775, 678, 789],
+          [842, 865, 891, 879],
+        ];
+        for (const [index, ink] of nativeInk.entries()) {
+          expect(ink.bands).toBe(1);
+          expect(ink.bounds).toEqual(expectedBounds[index]);
+          expect(finding.actualGlyphBoundsPx[index]).toEqual(
+            [
+              [406, 683, 457, 699],
+              [628, 775, 679, 790],
+              [841, 865, 892, 881],
+            ][index],
+          );
+        }
+        expect(nativeInk[0].bounds[3]).toBeLessThan(710);
+        expect(nativeInk[1].bounds[1]).toBeGreaterThan(760);
+        expect(nativeInk[1].bounds[3]).toBeLessThan(800);
+        expect(nativeInk[2].bounds[1]).toBeGreaterThan(850);
+        for (const [index, rect] of rects.entries()) {
+          const xs: number[] = [],
+            ys: number[] = [];
+          for (let y = rect[1]; y < rect[3]; y++)
+            for (let x = rect[0]; x < rect[2]; x++) {
+              const [r, g, b] = frame.pixels.slice((y * frame.width + x) * 4, (y * frame.width + x) * 4 + 3);
+              if (Math.min(r, g, b) > 245) {
+                xs.push(x);
+                ys.push(y);
+              }
+            }
+          expect(xs.length).toBeGreaterThan(25000);
+          expect([Math.min(...xs), Math.min(...ys), Math.max(...xs) + 1, Math.max(...ys) + 1]).toEqual(
+            [
+              [351, 674, 512, 889],
+              [573, 674, 734, 889],
+              [796, 674, 937, 889],
+            ][index],
+          );
+        }
       } else {
         expect(finding.visibleTextByRegion.map((v: { literal: string }) => v.literal)).toEqual([
           'EDGE',

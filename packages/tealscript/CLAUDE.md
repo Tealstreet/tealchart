@@ -4929,3 +4929,7 @@ observations. PNG-bound topology remains separate from plotarrow sign-direction 
 V104 v5 box wrap/alignment replay preserves each build's three getter values
 and intentional blanks. Absolute indices are observed exclusions; four modulo8
 cycles use original closed bars without synthesizing an own-origin prefix.
+
+V104 v5 vertical alignment adds one retained build with 8/8/7 span getters.
+Its 319 exact cells include 155 intentional blanks; the 33 absolute-index cells
+stay observed exclusions, and unrelated v11 slots receive no credit.

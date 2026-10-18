@@ -65,7 +65,7 @@ const black100 = present(0, 0, 0, 100, 0);
 
 describe('v98 v6 cast: observation-only non-identifiability witnesses', () => {
   it('binds the exact source, native inputs and existing complete evidence pin', () => {
-    expect(lock.revision).toBe('1faebe5ac656714b4177c9acbdb5e1e411e8e9b2');
+    expect(lock.revision).toBe('04a6378c310ef405448e5eea719bf4bc0e699e1a');
     for (const path of [
       base + 'numeric-controls-v6.json',
       native.csv.path,

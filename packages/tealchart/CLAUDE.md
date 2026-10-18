@@ -1721,3 +1721,7 @@ style/position swaps without claiming hidden creation order for disjoint subject
 V104 v5 wrap/alignment locks bind each of three boxes to its source position,
 complete caption and independently painted local raster. Whole-word wrap counts
 use active font measurements; native glyph metrics remain unobserved.
+
+V104 v5 vertical alignment binds complete EDGE ink to left/top, middle/center
+and right/bottom equal-height boxes. Compare complete per-object local rasters
+under system and DejaVu-only fonts; exact native font/padding metrics stay held.

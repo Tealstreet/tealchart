@@ -2,7 +2,7 @@ import { executeEntry, json, table } from './v104Fixture';
 
 export { json, lock, raw, table, revision } from './v104Fixture';
 export const capture = 'v104/captures/v104/';
-export const ids = ['v104-box-wrap-v5', 'v104-box-align-v5'];
+export const ids = ['v104-box-wrap-v5', 'v104-box-align-v5', 'v104-box-vertical-v5'];
 export const entries = ids.map((id) => {
   const report = json(capture + id + '/numeric-results-v1.json');
   const block = json(report.nativeBlock.path);

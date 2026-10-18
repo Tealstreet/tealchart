@@ -8,16 +8,18 @@ const hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('h
 const absoluteIndexCause =
   'OBSERVED / EXCLUDED: native absolute index and missing own-origin prefix are not replay context';
 
-describe('v104 original box text wrapping and horizontal alignment', () => {
-  it('binds an independent immutable revision, all v2 integrity dependencies and validation', () => {
-    expect(revision).toBe('1faebe5ac656714b4177c9acbdb5e1e411e8e9b2');
+describe('v104 original box text wrapping, horizontal and vertical alignment', () => {
+  it('binds an independent immutable revision, all v2/v11 integrity dependencies and validation', () => {
+    expect(revision).toBe('04a6378c310ef405448e5eea719bf4bc0e699e1a');
     expect(lock.revision).toBe(revision);
-    const path = capture + 'artifact-integrity-v2.json';
-    for (const proof of [...json(path).artifacts, { path, bytes: raw(path).length, sha256: hash(raw(path)) }]) {
-      expect(lock.files.find((p) => p.path === proof.path)).toEqual(proof);
-      expect({ path: proof.path, bytes: raw(proof.path).length, sha256: hash(raw(proof.path)) }).toEqual(proof);
+    for (const version of [2, 11]) {
+      const path = capture + `artifact-integrity-v${version}.json`;
+      for (const proof of [...json(path).artifacts, { path, bytes: raw(path).length, sha256: hash(raw(path)) }]) {
+        expect(lock.files.find((p) => p.path === proof.path)).toEqual(proof);
+        expect({ path: proof.path, bytes: raw(proof.path).length, sha256: hash(raw(proof.path)) }).toEqual(proof);
+      }
+      expect(json(capture + `validation-result-v${version}.json`).status).toBe('PASS');
     }
-    expect(json(capture + 'validation-result-v2.json').status).toBe('PASS');
     const models = json('v104/CASE-MATRIX-v1.json').facets;
     const manifest = json('v104/bundle-manifest-v1.json');
     for (const entry of entries) {
