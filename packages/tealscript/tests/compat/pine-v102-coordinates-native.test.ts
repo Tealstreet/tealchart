@@ -103,7 +103,7 @@ for (const version of versions) {
 
   describe(`${id}: bounded native coordinate and final-geometry evidence`, () => {
     it('binds the original source, native bodies, CSV/closure, PNG, contracts and derived verdicts', () => {
-      expect(lock.revision).toBe('6fba2a043155ecfd52bec4fbffb9f03144066ab3');
+      expect(lock.revision).toBe('f47a4e34ce33441ad37add124d9572119826138d');
       const integrity = json<{ artifacts: Proof[] }>(capture + 'artifact-integrity-v6.json');
       const shared = ['CAPTURE-TOOLING-LICENSE-v1.md', 'RESPONSE-v102-v6.md', 'account-actions-v6.json',
         'attempt-inventory-v6.json', 'facet-capabilities-v6.json', 'numeric-contracts-v1.json',

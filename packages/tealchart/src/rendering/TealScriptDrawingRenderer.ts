@@ -443,13 +443,18 @@ export function paintTealScriptDrawings(
       ctx.lineTo(extended.end.x, extended.end.y);
       ctx.stroke();
 
-      if (line.style === 'arrow_left' || line.style === 'arrow_both') {
+      if (line.style === 'arrow_left' || line.style === 'arrow_right' || line.style === 'arrow_both') {
+        const endpoints = resolveLineDrawingSegment(
+          { ...line, extend: 'none' }, bars, viewport, pane, chartWidth, minX, maxX, coordinateResolvers,
+        );
+        if (!endpoints) continue;
         ctx.setLineDash([]);
-        drawLineArrowhead(extended.start, extended.end, Math.max(1, line.width), line.color);
-      }
-      if (line.style === 'arrow_right' || line.style === 'arrow_both') {
-        ctx.setLineDash([]);
-        drawLineArrowhead(extended.end, extended.start, Math.max(1, line.width), line.color);
+        if (line.style === 'arrow_left' || line.style === 'arrow_both') {
+          drawLineArrowhead(endpoints.start, endpoints.end, Math.max(1, line.width), line.color);
+        }
+        if (line.style === 'arrow_right' || line.style === 'arrow_both') {
+          drawLineArrowhead(endpoints.end, endpoints.start, Math.max(1, line.width), line.color);
+        }
       }
     }
 
