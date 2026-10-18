@@ -19,7 +19,7 @@ import { DEFAULT_RENDER_OPTIONS } from '../types';
 
 export type StyleChannel = 'web' | 'web-pane' | 'web-unified' | 'native' | 'native-static';
 export interface StyleCommand { op: string; x: number; y: number; w?: number; h?: number; text?: string; anchorX?: number; anchorY?: number }
-export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; commands: StyleCommand[]; dash: number[]; globalAlpha?: number; lineWidth?: number }
+export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; commands: StyleCommand[]; dash: number[]; globalAlpha?: number; lineWidth?: number; font?: string; textAlign?: CanvasTextAlign; textBaseline?: CanvasTextBaseline }
 export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
   const { result, bars } = executeStyle(entry);
   const plots = result.plots.map(p => ({ ...p, scriptId: 's' })) as PlotOutput[];
@@ -40,7 +40,7 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
     stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), commands: [...commands], dash: [...dash], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
     rect: (x, y, w, h) => { commands.push({ op: 'R', x, y, w, h }); }, roundRect: noop, quadraticCurveTo: noop, bezierCurveTo: noop, clip: noop, scale: noop, translate: noop,
     fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), commands: [{ op: 'R', x, y, w, h }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }), strokeRect: noop,
-    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth }),
+    fillText: (text, x, y) => paints.push({ kind: 'text', color: String(ctx.fillStyle), commands: [{ op: 'T', text, x, y, anchorX: ctx.textAlign === 'center' ? x : undefined, anchorY: ctx.textBaseline === 'middle' ? y : undefined }], dash: [], globalAlpha: ctx.globalAlpha, lineWidth: ctx.lineWidth, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
     save: () => { states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline, dash: [...dash] }); },
     restore: () => { const state = states.pop(); if (state) { Object.assign(ctx, state); dash = state.dash; } },
     setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash], measureText: s => ({ width: s.length * 7 }) as TextMetrics,
@@ -75,7 +75,7 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
         const text = resolved<string>(node.props.text), font = node.props.font, metrics = font.getMetrics();
         const x = resolved<number>(node.props.x), y = resolved<number>(node.props.y);
         paints.push({ kind: 'text', color: resolved(node.props.color), commands: [{ op: 'T', x, y, text,
-          anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2 }], dash: [] });
+          anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2 }], dash: [], globalAlpha: node.opacity, font: '12px sans-serif', textAlign: 'left', textBaseline: 'alphabetic' });
       }
       if (node.type !== Path) continue;
       const path = resolved<any>(node.props.path);
@@ -84,7 +84,7 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
           x: name === 'addRect' ? args[0].x : args[0] ?? 0, y: name === 'addRect' ? args[0].y : args[1] ?? 0, w: name === 'addRect' ? args[0].width : args[2], h: name === 'addRect' ? args[0].height : undefined })))
         .sort((a, b) => a.order - b.order);
       const effect = nativePrimitives(node.props.children).find(p => p.type === DashPathEffect);
-      paints.push({ kind: node.props.style === 'stroke' ? 'stroke' : 'fill', color: resolved(node.props.color), commands, dash: effect?.props.intervals ?? [] });
+      paints.push({ kind: node.props.style === 'stroke' ? 'stroke' : 'fill', color: resolved(node.props.color), commands, dash: resolved<number[]>(effect?.props.intervals ?? []), globalAlpha: node.opacity, lineWidth: resolved<number>(node.props.strokeWidth ?? 1) });
     }
   }
   const x = (row: number) => (Number(entry.csv.raw(row, 'time')) * 1000 - viewport.startTime) / (viewport.endTime - viewport.startTime) * 1000;

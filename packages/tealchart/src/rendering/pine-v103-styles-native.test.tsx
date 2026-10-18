@@ -20,6 +20,39 @@ const expectVisiblePaint = (paint: StylePaint) => {
   expect(paint.globalAlpha).toBeGreaterThan(0);
   expect(paint.globalAlpha).toBeLessThanOrEqual(1);
   expect(colorAlpha * paint.globalAlpha!).toBeGreaterThan(0);
+  if (paint.kind === 'stroke') expect(paint.lineWidth).toBeGreaterThan(0);
+  // Rasterize each emitted primitive independently; another subject cannot supply its ink.
+  const padding = 32;
+  const minX = Math.floor(Math.min(...paint.commands.map(c => c.x - (c.w ?? 0))) - padding);
+  const minY = Math.floor(Math.min(...paint.commands.map(c => c.y - (c.h ?? c.w ?? 0))) - padding);
+  const maxX = Math.ceil(Math.max(...paint.commands.map(c => c.x + (c.w ?? 0))) + padding);
+  const maxY = Math.ceil(Math.max(...paint.commands.map(c => c.y + (c.h ?? c.w ?? 0))) + padding);
+  const ctx = createCanvas(maxX - minX, maxY - minY).getContext('2d');
+  ctx.translate(-minX, -minY);
+  ctx.fillStyle = paint.color; ctx.strokeStyle = paint.color;
+  ctx.globalAlpha = paint.globalAlpha!; ctx.lineWidth = paint.lineWidth ?? 1;
+  ctx.setLineDash(paint.dash);
+  ctx.beginPath();
+  for (const c of paint.commands) {
+    if (c.op === 'M') ctx.moveTo(c.x, c.y);
+    else if (c.op === 'L') ctx.lineTo(c.x, c.y);
+    else if (c.op === 'Z') ctx.closePath();
+    else if (c.op === 'R') ctx.rect(c.x, c.y, c.w!, c.h!);
+    else if (c.op === 'C') { ctx.moveTo(c.x + c.w!, c.y); ctx.arc(c.x, c.y, c.w!, 0, Math.PI * 2); }
+    else if (c.op === 'T') {
+      ctx.font = paint.font!; ctx.textAlign = paint.textAlign!; ctx.textBaseline = paint.textBaseline!;
+      ctx.fillText(c.text!, c.x, c.y);
+    }
+  }
+  if (paint.kind === 'stroke') ctx.stroke();
+  else if (paint.kind === 'fill') ctx.fill();
+  const pixels = ctx.getImageData(0, 0, maxX - minX, maxY - minY).data;
+  expect(pixels.some((value, i) => i % 4 === 3 && value > 0), JSON.stringify(paint)).toBe(true);
+};
+const expectVisibleColors = (trace: ReturnType<typeof traceStyles>, ...hexes: string[]) => {
+  for (const hex of hexes) for (const paint of color(trace.paints, hex)) {
+    if (paint.commands.some(c => ['L', 'C', 'R', 'T'].includes(c.op))) expectVisiblePaint(paint);
+  }
 };
 const drawingInk = (trace: ReturnType<typeof traceStyles>, channel: StyleChannel) => {
   const ctx = createCanvas(1000, 100).getContext('2d');
@@ -65,9 +98,18 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
             const paint = atSubject[0];
             expect(paint.commands.filter(c => c.op !== 'Z').map(c => ({ x: c.x, y: c.y })).sort((a, b) => a.x - b.x)).toEqual(points);
             expect(paint.commands.at(-1)?.op).toBe('Z');
-            if (paint.kind === 'stroke') expect(paint.dash.length).toBeGreaterThan(0);
-            else {
-              expectVisiblePaint(paint);
+            expectVisiblePaint(paint);
+            if (paint.kind === 'stroke') {
+              expect(paint.dash.length).toBeGreaterThanOrEqual(2);
+              expect(paint.dash.length % 2).toBe(0);
+              expect(paint.dash.every(length => Number.isFinite(length) && length > 0)).toBe(true);
+              const edge = Array.from({ length: Math.floor(points[2].x) - Math.ceil(points[0].x) - 15 },
+                (_, i) => ink(Math.ceil(points[0].x) + 8 + i, 80));
+              const isBlue = edge.map(pixel => pixel[3] > 0 && pixel[2] > pixel[0] && pixel[2] > pixel[1]);
+              expect(isBlue.some(Boolean)).toBe(true);
+              expect(isBlue.some(value => !value)).toBe(true);
+              expect(isBlue.slice(1).filter((value, i) => value !== isBlue[i]).length).toBeGreaterThan(1);
+            } else {
               const pixel = ink(points[1].x, (80 + 15 + 80) / 3);
               expect(pixel[3]).toBeGreaterThan(0);
               expect(pixel[0]).toBeGreaterThan(pixel[1]);
@@ -93,6 +135,13 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
         for (const [value, ends] of [[20, ['left']], [50, ['right']], [80, ['left', 'right']]] as [number, string[]][]) {
           const shaft = shafts.filter(p => p.commands.some(c => near(c.x, left) && near(c.y, 100 - value)));
           expect(shaft).toHaveLength(1);
+          expectVisiblePaint(shaft[0]);
+          for (const [a, b] of segments(shaft)) {
+            const pixel = ink((a.x + b.x) / 2, (a.y + b.y) / 2);
+            expect(pixel[3]).toBeGreaterThan(0);
+            expect(pixel[2]).toBeGreaterThan(pixel[0]);
+            expect(pixel[2]).toBeGreaterThan(pixel[1]);
+          }
           expect(shaft[0].commands.map(c => ({ x: c.x, y: c.y })).sort((a, b) => a.x - b.x)).toEqual([
             { x: left, y: 100 - value }, { x: trace.x(e.anchor - 50), y: 95 - value }, { x: right, y: 100 - value },
           ]);
@@ -132,6 +181,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       const name = 'fillgaps-overloads-v6';
       for (const id of ['plot-fill-false', 'plot-fill-true', 'hline-fill-positive']) facet(name, id);
       const e = entry(name), trace = traceStyles(e, channel);
+      expectVisibleColors(trace, '#fdd835', '#00bcd4', '#9c27b0');
       const polygons = (hex: string) => color(trace.paints, hex).filter(p => p.kind === 'fill').flatMap(p => {
         const islands: { x: number; y: number }[][] = [];
         for (const c of p.commands) {
@@ -154,6 +204,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
     it('joins adjacent blue circles without crossing holes, leaving aqua isolated', () => {
       facet('plot-controls-v6', 'circle-join');
       const e = entry('plot-controls-v6'), trace = traceStyles(e, channel);
+      expectVisibleColors(trace, '#2962ff', '#00bcd4');
       const joins = segments(blue(trace.paints).filter(p => p.kind === 'stroke'));
       for (const [title, hex] of [['JOIN', '#2962ff'], ['NOJOIN', '#00bcd4']]) {
         const circles = color(trace.paints, hex).flatMap(p => p.commands.filter(c => c.op === 'C'));
@@ -174,6 +225,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
     it('suppresses historical orange markers while preserving a positive tail and the long red tracker', () => {
       for (const id of ['show-last', 'trackprice']) facet('plot-controls-v6', id);
       const e = entry('plot-controls-v6'), trace = traceStyles(e, channel);
+      expectVisibleColors(trace, '#ff9800', '#f23645');
       const orange = color(trace.paints, '#ff9800').flatMap(p => p.commands.filter(c => c.op === 'C'));
       expect(orange).toHaveLength(4);
       expect(orange.every(c => c.x > trace.x(e.anchor - 10) && near(c.y, 35))).toBe(true);
@@ -184,6 +236,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
     it('places upper squares at value80, makes the lower squares larger and paints the literal X', () => {
       for (const id of ['shape-size', 'shape-absolute-location', 'literal-char']) facet('markers-v6', id);
       const e = entry('markers-v6'), trace = traceStyles(e, channel);
+      expectVisibleColors(trace, '#2962ff', '#ff9800');
       const squares = blue(trace.paints).flatMap(p => p.commands.filter(c => c.op === 'R'));
       const small = squares.filter(c => near(c.y + (c.h ?? 0) / 2, 20));
       const large = squares.filter(c => near(c.y + (c.h ?? 0) / 2, 40));
@@ -206,6 +259,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
     it('varies positive plotarrow heights with magnitude while sign-direction remains held', () => {
       const name = 'plotarrow-height-v6', e = entry(name), trace = traceStyles(e, channel);
       facet(name, 'relative-height');
+      expectVisibleColors(trace, '#2962ff');
       expect(e.regions.facets.find((f: any) => f.facetId.endsWith(':sign-direction')).verdict).toBe('UNDECIDED');
       const height = (row: number) => {
         const x = trace.x(row);
