@@ -2,17 +2,16 @@ import type { SkCanvas } from '@shopify/react-native-skia';
 import type { CanvasContext } from '../../rendering/CanvasContext';
 
 import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 
 import { Skia } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
+import { transformNativeWorklet } from '../../test/transformNativeWorklet';
+
 // Vitest normally strips directives without running the mobile Babel plugin.
 // Exercise the actual serialized function body to catch captured mutable state
 // and JS-only helper calls that ordinary draw-call tests cannot detect.
-const require = createRequire(import.meta.url);
-const babel = require('@babel/core') as { transformSync(source: string, options: unknown): { code: string } };
 interface Worklet {
   (...args: unknown[]): unknown;
   __initData?: { code: string };
@@ -22,16 +21,7 @@ function loadWorklets(file: string, cache = new Map<string, Record<string, unkno
   if (cache.has(file)) return cache.get(file)!;
   const exports: Record<string, unknown> = {};
   cache.set(file, exports);
-  const { code } = babel.transformSync(readFileSync(file, 'utf8'), {
-    filename: file,
-    configFile: false,
-    babelrc: false,
-    plugins: [
-      '@babel/plugin-transform-typescript',
-      'react-native-worklets/plugin',
-      '@babel/plugin-transform-modules-commonjs',
-    ],
-  });
+  const code = transformNativeWorklet(readFileSync(file, 'utf8'), file);
   new Function('require', 'exports', code)((name: string) => {
     if (name === '@shopify/react-native-skia') return { Skia };
     if (name.startsWith('.')) return loadWorklets(resolve(file, '..', `${name}.ts`), cache);
