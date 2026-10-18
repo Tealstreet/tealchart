@@ -25,7 +25,7 @@ interface Numeric {
   nativeRuntimeObservation: Binding;
 }
 // Composition advances only the checkout pin; native item18 artifact hashes stay unchanged.
-const pin = '56abd808d88595bab7808c063d065ce2bcd7dc55';
+const pin = 'db3199acaebfa812fae9066c983d14bc54fc831e';
 const directory = 'v95/captures/v95/';
 const folder = (v: number) => `${directory}v95-matrix-mutations-v${v}/attempt-v1/`;
 const sourcePath = (v: number) => `v95/sources/v95-matrix-mutations-v${v}.pine`;

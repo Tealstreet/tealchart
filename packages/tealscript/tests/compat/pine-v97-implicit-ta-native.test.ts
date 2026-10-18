@@ -22,7 +22,7 @@ interface Report {
   comparisonCounts: Record<string, number>;
   allClosedDirectionTransitions: { previous: Cell; current: Cell }[];
 }
-const pin = '56abd808d88595bab7808c063d065ce2bcd7dc55';
+const pin = 'db3199acaebfa812fae9066c983d14bc54fc831e';
 const base = 'v97/captures/v97/';
 const raw = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => raw(path).toString();
