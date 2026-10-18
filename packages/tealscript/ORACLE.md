@@ -244,3 +244,19 @@ The [v5 return](https://github.com/Tealstreet/tealscript-oracle/blob/5c8a503d7b6
 Replay uses only actual captured OHLC/time/volume from the first observed modulo8-zero row through the owned closed build. The selected A-31..A block yields288 exact non-index numeric/blank cells and64 translated index-context cells with zero absolute-origin credit. Each build getter supplies one finite event and31 intentional blanks. No output seeds, invented bars or native outputs enter execution. Other/developing/context rows receive no primary credit.
 
 Dotted strokes, boxes, polylines, plot/hline styles and earlier Pine versions inherit width scaling through the shared recipe as an explicit inference, separately regression-tested without additional native credit. Existing width1 recipe lengths and dash/gap proportions are retained as engine policy, not native-certified absolute metrics. The older copy comparison's local constructor recipe and width2 worklet expectation follow this same inferred correction; neither older capture certified a numeric period. Native DPI, absolute pixel lengths, phase/reset/clipping laws and historical holds remain held.
+
+## V104 finite glyph advance
+
+The v6 glyph slot at oracle `811a4d79` supplies one retained four-label plate:
+monospace I/W body widths agree within the preregistered edge uncertainty, while
+default-font I/W controls differ. Original source, CSV, PNG and map bindings are
+separate from the local font recipes exercised through web and native painters.
+The append-only fixture union includes v4 integrity dependencies; other v104
+slots receive no scoring credit from the glyph lock.
+
+The fixed A-31..A block contains 384 native cells. Unchanged-source replay
+compares 351 numeric/blank cells exactly, including 186 intentional blanks;
+33 absolute-index cells remain translated context. Four position getters each
+contribute one build observation, not 32 repeated getters. Original predecessors
+remain context; developing rows are excluded. Native font identity, fractional
+advances, padding, DPI/frame/zoom and universal raster claims stay held.
