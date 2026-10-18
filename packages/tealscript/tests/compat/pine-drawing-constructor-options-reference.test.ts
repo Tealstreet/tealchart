@@ -187,12 +187,15 @@ describe('Documented drawing constructor options', () => {
     'bottom_right',
   ]) {
     it(`position.${position} selects the same named table position in constructor and setter`, () => {
-      const result = run(
-        `id=table.new(position.${position},2,3)\nother=table.new(position.${position === 'top_left' ? 'bottom_left' : 'top_left'},1,1)\nother.set_position(position.${position})`,
+      const constructed = run(`id=table.new(position.${position},2,3)`);
+      const relocated = run(
+        `other=table.new(position.${position === 'top_left' ? 'bottom_left' : 'top_left'},1,1)\nother.set_position(position.${position})`,
       );
-      expect(result.errors).toEqual([]);
-      expect(result.drawings).toHaveLength(2);
-      expect(result.drawings?.map((d) => (d.type === 'table' ? d.position : null))).toEqual([position, position]);
+      for (const result of [constructed, relocated]) {
+        expect(result.errors).toEqual([]);
+        expect(result.drawings).toHaveLength(1);
+        expect(result.drawings![0]).toMatchObject({ type: 'table', position });
+      }
     });
   }
 });
