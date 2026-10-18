@@ -4901,3 +4901,7 @@ offset without changing the unchanged source or feeding native outputs. Replay
 context translates absolute indices by a multiple of eight and earns no startup
 or absolute-index credit. Step-position uncertainty remains held independently
 of exact numeric STEP values and supported gap/area/offset/dashed appearances.
+
+V103 table replay retains the rotated A-31..A block and eight original predecessors.
+Build getters supply one event plus31 blanks; absolute indices remain observed
+exclusions when replaying an original phase-aligned suffix without a fake prefix.

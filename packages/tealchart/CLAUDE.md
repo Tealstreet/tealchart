@@ -1674,3 +1674,7 @@ displacement in v5/v6, plus the v6 dashed-with-break stroke class. Keep the
 continuous line/area controls separate. CSV screen alignment does not shift the
 engine source arrays; painters apply offset once. Exact step turn placement,
 native raster metrics and dash periods remain held despite readable lanes.
+
+Native v103 table plates retain B/C after destination replacement and show zero
+cell dimensions auto-size like omitted dimensions. Original PNG/map controls
+bound these alternatives; resolved fonts, exact metrics and stopped v5 stay held.
