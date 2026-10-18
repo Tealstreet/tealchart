@@ -23,7 +23,7 @@ interface Facet { caseId: string; verdict: string; supportedCandidate?: string; 
   subproperties?: { property: string; verdict: string; cause?: string; regionsPx?: number[][] }[];
   visibleLinesByRegion?: Record<string, string[]> }
 const root = 'v102/captures/v102/';
-const revision = '3f3169de35577ad5041a994f39cac471fcffd8fa';
+const revision = '6fba2a043155ecfd52bec4fbffb9f03144066ab3';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const read = (path: string) => bytes(path).toString('utf8');
 const json = <T>(path: string): T => JSON.parse(read(path)) as T;
