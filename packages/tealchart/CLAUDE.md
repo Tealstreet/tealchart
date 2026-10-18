@@ -1708,3 +1708,9 @@ V103 copy/control equality also requires an independent primitive appearance
 reference for each object, including body, border and caption ink. Original PNG
 component colors, areas and bounds bind the native facts; local normal-font
 metrics instantiate those recipes without claiming native font/DPI equivalence.
+
+V103 styles bind closed dashed triangles, fillgaps, plot controls and markers to
+native PNGs. Both polyline versions witness open endpoint chevrons. Relative
+plotarrow heights are supported; direction and universal raster metrics stay held.
+Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
+style/position swaps without claiming hidden creation order for disjoint subjects.

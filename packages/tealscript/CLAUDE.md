@@ -4921,3 +4921,7 @@ exclusions when replaying an original phase-aligned suffix without a fake prefix
 V103 v5 extension/stroke and v5/v6 retained-linefill locks replay original phase-aligned
 suffixes through each one-time closed build. Absolute indices remain excluded.
 COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay held.
+
+V103 styles replay seven unchanged sources at their own closed retained anchors.
+Exact non-index cells include intentional blanks; one build event is not32 getter
+observations. PNG-bound topology remains separate from plotarrow sign-direction held.

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Tealstreet/tealscript-oracle.git",
-  "revision": "ac9d6992d6d84e296c58dca98fb6b707224d55a1",
+  "revision": "287ebfc19e282245be4df55fc6a9d0f5b876d817",
   "files": [
     {
       "path": "captures/v1/extrema-barsago-v1.csv",
@@ -39506,6 +39506,2831 @@
       "path": "v103/captures/v103/validation-result-v22.json",
       "bytes": 916,
       "sha256": "eec93e69266a0633a3e96e7c92bc6cef8253f6fcdba4e90801d035d493d3055d"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v23.md",
+      "bytes": 25688,
+      "sha256": "750103643eb7fccd90e875e948eb43fb9fa99c65084d1b9a449864bf68d1638d"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v24.md",
+      "bytes": 26626,
+      "sha256": "e53dff8ff76dd39a704831c0d17f5b9e6bd22089dcfba6be7712463f3abee397"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v25.md",
+      "bytes": 27516,
+      "sha256": "2982dacc267880d3972b42a1ecbcd0100be799856efd38eedbefaa3bc370e6d5"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v26.md",
+      "bytes": 28385,
+      "sha256": "1e7f2efe608106103391885bb849dc1244ea60b865907caf8a696821dc485ef0"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v27.md",
+      "bytes": 29419,
+      "sha256": "b9219f64613ff6025241b360873ca97a7404ebfd207c31a758780dde93bf670e"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v28.md",
+      "bytes": 30526,
+      "sha256": "4eb5823d8baa79ac9e4d3a4551623d4307a603290955330a53b7f5a227258464"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v23.json",
+      "bytes": 1301,
+      "sha256": "6b7a5b83c6aa233693c8278f56aeff537305cebd0b3273a582de467a238d34b9"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v24.json",
+      "bytes": 1301,
+      "sha256": "6b2c5a37d2451ef4a401ba1e877a40e2c52b7b5a8240b5485c05b7a959b4d680"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v25.json",
+      "bytes": 1301,
+      "sha256": "0bd37c0032dd40985403c2174af18f94d3ebfb67bb22b4f9f85395215fd1437f"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v26.json",
+      "bytes": 1301,
+      "sha256": "044e3b9094a68339569a6cfaec7dbc75d1e0e5e9bc506f0a0112f3b9fe8648f7"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v27.json",
+      "bytes": 1302,
+      "sha256": "f1c956b8123b4f0e77ef4e04a3b104a0c52c7cfc2652e16e47e44bbaf017f520"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v28.json",
+      "bytes": 1302,
+      "sha256": "d8966e0a37dc905bde1793bf99d4ead7052d96d6944948929fdf84c88752d80f"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v23.json",
+      "bytes": 363320,
+      "sha256": "e3c5b6d8d915150a1b23930a6d2b91a2746b7ec9eff1315542e484f485e1889c"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v24.json",
+      "bytes": 380566,
+      "sha256": "30b18a877b0bd4a4cc1da494207f1c72b84532b11ed506ec0845cf2057edaf8b"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v25.json",
+      "bytes": 396118,
+      "sha256": "9aa4013e6ddb80f247e041429dcf967f3cb3005631ba7cff9f57156d9ed408eb"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v26.json",
+      "bytes": 410842,
+      "sha256": "ceda9fe41e26d245b544ad25d0be081d6d630bc4fc6f51bedf2a7cb0317b541e"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v27.json",
+      "bytes": 426593,
+      "sha256": "5f1d9489485557fda31007c7a9093af371c8c377e35a40f8cc9a234a44ad4838"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v23.json",
+      "bytes": 427884,
+      "sha256": "4f5ecd448cd1c93e0f64bb1da97725cfe1f8e051dcd6cb1be9553dc07266ac9e"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v24.json",
+      "bytes": 449619,
+      "sha256": "484560126a558808b567045a9c22be60ec22db92d62cdc64349afce77e19314e"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v25.json",
+      "bytes": 470487,
+      "sha256": "2bfaeb7d465c1811204f06f40119da8aae6ec1d1a7acf44be46b274ca02fa01a"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v26.json",
+      "bytes": 490979,
+      "sha256": "a4a29425f5e779651ad59e6a6fb00cf622e8e65500c1cb7c6499058f55b19591"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v27.json",
+      "bytes": 511999,
+      "sha256": "7cc3addd28c2c5d1f1b8c2eb4ed99a1cfac5b7e66de539771db1dcacfe46f3ce"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v28.json",
+      "bytes": 534061,
+      "sha256": "a47b4fe03c573eabd3f4362d417b6477c942d416f872eaf9424234ac5a679492"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v23.json",
+      "bytes": 78452,
+      "sha256": "4fdad9a037be79a948629edba0fd3f0a0757f81bde464b84e7d2e478f695ae7b"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v24.json",
+      "bytes": 81961,
+      "sha256": "a24368b4c5946552f20923cbb0d1964ff2d581c01198e0f7c280d1a24d1c023c"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v25.json",
+      "bytes": 85474,
+      "sha256": "43f9e13f61c8b1d4702b7465377fa6d4179027211514f8ab8d0cb8a4b972d82d"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v26.json",
+      "bytes": 88855,
+      "sha256": "6f81a2ac501fe8853de5b6a79f0e6b909f8efdebbc580ab45bbde0d4ec2ccaba"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v27.json",
+      "bytes": 91637,
+      "sha256": "8a311975029d7c12f0652c787db2a98865b644a62baf57e498f0d72adf83327d"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v28.json",
+      "bytes": 97672,
+      "sha256": "74a6ae5ed8ac018abed79336dd3344210adc4bf87c670de2be4c5e64374fcfb9"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v23.json",
+      "bytes": 8978,
+      "sha256": "f4305fb76c78fcd7aa77f2e7601de6d2181faa99db2a7ef4a3cc73da20928b2c"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v24.json",
+      "bytes": 9362,
+      "sha256": "c28a546b2cedce9a11c3271c8a20c719cc629ba0d4044e7a4475b888305ca6c6"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v25.json",
+      "bytes": 9736,
+      "sha256": "64a6f947269ee1cbca1d3353c11cdbf63104b62f96948b103efc7c6dbf4ab905"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v26.json",
+      "bytes": 10098,
+      "sha256": "f84b576e28b8a7b4065c85bd7ca449337c1c3f44def36afbeb05108e0f926760"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v27.json",
+      "bytes": 10478,
+      "sha256": "53ff2b643d2b60928ca037353e32ab5b51e06a83f5f47646d56e73545b9b15e5"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v28.json",
+      "bytes": 10856,
+      "sha256": "73da6961f4c036787e42b202564adf47b7d61fa029063a6a9a3e4cfb18515fdf"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/add-response-v1.json",
+      "bytes": 10213,
+      "sha256": "0ef50008de487cafa462be8f31e09ff3d5729e285c84de6e65ec9443d96572c2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "10cb30a88daa575193f1f043567b3ba139e219e8852fc958cc4193a5314eea3d"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "02fd23f233041a240ab3b715a4450869b90f21a7af76b2f5d1d91ab93779fe28"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 547,
+      "sha256": "6b726a129a31af251a888c259161ad0a3b2a01667bd3d89a43627875f906e040"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2686,
+      "sha256": "960ffbe18fa6695dde3beaf53915774ee86461059f9e0f76d8aff8e5dde386f1"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6341,
+      "sha256": "f678ab05c59766355a961e4a2da29a6e143e8d8a389f5136c5af7ae31ed6aeaa"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1322,
+      "sha256": "89ee8acffe8641b0f1e400932175580fabbd86e8ea96f2bdf4ebf1bf68ed9a55"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "b68ff7e3a3a3a8e4e8eca294b16a0948cbc953ab73066b155d469e636b45f631"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 413,
+      "sha256": "0a36bc35d418a27225d1ce839f0a3869301d972751066b1d91284cccdda0e85e"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7583,
+      "sha256": "2ede01963ac5c3c769a89508e65da0d837371d7eae0e159dc78e0224fed036f8"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 384,
+      "sha256": "35531d34b2cae85b9b01dbd1b5c64e8b8a9594aae485f38538fbeb4374a6986c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7555,
+      "sha256": "94a364e1b7786e219ee87733fa58d2d0630d6eb924e5d73270fa085d606bdfbb"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 384,
+      "sha256": "35531d34b2cae85b9b01dbd1b5c64e8b8a9594aae485f38538fbeb4374a6986c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 7555,
+      "sha256": "e58063f63a5b203df1c9598c18231e6da8bf34552305be1e5d93beafa84b67a6"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 384,
+      "sha256": "35531d34b2cae85b9b01dbd1b5c64e8b8a9594aae485f38538fbeb4374a6986c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 7555,
+      "sha256": "7952cdf7bf66e301827e015878568d2df4c85add763a83e23a3cd61277a24841"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 384,
+      "sha256": "35531d34b2cae85b9b01dbd1b5c64e8b8a9594aae485f38538fbeb4374a6986c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7555,
+      "sha256": "2505e8774bb8a251e28649a341cb762a8ae2a4f9185412f805d92cdeb564eb4b"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 884,
+      "sha256": "560c7a7bb6c54fbe897f51aa9419761203e0745ebe6445d220a53830de61e480"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 8057,
+      "sha256": "5727c5ab8e416d648b59fe28eb58a8f299d2e6c20b4c8f167e024de7bbef02b6"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 525,
+      "sha256": "7e1d3a9d4df25abed013851df1848db5c53479c6011cde48207071e43ff515b2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7698,
+      "sha256": "353346d94ad636d6ed4dd98c424a5f0e4e881cf57f0c1f917eae5bb7d7bdb3c2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-23-25-exposed-v1.pine",
+      "bytes": 525,
+      "sha256": "7e1d3a9d4df25abed013851df1848db5c53479c6011cde48207071e43ff515b2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-23-25-v1.txt",
+      "bytes": 7698,
+      "sha256": "522864fadfa0636864e552035a7e1f3b0a2f5225e5bc22eb6d27f09a22355c18"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-25-27-exposed-v1.pine",
+      "bytes": 525,
+      "sha256": "7e1d3a9d4df25abed013851df1848db5c53479c6011cde48207071e43ff515b2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-25-27-v1.txt",
+      "bytes": 7698,
+      "sha256": "2dafc6b1bb779ba69babfe86efbc3206ab39dfa4f1a2e91386d1157167d5cb3b"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-27-29-exposed-v1.pine",
+      "bytes": 525,
+      "sha256": "7e1d3a9d4df25abed013851df1848db5c53479c6011cde48207071e43ff515b2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-27-29-v1.txt",
+      "bytes": 7698,
+      "sha256": "b68356a91b8d6956be62c6f56dbae574c38424840001a5c25b64f1a7c36edb2b"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-29-30-exposed-v1.pine",
+      "bytes": 525,
+      "sha256": "7e1d3a9d4df25abed013851df1848db5c53479c6011cde48207071e43ff515b2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-29-30-v1.txt",
+      "bytes": 7696,
+      "sha256": "f04fbb845e211df904e26cfe10289bac61b73d7ef47aa08274a8a791dea92f8b"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 413,
+      "sha256": "0a36bc35d418a27225d1ce839f0a3869301d972751066b1d91284cccdda0e85e"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7585,
+      "sha256": "8cc62250018f8d12236fb01de8512b6236e6433bf9e49873668461e52a019bf6"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 413,
+      "sha256": "0a36bc35d418a27225d1ce839f0a3869301d972751066b1d91284cccdda0e85e"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7585,
+      "sha256": "5a42447b5d2e8c7ab8a48eeba6ee0bf9e30d3839ddb8feeffec9490e7a749254"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 413,
+      "sha256": "0a36bc35d418a27225d1ce839f0a3869301d972751066b1d91284cccdda0e85e"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7585,
+      "sha256": "43e1ed6d5754fa5b6aeae12875f038500e20e7804d51352a1d0006a4a999b0c3"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 797,
+      "sha256": "087f62f1e38b875481b54d0c1ba5ee5e79abd26ae540a5a4162a13aed9bc2ca0"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 7968,
+      "sha256": "7b787e7bed333fec9b0a580ccdcecabd989c40d5e2e4400dad9ff2af62d077b7"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 1322,
+      "sha256": "89ee8acffe8641b0f1e400932175580fabbd86e8ea96f2bdf4ebf1bf68ed9a55"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7585,
+      "sha256": "a6477983bad7b7fa65d19c08cdb0de125ff186b09cb9245c529b8457b63ea12a"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 6956,
+      "sha256": "d5817ef449f8873fc74e599f629435e270df73cf3ca93393b9a9d9876618d7de"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/observation-v1.json",
+      "bytes": 5983,
+      "sha256": "1b75d11bf17ad61b86b80ccfc618c0fcee0e594ed13e0e0a07705fab38a1547e"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 8109,
+      "sha256": "db71af1f296cae597bfef8eb242de9ef5fcc6fa746422b65735e5c82feae6593"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8109,
+      "sha256": "db71af1f296cae597bfef8eb242de9ef5fcc6fa746422b65735e5c82feae6593"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6345,
+      "sha256": "2b73110af42f284c2c0a3be5517ac98b4dd4b818ff6b923142acde862d80b712"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7666,
+      "sha256": "1101319a3dbcaaf6433fb2ee2aa78cf8d27e4624843b9afc85c6866eea22c7c7"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 210904,
+      "sha256": "08b6d786c048a04aa02838d09c6e2f3260b83cbe60b459277bf210324a7329a0"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7732,
+      "sha256": "f40061eca01ee8041c05ff56bc4855158b01d16a96dc9b35bd3d8ecbcfe3d4c5"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 210905,
+      "sha256": "536b015a957b62d962b8817c6dc71b19a6699f89a9de358c38e343b7fc44f2c4"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7732,
+      "sha256": "f40061eca01ee8041c05ff56bc4855158b01d16a96dc9b35bd3d8ecbcfe3d4c5"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6802,
+      "sha256": "0eca00009187c5f92b7bae4a4cead0b08d677d5ea99671307aa525b10247a413"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1488,
+      "sha256": "015e9b6a9fdd4e3e6d5c05c7921a1c1c2d7fb3ccfe9b0b0fe54a37a3eba3fdc7"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/save-response-v1.json",
+      "bytes": 10213,
+      "sha256": "de5a1299960ddd0a880fc9e0c8787cf3ad70d900f1d0f260c527060bfc6e6ded"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "ec63510b429cad8e86568e312df1c2acfd9b96ecaf222dce513ae8e7f7d26c10"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6802,
+      "sha256": "0eca00009187c5f92b7bae4a4cead0b08d677d5ea99671307aa525b10247a413"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1239,
+      "sha256": "726422cc7174accbe41baec4463a0943939563f531a1f5858406fe29dd533d44"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7528,
+      "sha256": "d5d79cd3adc32d61f096c72f12948f64c90a117eef2fc37f2fea332fde181c84"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "8fcbed632177d4072751a6a9531d0042223951bc439da66c9bb447f74a71edfd"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 33498,
+      "sha256": "0d2851966ab5b6ba8b56024c8b25174902d6f15a9d4da9395336963ef774aa3d"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6812,
+      "sha256": "48e5c6d388cb1f008682fcf4d3b29500197789b0689c21ac106b848cae44a45d"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8249,
+      "sha256": "6e3c035d4b552795de6b03615fda9af8e31ca3ca4dabdf7900ff3557e23f8391"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6812,
+      "sha256": "181607c4f38c37c23dcfce2e0e9213a9900cdd0fcfba9893dde3df3f284ed378"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 143244,
+      "sha256": "ea9d88ca63d6ed95bdd1b1b2750223ead2eda6fc66d9d514cf944d9ab84c314a"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 71545,
+      "sha256": "081bdb453a531c771b7682b66d6db7f6aaff8e49d830c773bf7e5891b75c1ee6"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8525,
+      "sha256": "db81f217d2a15f3f046cb554fe00a8e6b0559a41c9505e25bf7b55f50198bc0c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 976,
+      "sha256": "19a1ba9b20cd46f21d2ab24ba2e6c59ee74fa9a8bc81c86924e36c12494caef2"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/compiler-diagnostics-v1.json",
+      "bytes": 1601,
+      "sha256": "9fd4029caa11ac199c6e400629637c03701a0d2ca9505dda2ddeca46492afa8c"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/derived-region-map-v1.json",
+      "bytes": 12725,
+      "sha256": "5610485c190f86672653aa2e4d8e501d7afaf74d6c16c0f1bd5b0c434d8ddd62"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/facet-assessment-v1.json",
+      "bytes": 3357,
+      "sha256": "040018c61491615b891f4b65e7a4986cdc38ffcad5850b717f990f721b649e85"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/native-cell-block-v1.json",
+      "bytes": 136196,
+      "sha256": "216df11d2eae24b1ec45e69718902d7d74b8bd0738f6b937d0039e08e0551399"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/numeric-results-v1.json",
+      "bytes": 187304,
+      "sha256": "c1438d909ef3f73131b2ff330cb57bec16d8d61510e2842ee70e2e8b2283469d"
+    },
+    {
+      "path": "v103/captures/v103/v103-fillgaps-overloads-v6/visual-inspection-v1.json",
+      "bytes": 4419,
+      "sha256": "db6dc139769a2c952d4daa9070d2af20a64f2c9edefdedf1c0e07c393a262c95"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/add-response-v1.json",
+      "bytes": 8686,
+      "sha256": "d0c128d46654b4f8e43dd74efac79d8f8a07316a03fac339a2f59747d6a7fa2c"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 315,
+      "sha256": "05ed9588c4e7ffa1b31fb968ee691f0f590b626f875d8e7ee503a8d3d1f960ce"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "9bdb405fd2a3190418ca4cf343267f549874a37c66280ea417ac378548790a35"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 525,
+      "sha256": "f39a09c621a8e36525f24f4d13db3cc50539b24411e88749379adc7e79629cf5"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2640,
+      "sha256": "5b1a2e94c41c309475d7555ca9e56ef7f379cbe51a8e087b71c85436e7db2c72"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6296,
+      "sha256": "cbbf5c3484a86a1761f402569de59509e84d1e23cfee62a3b016b50f9b9463f8"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1275,
+      "sha256": "1023b792df9c721689878aff7ea81b8316de911dbdc4f7d4277e3896dcf34af8"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "375f99f6cb11b7e37aa68722d710a7f18562b498dff5fdeb2c5136dbebc86654"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 402,
+      "sha256": "a547986b14cf4174fd54c892e78eb56f122f73ccb353277dcc6f1e3e33d19188"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7566,
+      "sha256": "2afd3c0542d5b8c7455b20df63ba957a55e7d695f388728f32ac355ec694e6fc"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 632,
+      "sha256": "2a710c0fcdc49c8732d86c5323b47da3d699c3778794ac6935fad4c0f3b38c3a"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7798,
+      "sha256": "a361d9b2cc0c7961851821e944ec85b6b2697b1be7ca7bda15d4cb493f7f02de"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 792,
+      "sha256": "a07e28d5c622699209baa569d90ff3c256ae4c1ecf1d95cacbb40a4e43df3082"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 7958,
+      "sha256": "e574601923c83b783cdfb42faac63bd1a2593131e6576e4b200330e9c6d0d229"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 792,
+      "sha256": "a07e28d5c622699209baa569d90ff3c256ae4c1ecf1d95cacbb40a4e43df3082"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 7958,
+      "sha256": "a75dc341137b4313e9202768519aaba99e3b9a3d56e9d579c5745ffe0490910e"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 792,
+      "sha256": "a07e28d5c622699209baa569d90ff3c256ae4c1ecf1d95cacbb40a4e43df3082"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7958,
+      "sha256": "43b3b90b7ee7bf2615021025a6fc78b1f6bbe49e5a77e1a3579b3a4dcf9c3ba8"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 745,
+      "sha256": "276ed4290cfe8a0e90c1b43c56b9d123f6e5339e79eb0fb21d36eaa986e791b1"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 7911,
+      "sha256": "fd248e204dfa2135bafae7a94fffcd72e7c00ab32ea344763024f10dea904aa6"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 81,
+      "sha256": "5d50db8fe36b59151a65cde23e052482747e2a924bb80948b40c9ab49905d2c5"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7247,
+      "sha256": "b0f0452d461cb501568b162682d3ca1dcd5f3f1314ed4f7cd781999f804b404e"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 402,
+      "sha256": "a547986b14cf4174fd54c892e78eb56f122f73ccb353277dcc6f1e3e33d19188"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7566,
+      "sha256": "7df089453321f2d9e31d8d9b0836498a92114dc2f4b0d9d86d6ebbb14d50f3a4"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 402,
+      "sha256": "a547986b14cf4174fd54c892e78eb56f122f73ccb353277dcc6f1e3e33d19188"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7566,
+      "sha256": "44d944a7230ea96a38ddb543cf53bbc72a1062df2f0c4717a31ffbcc4328369c"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 402,
+      "sha256": "a547986b14cf4174fd54c892e78eb56f122f73ccb353277dcc6f1e3e33d19188"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7566,
+      "sha256": "88001b6219f0f411e3300cc87d5282c84272f7afe305ef27adfc8a67d731fd07"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 902,
+      "sha256": "51addd936097869ecfd02df7b842fc072ef5b6a6de2c185ab762e25048a9dc1d"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8068,
+      "sha256": "fc2f52f911b24fc7221e5671ac874adf4817ddd7516410ceb04dd0c9a642bfbf"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 1275,
+      "sha256": "1023b792df9c721689878aff7ea81b8316de911dbdc4f7d4277e3896dcf34af8"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7566,
+      "sha256": "1d1d1d1a4b17a3d27df747a94f55e56c864476c1fd99d754e63907cb1ca2ebbd"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 5208,
+      "sha256": "d0a55e21ac14bfb493ca1b08ee61094451e83c9f03c0c230adf1376c3c79b76e"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/observation-v1.json",
+      "bytes": 4858,
+      "sha256": "a356348a71d357ad243cb703d437f940690455e54c8b48ca1b21192f89ddf12e"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7606,
+      "sha256": "2dfc69c583c5229dc74acf66cd11409257cb07be65e9a2459c1929586deedcb9"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 7792,
+      "sha256": "0e21e86dabb0b164cf01f2dec7c196da506ed85d1d5482820f309cc80da62141"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6291,
+      "sha256": "6f08217f6f04c2060457a2bf1d569a4be76c9fe1acbccd340bc5ff839e6e5207"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7240,
+      "sha256": "2a48751abddce8c1d47f0384a5422a9a51a756ae3a8d874c18c8ca9da1166cd3"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 201072,
+      "sha256": "b0e8a88bb8c33e6005ece058948a1c72b546865e8640c42cf3c103e4fe66f6ce"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7295,
+      "sha256": "f16dc557dcd58ab2abc6ccc9b4be8dc856e4ee4ad3b1b63daf3c58bfdc209eaa"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 201072,
+      "sha256": "f403f61aaa1fbd5574080ea20490c8a551b5b0b8445dc55efb197e798fe0d407"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7295,
+      "sha256": "aa805c5c0e8cede0504b77c14fc4d3b2584703a1951eac673da41b58d774d434"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6685,
+      "sha256": "a2b4c12553a66539bc6d7063e7f92fe39a4d4b477d43bee9f0e2f5ace5eec392"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1434,
+      "sha256": "8ad60ea08027c2df7e7f573fe05383af1430dd2552dbe42b5e92a92ac0934d85"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/save-response-v1.json",
+      "bytes": 8686,
+      "sha256": "99aa89d4ef3e134fc1821ea3dbbd1bb94b9d89072f957ea003b560be27456725"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 663,
+      "sha256": "143aebcdd64ea0f35fb02a1f208a8a0bd85559e02414965fad5c3f0821a8a2ce"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6685,
+      "sha256": "2b5dd2cdb45ff492750f385c9fbf2dd5d1dd1386c2f1d9e575ff7b245d1d0daa"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1206,
+      "sha256": "9a87d2792140e9da672da9c5a74491af8d152e60d9c8f2d22f532182df7244e1"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7411,
+      "sha256": "97587e7604c262fc2e20d65b2a52d13df9db7ebf75adfc71a0b4e3a6d7e331f4"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "e1385c9d1fe4280882640b0c83e09e582ffabe5175d02489ab84585665603ff8"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 31527,
+      "sha256": "4605435ee4791e4d1e4f1e11e6ac987a4dea38f93f41db89ec5847a1a98b04c2"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6693,
+      "sha256": "72248ad3091759e495ec69aed0a3deeb1c0e881d4fee4b5d8b14dc194133734b"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 7651,
+      "sha256": "20e842843edba32e42efece5ebc1c2342c1f1a12dae84764a4a64241d9eca744"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6693,
+      "sha256": "dc37e4f095d98efbffb16c1938e7405f1862b1fb7c377609e89e488bda85c769"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 146107,
+      "sha256": "da69b3df92556a0fdee0e593fc9d2994af0f9db7ce556d35d3a87140a6dabdff"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 73003,
+      "sha256": "976e2e9324965db0812e20e09a78085e04b22c0e33fa7b14ce1ef9f86df2ffc3"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8495,
+      "sha256": "03cdba720520661a9d3fb27a63a2f8507749417eb4c30519850a943f3b9757b0"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 954,
+      "sha256": "15c932a166b6b06edf4953df7004ab32023d4bc8ea89e2ffb82fbf9d7b7d1495"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/compiler-diagnostics-v1.json",
+      "bytes": 1566,
+      "sha256": "47fb1f81345af1a462ad851860eaa025d20c1e9b59913a902f3034f4708f93ff"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/derived-region-map-v1.json",
+      "bytes": 14080,
+      "sha256": "3af262e35f298fb7812c4115a4ef38718819b0465c48e84f24db754d6a2591d5"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/facet-assessment-v1.json",
+      "bytes": 3251,
+      "sha256": "d66eb1dd75296726b01fe2140cc4a60a7aeb4aebbb8ef2379abd88bc74d82d64"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/native-cell-block-v1.json",
+      "bytes": 128072,
+      "sha256": "dc997c8551d5b03098ada376d43880760ccf420cc3703a8d573dbd3a1a606a77"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/numeric-results-v1.json",
+      "bytes": 171807,
+      "sha256": "9fb14aed9921f072eb4584b8fbce83b750e8946a561d0c4816cd13ed6e21f11b"
+    },
+    {
+      "path": "v103/captures/v103/v103-markers-v6/visual-inspection-v1.json",
+      "bytes": 5843,
+      "sha256": "08c2bfa80de017a9b74a138b0b2e0b0cacc271c6f7701464e15b7ac8157f49df"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/add-response-v1.json",
+      "bytes": 8870,
+      "sha256": "b4e9ba6c2908dad8f2245c867483727413e8ea6f4e17fad460e9d8714e655e18"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 315,
+      "sha256": "ea8ac5848d7b65f789eba2a5a639f3e99bf5f62e039dee75acfcebd66018b490"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "eec61d49ef4143d53728f6204b8b7abf112103625a09a51503713e34c959837c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 537,
+      "sha256": "e9751d8bbe4b1237ca5f835c162f10e09a6ae25b0e1d8deec44a17379fdcc179"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2664,
+      "sha256": "ca84ae195ba5b359d5ee454696cb93becc50d86058fea093c55a7433c83bdcf1"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6343,
+      "sha256": "1fe21c8d173283a168c02f6cd2794eabf58ee20020c535250a5e07aaaae493e1"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1274,
+      "sha256": "0835d4388fd9d4383101ed41197d3120050c8ac34d7bdec53026243c2c0587b5"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "6463c09b6a623d8bc8bd8d4ea6394f03d7d6ade8cea75a05806f04bf9c1db0ff"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "d1364b428f4ea7e2127fbdec8482cafa09fce4e13900b10a44d6005411293d87"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7575,
+      "sha256": "9f19fc5c35206dfa8c628a02253375d271e43bdf5b7de6a93da7e308f4921f52"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 541,
+      "sha256": "ddbd5599b2b414df92aed22c2ba1b00e6df10664666f30bc47a75b64af0e68a6"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7715,
+      "sha256": "b5a6a1444c7d2ac206b90fa2a1b01fdab41027f35a911d3a632f4edbc1ea2ced"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 621,
+      "sha256": "13b4d67a20dd4608257e1be8f2f807f35a3177f0babd059b6b773685cdbd36db"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 7795,
+      "sha256": "be39e9ae86362364e9eb8786d0f7fb19bc8ea6384163940e4fd79aac21b1e330"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 621,
+      "sha256": "13b4d67a20dd4608257e1be8f2f807f35a3177f0babd059b6b773685cdbd36db"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 7796,
+      "sha256": "9bc226f7200a2cfd63bae8b0b456c806098c37bb51fecf7a783fd8646b609135"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 621,
+      "sha256": "13b4d67a20dd4608257e1be8f2f807f35a3177f0babd059b6b773685cdbd36db"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7796,
+      "sha256": "ebefc3db8aac0e7dc9b46591166e247b71f5294416aae231f9f9e1073383c6ac"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 866,
+      "sha256": "fa8694be76222b1c9e8879d8ca9f2948e3bf4a9437eaf9f31bb2c4aa1981313d"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 8041,
+      "sha256": "2d291f26ddd1114e950514cfd525402885a75b03ed8c39bf7178b2ab9af9e550"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 245,
+      "sha256": "21957d82391ea033353ec857765c18c79cc8018dd6e6c43713874e3e868f5a85"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7420,
+      "sha256": "3ebb57a789c3510f0b14e6c459e31ba3c7fdf7c8ffe03b92a05c8b4766cd6839"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-23-25-exposed-v1.pine",
+      "bytes": 245,
+      "sha256": "21957d82391ea033353ec857765c18c79cc8018dd6e6c43713874e3e868f5a85"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-23-25-v1.txt",
+      "bytes": 7420,
+      "sha256": "36a2b7156c3b8ff982052dd1ca19249d41434e1079a32ad04c9cb5e8f5fd52fb"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "d1364b428f4ea7e2127fbdec8482cafa09fce4e13900b10a44d6005411293d87"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7575,
+      "sha256": "72a0799cd6321bf7117e2f9967d3b2dc1b2febd53893a32d7c1d2aa46d123375"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "d1364b428f4ea7e2127fbdec8482cafa09fce4e13900b10a44d6005411293d87"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7581,
+      "sha256": "e3dcd2a87de133030ddb7fa848036ea5309eb477d55728a215f9b9d125226f45"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "d1364b428f4ea7e2127fbdec8482cafa09fce4e13900b10a44d6005411293d87"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7581,
+      "sha256": "d6436c8d9830c4d47b749a6e6fe4cd9b1fe3c40e857297f2bc3d272abd21811a"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 908,
+      "sha256": "19f7e1e7b921a8d980589222475fabe68e8e07729ca1d1ca32a6e97c0a3e4e97"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8082,
+      "sha256": "0881ad54c31b68c4c5d77407fe3d8c00f3fdb9003c6406d223161cc82521b49e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 1274,
+      "sha256": "0835d4388fd9d4383101ed41197d3120050c8ac34d7bdec53026243c2c0587b5"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7581,
+      "sha256": "7d33dc25b36a527e231e13ed302ad7dc4ee6955a441ae05085972cedaad2a720"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 5649,
+      "sha256": "a3d02f768d39cf1952fb0ece51d6bd0198f4f18a9e847e61069dc216367a996b"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/observation-v1.json",
+      "bytes": 5202,
+      "sha256": "890f7c842782e34b3d98a19bbc5fcb502ae04d7e9bc75821307cf6b7607659b4"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7793,
+      "sha256": "9e8704341588304fc5f80dcdf6934dcf00c3dac1418e5a3a5513bf8e2ca89517"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 8032,
+      "sha256": "fde163445ec6254a59acf77d51509e440ccbe439f9886d15e959031410c409e9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6296,
+      "sha256": "cbbf5c3484a86a1761f402569de59509e84d1e23cfee62a3b016b50f9b9463f8"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7413,
+      "sha256": "4f3d4adb456c39cad5f33e3acb86c2f44bdd7ae84d2e913a0bec9f1c6c888fae"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 207903,
+      "sha256": "eefe273c76ff0ab704c1e5188ed17f2de9afebd8948ad52dc3311b02b381f1e2"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7474,
+      "sha256": "782e4791bfaef07159a4a2977301a9806ade333cf1c704f5f885827aff3a8bb9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 207928,
+      "sha256": "3dd5fb2340cc0684ca938feebf9a2e58b4845c62c73085cb9248b0996d61881d"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7474,
+      "sha256": "782e4791bfaef07159a4a2977301a9806ade333cf1c704f5f885827aff3a8bb9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6755,
+      "sha256": "0b670776ec0f5240ad43f9ae70e02e0b6122fb971bdb8a938a3fdae88feb36f5"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1435,
+      "sha256": "a62d1a7b7ae0b05f1f6d269edefa3f7a725dd272fb63f693f41298630dd2907a"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/save-response-v1.json",
+      "bytes": 8870,
+      "sha256": "f7ce5a7040add9d1aed06ff4bc553baf94aaeb6a90a7ed3be640f35bc831eb78"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 663,
+      "sha256": "5b28ad62e9bcf9013ec5e5a283c60fd6ac272924f6785c80350d47e8a8ad6804"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6755,
+      "sha256": "0b670776ec0f5240ad43f9ae70e02e0b6122fb971bdb8a938a3fdae88feb36f5"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1234,
+      "sha256": "61916291a09820888c1148f238e3b41b613fce074db7382ad0bf62612fb54cce"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7481,
+      "sha256": "f8edf3478238198519edb5de8561c792588b27502137a648d4536f247cc18345"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "7f4bc0bb95588032d3a9088ed27c340e70ce1bdfc08848d22f3e0da3366006f2"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 33609,
+      "sha256": "23b286dec88c8f9b09ce9de4368471f3f02bb39b603a09f330402255baea2ba1"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6784,
+      "sha256": "3146d358e14fa0c9554d02eac1be19c4d47d7b3e0953762093889f8530fdb9f1"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8296,
+      "sha256": "c030a75e51f4721daa897d0af81ed531d3072dcf04a30bae279e0d1df8f8f948"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6741,
+      "sha256": "35729fa0f5837504bbb43f62d96399c2dffb3ec5bd2967070647837e26521abd"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 148409,
+      "sha256": "d1f70f0f971628a8eb8582e3b01498754e519486209e6cf932ea215515392da6"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 71658,
+      "sha256": "42c395c05a49af82866484ff02e6ef2bb8fa1132177220ead445850bfc3decbe"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8513,
+      "sha256": "5bba001db93bc88141001aba5914aa3d2598aac7c960e3faad3747e323bfeff2"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 966,
+      "sha256": "5f94510be2b688eb92fee80334e30d919d06d50ee4c2c998b60f794806f2a668"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/compiler-diagnostics-v1.json",
+      "bytes": 1584,
+      "sha256": "8c7f88456489317278ebf8217d8d223a54a6cfa9a5359f250483ec2a8f0cdf0a"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/derived-region-map-v1.json",
+      "bytes": 12856,
+      "sha256": "5f4d0c44bbcdd4124baff5bc6951415958e7ee2711479082fbc5a1005a9349b6"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/facet-assessment-v1.json",
+      "bytes": 3371,
+      "sha256": "f3862e83ad3031b5725cf336fdc8c1cbdc5989dcadb7021819e7e95ec91d5254"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/native-cell-block-v1.json",
+      "bytes": 136838,
+      "sha256": "9ae26e7e76c18bcd29132810907049c497c01f9cbe6f10561b1ec652416e8605"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/numeric-results-v1.json",
+      "bytes": 186767,
+      "sha256": "5f68a92f46df97285d1ddefc47df0cfb0b562737e62dff848db8f87eedcd3a97"
+    },
+    {
+      "path": "v103/captures/v103/v103-plot-controls-v6/visual-inspection-v1.json",
+      "bytes": 4610,
+      "sha256": "e2a5e696ffe3293444e321507dd33c783e568e47a64e86db6b3e2ae28bc6d9e5"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/add-response-v1.json",
+      "bytes": 8349,
+      "sha256": "3867ee75814572b50442f97f05d46336f7dee46aeb0f057c58d6ce8940217c1f"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 315,
+      "sha256": "1cea0a672160553211218303eea6d3f8b9a4e4adcc8de2ee8535d75ea0b56f77"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "76fa5a746122df2237885827203b8456001189d180cd1151efd610d339d5001c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 543,
+      "sha256": "d750370bb9fc0f3c9d7c49390adc62807913b56f26f1f1eb8a2a961e6e13dbcb"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2676,
+      "sha256": "b84948dde0b0aa143901abbd2042b59459d404bcd34cd92937c795c97e44c00b"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6291,
+      "sha256": "6f08217f6f04c2060457a2bf1d569a4be76c9fe1acbccd340bc5ff839e6e5207"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1244,
+      "sha256": "dbe3e010b7bccf2c89127551a027aba45488f418f67445b4405363ba7a9e1a9c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "53bfca5aa217d3e8563232f2868d7131cf32e29656d400895734d3e3d888d68f"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 410,
+      "sha256": "0c7745b5ea594e958c5a9e6abaa727d50fbd9b10736929c305953fcdb308b94e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7563,
+      "sha256": "03b7ba6323e922698e0e242214eeb301d0d32ecf37f656a4b1fa877b46ce3bb7"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 529,
+      "sha256": "c133585ba6f59d2b9a44e7fd57fd7b29af5500814756fa1c50123f118ab7bdd6"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7683,
+      "sha256": "41674684c8c960ce8c95de33ca982a51e051d9d9407743ac82dd8c173feea472"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 614,
+      "sha256": "59c67f2392736559c8aa4b2d41894d284616e3ef3f7beda3aa356c8aec37a2a9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 7768,
+      "sha256": "9073bcdb92df05be012a6675996feb4b8fd237b3f8a11cd91cdcaecbd18af98c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 614,
+      "sha256": "59c67f2392736559c8aa4b2d41894d284616e3ef3f7beda3aa356c8aec37a2a9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 7768,
+      "sha256": "28cea13f5bf6a9119ef13ba9ddd09b1e75bb00f8c3363e8c5ca9c0e5b6be0605"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 614,
+      "sha256": "59c67f2392736559c8aa4b2d41894d284616e3ef3f7beda3aa356c8aec37a2a9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7768,
+      "sha256": "e0b94c72b8187aa0268a2cf9e36bd52f308b0cff3fcc67f28d3947eecba16dd9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 834,
+      "sha256": "465fa3e5c2f292a7a7e9db81cedd98818cf3f9a3080c28de180c6582d47c1b3f"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 7988,
+      "sha256": "e57fd4435579d277a45f6d84b33e0a6d2f98add9213b84d1916021f6acb86324"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 220,
+      "sha256": "6d040c78238403dd34d1783f24988943a32116c971abea0db6762fc5cee6c96c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7374,
+      "sha256": "fc207d0adaaaea3bb839dc69e411ab4a3b789d8daaca9c2282265f623642baf2"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-23-24-exposed-v1.pine",
+      "bytes": 220,
+      "sha256": "6d040c78238403dd34d1783f24988943a32116c971abea0db6762fc5cee6c96c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-23-24-v1.txt",
+      "bytes": 7374,
+      "sha256": "7b780fc4840055c74175e74ba77994ee9f1256cb84492f1d57da2eb66547a92d"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 410,
+      "sha256": "0c7745b5ea594e958c5a9e6abaa727d50fbd9b10736929c305953fcdb308b94e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7563,
+      "sha256": "5ef06f7c3767fd6507ba4d3e17db26fb4a29311c754269d7acbd11fba6d81997"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 410,
+      "sha256": "0c7745b5ea594e958c5a9e6abaa727d50fbd9b10736929c305953fcdb308b94e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7563,
+      "sha256": "7a87c4cf4bb2242840b38b71d6fd38c0a424f08aa837ffa4b702a03ec97c8dca"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 410,
+      "sha256": "0c7745b5ea594e958c5a9e6abaa727d50fbd9b10736929c305953fcdb308b94e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7563,
+      "sha256": "3636ebbcf7e4ad12568809d482ee3c1694a12423f96af6d67f19571c092c9cb9"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 910,
+      "sha256": "e6dd6a3a798648d7b23634954526a46a62d84157714e784b38ebf5b2da8aa435"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8064,
+      "sha256": "d628f6f7f5fab813206a4ae2da76cbb92167754edcfc1c4f5abbd5e4d845cc53"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 1244,
+      "sha256": "dbe3e010b7bccf2c89127551a027aba45488f418f67445b4405363ba7a9e1a9c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7563,
+      "sha256": "4517d2af334be36a495d82045c64e797f79825d947077322cd9e827142dd3422"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 5652,
+      "sha256": "94fc716e6df375d3e6ea20309e5423fb5a50b3707ab3c182ea357f0f50eac6b8"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/observation-v1.json",
+      "bytes": 5268,
+      "sha256": "d57255c02c4b5562fd1db6563626bc34fd733f621941fe1e9a886fd5dd3deecd"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7887,
+      "sha256": "4604aa79229adf284167c9587ece867bf6befce73e9c43f0815f8bcde2f622ea"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 7887,
+      "sha256": "4604aa79229adf284167c9587ece867bf6befce73e9c43f0815f8bcde2f622ea"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6319,
+      "sha256": "173163990c0d5abaf67f6b99ad6c06a1744d5511626ccf3d4ffd1f9e5b546be6"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7367,
+      "sha256": "5c649947fd707e007a875f8f707eeb54b8e0bb3ab36c55205826f9666accacc3"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 205049,
+      "sha256": "0d3d05173dc8bbb8fd6b1fb7f5ee0a23d79b70b74492ad750fe644a6754ac83c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7431,
+      "sha256": "dba3a8f7ea21283133d19e07dbb106368a5147157329f0dd1823a8947b439c59"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 204323,
+      "sha256": "1da386f4d49f143116dcd6e90662454ef43c926ae46de35e22278b3baea50110"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7431,
+      "sha256": "dba3a8f7ea21283133d19e07dbb106368a5147157329f0dd1823a8947b439c59"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6630,
+      "sha256": "358264d99a824c7f0c153b9c921e0f21bd409a903ddc9c87a6bc9a948bfb5e77"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 1404,
+      "sha256": "1859fa1705a3edfb648206c455a5d55930a5136d3c32111f49c9e8e5307b39b8"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/save-response-v1.json",
+      "bytes": 8349,
+      "sha256": "b269cf090b79c57285ca9fe8d6af84cf58e51af212de6de528d110c125540303"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 663,
+      "sha256": "44206933e9fdd1ef17a72462341dd2adf0a2236b913d468d68f6794298780b48"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6630,
+      "sha256": "358264d99a824c7f0c153b9c921e0f21bd409a903ddc9c87a6bc9a948bfb5e77"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1182,
+      "sha256": "c8248c3d568494aad2f085793fd5602104f6f0cc9f4d5eb796530799344f32b0"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7427,
+      "sha256": "cb8ac8087f36ecd601812e861afd584a989a14b2d07effd2adaf66f812dbd408"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "e578170f899d0c37301122b7a923be125262586451c6b2d499e79d4c3047ce2c"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 31639,
+      "sha256": "794b2da66638d4e31be68ed196888ec2937d947a58c8695cff53553609fb6563"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6632,
+      "sha256": "0e93a64fb4d23adeec0698f3b065c371b91843f5164122bc1d6b3aca662e0ee1"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 7195,
+      "sha256": "f865a7d55be90fdfc6e1d79c5f4b2ef54b26924a39ac899ae104235b5a8a4444"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6638,
+      "sha256": "ad808bac18596316bf40f3a7fcea03c5a9516c6a2d835b3012df01092b8fd98e"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 147760,
+      "sha256": "5a49c87cceb5a8464411f3f211c1304fa0cde6876f6bc8eed0f50463687a3b3f"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 71983,
+      "sha256": "b1842a85f53dda0e9d8bcb27b2f8f2f4df8e3d07d6743010db3db0d1e2827b57"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8567,
+      "sha256": "3fd8974a782eea3ccbf35091387c9e796325405696c07d1f573abdd5957adf5b"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 972,
+      "sha256": "6ad39fef303af335f5fe3fcc6543594009e855678938ac5771479114446c1b11"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/compiler-diagnostics-v1.json",
+      "bytes": 1593,
+      "sha256": "d053f6785fba109269144e2fdc3f643d29047fbf108a97778b66bb615f08eb19"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/derived-region-map-v1.json",
+      "bytes": 10931,
+      "sha256": "5ec5109c14c29d151de13dc54110cde87a93b338974f257b1ddedeae31e5ed4d"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/facet-assessment-v1.json",
+      "bytes": 2634,
+      "sha256": "6c49b83d347bf0ed459b140ef0f49290a48624da940347c790eb0e6b30fa4363"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/native-cell-block-v1.json",
+      "bytes": 117703,
+      "sha256": "ed623be204478dfd9a96159b6c474b37e63aa952711e8309980b17d309d640b7"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/numeric-results-v1.json",
+      "bytes": 158793,
+      "sha256": "1f9cf653f723ae7a6f81f30f38ec2060954b6581b2fe9adafa9aa10e16e79795"
+    },
+    {
+      "path": "v103/captures/v103/v103-plotarrow-height-v6/visual-inspection-v1.json",
+      "bytes": 3828,
+      "sha256": "833ad7f0405b8dfef633387fafd07726de6d3ad0d28d7dfbd24074dcd9748ccd"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/add-response-v1.json",
+      "bytes": 13568,
+      "sha256": "239cc65644be7c9a3893d38d969593469d94222693ff6f4673003c70df0bb93c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "3b605f5fade9550e53e30e6e5d5e4d2ebdf98bcb718dcee9830a75d13c7143a9"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "2ad415725e81ce8841b8c1138c96714cc31ec7615dc277b3e52dc924e3d3d91e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/attempt-start-v1.json",
+      "bytes": 541,
+      "sha256": "8b5a49afa333585521c1728c3b30dfe2f3a6e6536cb660f172ffd7f9daef668d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2674,
+      "sha256": "3106a31372090cd1e4d4c44520bf4dcb6d8e4dd661d9c2db72b5b2ab34ff8730"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/context-before-v1.txt",
+      "bytes": 6319,
+      "sha256": "8db64a6f919fde92a9ca719cca67fb708dd035985d4d1b90170d09a1cf8b504a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/executed-v1.pine",
+      "bytes": 2084,
+      "sha256": "a906d3427ad4b510df4a23e07591045ebffecd1b317e438cf4a7bc125475cb3c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "42559794c7a22fb8b07a91ef043707e54a36e456bea1830c37e2f99eb9489782"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "151e954532eff177fe51ee19f75e767111dfd341dc3255fe016e96bdfed23955"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7550,
+      "sha256": "e2d8b54269f4ec88b003d523c4af358e1428cc808d51ae9a506c689eed84cdb7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 687,
+      "sha256": "0aefd54dff2967caecb18366fb1b973b8a5c8c78a7bbaf10e6b9a9bc08e864a6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7811,
+      "sha256": "36c19d65a01c3e19101820667e4fdbc99e800cabaa145df8aa04244f003c0197"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 984,
+      "sha256": "64cd4bdf3f80da9d8bd9bc668e9030b235b7e2eb5e0fbe8ad0da02e452cbdbb3"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 8108,
+      "sha256": "4c6d912e996cd07d2b3edd82de62bca128bb49a296246b17a774aa5832b57f99"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 1006,
+      "sha256": "80b9a56fff6f96ffccb223bbeae1293e1633db2ac7d6d5a105ec685f7b529a8b"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 8130,
+      "sha256": "90baa1aae7daabb0461829ee2d487c1fe6f9598d192060cf789cfd535e92235d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 724,
+      "sha256": "c7bac720d276433cca6042b56f1fd379377c3e1fb56e07851651c3400d24d537"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7848,
+      "sha256": "5d126aa8be5016cc47e0661892027ba058ce9f7b8ca7f66d791d0cc4fb4bf58e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 1054,
+      "sha256": "36cb91295fe6522a90001e471c8669125629430ee2dbb46bb43e0468980614c2"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 8178,
+      "sha256": "cf7dba1a8d6c12d10bdcc314b13afebc0118fc081ab6cf9445be62cf851267ed"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 613,
+      "sha256": "28da17f852227dc7b8d566d69891deea6ccebc4b19e2b7adfdc91a7b0a44a26d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7737,
+      "sha256": "0f04ab441aa87c3c0995d9a36e01cdf499ee0e3d2d13a396169fab89efa72b5b"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-23-25-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-23-25-v1.txt",
+      "bytes": 7752,
+      "sha256": "8c2fdf2fdfb4c1388c20d13c1c2cfdd18bbbdbe8bffde1bb0f61aca18e3373dc"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-25-27-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-25-27-v1.txt",
+      "bytes": 7752,
+      "sha256": "6bcb5d27f299e1a1a3f1b28699a0cfba1a02d38fd0383ca7ab9edb2967c8b0c4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-27-29-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-27-29-v1.txt",
+      "bytes": 7752,
+      "sha256": "8555216aa91042f2f5a6413193e6d255b01a2b3c08082ed912e7448dc85d670f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-29-31-exposed-v1.pine",
+      "bytes": 662,
+      "sha256": "54b6323ec7b4da085388be16e3ca1cb863efb8de45ab42b6179e1d8d832d9af9"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-29-31-v1.txt",
+      "bytes": 7786,
+      "sha256": "c65b9a8b17871fe28452c8b9a5e6bae683adf8f1a414d01c422ad3d797c6ddfb"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "151e954532eff177fe51ee19f75e767111dfd341dc3255fe016e96bdfed23955"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7531,
+      "sha256": "1e19e62ccf1719cfb63ba0d18ddcd03ad82fc01df05213d5028930de797fc218"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-31-32-exposed-v1.pine",
+      "bytes": 42,
+      "sha256": "c0ac38a462bce346dee4a2334befd1860377b3ebe3bd6c282a18a01b29bc90f4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-31-32-v1.txt",
+      "bytes": 7166,
+      "sha256": "afcc6272647fbebd405e9fe04aee6374d220a5d0f0e92779b53250951a09729a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "151e954532eff177fe51ee19f75e767111dfd341dc3255fe016e96bdfed23955"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7531,
+      "sha256": "9550084231040f31812095c837490a6d6d2b6bfba44bd821cf5fdff6413d4a8b"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "151e954532eff177fe51ee19f75e767111dfd341dc3255fe016e96bdfed23955"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7531,
+      "sha256": "20ff73578e26fcb39a594a9179b9d6bb9d3388c1e010514128c6611357196661"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 908,
+      "sha256": "fd4ef609947398e85427ebb30df7cee930ea6ba32d631b26f6e59a9827e19615"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8032,
+      "sha256": "45d59f4199bc65bfbd1efb69fdba35fe821e5dbff93df8633d27f4e814231177"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 2084,
+      "sha256": "a906d3427ad4b510df4a23e07591045ebffecd1b317e438cf4a7bc125475cb3c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7531,
+      "sha256": "b58ce3f5ccce4692345763ffc3cf819bf3cc2abd0cd5a9644f71bfcae5307d52"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 7408,
+      "sha256": "99334257a41e81f5d08f6c67fbba599f8a2bf4349492cbb6b438dcbcb14bea69"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/observation-v1.json",
+      "bytes": 6128,
+      "sha256": "1384bb81ad73518337ef4c582cd2a24628877631ee548d4060b430de433ee66c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7573,
+      "sha256": "c77e231a90e67748eae25dc1861292b1babac4634626c40ebed4473eba51db51"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 7674,
+      "sha256": "e2b4e6be990959d6213860618e04b6db7a874bc3950e9fa46191249b501fffc1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-remove-v1.txt",
+      "bytes": 6295,
+      "sha256": "a68aceb0d93ead8065d90609c22d80288fcaac909c55a5e69896fa87383cc34f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7159,
+      "sha256": "67e493504acb6ef38cc614be73d24e9b6bdb24c2cb83c1cf05c31cf2fe8087cc"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 238517,
+      "sha256": "cee085a2fe31ecf65b89cbd2da16fa3d49d613ab1178493677e9e54c71c89053"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7222,
+      "sha256": "9ef6d400049193c7108df7b34ffbfee87bc5298ef607da08ed1d8a602062a31a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/pre-add-v1.jpg",
+      "bytes": 238517,
+      "sha256": "cee085a2fe31ecf65b89cbd2da16fa3d49d613ab1178493677e9e54c71c89053"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/pre-add-v1.txt",
+      "bytes": 7222,
+      "sha256": "9ef6d400049193c7108df7b34ffbfee87bc5298ef607da08ed1d8a602062a31a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6598,
+      "sha256": "d8793217ed2598f2c098e16fb6d55df68b2d8713634af040db46b5500698eac7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/save-request-v1.txt",
+      "bytes": 2252,
+      "sha256": "d29d32dd4a59430f694242ff98099a741d737cf80e5fe01d19cf952a31421388"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/save-response-v1.json",
+      "bytes": 13568,
+      "sha256": "eb01071834342947227771e5a450c54b6811107b5de2a486f687a028b0e773f4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "8d39b1e4d0bc221d8731e0e092834099a9080e124e0baf383a9e81e259cc60f7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6598,
+      "sha256": "d8793217ed2598f2c098e16fb6d55df68b2d8713634af040db46b5500698eac7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1263,
+      "sha256": "c443fd9225e1d9feb7a4c5829a10a18109ebca761a9a4358f8f86c283fbba7f7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7346,
+      "sha256": "f0771c12c2f483a65841fbbb08ea5bd31f1de7a3e8cc3865c49f23f8da3077ec"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "152df9f8d11a09938a9780d0629be9aa11a0feea3feaf7fafe64a00f350103f4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 34372,
+      "sha256": "0e03224fd3a50eebee3ce6a0c235de177c220e84f5e77b528a94aa4ff2eab6f9"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6628,
+      "sha256": "77f4bcc039d2dc89e7b0552a6ee8e233aedc86f01495a42a67a53be903719b61"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8307,
+      "sha256": "1b8927cc160b12c833f22005ce007a5a2b62ef9a4c9bb79d351549344e51be33"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6628,
+      "sha256": "083dc10c906affea0e69443667a94bbd91c43695654f7453433511780c9c79be"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 144386,
+      "sha256": "5c47508334cd560f4a2fca403c526b97e4b9d50eeb60dd417ae353bd91eb93e1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 72838,
+      "sha256": "1960c5a3265ffa1e28001166cd65399f0a642d9c95458f5527a155cdab0037b7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8597,
+      "sha256": "ccee2ad71d184692fa8e80d27f2960ceaae0d97dc45344ec26c8bb7a74c60246"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 970,
+      "sha256": "d2fea5cde13f38112c51cf868d4138bf002ce92583d88d46dbf418c51149f9e7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/compiler-diagnostics-v1.json",
+      "bytes": 1592,
+      "sha256": "23167cec7d34963e0f6a8af78c8685d065f8818c5b552040976cbe5d2356b9d7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/derived-region-map-v1.json",
+      "bytes": 20807,
+      "sha256": "152ff5875e00ee9d9f859fcbec462a5a21268ea889d1fc01b12bee9b46836673"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/facet-assessment-v1.json",
+      "bytes": 5889,
+      "sha256": "a1b24aa702a37e63766dfc9ace64a5f76ecc56f51b5d057c54e72cf6cb2c727c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/native-cell-block-v1.json",
+      "bytes": 138883,
+      "sha256": "8224fe774be39b54def6f6aa0ee8a45fbabab8f8a212c99e003e947228b1030c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/numeric-results-v1.json",
+      "bytes": 190287,
+      "sha256": "5f003e4030de1676055031a984e23011c3d390aec6ea68f2368128cc6c799363"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v5/visual-inspection-v1.json",
+      "bytes": 8848,
+      "sha256": "a7f89aed493db1960d81aa42cf2dfc4565c4581e9c4129ab2e5e3aaa7ca45438"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/add-response-v1.json",
+      "bytes": 13302,
+      "sha256": "d74f8790d3aadd9c6dd4743702fe81ee057498f9dff41acc56a31bd97429d0ba"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "ba7aa50a7782e62cbcb5100f7160979a3b85e1ec3de8c5e6c2d94919e96e1c7e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "c335c53793c7808eafe6f2332e4ffad6a81102fd8054ed1f1a73e9352f9328a1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 549,
+      "sha256": "0941bc03d2facf55813703d497cae2ce78acc2de4d6b9d8311ba99d413edfbec"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2690,
+      "sha256": "45b53e6cf6b35730cacf39933e611a150025787303ef2865efe9f0e197500f07"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6348,
+      "sha256": "cb548e9aa74124e8871a81b383d778c25400262af165e46e148dfff90bac3168"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/executed-v1.pine",
+      "bytes": 1971,
+      "sha256": "0f555366d356b6aa38d2762c62a9b1b6a575a8df54dbdf3e9569bc646465533c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "a6aa53511ba3a3f934c8486b0e00131b44be80530a7519c8fdb048c56d0af041"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 412,
+      "sha256": "dd5c14b101937b395efabaa9d19b4ba82f13bcac735994e0ea4ef2e19f40bc2d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7565,
+      "sha256": "a409c560a014bd95cf402bd240912cf5dd4ca0a85ddd9561ca6e2e276d598159"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 574,
+      "sha256": "fec00fe63216b6e7300631c623e907fb983e765e40362fc4757b63f7958b512c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7728,
+      "sha256": "3787e89775acb4068846d246e266c064549ebab215118ef7736f5fb83d3621cc"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 676,
+      "sha256": "a00befb894bbc49208e50441e2f1159499ed19e9fa9facee41c19ea169bdbc02"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 7830,
+      "sha256": "d554a35f5462c42efe85fa30423ea4519e38ef8f849b03773dd8b43cb0f7f531"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 852,
+      "sha256": "d8248345e75d8f0a00c8f0e9cb714c219e5988f9f95adde1578ca373a0025ad4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 8006,
+      "sha256": "f749966d178462edca1cd85fb390a9d89e0c003d08798a6d6fdc32f130f86b49"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 852,
+      "sha256": "d8248345e75d8f0a00c8f0e9cb714c219e5988f9f95adde1578ca373a0025ad4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 8006,
+      "sha256": "8ff55998df48983dbbcb5e67a31eae7e860e1d5d8ae17ac15cb09142965469da"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 1312,
+      "sha256": "f907c7b8e03566acf37fc9824be2df84c855f5320a3b51f3f6738662d0ff3526"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 8466,
+      "sha256": "b7367d49bd25dee85a221b0c52fcb350d1f178e9d9b0f6e734aabafdb6b872ca"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 545,
+      "sha256": "df4fd1e413d30f7f9455598ce8f340183729ea6aa81da774943371ce4c80a790"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7699,
+      "sha256": "b44d8a75317d148009b13ccc7403387c2f3330f928fc879344c617c7cffea00f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-23-25-exposed-v1.pine",
+      "bytes": 545,
+      "sha256": "df4fd1e413d30f7f9455598ce8f340183729ea6aa81da774943371ce4c80a790"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-23-25-v1.txt",
+      "bytes": 7699,
+      "sha256": "f35fb065c92b994b5a001e257b9a9910dd09774ccc80c66d196b6bb900a82916"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-25-27-exposed-v1.pine",
+      "bytes": 545,
+      "sha256": "df4fd1e413d30f7f9455598ce8f340183729ea6aa81da774943371ce4c80a790"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-25-27-v1.txt",
+      "bytes": 7699,
+      "sha256": "e2c53dae898f24fb233ea1959a3206291df0f117b010c5687306c362e317b1b3"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-27-29-exposed-v1.pine",
+      "bytes": 545,
+      "sha256": "df4fd1e413d30f7f9455598ce8f340183729ea6aa81da774943371ce4c80a790"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-27-29-v1.txt",
+      "bytes": 7699,
+      "sha256": "031f753f9b1a4b7756465fd281cc02f1b75e8d8b92acfd5327f3f50118852f5f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-29-31-exposed-v1.pine",
+      "bytes": 707,
+      "sha256": "eb5ca4791a77816073c44a600334fc0c41215023fb8dd46be8b933d9fa720bfa"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-29-31-v1.txt",
+      "bytes": 7861,
+      "sha256": "caf2725c349f4879ac8a43f1a70709bcc8ed199c7b106e46225ecad82db80b8d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 412,
+      "sha256": "dd5c14b101937b395efabaa9d19b4ba82f13bcac735994e0ea4ef2e19f40bc2d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7565,
+      "sha256": "55880284b7e1a4c722d52b9a1fd416e536989421042bc9bae24d0f8d8947b100"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-31-33-exposed-v1.pine",
+      "bytes": 162,
+      "sha256": "4ad2fb1e810a1e04ab36bec8a3b95a85a22630adfe26bad9a39cd17de32f31c1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-31-33-v1.txt",
+      "bytes": 7316,
+      "sha256": "54251baba4c9180f33a137c5f7c2aeb53e5484ceb1f98bde55b25efe9d9271f5"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-33-34-exposed-v1.pine",
+      "bytes": 162,
+      "sha256": "4ad2fb1e810a1e04ab36bec8a3b95a85a22630adfe26bad9a39cd17de32f31c1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-33-34-v1.txt",
+      "bytes": 7316,
+      "sha256": "767e9f1b8b65eaef57a9bd53a2270ab723f0dee7b53d74bddd7ffc818e63ef02"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 412,
+      "sha256": "dd5c14b101937b395efabaa9d19b4ba82f13bcac735994e0ea4ef2e19f40bc2d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7565,
+      "sha256": "8546c3f2fdd8caa0abafb4ca2b714da5816505c1a28bc8adc105b7b9db509588"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 412,
+      "sha256": "dd5c14b101937b395efabaa9d19b4ba82f13bcac735994e0ea4ef2e19f40bc2d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7565,
+      "sha256": "0b23a43593d9c49941706a4c03b7ab06f59343b0f2c7bad0d0c6b3790d054737"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 912,
+      "sha256": "10efea342801b3aae1e96d7f3a5efec7b4c951e9a5b46b929f992054c04fcabb"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8066,
+      "sha256": "c06661d2b48206efa7484661cf1ae94c331c4bd9dfaff5ed1046a593c86dd6e1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 1971,
+      "sha256": "0f555366d356b6aa38d2762c62a9b1b6a575a8df54dbdf3e9569bc646465533c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7565,
+      "sha256": "a2152cb5334635cec0806111126911aff1a135093a30de3e9da0623f278f8c72"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 7845,
+      "sha256": "ba05ab0da0ac8003e4a03f106fb06ccc68b2ff06958338e76664863dcc145f84"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/observation-v1.json",
+      "bytes": 6456,
+      "sha256": "57b2927298eed190b2c42095fc7be763b753685edec6f1936d039d713174ca27"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7731,
+      "sha256": "06f35c27dab9a72354258b0253ae7cae6d11e35b0109fe16bab410f499c60b5d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 7777,
+      "sha256": "de9a9813f3150604cfe3fdee2603d51c4b1914a871d7eb0a1480608f79845578"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6341,
+      "sha256": "f678ab05c59766355a961e4a2da29a6e143e8d8a389f5136c5af7ae31ed6aeaa"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7309,
+      "sha256": "7ebef65bf00efc1e391fcdb76db8476121572d4022b3f46c8ec31395084140e6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 232465,
+      "sha256": "a1ff2607a75d21fd79381ccc68c047c566bd65a6be4c1dbe4105504a03c5290c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7376,
+      "sha256": "7c2031f4e3444ea1c764beb52e4bb745f0c79089ffa0877de7f595a22c971f01"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 232382,
+      "sha256": "bc5267e0f76eeb45b7915b1e78b7be3e4535bc9e4023327cc602654fe9057715"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7376,
+      "sha256": "7c2031f4e3444ea1c764beb52e4bb745f0c79089ffa0877de7f595a22c971f01"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6656,
+      "sha256": "3168b508cd48957004b283275f65e44d60a91f2b9c7c085f9ca085e67a1c5b02"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 2141,
+      "sha256": "9daffcf7283429240660c5c8ecf376d1347945370e53e51a17f7302aeb3f760f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/save-response-v1.json",
+      "bytes": 13302,
+      "sha256": "3656be8a784be5828031d9644e30a962311c7a651f4dc6061937b69955633ab1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "4ad85fe1b4508f1a2a2d944f0fa09d2662bf47c8cbd22686a33ecba33e7ca4ca"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6656,
+      "sha256": "0750bc234ff0be34dfc83fa34bb94b49a83a6c83361ee1f69f63d03c40179fed"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1145,
+      "sha256": "5695fb8625c8419b716e9b98e59620e5c0bc050dee24f70f2bf5d6d5bf0a0046"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7382,
+      "sha256": "0574f877337f0303d8490b2c3e19a04903822d0e8d6e4dd20abbc14a7edd42fb"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "ccdb8c71429710cd4ea7ad0bf53f3cc479a4bca8c11a962a13f6bdd8d440921e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 30189,
+      "sha256": "8fb22b1d4dfdfc90b59d4bc259c4ae31b9798c1f7a0b71710cee36ae26fd1217"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6664,
+      "sha256": "3f7f502daf7b7e868b94c589c3ec7847158ce91aa7158342192061f0c1f0db3d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 6660,
+      "sha256": "a1cdec24c3137fed78cf5e4f75c42fc4862a1e877371c6f3d9d2deac2c54b956"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6661,
+      "sha256": "2875c63609cc00294a9b4874f5c2382af9b3ff4b72da924b25fbbdb41fcb1c81"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 142917,
+      "sha256": "ebaa38b0bad98860ef15bf56f1e1bfa03e3e246dc0215fa930548f2bd678f92f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 71030,
+      "sha256": "a4a7b8c88afdac2d2a80cb378f810d6e6ebdb6697e7dadd99af9378b13743c7f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8495,
+      "sha256": "4fb7ca47723cdc3d1c5c8a6bd472d8eabbdd4f798b3f92d37857e5719b20fc88"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 978,
+      "sha256": "e027702db7c79608e097fcd7ff128ec727f7ba5df26a5ff13d4039973236a192"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/compiler-diagnostics-v1.json",
+      "bytes": 1604,
+      "sha256": "d57eb733679ddde969e4265b7671a2b371b6843d91db755ef504cd84b27065aa"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/derived-region-map-v1.json",
+      "bytes": 14816,
+      "sha256": "2d1ae7b8bd2900bbf03013ad258e04d18cdf81cc5635bf6af4c6694613ffe1f3"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/facet-assessment-v1.json",
+      "bytes": 4185,
+      "sha256": "f24c81d410e95101ad3ca5e7d2ce5a37bf5873347140ee762556e25456773366"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/native-cell-block-v1.json",
+      "bytes": 107357,
+      "sha256": "e6e6c08cfa8542d26d1c7ac0c38f9a3487eb17d1f4d26664467035c138deec7a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/numeric-results-v1.json",
+      "bytes": 145964,
+      "sha256": "18b3ad8c5ff431232f13afbe6ce1cdc7ca9772a08528a0684a7a12f157b34168"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-fill-style-v6/visual-inspection-v1.json",
+      "bytes": 5456,
+      "sha256": "3d2c965e70707a1ba18e946f7086de3e81b69ecc3c6603d52f3811990dab138e"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v23.json",
+      "bytes": 916,
+      "sha256": "c5bcfa038bdc1d48951831c58b4764d4954f28bf1d43db3018b78683f1884339"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v24.json",
+      "bytes": 916,
+      "sha256": "9fee7305641762beca9408a47c6ed01aa61d0a192fd60c2645bd27e896423aa4"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v25.json",
+      "bytes": 916,
+      "sha256": "0e9ac614792e2372ed79abaef1fad61bc4bb821c0ae78131e29732a601fe3bbb"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v26.json",
+      "bytes": 916,
+      "sha256": "2ad550324d5464d0ffae9c257fb0dfdd85fabe3aa91127f719923fd698f699c5"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v27.json",
+      "bytes": 917,
+      "sha256": "9d66cc6af34b9ec41a775fb478ad8ebddf7d04a900a3b66dc2e41e1573004746"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v28.json",
+      "bytes": 917,
+      "sha256": "dd585463a25932a6869b8f01266ac8f42865c233d12df5408fc26935c9a8e1de"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v28.json",
+      "bytes": 444073,
+      "sha256": "033063d58be4bec2040b1fd853655094466da78244111d5fc43f6b60bfc7fce5"
+    },
+    {
+      "path": "v103/captures/v103/RESPONSE-v103-v29.md",
+      "bytes": 31506,
+      "sha256": "3293aaf7b30473ee00861924cd9342582ee2d90783f78be3d2ce2c2e639cdbf9"
+    },
+    {
+      "path": "v103/captures/v103/account-actions-v29.json",
+      "bytes": 1369,
+      "sha256": "45dfab19f1afec13e6d081a184426ce2154501d881832951755215e2d92116d2"
+    },
+    {
+      "path": "v103/captures/v103/attempt-inventory-v29.json",
+      "bytes": 556157,
+      "sha256": "6a0e1426eb909ad880ecfbe9419ca42b3862fc9d1501a8ca6bfd00f492f9ff52"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/existing-layout-comparison-v1.json",
+      "bytes": 39798,
+      "sha256": "3209d71c9d08165003315f3560b9a435f24bea900ea0656d258b5cd1a2f48538"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/native-layout-dialog-after-v1.txt",
+      "bytes": 7362,
+      "sha256": "5191ecc5020391a628532436180454b3f87565a62e65e621c1a611f806dab07f"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/native-layout-list-after-response-v1.json",
+      "bytes": 7487,
+      "sha256": "ab165bbeb2492d2e4265ed0aaf516756f875e866310ddcef4c51c3e1529d9edb"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/native-layout-list-receipt-v1.json",
+      "bytes": 154,
+      "sha256": "92f5d514c9d01767d33d03bc28b5ac5acc3057984a5f0723e0714feea3f98e21"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/native-layout-save-receipt-v1.json",
+      "bytes": 104,
+      "sha256": "efd305319ec16ffd43a80e15bed4a6696aad8d8efeba7f1c92334f6b6e6a0518"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/native-layout-save-response-v1.json",
+      "bytes": 66,
+      "sha256": "5ac75ddc80441d578dd6964c0664a4a407c5cb5b0b9a039266288e2358917fa8"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/new-layout-before-save-v1.txt",
+      "bytes": 6295,
+      "sha256": "de5b08b64ea33405fb6b6d288449c11afb0fefce2917b807869f54b7f988d50f"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/new-layout-clean-saved-v1.jpg",
+      "bytes": 168263,
+      "sha256": "f78dbbb4e582191e4dba7aedbc6d2d881bad999459ad59100d707f3c7a1c51ce"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/new-layout-clean-saved-v1.txt",
+      "bytes": 6385,
+      "sha256": "ceb5732163408f78f11e76f1f1b7373fa9967e39ffc962a0069e9e3cb8bb644d"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-1-after-v1.txt",
+      "bytes": 5849,
+      "sha256": "b8d7408acf3c1046c30a06c5b2ae3100ef8449e57d5200b19033e0aba56ac0dd"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-10-after-v1.txt",
+      "bytes": 5828,
+      "sha256": "e8095fdc54ba4a437d7c3ebff85829d2532d2f8bed6f5788bf1911c86f8b2cad"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-11-after-v1.txt",
+      "bytes": 5771,
+      "sha256": "0901a9f178067fcd04ba4e16f82fda1993e010f992492213d73d8d6b1a71faa4"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-12-after-v1.txt",
+      "bytes": 6185,
+      "sha256": "0664e4925d3710608318d0afe5c551c1bf36c94e816989fd5744d6d1d37e6278"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-13-after-v1.txt",
+      "bytes": 6322,
+      "sha256": "0d5770491dbcda94732605ebff00fb2a05ea352aec2f9e021741865395c1b334"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-14-after-v1.txt",
+      "bytes": 6307,
+      "sha256": "7fdfd402bdd7fb7ea8d370059d5ad4140fe7e8f4af2b95869620b7269d52f3cb"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-2-after-v1.txt",
+      "bytes": 5857,
+      "sha256": "6727b19719faf4aa5b685aaf29c2e2c8ef9ad737c13846b1d45e93e66925b492"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-3-after-v1.txt",
+      "bytes": 5914,
+      "sha256": "d2e8c15e7fabde813d2a299f60c73b7ddc0d7593b17544daa98b8e0e34d0ea5f"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-4-after-v1.txt",
+      "bytes": 5466,
+      "sha256": "bbdb9c2961a9fb9016ff7b16a173c8273388a67f90f7b6d25c3ae320382fdfcb"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-5-after-v1.txt",
+      "bytes": 13116,
+      "sha256": "fd04020e56ee75775e15a0d11757189fd131da12d8fc6a78613a4891729f97d0"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-6-after-v1.txt",
+      "bytes": 5827,
+      "sha256": "1c8af6eb021c5107fafc8bbcc285e3c6d2587a1f3ab5d9bc4b67fae521e4f723"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-7-after-v1.txt",
+      "bytes": 5827,
+      "sha256": "25fdae25284a14b90244f9035d4f2ce3f2ce3645cb43080bbd4650aecf14d4b2"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-8-after-v1.txt",
+      "bytes": 5822,
+      "sha256": "a9836a145c7c0844d5a30f40cdb84bae531f4c0bda8022520868fe51f4642c6b"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/page-9-after-v1.txt",
+      "bytes": 5827,
+      "sha256": "253b35bbf0401a71a1da3eae212287a9a368875ce9b28e869c7ddb584657dfa3"
+    },
+    {
+      "path": "v103/captures/v103/environment-v2/pages-after-v1.json",
+      "bytes": 1488,
+      "sha256": "8f9bd151b299247f8ceabd4e2821f74cc4d5bd45879d1b6469bee7efe230f108"
+    },
+    {
+      "path": "v103/captures/v103/facet-capabilities-v29.json",
+      "bytes": 103707,
+      "sha256": "90fc76d12a8ea755a300738f495c638945530a8908389b0557ec546bb1b38be5"
+    },
+    {
+      "path": "v103/captures/v103/numeric-controls-v29.json",
+      "bytes": 11234,
+      "sha256": "2520570798c6c2efb5f7ee1230c74cee67d3e1dac6a5a499657b51c5c6b5f0e9"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/add-response-v1.json",
+      "bytes": 13514,
+      "sha256": "7e28934fac87b7d61688653b02ee0bec1d2073d3a6eabe89db5da084b8f89b9e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/add-transport-v1.json",
+      "bytes": 316,
+      "sha256": "66ca0d0be99379580c77a058dc314a105218f5fa0631047024c807e49d6481f5"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/add-trigger-v1.json",
+      "bytes": 47,
+      "sha256": "bec665f8e200ce681c98851eb1d6d22b44786142abcbe90f42a1f07e20e8e140"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/attempt-start-v1.json",
+      "bytes": 541,
+      "sha256": "67346994e75b687395707d704a3e1d2740c3be3049c3eb0791499985dded3185"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/capture-receipt-v1.json",
+      "bytes": 2674,
+      "sha256": "9565c4e84bc5670d5bb01bdd2c1f747dbef14b7999b04b9e48240b09d58c24e5"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/context-before-v1.txt",
+      "bytes": 6295,
+      "sha256": "a68aceb0d93ead8065d90609c22d80288fcaac909c55a5e69896fa87383cc34f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/executed-v1.pine",
+      "bytes": 2084,
+      "sha256": "176e1eb5952a374204f9afbd9a7d46b764e6bb770559b93cba563bcedcce5d62"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-range-clock-v1.json",
+      "bytes": 61,
+      "sha256": "1a487b4f3cec821142dace5a6454c31b68a8262f742db86b458e1c86412cec4c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-1-3-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "35e16ec094624b8b46bc4b8918658d3fee80032b61f5fc34ab1b4acf126a411d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-1-3-v1.txt",
+      "bytes": 7571,
+      "sha256": "f8843a22bdc9facad705ee0f1c9e9a951350fa0e99accde71413ddf27a354ea6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-11-13-exposed-v1.pine",
+      "bytes": 687,
+      "sha256": "0aefd54dff2967caecb18366fb1b973b8a5c8c78a7bbaf10e6b9a9bc08e864a6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-11-13-v1.txt",
+      "bytes": 7851,
+      "sha256": "27fb652f5d153e82afadc5241e840c2645675a22fb454e4c82d50b7fda6576d7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-13-15-exposed-v1.pine",
+      "bytes": 984,
+      "sha256": "64cd4bdf3f80da9d8bd9bc668e9030b235b7e2eb5e0fbe8ad0da02e452cbdbb3"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-13-15-v1.txt",
+      "bytes": 8148,
+      "sha256": "728abbf66383e37a2990684d1f83ad2dc2bbde91424ba82fe16eea888b43e85a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-15-17-exposed-v1.pine",
+      "bytes": 1006,
+      "sha256": "80b9a56fff6f96ffccb223bbeae1293e1633db2ac7d6d5a105ec685f7b529a8b"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-15-17-v1.txt",
+      "bytes": 8170,
+      "sha256": "36ca9fa37a490c4d8e1449b67db1104656982f388fe865b61add30ec5944af3c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-17-19-exposed-v1.pine",
+      "bytes": 724,
+      "sha256": "c7bac720d276433cca6042b56f1fd379377c3e1fb56e07851651c3400d24d537"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-17-19-v1.txt",
+      "bytes": 7888,
+      "sha256": "c66ecb2efe2c79885fa98e71767ca08cce57651a8a68078ef5f9d4028e490d98"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-19-21-exposed-v1.pine",
+      "bytes": 1054,
+      "sha256": "36cb91295fe6522a90001e471c8669125629430ee2dbb46bb43e0468980614c2"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-19-21-v1.txt",
+      "bytes": 8218,
+      "sha256": "54110aa08a078e7aeb216eaf1889390cef5a6f2d67c322f48c9583e13538ea87"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-21-23-exposed-v1.pine",
+      "bytes": 613,
+      "sha256": "28da17f852227dc7b8d566d69891deea6ccebc4b19e2b7adfdc91a7b0a44a26d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-21-23-v1.txt",
+      "bytes": 7777,
+      "sha256": "2c8865fd6e505352d3141c558bd713cdfe4ad0c8977b0e3117d02730c2c253fb"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-23-25-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-23-25-v1.txt",
+      "bytes": 7793,
+      "sha256": "b5f0bb2222fa0ef36bd68afd8d6b7deb38c6c4c2b8cbffc5035124c69c1732a4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-25-27-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-25-27-v1.txt",
+      "bytes": 7794,
+      "sha256": "9025fbfa7b9973e115b3777b48d0445c95b3cae997cbe67a41226df8f2a4fbe1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-27-29-exposed-v1.pine",
+      "bytes": 628,
+      "sha256": "6a6b3e1c7f9365ac41fa5a889437bbc2d46554a480e6158a3dd93a918979dc18"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-27-29-v1.txt",
+      "bytes": 7794,
+      "sha256": "a4f0e0f6c5233be8cc1e9f364c2f89c1f2c7c07c31361ad473e3516b6ef1e736"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-29-31-exposed-v1.pine",
+      "bytes": 662,
+      "sha256": "54b6323ec7b4da085388be16e3ca1cb863efb8de45ab42b6179e1d8d832d9af9"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-29-31-v1.txt",
+      "bytes": 7828,
+      "sha256": "6fb525900c7d66aad52c3bde8f8b9cba4c3a5fcaa193f6c566c663657900ca0f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-3-5-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "35e16ec094624b8b46bc4b8918658d3fee80032b61f5fc34ab1b4acf126a411d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-3-5-v1.txt",
+      "bytes": 7571,
+      "sha256": "55ae44d98d1012459b4ed8511ab25f81babddb847da4add169715f26d4dfe5b6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-31-32-exposed-v1.pine",
+      "bytes": 42,
+      "sha256": "c0ac38a462bce346dee4a2334befd1860377b3ebe3bd6c282a18a01b29bc90f4"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-31-32-v1.txt",
+      "bytes": 7208,
+      "sha256": "67cac53b05cedeb299b14ecdc9cd945c743bb65c6a9c03b9cbf4842e0736c5a6"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-5-7-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "35e16ec094624b8b46bc4b8918658d3fee80032b61f5fc34ab1b4acf126a411d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-5-7-v1.txt",
+      "bytes": 7571,
+      "sha256": "4d22eea0da1e8b6a77d5d096e143a023fce06ffab2fe846094ee7bd84642c04c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-7-9-exposed-v1.pine",
+      "bytes": 408,
+      "sha256": "35e16ec094624b8b46bc4b8918658d3fee80032b61f5fc34ab1b4acf126a411d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-7-9-v1.txt",
+      "bytes": 7571,
+      "sha256": "7df43d712787850e8954be16a084529d0fc1e0f48df73c097d37e6b2fe8ce13d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-9-11-exposed-v1.pine",
+      "bytes": 908,
+      "sha256": "450b9cf598d102d1d5b65d179ecfc82c4a8a9dffc4ec91fd97f4c34cb992ae06"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-9-11-v1.txt",
+      "bytes": 8072,
+      "sha256": "6d99a5593a110dbce48e8692c798aaae8e59b61c997d7ba6d0c1c2195035d560"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-assembled-v1.pine",
+      "bytes": 2084,
+      "sha256": "176e1eb5952a374204f9afbd9a7d46b764e6bb770559b93cba563bcedcce5d62"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-start-v1.txt",
+      "bytes": 7571,
+      "sha256": "2cd85eeb47bc2387ee8cbd44beb98ccb6ef9692e2bcc5a77d9eaa3a40902480d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/full-editor-ranges-verification-v1.json",
+      "bytes": 7408,
+      "sha256": "48b965a61946ed9a56106470c48bf53480e602513f951038f432572ce1a0405a"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/observation-v1.json",
+      "bytes": 6128,
+      "sha256": "8a16618b02fc03183ef91d971e3729a1c2ed2fe56ba3c0c4ff65848cdb87d46e"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-add-immediate-v1.txt",
+      "bytes": 7595,
+      "sha256": "a861fc2e83bf7fb5a265362f3c904975493fbd131eefe05930dc3507a9b41a25"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-add-settled-v1.txt",
+      "bytes": 7718,
+      "sha256": "eb8c7964cd2a186b2dfc41f17a5fdd8016b40f3e69518b11454fc16ba8dcd797"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-remove-v1.txt",
+      "bytes": 6295,
+      "sha256": "de5b08b64ea33405fb6b6d288449c11afb0fefce2917b807869f54b7f988d50f"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-save-immediate-v1.txt",
+      "bytes": 7201,
+      "sha256": "3b9ae80c0991a55f49bdfc2a64edeb230e5c7990935c1c917277864f586734c7"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-save-settled-v1.jpg",
+      "bytes": 237812,
+      "sha256": "d1497ed75f23dacd56694c6c4d59d0ca821a05519a7984ba56c3be2a087efbb2"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/post-save-settled-v1.txt",
+      "bytes": 7264,
+      "sha256": "4f50fba3405d2f44fbb6b0fb4f7c7dcb13aba8e874e8e6cfaabf25822f8b7dac"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/pre-add-v1.jpg",
+      "bytes": 237812,
+      "sha256": "d1497ed75f23dacd56694c6c4d59d0ca821a05519a7984ba56c3be2a087efbb2"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/pre-add-v1.txt",
+      "bytes": 7264,
+      "sha256": "4f50fba3405d2f44fbb6b0fb4f7c7dcb13aba8e874e8e6cfaabf25822f8b7dac"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/runtime-inspection-before-v1.txt",
+      "bytes": 6642,
+      "sha256": "1ca2839980ed456bb2ee99783e35929d987fd7813e625a408e00c3259b31de38"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/save-request-v1.txt",
+      "bytes": 2252,
+      "sha256": "9540bd660c77f1df821779888a89b6c36b3f56ada5aba14735ccc4553ec1fae1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/save-response-v1.json",
+      "bytes": 13514,
+      "sha256": "e45ede7027f679065df68f0f1039efaeab61a4ae7ac06df3536ebda756d60728"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/save-transport-v1.json",
+      "bytes": 664,
+      "sha256": "19c3bcb7361bc421e59225c11c502e7e574225da387fa858a0a8b5c57c2531b1"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/before-export-v1.txt",
+      "bytes": 6642,
+      "sha256": "1ca2839980ed456bb2ee99783e35929d987fd7813e625a408e00c3259b31de38"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/chart-download-v1.json",
+      "bytes": 1266,
+      "sha256": "b3aa0130f7770bd174bda3c13253b35ba00884f3753e45ed2afa6632725743bc"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/chart-export-dialog-v1.txt",
+      "bytes": 7368,
+      "sha256": "c2866d12d57fc404f7412421562cc3beddc36fa2be612daa112747b0e691f186"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/chart-export-trigger-v1.json",
+      "bytes": 214,
+      "sha256": "c68ad5c6ffa0553c2dec25c09aa3248c6b8c975e19c673f00defdbec8c48253c"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/chart-native-v1.csv",
+      "bytes": 34470,
+      "sha256": "22521aa7e347048fe7c9ad621b025569f77ab904ac8c8df5f54f92c394976baf"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/chart-post-export-snapshot-v1.txt",
+      "bytes": 6650,
+      "sha256": "51d24e34333faf31bc89ccec9f456d39a3c97e0f0deea8a33e9f282fe9168165"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/column-bindings-v1.json",
+      "bytes": 8307,
+      "sha256": "a088bd29bd97b9451f3dcf4ca93f270e173b33f08384ca91a3c835e9024e90d3"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/render-context-v1.txt",
+      "bytes": 6650,
+      "sha256": "1f1d534d6f4427db854c27e5cff3a50bb8e8c2437e80c0fc2978685239d38824"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/render-v1.png",
+      "bytes": 143605,
+      "sha256": "bc8e10312fb96cbfaff763461e47976dc31aa6ea20fa33a76e14360c03d754ee"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/row-closure-mask-v1.csv",
+      "bytes": 73047,
+      "sha256": "5f947fb5948e61ece5925174015158df8d5f21050d7e47fa96c0aa3b8d118e3d"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/row-set-observation-v1.json",
+      "bytes": 8615,
+      "sha256": "319f19e3a0f5e7cdaae562f136b9159e4cd92bc222a6f77fd1b9c570edafaead"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/attempt-v1/session-mode0-v1/session-receipt-v1.json",
+      "bytes": 970,
+      "sha256": "1cb2f95e18b5781cc08c35eae5034de8e64601ea9f1f014eefc0b9032aba27cf"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/compiler-diagnostics-v1.json",
+      "bytes": 1592,
+      "sha256": "c42876e73c6772f14b559752331f76122ec732ba1908a8c0bb4bf86b2f44d947"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/derived-region-map-v1.json",
+      "bytes": 20490,
+      "sha256": "e65d8dc51ffcc8d73893ca97a04dbbf452204e675500c0be6ccf90eedae1da65"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/facet-assessment-v1.json",
+      "bytes": 5889,
+      "sha256": "e1a3858499512dcfefb2ee4a67bc11ea66280451419539891f7b4354b3024584"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/native-cell-block-v1.json",
+      "bytes": 138883,
+      "sha256": "c23c1210a4fa62316441897fd426b58ea05f4337969bf9cd82d95f4ff8b93649"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/numeric-results-v1.json",
+      "bytes": 190287,
+      "sha256": "14dbf4a6c1f9906d40ac18f454f522432d7978ec2a664f4131a11765049b8704"
+    },
+    {
+      "path": "v103/captures/v103/v103-polyline-arrows-v6/visual-inspection-v1.json",
+      "bytes": 8536,
+      "sha256": "637018c91d1dee124d91e8983e39d0840f80a9549ab672b7dd0c2b51a89e1d68"
+    },
+    {
+      "path": "v103/captures/v103/validation-result-v29.json",
+      "bytes": 985,
+      "sha256": "45173886fc92192ead2f0603f215e3f1fa30ddeecc33dc55ce7872ef31b7c1a9"
+    },
+    {
+      "path": "v103/captures/v103/artifact-integrity-v29.json",
+      "bytes": 466198,
+      "sha256": "4c47195e3cda560be3796dd5f6425abfbf878b450aa86c1e4777e7d898ba6752"
     }
   ]
 }
