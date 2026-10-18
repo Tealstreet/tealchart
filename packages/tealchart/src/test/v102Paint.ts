@@ -10,7 +10,7 @@ import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScript
 export interface FixturePaint { kind: 'fill' | 'stroke'; color: string; width: number; dash: number[]; points: { x: number; y: number }[] }
 export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry>, 'result' | 'bars'>, channel: 'web' | 'native' | 'plots', rectangles = false) {
   const paints: FixturePaint[] = [];
-  const texts: { text: string; x: number; y: number; color: string; font: string }[] = [];
+  const texts: { text: string; x: number; y: number; color: string; font: string; textAlign: CanvasContext['textAlign']; textBaseline: CanvasContext['textBaseline'] }[] = [];
   const bodies: { shape: 'rect' | 'roundRect'; color: string; points: { x: number; y: number }[] }[] = [];
   let shape: 'rect' | 'roundRect' | undefined;
   const closedPaths: { x: number; y: number }[][] = [];
@@ -30,8 +30,8 @@ export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry
     fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: rectangles ? [{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }] : [{ x, y }] }),
     stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] }),
     strokeRect: (x, y, w, h) => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), width: ctx.lineWidth, dash: [...dash], points: rectangles ? [{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }] : [{ x, y }] }),
-    fillText: (text, x, y) => texts.push({ text, x, y, color: String(ctx.fillStyle), font: ctx.font }),
-    save: () => states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font }),
+    fillText: (text, x, y) => texts.push({ text, x, y, color: String(ctx.fillStyle), font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
+    save: () => states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
     restore: () => Object.assign(ctx, states.pop()), setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash],
     measureText: text => ({ width: text.length * 7 }) as TextMetrics,
   };

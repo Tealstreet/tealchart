@@ -58,7 +58,7 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
         const centerX = x(offset) + (x(offset + 15) - x(offset)) / 2;
         const atBox = boxTexts.filter(t => t.x > x(offset) && t.x < x(offset + 15));
         expect(atBox, `box at ${offset}`).toEqual([
-          expect.objectContaining({ text, color, x: centerX, y: 60 }),
+          expect.objectContaining({ text, color, x: centerX, y: 60, textAlign: 'center', textBaseline: 'middle' }),
         ]);
       }
       expect(paints.find(p => p.kind === 'stroke' && p.points[0]?.x === x(-90) && p.points[0]?.y === 50)).toMatchObject({ color: blue, width: 4, dash: [6, 4] });
@@ -83,10 +83,10 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       const labelTexts = texts.filter(t => t.y > 70);
       expect(labelBodies).toHaveLength(3);
       expect(labelTexts).toHaveLength(3);
-      for (const [offset, shape, color, text] of [
-        [-82, 'rect', red, 'SRC'],
-        [-52, 'roundRect', blue, 'COPY'],
-        [-22, 'roundRect', blue, 'COPY'],
+      for (const [offset, shape, color, text, textAlign] of [
+        [-82, 'rect', red, 'SRC', 'left'],
+        [-52, 'roundRect', blue, 'COPY', 'center'],
+        [-22, 'roundRect', blue, 'COPY', 'center'],
       ] as const) {
         const atLabel = labelBodies.filter(body => body.points[0].x < x(offset) && body.points[1].x > x(offset));
         expect(atLabel, `label body at ${offset}`).toEqual([expect.objectContaining({ shape, color })]);
@@ -95,7 +95,7 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
         expect(points[0].y + (points[2].y - points[0].y) / 2).toBe(88);
         const atText = labelTexts.filter(t => t.x > x(offset - 15) && t.x < x(offset + 15));
         expect(atText, `label text at ${offset}`).toEqual([
-          expect.objectContaining({ text, color: '#FFFFFF' }),
+          expect.objectContaining({ text, color: '#FFFFFF', textAlign, textBaseline: 'middle' }),
         ]);
         if (text === 'COPY') expect(atText[0]).toMatchObject({ x: x(offset), y: 88 });
       }

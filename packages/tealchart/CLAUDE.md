@@ -1663,3 +1663,7 @@ cover the four extension modes; universal arrow metrics remain held.
 Native v102 arrow-both heads are open stroked chevrons with a continuing shaft
 and empty interior. The shared line/polyline head primitive uses its width/color;
 only the captured v6 line earns native topology credit, with metrics held.
+
+Drawing paint traces retain text alignment and baseline at fillText, including
+save/restore. Copy appearance checks bind those fields to each object's column;
+text coordinates alone do not establish centered ink.
