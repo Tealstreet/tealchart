@@ -86,7 +86,7 @@
     "@babel/plugin-transform-react-jsx": "^7.29.7",
     "@babel/plugin-transform-typescript": "^7.29.7",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "@napi-rs/canvas": "^1.0.9",
+    "@napi-rs/canvas": "^1.0.11",
     "@shopify/react-native-skia": "2.12.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
