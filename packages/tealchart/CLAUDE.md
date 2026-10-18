@@ -2,11 +2,16 @@ Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
 passes must keep each script together, and native plots share the same ordering.
 Background stripes remain beneath fills. Shared drawing paint puts lines after
-linefills and boxes after lines, then labels. Captured tables cover intersected
-fill only: table-vs-label/box/line/linefill intersections remain unobserved.
+linefills and boxes after lines, then labels. Those v93 captures show tables covering
+intersected fill only; table-vs-label/box/line/linefill intersections were unobserved there.
 V102 additionally pins polylines above lines and below boxes in both creation
-directions. Polyline-label and actual table intersections stay UNDECIDED.
+directions. V102's polyline-label and table-intersection maps retain UNDECIDED.
 Screenshot/region bindings certify these bounded precedence checks, not pixel parity.
+
+V103 independently witnesses labels above polylines in both creation orders in
+v5/v6, and v6 tables above isolated line/polyline/box/label/linefill subjects with
+visible outside controls. These seven plates close their own pairs only; v102's
+occluded evidence, v5 table precedence and universal raster/font metrics stay held.
 
 Pine Style controls on web retain coded plots separately from display overrides.
 Reselecting a plot sets all display locations; Defaults resets coded inputs and
