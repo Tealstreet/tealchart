@@ -2,6 +2,7 @@
 import type { SkCanvas, SkFont } from '@shopify/react-native-skia';
 import type { PixelFrame } from '../test/v103BoxTextPaint';
 
+import { createCanvas } from '@napi-rs/canvas';
 import { matchFont } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -75,11 +76,34 @@ const layoutSlots = [
   { role: 'D left top', rect: [551, 841, 793, 891], words: ['EDGE'] },
   { role: 'E right bottom', rect: [851, 841, 1093, 891], words: ['EDGE'] },
 ];
+function measuredWrappedWords(entry: (typeof entries)[number]) {
+  const ctx = createCanvas(1, 1).getContext('2d');
+  ctx.font = '12px monospace';
+  const words = entry.regions.facets[0].manualFinding.visibleTextByRegion
+    .slice(0, 3)
+    .map((region: { literal: string }) => region.literal)
+    .join(' ')
+    .split(' ');
+  // The frozen source spans eight bars; local text padding is six pixels per side.
+  // Native glyph metrics are held, so measure before choosing maximal whole-word lines.
+  const width = 8 * entry.regions.registration.pixelsPerOwnBar - 12;
+  expect(words.every((word: string) => ctx.measureText(word).width <= width)).toBe(true);
+  const lines: string[] = [];
+  for (let start = 0; start < words.length; ) {
+    const ends = Array.from({ length: words.length - start }, (_, index) => start + index + 1);
+    const end = ends.findLast((end) => ctx.measureText(words.slice(start, end).join(' ')).width <= width)!;
+    lines.push(words.slice(start, end).join(' '));
+    start = end;
+  }
+  expect(lines.length).toBeGreaterThan(1);
+  return lines;
+}
 function assertTextIdentity<T extends LocatedText>(
   texts: T[],
   format: boolean,
   fontOf: (text: T) => unknown,
   expectedFont: (key: string) => unknown = (key) => key,
+  wrappedWords = layoutSlots[0].words,
 ) {
   if (format) {
     expect(texts).toHaveLength(4);
@@ -92,8 +116,10 @@ function assertTextIdentity<T extends LocatedText>(
       expect(fontOf(calls[0]), `${role} font at original position`).toBe(expectedFont(font));
     }
   } else {
-    expect(texts).toHaveLength(7);
-    for (const { role, rect, words } of layoutSlots) {
+    expect(texts).toHaveLength(wrappedWords.length + 4);
+    for (const { role, rect, words } of layoutSlots.map((slot, index) =>
+      index === 0 ? { ...slot, words: wrappedWords } : slot,
+    )) {
       const calls = texts.filter((text) => inRect(text, rect));
       expect(
         calls.map((text) => text.text),
@@ -240,16 +266,17 @@ for (const entry of entries)
       it(`${channel}: paints the observed alternatives through the real box text painter`, () => {
         const paint = paintBoxText(entry, channel);
         expect(paint.result.drawings.every((d) => d.type === 'box')).toBe(true);
-        assertTextIdentity(paint.texts, entry.id.includes('format'), (text) => text.font);
+        const format = entry.id.includes('format');
+        const wrappedWords = format ? [] : measuredWrappedWords(entry);
+        assertTextIdentity(paint.texts, format, (text) => text.font, undefined, wrappedWords);
         if (entry.id.includes('layout')) {
           expect(paint.result.drawings).toHaveLength(5);
           assertLayout(paint, entry);
           const wrapped = paint.texts.filter((t) => t.x < 700 && t.y < 790);
           expect(wrapped.length).toBeGreaterThan(1);
-          expect(wrapped.map((t) => t.text)).toEqual(
-            entry.regions.facets[0].manualFinding.visibleTextByRegion
-              .slice(0, 3)
-              .map((r: { literal: string }) => r.literal),
+          expect(wrapped.map((t) => t.text)).toEqual(wrappedWords);
+          expect(wrapped.map(({ x, y, align, baseline }) => ({ x, y, align, baseline }))).toEqual(
+            wrappedWords.map((_, index) => ({ x: 557, y: 679 + index * 15, align: 'left', baseline: 'top' })),
           );
           expect(paint.texts.filter((t) => t.text === 'AA BB CC DD EE FF')).toHaveLength(2);
           const [top, bottom] = layoutSlots

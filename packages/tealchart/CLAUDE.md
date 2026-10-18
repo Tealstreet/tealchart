@@ -3,6 +3,9 @@ right/bottom alignment versus left/top controls, and none/bold/italic/both sette
 Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
 these eight frozen alternatives. V5 layout stopped before Save and earns zero credit;
 resolved fonts, exact glyph metrics, frame identity and universal composition stay held.
+Local box-text replay derives maximal whole-word lines from the canvas font's
+measurements at the frozen source width. Keep native PNG line observations fixed,
+and retain per-position literal/font/alignment checks across host font fallbacks.
 
 Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
