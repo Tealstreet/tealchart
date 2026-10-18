@@ -59,7 +59,7 @@ const entries = json<{ sources: { sourceId: string; numericResults: Proof }[] }>
   .map((entry) => json<Source>(entry.numericResults.path));
 
 it('binds the append-only v99 evidence, integrity, validation and the exact source index', () => {
-  expect(lock.revision).toBe('8606897ec777cca3ad18e755b7c0d99a486d777e');
+  expect(lock.revision).toBe('db3199acaebfa812fae9066c983d14bc54fc831e');
   const integrity = json<{ artifacts: Proof[] }>(base + 'artifact-integrity-v6.json');
   const files = lock.files.filter((f) => f.path.startsWith('v99/'));
   expect(files.length).toBeGreaterThanOrEqual(113);

@@ -1,3 +1,9 @@
+V102 coordinate v5 locks use the unchanged source and eight original closed
+predecessors. Final point fields and +40 translated controls agree with the
+original PNG/map; numeric getters do not certify pixels or intermediate modes.
+Coincident box/label initial coordinates leave ignored setters indistinguishable;
+v5 box xloc, transient label time mode and universal raster metrics remain held.
+
 V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
 Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
 literal-cast/root-initializer comparisons fold separately from runtime missing
