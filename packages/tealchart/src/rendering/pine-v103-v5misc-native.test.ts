@@ -125,15 +125,30 @@ describe('v103 original PNG-bound v5 styles and independently captured v5/v6 ret
         const fills = paints.filter(p => p.kind === 'fill');
         expect(fills).toHaveLength(1);
         expect(fills[0].color).toBe('#2962FF80');
-        const expected = [projectedX(bars, -90), 50, projectedX(bars, -55), 70];
-        bounds(fills[0]).forEach((v, i) => expect(v).toBeCloseTo(expected[i], 10));
         const parents = paints.filter(p => p.kind === 'stroke' && p.color === '#787B86');
         expect(parents).toHaveLength(4);
-        for (const start of [-90, -40]) for (const value of [30, 50]) {
+        const parentPairs = [-90, -40].map(start => [30, 50].map(value => {
           const parent = parents.find(p => Math.abs(bounds(p)[0] - projectedX(bars, start)) < 1e-9 && bounds(p)[1] === 100 - value);
           expect(parent).toBeDefined();
-          expect(bounds(parent!)[2]).toBeCloseTo(projectedX(bars, start + 35), 10);
-        }
+          expect(parent!.points).toHaveLength(2);
+          for (const [endpoint, relative] of [start, start + 35].entries()) {
+            expect(parent!.points[endpoint].x).toBeCloseTo(projectedX(bars, relative), 10);
+            expect(parent!.points[endpoint].y).toBe(100 - value);
+          }
+          return parent!.points;
+        }));
+        const [firstParent, secondParent] = parentPairs[0];
+        expect(fills[0].points).toHaveLength(4);
+        const boundaryEdges = fills[0].points.flatMap((point, i, points) => [
+          [point, points[(i + 1) % points.length]],
+          [points[(i + 1) % points.length], point],
+        ]);
+        for (const edge of [
+          firstParent,
+          secondParent,
+          [firstParent[0], secondParent[0]],
+          [firstParent[1], secondParent[1]],
+        ]) expect(boundaryEdges).toContainEqual(edge);
       });
     }
   }

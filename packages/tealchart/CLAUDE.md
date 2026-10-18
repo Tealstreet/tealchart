@@ -1667,4 +1667,6 @@ only the captured v6 line earns native topology credit, with metrics held.
 V103 v5 extension/stroke rows bind each line and box to its own lane through both
 painters. Separate v5/v6 retained-linefill PNGs witness a single blue current band,
 an empty old band and deleted right fill with positive parent/left-fill controls.
+Each retained fill boundary follows both parent segments and connects their
+corresponding left/right endpoints; equal bounds alone cannot witness a filled band.
 Frozen windows and original PNG hashes bound these classes; raster metrics stay held.
