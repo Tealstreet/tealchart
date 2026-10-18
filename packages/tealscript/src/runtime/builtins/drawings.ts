@@ -1345,6 +1345,11 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('table.set_position', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       table.position = runtime.toStringValue(callArg(args, namedArgs, 1, 'position', undefined, ['table_id']));
+      for (const previous of ctx.getDrawings()) {
+        if (previous.type === 'table' && previous.id !== table.id && sameTableLocation(ctx, previous, table)) {
+          ctx.deleteDrawing(previous.id);
+        }
+      }
     });
     return undefined;
   });

@@ -32,7 +32,7 @@ for (const s of json<{ sources: RequestSource[] }>('v100/bundle-manifest-v1.json
 // The companion v101 lock asserts the value; CM-A is refuted at that new frontier.
 describe('v96/v98/v99/v100 constant colors: every selected closed non-index cell', () => {
   it('keeps nine immutable source executions and their complete 23,448-cell accounting', () => {
-    expect(lock.revision).toBe('56abd808d88595bab7808c063d065ce2bcd7dc55');
+    expect(lock.revision).toBe('3f3169de35577ad5041a994f39cac471fcffd8fa');
     expect(cases).toHaveLength(9);
     expect(cases.reduce((n, c) => n + c.rows.length * c.titles.filter(t => t !== 'INPUT_INDEX').length, 0)).toBe(23448);
     for (const path of controls) bound(path);
