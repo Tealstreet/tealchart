@@ -229,9 +229,9 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   {
     name: 'edge-line-styles',
     platform: 'linux',
-    differingPixels: 0,
+    differingPixels: 2327,
     totalPixels: 120000,
-    differingPixelRatio: 0,
+    differingPixelRatio: 0.019391666666666668,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,

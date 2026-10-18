@@ -236,3 +236,11 @@ footprints and arrow tips, plot value lanes and CSV phase rows, and individual
 square/glyph anchors. Palette-preserving real-painter swaps go RED, including
 plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
 order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+## V104 width-dependent dash periods
+
+The [v5 return](https://github.com/Tealstreet/tealscript-oracle/blob/5c8a503d7b6cc1c161f75d484b5340ebc459a55b/v104/captures/v104/RESPONSE-v104-v5.md) binds the unchanged v6 source, original CSV and PNG. Its three separated blue horizontal lanes own widths1/4/8, identical spans29, and different value anchors85/65/40. Independent native PNG profiles establish period ratios1:4:8 (SUPPORTED_B), refuting constant period. Real web/native painter commands and per-lane raster profiles lock each lane's own width, position and period; swapped lanes and one-sided faults are separately rejected.
+
+Replay uses only actual captured OHLC/time/volume from the first observed modulo8-zero row through the owned closed build. The selected A-31..A block yields288 exact non-index numeric/blank cells and64 translated index-context cells with zero absolute-origin credit. Each build getter supplies one finite event and31 intentional blanks. No output seeds, invented bars or native outputs enter execution. Other/developing/context rows receive no primary credit.
+
+Dotted strokes, boxes, polylines, plot/hline styles and earlier Pine versions inherit width scaling through the shared recipe as an explicit inference, separately regression-tested without additional native credit. Existing width1 recipe lengths and dash/gap proportions are retained as engine policy, not native-certified absolute metrics. The older copy comparison's local constructor recipe and width2 worklet expectation follow this same inferred correction; neither older capture certified a numeric period. Native DPI, absolute pixel lengths, phase/reset/clipping laws and historical holds remain held.

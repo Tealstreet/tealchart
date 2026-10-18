@@ -1,5 +1,5 @@
 import type { SkPath, SkPicture } from '@shopify/react-native-skia';
-import type { PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
@@ -17,6 +17,7 @@ import { DashPathEffect, Group, LinearGradient, Picture, Skia, Path as SkiaPath 
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { appendPlotFillQuad, getPlotFillSample, plotFillGradientKey } from '../../rendering/plotFillGeometry';
+import { pineLineDash } from '../../rendering/pineLineDash';
 import { appendPlotAreaBaseline } from '../../rendering/plotGeometry';
 import { plotArrowHeight, plotMarkerSize, plotMarkerTextLineOffset } from '../../rendering/plotMarkerGeometry';
 import { orderTealScriptPlots } from '../../rendering/tealScriptPlotOrder';
@@ -87,11 +88,6 @@ function nativePlotStyleUsesPointMarkers(style: PlotStyle): boolean {
   return style === 'cross' || style === 'circles';
 }
 
-function nativeIndicatorLineDash(lineStyle: PlotLineStyle | undefined): number[] | null {
-  if (lineStyle === 'dashed') return [6, 4];
-  if (lineStyle === 'dotted') return [2, 3];
-  return null;
-}
 
 function getNativeIndicatorColor(color: PlotOutput['color']): string {
   if (Array.isArray(color)) return color.find((value): value is string => Boolean(value)) ?? '#2196F3';
@@ -1298,7 +1294,7 @@ function NativeLiveIndicatorPlotPath({
         />
         {join && (
           <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={1} strokeCap="round" strokeJoin="round">
-            {dash && <DashPathEffect intervals={dash} />}
+            {dash?.length ? <DashPathEffect intervals={dash.map(n => n / Math.max(1, strokeWidth))} /> : null}
           </SkiaPath>
         )}
       </Group>
@@ -1316,7 +1312,7 @@ function NativeLiveIndicatorPlotPath({
         strokeCap="round"
         strokeJoin="round"
       >
-        {dash && <DashPathEffect intervals={dash} />}
+        {dash?.length ? <DashPathEffect intervals={dash} /> : null}
       </SkiaPath>
       {style === 'stepline_diamond' && <SkiaPath path={diamondPath} color={color} />}
     </Group>
@@ -1439,7 +1435,7 @@ function NativeProjectedIndicatorPlotPath({
         />
         {join && (
           <SkiaPath path={linePath} color={color} style="stroke" strokeWidth={1} strokeCap="round" strokeJoin="round">
-            {dash && <DashPathEffect intervals={dash} />}
+            {dash?.length ? <DashPathEffect intervals={dash.map(n => n / Math.max(1, strokeWidth))} /> : null}
           </SkiaPath>
         )}
       </Group>
@@ -1457,7 +1453,7 @@ function NativeProjectedIndicatorPlotPath({
         strokeCap="round"
         strokeJoin="round"
       >
-        {dash && <DashPathEffect intervals={dash} />}
+        {dash?.length ? <DashPathEffect intervals={dash} /> : null}
       </SkiaPath>
       {style === 'stepline_diamond' && <SkiaPath path={diamondPath} color={color} />}
     </Group>
@@ -1768,7 +1764,7 @@ function NativeIndicatorHlinePath({
   const price = typeof plot.price === 'number' && Number.isFinite(plot.price) ? plot.price : null;
   const color = getNativeIndicatorColorAt(plot.color, 0, '#787B86');
   const strokeWidth = plot.linewidth || 1;
-  const dash = nativeIndicatorLineDash(plot.lineStyle ?? 'dashed');
+  const dash = pineLineDash(plot.lineStyle ?? 'dashed', strokeWidth);
   const opacity = isNativeIndicatorPlotVisible(plot) && price !== null && color !== null ? 1 : 0;
   const clip = useDerivedValue(() => ({
     x: frame.contentLeft,
@@ -1807,7 +1803,7 @@ function NativeIndicatorHlinePath({
         style="stroke"
         strokeWidth={strokeWidth}
       >
-        {dash && <DashPathEffect intervals={dash} />}
+        {dash?.length ? <DashPathEffect intervals={dash} /> : null}
       </SkiaPath>
     </Group>
   );
@@ -2405,7 +2401,7 @@ function NativeIndicatorPlotPath({
   const colors = useMemo(() => getNativeIndicatorColorSet(plot.color, fallbackColor), [fallbackColor, plot.color]);
   const strokeWidth = plot.linewidth ?? 1;
   const style = plot.style ?? 'line';
-  const dash = nativeIndicatorLineDash(plot.lineStyle);
+  const dash = pineLineDash(plot.lineStyle, strokeWidth);
   const isHistogram = style === 'histogram' || style === 'columns';
   const isArea = style === 'area' || style === 'areabr';
   const isPointMarker = nativePlotStyleUsesPointMarkers(style);
