@@ -1732,3 +1732,8 @@ use active font measurements; native glyph metrics remain unobserved.
 V104 v5 vertical alignment binds complete EDGE ink to left/top, middle/center
 and right/bottom equal-height boxes. Compare complete per-object local rasters
 under system and DejaVu-only fonts; exact native font/padding metrics stay held.
+
+V104 v6 plotarrow sign-direction is bound to its own closed CSV signs and PNG
+tip narrowing, shoulders and shaft through web and native painters. Use separate
+plotarrow glyphs; plotshape arrows retain their existing marker geometry. The older
+v103 sign-direction facet and universal native raster metrics remain held.

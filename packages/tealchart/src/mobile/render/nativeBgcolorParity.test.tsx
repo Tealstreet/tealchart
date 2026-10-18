@@ -16,7 +16,9 @@ describe('native Bgcolor audit gaps', () => {
     ]);
     harness.sharedViewport.startTime.value = 1000;
     const path = harness.paths()[0].path;
-    expect(vi.mocked(path.lineTo).mock.calls[0][1] - vi.mocked(path.moveTo).mock.calls[0][1]).toBe(22.5);
+    const ys = [vi.mocked(path.moveTo).mock.calls[0], ...vi.mocked(path.lineTo).mock.calls.slice(0, 6)]
+      .map(([, y]) => y);
+    expect(Math.max(...ys) - Math.min(...ys)).toBe(22.5);
   });
 
   it.each([
@@ -28,9 +30,9 @@ describe('native Bgcolor audit gaps', () => {
       testPlot({ type: 'plotarrow', minHeight, maxHeight, values: [1, 4, null, null, null] }),
     ]).paths();
     const path = paths[0].path;
-    const tipY = vi.mocked(path.moveTo).mock.calls[0][1];
-    const baseY = vi.mocked(path.lineTo).mock.calls[0][1];
-    expect(baseY - tipY).toBe(22.5);
+    const ys = [vi.mocked(path.moveTo).mock.calls[0], ...vi.mocked(path.lineTo).mock.calls.slice(0, 6)]
+      .map(([, y]) => y);
+    expect(Math.max(...ys) - Math.min(...ys)).toBe(22.5);
   });
 
   it('translates background stripes by the final plot offset', () => {

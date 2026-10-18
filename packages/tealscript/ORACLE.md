@@ -198,7 +198,7 @@ no retroactive execution credit. This is a mutation-proven regression lock.
 
 ## V103 plot and polyline style controls
 
-The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/287ebfc19e282245be4df55fc6a9d0f5b876d817/v103/captures/v103/RESPONSE-v103-v29.md)
+The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v103/captures/v103/RESPONSE-v103-v29.md)
 separately binds seven unchanged sources: v6 polyline fill/style, plot/hline
 fillgaps overloads, plot controls, markers, plotarrow height, and v5/v6 polyline
 arrows. Each uses the unique retained closed anchor A and own A-31..A, with

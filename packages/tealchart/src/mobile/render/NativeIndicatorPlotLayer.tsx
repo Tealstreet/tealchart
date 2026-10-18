@@ -550,7 +550,7 @@ function appendNativeIndicatorArrowPath(
   direction: 'up' | 'down',
 ): void {
   'worklet';
-  appendNativePlotMarker(path, x, y, direction === 'up' ? 'arrowup' : 'arrowdown', size);
+  appendNativePlotMarker(path, x, y, direction === 'up' ? 'plotarrowup' : 'plotarrowdown', size);
 }
 
 function appendNativeIndicatorShapePath(

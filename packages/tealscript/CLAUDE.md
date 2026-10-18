@@ -4933,3 +4933,8 @@ cycles use original closed bars without synthesizing an own-origin prefix.
 V104 v5 vertical alignment adds one retained build with 8/8/7 span getters.
 Its 319 exact cells include 155 intentional blanks; the 33 absolute-index cells
 stay observed exclusions, and unrelated v11 slots receive no credit.
+
+V104 arrow-direction replay scores 288 unchanged numeric/blank cells plus64
+SOURCE_BOOL plotchar exports in the own retained closed block. Absolute-index
+translations are64 observed exclusions; earlier blocks and the developing row
+earn no primary credit. The separate v103 sign-direction hold stays unchanged.
