@@ -48,7 +48,7 @@ interface Numeric {
   nativeVectorPresenceSummary: { property: string; firstFiniteOwnIndex: number; primary128BlankOwnIndices: number[] }[];
   facets: { facet: string; captureStatus: string; hypothesisVerdict: string }[];
 }
-const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
+const revision = 'eca042005e30671c45fe5cd250dd6a29ba2505bf';
 const base = 'v97/captures/v97/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString();

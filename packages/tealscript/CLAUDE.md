@@ -4889,3 +4889,7 @@ V102 v6 style locks score exact non-index primary cells with CSV offsets project
 from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
 The three exact omitted-formatting sources refuse with CE10165; they earn no
 runtime or appearance credit. Explicit formatting calls retain their old locks.
+
+V103 table replay retains the rotated A-31..A block and eight original predecessors.
+Build getters supply one event plus31 blanks; absolute indices remain observed
+exclusions when replaying an original phase-aligned suffix without a fake prefix.

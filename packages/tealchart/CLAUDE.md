@@ -1656,3 +1656,7 @@ fixed duration there.
 Native v102's extend.both arrow-both line keeps heads on the supplied endpoints.
 The shared painter extends its shaft independently. Other captured lines/boxes
 cover the four extension modes; universal arrow metrics remain held.
+
+Native v103 table plates retain B/C after destination replacement and show zero
+cell dimensions auto-size like omitted dimensions. Original PNG/map controls
+bound these alternatives; resolved fonts, exact metrics and stopped v5 stay held.
