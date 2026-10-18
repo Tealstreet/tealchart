@@ -51,7 +51,7 @@ interface Observation {
   nativeStudyInstanceId: null;
   editorMarkerArrays: null;
 }
-const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
+const revision = '528e23e9b8d5068bc079aaeb5bf6ab6a826e3d5c';
 const base = 'v95/captures/v95/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString();

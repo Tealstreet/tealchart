@@ -1,3 +1,9 @@
+V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
+right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
+Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
+these eight frozen alternatives. V5 layout stopped before Save and earns zero credit;
+resolved fonts, exact glyph metrics, frame identity and universal composition stay held.
+
 V102 coordinate v5/v6 locks use the unchanged sources and eight original closed
 predecessors. V6 additionally witnesses the box time-mode getter delta0. Final point fields and +40 translated controls agree with the
 original PNG/map; numeric getters do not certify pixels or intermediate modes.
