@@ -1650,3 +1650,7 @@ Anything that needs when a month bar CLOSES uses `barCloseTimeMs`, which adds
 whole calendar months (the last-trade countdown counted 30 days, so it ran out
 on October 31st and three days into March). Weekly and shorter bars are a
 fixed duration there.
+
+Native v102's extend.both arrow-both line keeps heads on the supplied endpoints.
+The shared painter extends its shaft independently. Other captured lines/boxes
+cover the four extension modes; universal arrow metrics remain held.

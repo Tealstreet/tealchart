@@ -34,7 +34,7 @@ function survivors(scope: Scope, block: Block, phase: boolean) {
 
 describe('v100 constant colors: native observations and frozen projections, historical frozen projections before the v101 discriminator', () => {
   it('binds all immutable dependencies, exact proposal bytes and original source ownership', () => {
-    expect(lock.revision).toBe('56abd808d88595bab7808c063d065ce2bcd7dc55');
+    expect(lock.revision).toBe('f47a4e34ce33441ad37add124d9572119826138d');
     const integrity = json<{ artifacts: Proof[] }>(root + 'captures/v100/artifact-integrity-v3.json');
     expect(integrity.artifacts).toHaveLength(195);
     for (const p of integrity.artifacts) {

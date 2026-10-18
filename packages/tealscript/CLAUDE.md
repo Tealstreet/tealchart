@@ -4869,3 +4869,8 @@ Own-origin Boolean history encodes -1 in v5 and 0 in v6; fixnan is missing
 until own1. Both literal-seed7 random calls independently match all128 native
 strings from own0 exactly. These bounded fresh-prefix locks do not recover the
 old v95 suffix frontier, unseeded/changing-seed behavior or realtime updates.
+
+V102 v6 style locks score exact non-index primary cells with CSV offsets projected
+from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
+The three exact omitted-formatting sources refuse with CE10165; they earn no
+runtime or appearance credit. Explicit formatting calls retain their old locks.

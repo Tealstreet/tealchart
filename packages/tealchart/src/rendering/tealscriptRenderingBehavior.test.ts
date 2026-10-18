@@ -1027,6 +1027,17 @@ describe('TealScript rendering behavior matrix', () => {
     ).toBe('78,256.1306');
   });
 
+  it('keeps line arrowheads at supplied endpoints when the shaft extends', () => {
+    for (const style of ['arrow_left', 'arrow_right', 'arrow_both'] as const) {
+      const line = makeLine('endpoint-arrows', { x1: 1, x2: 2, y1: 106, y2: 106, style });
+      const bounded = renderDrawings([line]).calls.filter(call => call.op === 'moveTo');
+      const extended = renderDrawings([{ ...line, extend: 'both' }]).calls.filter(call => call.op === 'moveTo');
+      expect(extended[0]).not.toEqual(bounded[0]);
+      expect(extended.slice(1)).toEqual(bounded.slice(1));
+      expect(extended).toHaveLength(style === 'arrow_both' ? 3 : 2);
+    }
+  });
+
   it('renders drawing objects with coordinates, mutator-visible styles, text, and layer order', () => {
     const ctx = renderDrawings([
       makeLine('line-a', { y1: 100, y2: 108 }),
