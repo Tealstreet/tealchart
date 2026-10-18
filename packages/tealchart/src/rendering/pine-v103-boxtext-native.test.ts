@@ -1,15 +1,15 @@
 // @vitest-environment node
-import type { SkCanvas } from '@shopify/react-native-skia';
+import type { SkCanvas, SkFont } from '@shopify/react-native-skia';
 import type { PixelFrame } from '../test/v103BoxTextPaint';
 
 import { matchFont } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
-import { entries, executeBoxText, json, raw } from '../../../tealscript/tests/fixtures/v103BoxText';
+import { entries, json, raw } from '../../../tealscript/tests/fixtures/v103BoxText';
 import { createNativeDrawingContext } from '../mobile/render/nativeDrawingContext';
 import { createNativeDrawingFonts } from '../mobile/render/nativeDrawingFonts';
 import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScriptDrawings';
-import { glyphMask, nativeBoxTextPixels, paintBoxText } from '../test/v103BoxTextPaint';
+import { boxTextScene, glyphMask, nativeBoxTextPixels, paintBoxText } from '../test/v103BoxTextPaint';
 
 const inset = (r: number[]) => [r[0] + 3, r[1] + 3, r[2] - 3, r[3] - 3];
 function assertLayout(frame: PixelFrame, entry: (typeof entries)[number]) {
@@ -57,6 +57,54 @@ function assertFormatting(frame: PixelFrame, entry: (typeof entries)[number]) {
   expect(both.signature, 'combined formatting differs from none').not.toBe(none.signature);
   expect(both.signature, 'combined formatting differs from bold-only').not.toBe(bold.signature);
   expect(both.signature, 'combined formatting differs from italic-only').not.toBe(italic.signature);
+}
+type LocatedText = { text: string; x: number; y: number };
+const inRect = (text: LocatedText, rect: number[]) =>
+  text.x >= rect[0] && text.x < rect[2] && text.y >= rect[1] && text.y < rect[3];
+// Original PNG slots, independent of painter projection and drawing creation order.
+const formatSlots = [
+  { role: 'A none', rect: [551, 685, 793, 759], font: '18px monospace' },
+  { role: 'B bold', rect: [851, 685, 1093, 759], font: 'bold 18px monospace' },
+  { role: 'C italic', rect: [551, 793, 793, 867], font: 'italic 18px monospace' },
+  { role: 'D combined', rect: [851, 793, 1093, 867], font: 'italic bold 18px monospace' },
+];
+const layoutSlots = [
+  { role: 'A wrapped', rect: [551, 673, 600, 783], words: ['AA BB', 'CC DD', 'EE FF'] },
+  { role: 'B nowrap', rect: [911, 673, 1040, 783], words: ['AA BB CC DD EE FF'] },
+  { role: 'C wide control', rect: [551, 793, 1093, 831], words: ['AA BB CC DD EE FF'] },
+  { role: 'D left top', rect: [551, 841, 793, 891], words: ['EDGE'] },
+  { role: 'E right bottom', rect: [851, 841, 1093, 891], words: ['EDGE'] },
+];
+function assertTextIdentity<T extends LocatedText>(
+  texts: T[],
+  format: boolean,
+  fontOf: (text: T) => unknown,
+  expectedFont: (key: string) => unknown = (key) => key,
+) {
+  if (format) {
+    expect(texts).toHaveLength(4);
+    for (const { role, rect, font } of formatSlots) {
+      const calls = texts.filter((text) => inRect(text, rect));
+      expect(
+        calls.map((text) => text.text),
+        `${role} sentinel at original position`,
+      ).toEqual(['FORMAT']);
+      expect(fontOf(calls[0]), `${role} font at original position`).toBe(expectedFont(font));
+    }
+  } else {
+    expect(texts).toHaveLength(7);
+    for (const { role, rect, words } of layoutSlots) {
+      const calls = texts.filter((text) => inRect(text, rect));
+      expect(
+        calls.map((text) => text.text),
+        `${role} sentinel at original position`,
+      ).toEqual(words);
+      for (const text of calls)
+        expect(fontOf(text), `${role} font at original position`).toBe(
+          expectedFont(role.startsWith('D') || role.startsWith('E') ? '16px sans-serif' : '12px monospace'),
+        );
+    }
+  }
 }
 for (const entry of entries)
   describe(`${entry.id} original PNG box-text certificate`, () => {
@@ -119,15 +167,33 @@ for (const entry of entries)
           'AA BB CC DD EE FF',
           'AA BB CC DD EE FF',
         ]);
-      } else assertFormatting(frame, entry);
+        expect(layoutSlots.map((slot) => slot.rect)).toEqual([
+          ...regions.facets[0].manualFinding.actualSubjectRegionsPx,
+          ...regions.facets[0].manualFinding.actualControlRegionsPx,
+          ...regions.facets[1].manualFinding.actualControlRegionsPx,
+          ...regions.facets[1].manualFinding.actualSubjectRegionsPx,
+        ]);
+      } else {
+        assertFormatting(frame, entry);
+        expect(formatSlots.map((slot) => slot.rect)).toEqual([
+          ...regions.facets[0].manualFinding.actualControlRegionsPx,
+          ...regions.facets
+            .slice(0, 3)
+            .flatMap((facet: (typeof regions.facets)[number]) => facet.manualFinding.actualSubjectRegionsPx),
+        ]);
+      }
       expect(regions.nativeFrameId).toBeNull();
       expect(regions.exposedAppearanceMetadata).toMatchObject({ zoom: null, dpi: null, resolvedFont: null });
     });
     it('native: prepares captured box fonts and passes them through the Skia text context', () => {
-      const { result, bars } = executeBoxText(entry);
-      const drawings = result.drawings.map((d) => ({ ...d, scriptId: 'captured' }));
+      const { drawings, bars, viewport, pane, margins, paneWidthPx: width } = boxTextScene(entry);
       const templateFont = matchFont({ fontSize: 18 });
-      vi.mocked(matchFont).mockImplementation(() => ({ ...templateFont }));
+      const descriptors = new Map<SkFont, Parameters<typeof matchFont>[0]>();
+      vi.mocked(matchFont).mockImplementation((descriptor) => {
+        const font = { ...templateFont };
+        descriptors.set(font, descriptor);
+        return font;
+      });
       vi.mocked(matchFont).mockClear();
       const fonts = createNativeDrawingFonts(drawings);
       const format = entry.id.includes('format');
@@ -135,56 +201,46 @@ for (const entry of entries)
         ? ['18px monospace', 'bold 18px monospace', 'italic 18px monospace', 'italic bold 18px monospace']
         : ['12px monospace', '16px sans-serif'];
       expect(Object.keys(fonts)).toEqual(keys);
-      expect(vi.mocked(matchFont).mock.calls.map(([descriptor]) => descriptor)).toEqual(
-        keys.map((key) =>
-          expect.objectContaining({
-            fontSize: format ? 18 : key.startsWith('12') ? 12 : 16,
-            fontWeight: key.includes('bold') ? 'bold' : 'normal',
-            fontStyle: key.includes('italic') ? 'italic' : 'normal',
-          }),
-        ),
-      );
+      expect(vi.mocked(matchFont)).toHaveBeenCalledTimes(keys.length);
+      for (const key of keys)
+        expect(descriptors.get(fonts[key]), `${key} descriptor belongs to its font object`).toMatchObject({
+          fontSize: format ? 18 : key.startsWith('12') ? 12 : 16,
+          fontWeight: key.includes('bold') ? 'bold' : 'normal',
+          fontStyle: key.includes('italic') ? 'italic' : 'normal',
+        });
       const drawText = vi.fn();
       const canvas = Object.fromEntries(
         ['save', 'restore', 'clipPath', 'drawPath', 'drawRect'].map((name) => [name, vi.fn()]),
       );
       const ctx = createNativeDrawingContext({ ...canvas, drawText } as unknown as SkCanvas, fonts);
-      const { anchorXPx, pixelsPerOwnBar, paneWidthPx: width, paneHeightPx: height } = entry.regions.registration;
-      const startTime = bars[bars.length - 1].time - (anchorXPx / pixelsPerOwnBar) * 120_000;
-      paintNativeTealScriptDrawings({
-        ctx,
-        drawings,
-        bars,
-        width,
-        margins: { left: 0, right: 0, top: 0, bottom: 0 },
-        viewport: { startTime, endTime: startTime + (width / pixelsPerOwnBar) * 120_000, priceMin: 0, priceMax: 100 },
-        panes: [
-          {
-            id: 'study',
-            type: 'indicator',
-            indicatorIds: ['captured'],
-            heightRatio: 1,
-            fixedRange: true,
-            top: 0,
-            bottom: height,
-            height,
-            yMin: 0,
-            yMax: 100,
-          },
-        ],
-      });
-      if (format) {
-        expect(drawText.mock.calls.map((call) => call[0])).toEqual(Array(4).fill('FORMAT'));
-        drawText.mock.calls.forEach((call, index) => expect(call[4]).toBe(fonts[keys[index]]));
-      } else {
-        expect(drawText.mock.calls.filter((call) => call[0] === 'EDGE')).toHaveLength(2);
-        expect(drawText.mock.calls.some((call) => call[0] === 'AA BB CC DD EE FF')).toBe(true);
+      paintNativeTealScriptDrawings({ ctx, drawings, bars, width, margins, viewport, panes: [pane] });
+      const texts = drawText.mock.calls.map(([text, x, y, , font]) => ({ text, x, y, font }));
+      assertTextIdentity(
+        texts,
+        format,
+        (text) => text.font,
+        (key) => fonts[key],
+      );
+      if (!format) {
+        for (const [index, { role, rect }] of layoutSlots.slice(3).entries()) {
+          const text = texts.find((text) => text.text === 'EDGE' && inRect(text, rect))!;
+          const metrics = text.font.getMetrics();
+          expect(text.x + text.font.measureText(text.text).width, role).toBeLessThan(rect[2]);
+          if (index === 0) {
+            expect(text.x, role).toBeLessThan((rect[0] + rect[2]) / 2);
+            expect(text.y + metrics.descent, role).toBeLessThan((rect[1] + rect[3]) / 2);
+          } else {
+            expect(text.x, role).toBeGreaterThan((rect[0] + rect[2]) / 2);
+            expect(text.y + metrics.ascent, role).toBeGreaterThan((rect[1] + rect[3]) / 2);
+          }
+        }
       }
     });
     for (const channel of ['web', 'native'] as const)
       it(`${channel}: paints the observed alternatives through the real box text painter`, () => {
         const paint = paintBoxText(entry, channel);
         expect(paint.result.drawings.every((d) => d.type === 'box')).toBe(true);
+        assertTextIdentity(paint.texts, entry.id.includes('format'), (text) => text.font);
         if (entry.id.includes('layout')) {
           expect(paint.result.drawings).toHaveLength(5);
           assertLayout(paint, entry);
@@ -196,17 +252,12 @@ for (const entry of entries)
               .map((r: { literal: string }) => r.literal),
           );
           expect(paint.texts.filter((t) => t.text === 'AA BB CC DD EE FF')).toHaveLength(2);
-          const [top, bottom] = paint.texts.filter((t) => t.text === 'EDGE');
+          const [top, bottom] = layoutSlots
+            .slice(3)
+            .map(({ rect }) => paint.texts.find((text) => text.text === 'EDGE' && inRect(text, rect))!);
           expect([top.align, top.baseline, bottom.align, bottom.baseline]).toEqual(['left', 'top', 'right', 'bottom']);
         } else {
           expect(paint.result.drawings).toHaveLength(4);
-          expect(paint.texts.map((t) => t.text)).toEqual(Array(4).fill('FORMAT'));
-          expect(paint.texts.map((t) => t.font)).toEqual([
-            '18px monospace',
-            'bold 18px monospace',
-            'italic 18px monospace',
-            'italic bold 18px monospace',
-          ]);
           assertFormatting(paint, entry);
         }
       });

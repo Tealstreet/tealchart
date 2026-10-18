@@ -43,7 +43,7 @@ export async function nativeBoxTextPixels(entry: BoxTextEntry): Promise<PixelFra
   ctx.drawImage(image, 0, 0);
   return { width: image.width, height: image.height, pixels: ctx.getImageData(0, 0, image.width, image.height).data };
 }
-export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
+export function boxTextScene(entry: BoxTextEntry) {
   const replay = executeBoxText(entry),
     { regions } = entry;
   const { width, height } = regions.originalDimensionsPx;
@@ -51,23 +51,6 @@ export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
   const calibration = json(regions.manualInspection.path).axisCalibration;
   const [left, top, , bottom] = paneInteriorBoundsPx;
   const valueScale = (calibration.yZeroPx - calibration.yHundredPx) / 100;
-  const canvas = createCanvas(width, height),
-    active = canvas.getContext('2d');
-  const texts: TextPaint[] = [];
-  const ctx = new Proxy(active, {
-    get(target, property) {
-      if (property === 'fillText')
-        return (text: string, x: number, y: number) => {
-          texts.push({ text, x, y, font: target.font, align: target.textAlign, baseline: target.textBaseline });
-          target.fillText(text, x, y);
-        };
-      const value = Reflect.get(target, property, target);
-      return typeof value === 'function' ? value.bind(target) : value;
-    },
-    set(target, property, value) {
-      return Reflect.set(target, property, value, target);
-    },
-  }) as unknown as CanvasContext;
   const pane: ComputedPane = {
     id: 'study',
     type: 'indicator',
@@ -91,6 +74,43 @@ export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
     priceMax: pane.yMax,
   };
   const drawings = replay.result.drawings.map((d) => ({ ...d, scriptId: 'captured' }));
+  return {
+    ...replay,
+    width,
+    height,
+    left,
+    scale,
+    valueScale,
+    calibration,
+    pane,
+    margins,
+    viewport,
+    drawings,
+    paneWidthPx,
+  };
+}
+export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
+  const scene = boxTextScene(entry);
+  const { width, height, left, scale, valueScale, calibration, pane, margins, viewport, drawings, paneWidthPx, bars } =
+    scene;
+  const { startTime } = viewport;
+  const canvas = createCanvas(width, height),
+    active = canvas.getContext('2d');
+  const texts: TextPaint[] = [];
+  const ctx = new Proxy(active, {
+    get(target, property) {
+      if (property === 'fillText')
+        return (text: string, x: number, y: number) => {
+          texts.push({ text, x, y, font: target.font, align: target.textAlign, baseline: target.textBaseline });
+          target.fillText(text, x, y);
+        };
+      const value = Reflect.get(target, property, target);
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+    set(target, property, value) {
+      return Reflect.set(target, property, value, target);
+    },
+  }) as unknown as CanvasContext;
   if (channel === 'web')
     new TealScriptDrawingRenderer({
       ctx,
@@ -107,5 +127,5 @@ export function paintBoxText(entry: BoxTextEntry, channel: 'web' | 'native') {
       },
     }).render(partitionTealScriptDrawings(drawings), bars, viewport, pane);
   else paintNativeTealScriptDrawings({ ctx, drawings, bars, viewport, panes: [pane], width: paneWidthPx, margins });
-  return { ...replay, texts, width, height, pixels: active.getImageData(0, 0, width, height).data };
+  return { ...scene, texts, width, height, pixels: active.getImageData(0, 0, width, height).data };
 }
