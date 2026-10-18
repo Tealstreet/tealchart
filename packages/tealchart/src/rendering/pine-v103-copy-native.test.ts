@@ -52,6 +52,15 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       const copies = texts.filter(t => t.text === 'COPY' && t.y > 50 && t.y < 70);
       expect(copies).toHaveLength(2); expect(copies.every(t => t.color === blue)).toBe(true);
       expect(texts.find(t => t.text === 'SRC' && t.y > 50 && t.y < 70)?.color).toBe(red);
+      const boxTexts = texts.filter(t => t.y > 50 && t.y < 70);
+      expect(boxTexts).toHaveLength(3);
+      for (const [offset, text, color] of [[-90, 'SRC', red], [-60, 'COPY', blue], [-30, 'COPY', blue]] as const) {
+        const centerX = x(offset) + (x(offset + 15) - x(offset)) / 2;
+        const atBox = boxTexts.filter(t => t.x > x(offset) && t.x < x(offset + 15));
+        expect(atBox, `box at ${offset}`).toEqual([
+          expect.objectContaining({ text, color, x: centerX, y: 60 }),
+        ]);
+      }
       expect(paints.find(p => p.kind === 'stroke' && p.points[0]?.x === x(-90) && p.points[0]?.y === 50)).toMatchObject({ color: blue, width: 4, dash: [6, 4] });
       expect(paints.some(p => p.kind === 'fill' && p.color === '#00BCD4' && p.points[0]?.x === x(-90))).toBe(true);
     });
@@ -70,6 +79,26 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       expect(copies).toHaveLength(2); expect(copies.every(t => t.color === '#FFFFFF')).toBe(true);
       expect(copies[0].font).toBe(copies[1].font);
       expect(paints.some(p => p.kind === 'fill' && p.color === red && p.points.some(p => p.y > 75))).toBe(true);
+      const labelBodies = paths.filter(p => p.points.some(point => point.y > 75));
+      const labelTexts = texts.filter(t => t.y > 70);
+      expect(labelBodies).toHaveLength(3);
+      expect(labelTexts).toHaveLength(3);
+      for (const [offset, shape, color, text] of [
+        [-82, 'rect', red, 'SRC'],
+        [-52, 'roundRect', blue, 'COPY'],
+        [-22, 'roundRect', blue, 'COPY'],
+      ] as const) {
+        const atLabel = labelBodies.filter(body => body.points[0].x < x(offset) && body.points[1].x > x(offset));
+        expect(atLabel, `label body at ${offset}`).toEqual([expect.objectContaining({ shape, color })]);
+        const points = atLabel[0].points;
+        expect(points[0].x + (points[1].x - points[0].x) / 2).toBe(x(offset));
+        expect(points[0].y + (points[2].y - points[0].y) / 2).toBe(88);
+        const atText = labelTexts.filter(t => t.x > x(offset - 15) && t.x < x(offset + 15));
+        expect(atText, `label text at ${offset}`).toEqual([
+          expect.objectContaining({ text, color: '#FFFFFF' }),
+        ]);
+        if (text === 'COPY') expect(atText[0]).toMatchObject({ x: x(offset), y: 88 });
+      }
     });
   }
 });
