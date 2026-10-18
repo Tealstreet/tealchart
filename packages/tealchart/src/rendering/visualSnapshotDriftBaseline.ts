@@ -349,17 +349,6 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
     height: 300,
   },
   {
-    name: 'line-stepline',
-    platform: 'linux',
-    differingPixels: 0,
-    totalPixels: 120000,
-    differingPixelRatio: 0,
-    channelTolerance: 16,
-    maxDifferingPixelRatio: 0.08,
-    width: 400,
-    height: 300,
-  },
-  {
     name: 'plotarrow-mixed',
     platform: 'linux',
     differingPixels: 0,

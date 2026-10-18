@@ -284,3 +284,20 @@ the third box is seven bars wide, while the first two are eight. Independent
 web/native local raster references bind those same identities across host fonts.
 The combined three-source score is 957 exact cells, 465 blanks and 99 excluded
 index cells. No other v11 source earns credit here; native raster metrics stay held.
+
+V104 step-turn v5/v6 at oracle `735d1b50` supplies two independent PNG/CSV/certificate
+joins for phase8 and phase24: native plain stepline turns occur at X(t)-b/2.
+Both web and native painters use that half-slot boundary and retain the sample
+centre after the vertical. `steplinebr` and `stepline_diamond` remain unchanged.
+The locks score 640 exact primary values/blanks, with 128 translated absolute-index
+context cells excluded from numeric credit. Each source replays an original
+modulo32-aligned exported prefix through its own retained anchor, preserving eight
+original predecessors and giving startup/developing/other rows zero credit.
+Raw PNG samples preserve their encoded channels without ICC conversion.
+The former centre-turn synthetic PNG is replaced by an independent exact
+half-slot raster constructor; the drift tolerance is not increased.
+
+Composition controls combine those unchanged replay inputs with local dashed/dotted,
+width1/4/8 and scalar/series-colour plot overrides through all six painter routes.
+They bind each own half-slot turn to its width-scaled pattern and painted ink,
+without native dashed-stepline, absolute period or phase/reset credit.
