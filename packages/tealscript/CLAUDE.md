@@ -1,3 +1,15 @@
+V103 noncoincident-point v5/v6 captures distinguish all five applied point setters
+and copied fields after later point mutation through their own original PNG/maps.
+Keep 958 exact numeric/blank cells separate from 66 translated absolute-index cells.
+The transient label time-mode getter is numeric only; final pixels cannot observe
+the intermediate mode flag, native frame/font metadata or historical holds.
+
+V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
+right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
+Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
+these eight frozen alternatives. V5 layout stopped before Save and earns zero credit;
+resolved fonts, exact glyph metrics, frame identity and universal composition stay held.
+
 V102 coordinate v5/v6 locks use the unchanged sources and eight original closed
 predecessors. V6 additionally witnesses the box time-mode getter delta0. Final point fields and +40 translated controls agree with the
 original PNG/map; numeric getters do not certify pixels or intermediate modes.
@@ -6,6 +18,11 @@ v5 box xloc, transient label time mode and universal raster metrics remain held.
 V6 box-text locks preserve whole-recipe equivalence and the vertical subfacet;
 wrap, horizontal alignment and isolated bold/italic effects remain held. All four
 v6 table appearance cases remain held despite the exact3/2/1/2 numeric vector.
+
+V103 polyline-label v5/v6 and isolated table-over-line/polyline/box/label/linefill v6 plates match
+the existing drawing order. Replay uses an original phase-aligned exported prefix,
+keeps eight predecessors, and translates absolute indices as excluded context.
+Original PNG/maps witness each pair; other versions/groups and raster metrics stay held.
 
 V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
 Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
@@ -4889,3 +4906,22 @@ V102 v6 style locks score exact non-index primary cells with CSV offsets project
 from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
 The three exact omitted-formatting sources refuse with CE10165; they earn no
 runtime or appearance credit. Explicit formatting calls retain their old locks.
+
+V103 visible-gap v5/v6 uses retained-anchor A-31..A, not the older phase-zero
+selection. Raw OFFSET1 exports are screen-aligned; sample destination minus
+offset without changing the unchanged source or feeding native outputs. Replay
+context translates absolute indices by a multiple of eight and earns no startup
+or absolute-index credit. Step-position uncertainty remains held independently
+of exact numeric STEP values and supported gap/area/offset/dashed appearances.
+
+V103 table replay retains the rotated A-31..A block and eight original predecessors.
+Build getters supply one event plus31 blanks; absolute indices remain observed
+exclusions when replaying an original phase-aligned suffix without a fake prefix.
+
+V103 v5 extension/stroke and v5/v6 retained-linefill locks replay original phase-aligned
+suffixes through each one-time closed build. Absolute indices remain excluded.
+COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay held.
+
+V103 styles replay seven unchanged sources at their own closed retained anchors.
+Exact non-index cells include intentional blanks; one build event is not32 getter
+observations. PNG-bound topology remains separate from plotarrow sign-direction held.
