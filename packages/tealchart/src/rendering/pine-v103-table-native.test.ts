@@ -6,7 +6,7 @@ import { countClass, nativeTablePixels, paintTable } from '../test/v103TablePain
 import type { PixelClass } from '../test/v103TablePaint';
 
 for (const entry of entries) describe(`${entry.id} original PNG table certificate`, () => {
-  it('re-derives registered windows and native colored controls, without glyph/font/frame-identity credit', async () => {
+  it('re-derives registered windows and native colored controls, without font/frame-identity credit', async () => {
     const { regions } = entry;
     const image = await nativeTablePixels(entry);
     expect([image.width, image.height]).toEqual([regions.originalDimensionsPx.width, regions.originalDimensionsPx.height]);
@@ -53,6 +53,13 @@ for (const entry of entries) describe(`${entry.id} original PNG table certificat
         expect(count(positive, 'aqua')).toBeGreaterThan(0);
         expect(finding.occlusion).toContain('legend');
       } else {
+        if (facet.facetId.endsWith(':final-relocation')) {
+          expect(finding.observation).toContain('B is readable at bottom-right');
+          expect(finding.observation).toContain('Independent C remains bottom-left');
+          expect(finding.visibleTextByRegion.map((text: { literal: string }) => text.literal)).toEqual(['B TOP', 'B LEFT / B RIGHT']);
+          expect(finding.actualSubjectRegionsPx[0][0]).toBeGreaterThan(x0 + (x1 - x0) / 2);
+          expect(finding.actualControlRegionsPx[0][2]).toBeLessThan(x0 + (x1 - x0) / 2);
+        }
         for (const rect of [...finding.actualSubjectRegionsPx, ...finding.actualControlRegionsPx]) {
           expect(count(rect, 'yellow')).toBeGreaterThan(0);
           expect(count(rect, 'blue')).toBeGreaterThan(0);
@@ -80,16 +87,24 @@ for (const entry of entries) describe(`${entry.id} original PNG table certificat
         expect(result.drawings.filter(d => d.type === 'table')).toHaveLength(2);
         expect(fills).toHaveLength(2);
         expect(frames).toHaveLength(2);
-        expect(texts).toEqual(['B TOP', 'B LEFT', 'B RIGHT', 'C TOP', 'C LEFT', 'C RIGHT']);
-        const b = fills.find(r => r.x > width / 2)!;
-        const c = fills.find(r => r.x < width / 2)!;
-        expect(b, 'B retained bottom-right').toBeDefined();
-        expect(c, 'independent C bottom-left control').toBeDefined();
+        expect(texts.map(text => text.text)).toEqual(['B TOP', 'B LEFT', 'B RIGHT', 'C TOP', 'C LEFT', 'C RIGHT']);
+        const bodyFor = (identity: 'B' | 'C') => {
+          const sentinels = texts.filter(text => text.text.startsWith(`${identity} `));
+          expect(sentinels.map(text => text.text)).toEqual([`${identity} TOP`, `${identity} LEFT`, `${identity} RIGHT`]);
+          const bodies = fills.filter(body => sentinels.every(text => text.x > body.x && text.x < body.x + body.w
+            && text.y > body.y && text.y < body.y + body.h));
+          expect(bodies, `${identity} sentinels belong to one painted body`).toHaveLength(1);
+          return bodies[0]!;
+        };
+        const b = bodyFor('B');
+        const c = bodyFor('C');
+        expect(b.x, 'B identity retained bottom-right').toBeGreaterThan(width / 2);
+        expect(c.x + c.w, 'C identity remains wholly bottom-left').toBeLessThan(width / 2);
         expect(b.y).toBeGreaterThan(height * 0.7);
         expect(c.y).toBe(b.y);
         expect([b.w, b.h, b.color]).toEqual([c.w, c.h, c.color]);
         expect(count([0, 0, width * 0.25, height * 0.22], 'red'), 'old red table absent without losing controls').toBe(0);
-        for (const body of [b, c]) {
+        for (const [identity, body] of [['B', b], ['C', c]] as const) {
           const frame = frames.find(r => r.x === body.x && r.y === body.y)!;
           expect(frame).toMatchObject({ w: body.w, h: body.h });
           const borders = rects.filter(r => r.kind === 'stroke' && r.width === 2 && r.x >= body.x && r.x < body.x + body.w);
@@ -97,6 +112,15 @@ for (const entry of entries) describe(`${entry.id} original PNG table certificat
           expect(borders[0]).toMatchObject({ x: body.x, y: body.y, w: body.w });
           expect(borders[1].y).toBe(body.y + borders[0].h);
           expect(borders[2].y).toBe(borders[1].y);
+          for (const [index, suffix] of ['TOP', 'LEFT', 'RIGHT'].entries()) {
+            const text = texts.find(text => text.text === `${identity} ${suffix}`)!;
+            const cell = borders[index];
+            expect(text.bounds[0], `${text.text} ink stays in its painted cell`).toBeGreaterThan(cell.x);
+            expect(text.bounds[1]).toBeGreaterThan(cell.y);
+            expect(text.bounds[2]).toBeLessThan(cell.x + cell.w);
+            expect(text.bounds[3]).toBeLessThan(cell.y + cell.h);
+            expect(count(text.bounds, 'black'), `${text.text} has visible contrasting glyph ink`).toBeGreaterThan(0);
+          }
           expect(count([body.x + 3, body.y + 3, body.x + body.w - 3, body.y + body.h - 3], 'yellow')).toBeGreaterThan(0);
           expect(count([body.x - 2, body.y - 2, body.x + body.w + 2, body.y + body.h + 2], 'blue')).toBeGreaterThan(0);
           const mid = body.x + body.w / 2;

@@ -8,14 +8,15 @@ import { TealScriptDrawingRenderer } from '../rendering/TealScriptDrawingRendere
 import { partitionTealScriptDrawings } from '../rendering/TealScriptDrawingPartition';
 import { DEFAULT_RENDER_OPTIONS } from '../types';
 
-export type PixelClass = 'red' | 'blue' | 'yellow' | 'aqua';
+export type PixelClass = 'red' | 'blue' | 'yellow' | 'aqua' | 'black';
 export function colored(rgba: Uint8ClampedArray, offset: number, color: PixelClass) {
   const [r, g, b, a] = rgba.slice(offset, offset + 4);
   if (a < 128) return false;
   if (color === 'red') return r > 170 && r > g * 1.5 && r > b * 1.3;
   if (color === 'blue') return b > 170 && b > r * 1.5 && b > g * 1.2;
   if (color === 'yellow') return r > 170 && g > 150 && b < 120;
-  return g > 120 && b > 120 && r < 100;
+  if (color === 'aqua') return g > 120 && b > 120 && r < 100;
+  return r < 100 && g < 100 && b < 100;
 }
 export function countClass(pixels: Uint8ClampedArray, width: number, rect: number[], color: PixelClass) {
   let count = 0;
@@ -35,7 +36,7 @@ export function paintTable(entry: TableEntry, channel: 'web' | 'native') {
   const canvas = createCanvas(width, height);
   const active = canvas.getContext('2d');
   const rects: { kind: 'fill' | 'stroke'; color: string; width: number; x: number; y: number; w: number; h: number }[] = [];
-  const texts: string[] = [];
+  const texts: { text: string; x: number; y: number; bounds: number[] }[] = [];
   const ctx = new Proxy(active, {
     get(target, property) {
       if (property === 'fillRect' || property === 'strokeRect') return (x: number, y: number, w: number, h: number) => {
@@ -43,7 +44,12 @@ export function paintTable(entry: TableEntry, channel: 'web' | 'native') {
         rects.push({ kind: fill ? 'fill' : 'stroke', color: String(fill ? target.fillStyle : target.strokeStyle), width: target.lineWidth, x, y, w, h });
         target[property](x, y, w, h);
       };
-      if (property === 'fillText') return (text: string, x: number, y: number) => { texts.push(text); target.fillText(text, x, y); };
+      if (property === 'fillText') return (text: string, x: number, y: number) => {
+        const ink = target.measureText(text);
+        texts.push({ text, x, y, bounds: [x - ink.actualBoundingBoxLeft, y - ink.actualBoundingBoxAscent,
+          x + ink.actualBoundingBoxRight, y + ink.actualBoundingBoxDescent] });
+        target.fillText(text, x, y);
+      };
       const value = Reflect.get(target, property, target);
       return typeof value === 'function' ? value.bind(target) : value;
     },
