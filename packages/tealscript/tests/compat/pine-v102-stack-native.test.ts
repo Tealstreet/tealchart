@@ -1,10 +1,9 @@
+import { lock } from '../fixtures/v102Fixture';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { executeStack, stackCapture, stackEntries, stackJson, stackRaw, stackRevision, stackTable } from '../fixtures/v102Stack';
 
 const hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
-const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8'));
 describe('v102 stacking: four returned sources and bounded native observations', () => {
   it('binds the append-only pin and every immutable request/native/derived dependency', () => {
     expect(lock.revision).toBe(stackRevision);

@@ -1,8 +1,11 @@
-V102 coordinate v5 locks use the unchanged source and eight original closed
-predecessors. Final point fields and +40 translated controls agree with the
+V102 coordinate v5/v6 locks use the unchanged sources and eight original closed
+predecessors. V6 additionally witnesses the box time-mode getter delta0. Final point fields and +40 translated controls agree with the
 original PNG/map; numeric getters do not certify pixels or intermediate modes.
 Coincident box/label initial coordinates leave ignored setters indistinguishable;
 v5 box xloc, transient label time mode and universal raster metrics remain held.
+V6 box-text locks preserve whole-recipe equivalence and the vertical subfacet;
+wrap, horizontal alignment and isolated bold/italic effects remain held. All four
+v6 table appearance cases remain held despite the exact3/2/1/2 numeric vector.
 
 V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
 Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
@@ -4881,3 +4884,8 @@ Own-origin Boolean history encodes -1 in v5 and 0 in v6; fixnan is missing
 until own1. Both literal-seed7 random calls independently match all128 native
 strings from own0 exactly. These bounded fresh-prefix locks do not recover the
 old v95 suffix frontier, unseeded/changing-seed behavior or realtime updates.
+
+V102 v6 style locks score exact non-index primary cells with CSV offsets projected
+from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
+The three exact omitted-formatting sources refuse with CE10165; they earn no
+runtime or appearance credit. Explicit formatting calls retain their old locks.
