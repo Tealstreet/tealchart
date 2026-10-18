@@ -3380,6 +3380,10 @@ A successful table.new call automatically deletes older tables at its position,
 including empty replacements. Replaced references become missing for na checks
 and their cells stop consuming the table allocation budget. Capacity validation
 preserves the previous table if the requested replacement itself is invalid.
+Native v102 v5 table relocation replaces the occupied destination table,
+invalidating its aliases and releasing its cells through the existing deletion path.
+Use effective pane plus position, preserve the moving table itself, and keep
+visual placement/appearance held when the native PNG has no readable table.
 Identical table.merge_cells ranges remain idempotent as captured in native v3
 scalar-07; this does not settle arbitrary overlapping ranges.
 

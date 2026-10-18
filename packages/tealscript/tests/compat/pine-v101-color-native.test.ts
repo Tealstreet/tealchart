@@ -32,7 +32,7 @@ const codes = source.plots.filter(p => p.sourcePlotOrdinal >= 3);
 
 describe('v101 constant-color witness: native direct RGB/NEW90 equals one', () => {
   it('binds every dependency, exact frozen source and source-owned original cells', () => {
-    expect(lock.revision).toBe('db3199acaebfa812fae9066c983d14bc54fc831e');
+    expect(lock.revision).toBe('3f3169de35577ad5041a994f39cac471fcffd8fa');
     const integrityPath = capture + 'artifact-integrity-v1.json';
     const artifacts = json<{ artifacts: Proof[] }>(integrityPath).artifacts;
     expect(artifacts).toHaveLength(107);
