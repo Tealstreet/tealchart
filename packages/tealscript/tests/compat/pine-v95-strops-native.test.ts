@@ -23,7 +23,7 @@ interface Observation {
   sourceSha256: string; requestSource: string; executed: Proof; nativeCompileSuccess: boolean;
   privateScriptId: string; privateVersion: string; nativeStudyInstanceId: null; editorMarkerArrays: null;
 }
-const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
+const revision = 'c1d406006d80e2edc4d16d2952b503bf9dff0dc4';
 const base = 'v95/captures/v95/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString();

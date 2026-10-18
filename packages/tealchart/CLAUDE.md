@@ -1656,3 +1656,9 @@ fixed duration there.
 Native v102's extend.both arrow-both line keeps heads on the supplied endpoints.
 The shared painter extends its shaft independently. Other captured lines/boxes
 cover the four extension modes; universal arrow metrics remain held.
+
+V103 visible-gap PNG/map locks bind finite linebr/areabr holes and marker offset
+displacement in v5/v6, plus the v6 dashed-with-break stroke class. Keep the
+continuous line/area controls separate. CSV screen alignment does not shift the
+engine source arrays; painters apply offset once. Exact step turn placement,
+native raster metrics and dash periods remain held despite readable lanes.

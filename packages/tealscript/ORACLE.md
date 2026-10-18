@@ -111,3 +111,25 @@ The loader rejects manifest revision drift; review and update its literal togeth
 with the manifest when adopting new captures.
 The web/native recorders share `tealchart/src/test/v102Paint.ts`; family adapters
 retain the recorded fields used by their finite paint contracts.
+
+## V103 visible gap captures
+
+The v5/v6 visible-gap locks use oracle `c1d406006d80e2edc4d16d2952b503bf9dff0dc4`
+and the original RESPONSE-v103-v6 sources, CSVs, PNGs and derived maps. The
+unique retained closed anchor selects A-31..A, with eight original predecessors.
+Replay uses only actual main-chart OHLCV/time, starting at an observed phase-zero
+row so the translated local index preserves modulo eight. Both absolute-index
+channels are context projections and receive no native parity credit. There is
+no own-origin startup claim, invented timestamp continuity or native-output seed.
+
+OFFSET1's raw CSV is SCREEN_ALIGNED, independently distinguished from the
+refuted SOURCE_SERIES prediction. Numeric comparison samples the engine source
+at destination minus offset; the real plot painters separately apply the offset.
+The original PNGs/map support four finite line/area holes and four marker pairs
+per version, plus the v6 dashed-stroke class on three nonmissing falling segments.
+Web legacy, indicator-pane and unified painters and both native projection routes
+consume the replayed outputs. They assert topology, displacement and stroke class,
+not exact native raster or dash-period equality. The two step-half-bar facets
+remain UNDECIDED because the preregistered uncertainty cannot separate the models.
+Developing, other closed and replay-context rows receive zero primary credit;
+native frame, font, DPI, zoom, unreturned slots and historical holds remain held.
