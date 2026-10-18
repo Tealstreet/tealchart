@@ -1,5 +1,5 @@
 import { lock } from './v102Fixture';
 
 export { executeEntry, json, lock, raw, table, text } from './v102Fixture';
-export const revision = '287ebfc19e282245be4df55fc6a9d0f5b876d817';
+export const revision = '1faebe5ac656714b4177c9acbdb5e1e411e8e9b2';
 if (lock.revision !== revision) throw new Error(`V103 fixture revision mismatch: expected ${revision}, received ${lock.revision}`);

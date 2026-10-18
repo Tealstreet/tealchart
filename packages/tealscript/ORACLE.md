@@ -236,3 +236,19 @@ footprints and arrow tips, plot value lanes and CSV phase rows, and individual
 square/glyph anchors. Palette-preserving real-painter swaps go RED, including
 plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
 order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+
+## V104 v5 box wrapping and horizontal alignment
+
+The [v104 return](https://github.com/Tealstreet/tealscript-oracle/blob/1faebe5ac656714b4177c9acbdb5e1e411e8e9b2/v104/captures/v104/RESPONSE-v104-v2.md)
+binds two unchanged sources, each with one retained closed build and its fixed
+A−31..A block. Exact replay scores 638 cells, including 310 intentional blanks;
+66 absolute-index cells remain observed exclusions. Three span getters per source
+are one build event each, not 32 independent getter observations.
+
+Original PNG and region-map bindings retain complete wrapped/nowrap captions and
+three position-bound EDGE alternatives. Real web/native painters additionally
+match an independent local canvas reference at the frozen source coordinates.
+Local line choices use active font measurement, tested with system and DejaVu-only
+fonts. Exact native glyph/DPI/padding metrics, hidden frame identity, unrelated v104
+slots and universal composition remain held with zero added credit.

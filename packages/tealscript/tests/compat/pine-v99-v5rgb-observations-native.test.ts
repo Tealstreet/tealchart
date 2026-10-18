@@ -10,7 +10,7 @@ interface NativeSource {
   selectedDataRowOrdinals: number[]; primaryUniquePlotCells: number;
   rows: { allRequestedRawCells: Pointer[]; nativeContextCells: Pointer[] }[];
 }
-const revision = '287ebfc19e282245be4df55fc6a9d0f5b876d817';
+const revision = '1faebe5ac656714b4177c9acbdb5e1e411e8e9b2';
 const base = 'v99/captures/v99/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString('utf8');

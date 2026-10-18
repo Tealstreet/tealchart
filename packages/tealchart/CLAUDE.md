@@ -1717,3 +1717,7 @@ native PNGs. Both polyline versions witness open endpoint chevrons. Relative
 plotarrow heights are supported; direction and universal raster metrics stay held.
 Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
 style/position swaps without claiming hidden creation order for disjoint subjects.
+
+V104 v5 wrap/alignment locks bind each of three boxes to its source position,
+complete caption and independently painted local raster. Whole-word wrap counts
+use active font measurements; native glyph metrics remain unobserved.
