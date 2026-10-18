@@ -1,3 +1,5 @@
+import { copy6, copyRevision } from '../fixtures/v103Copy';
+import type { CopyPointer } from '../fixtures/v103Copy';
 import { executeEntry, raw as bytes, text, json, lock, table as csv, revision } from '../fixtures/v102Fixture';
 import type { BoxDrawingOutput, LabelDrawingOutput, LineDrawingOutput } from '../../src/runtime/drawings/types';
 
@@ -293,5 +295,130 @@ describe('v102 finite drawing-copy appearance and independent getters', () => {
       expect(regions.derivedCalibration.primaryXPx.every(p => !p.visible)).toBe(true);
       expect(assessment.cases.every(c => c.versionBoundary.includes('no v5/v6 transfer'))).toBe(true);
     });
+  });
+});
+
+// This new execution does not promote the separate v102 v6 entry stop above.
+describe('v103 v6 native copy execution, finite getters and original PNG', () => {
+  const e = copy6;
+  const { block, csv: data, rowSet, regions } = e;
+  const primary = rowSet.selectedPrimaryClosedRowOrdinals;
+  const at = (title: string, ordinal: number) => e.replay.result.plots.find(p => p.title === title)!.values[ordinal - e.startRowOrdinal];
+  const pointer = (p: CopyPointer) => {
+    expect(p.csvSha256).toBe(block.csv.sha256);
+    expect(data.headers[p.columnOrdinal - 1]).toBe(p.headerRaw);
+    expect(data.rows[p.rowOrdinal - 1][p.columnOrdinal - 1]).toBe(p.valueRaw);
+  };
+  it('binds the independent v103 pin, unchanged executed source, compiler bodies and complete v19 integrity', () => {
+    expect(lock.revision).toBe(copyRevision);
+    for (const proof of json<{ artifacts: Proof[] }>('v103/captures/v103/artifact-integrity-v19.json').artifacts) assertBound(proof);
+    assertBound(lock.files.find(f => f.path === 'v103/captures/v103/artifact-integrity-v19.json')!);
+    expect(hash(Buffer.from(e.source))).toBe(block.sourceSha256);
+    expect(e.source).toBe(text(e.folder + 'attempt-v1/executed-v1.pine'));
+    expect([regions.sourceSha256, regions.nativePrivateId, regions.nativePrivateVersion])
+      .toEqual([block.sourceSha256, block.nativePrivateId, '1.0']);
+    const compiler = json<{ transports: { success: boolean; originalBody: Proof }[]; sourceEntryStop: null }>(e.folder + 'compiler-diagnostics-v1.json');
+    expect(compiler.sourceEntryStop).toBeNull(); expect(compiler.transports).toHaveLength(2);
+    for (const transport of compiler.transports) { expect(transport.success).toBe(true); assertBound(transport.originalBody); }
+    expect(e.replay.result.errors).toEqual([]);
+  });
+  it('independently derives A-31..A and eight predecessors, rejecting the developing row', () => {
+    const closed = data.rows.flatMap((r, i) => data.raw(i + 1, 'CHART_CONFIRMED') === '1'
+      && Number(r[0]) * 1000 + 120_000 <= Date.parse(rowSet.nativeExportUtc) ? [i + 1] : []);
+    expect(closed).toEqual(rowSet.independentlyClosedRowOrdinals); expect(closed).toHaveLength(338);
+    expect(data.rows).toHaveLength(339);
+    const anchors = closed.filter(n => data.raw(n, 'VISUAL_ANCHOR_TIME') === data.raw(n, 'INPUT_TIME')
+      && data.raw(n, 'VISUAL_ANCHOR_INDEX') === data.raw(n, 'INPUT_INDEX'));
+    expect(anchors).toEqual([338]);
+    expect(primary).toEqual(Array.from({ length: 32 }, (_, i) => anchors[0] - 31 + i));
+    expect(rowSet.originalClosedPredecessorRowOrdinals).toEqual(Array.from({ length: 8 }, (_, i) => anchors[0] - 39 + i));
+    expect(block.rows.map(r => r.rowOrdinal)).toEqual(primary);
+    expect(block.predecessors.map(r => r.rowOrdinal)).toEqual(rowSet.originalClosedPredecessorRowOrdinals);
+    expect([block.primaryCertificate, rowSet.primaryInputCertificateValid, rowSet.runtimeFailed]).toEqual([true, true, false]);
+    const mask = csv(block.closureMask.path), col = mask.headers.indexOf('independently_closed');
+    expect(col).toBeGreaterThanOrEqual(0);
+    for (const [i, r] of data.rows.entries()) {
+      expect(mask.rows[i][col]).toBe(closed.includes(i + 1) ? '1' : '0');
+      expect(data.raw(i + 1, 'INPUT_TIME')).toBe(String(Number(r[0]) * 1000));
+      if (i) {
+        expect(Number(r[0])).toBeGreaterThan(Number(data.rows[i - 1][0]));
+        expect(Number(data.raw(i + 1, 'INPUT_INDEX'))).toBe(Number(data.raw(i, 'INPUT_INDEX')) + 1);
+      }
+    }
+    for (const row of [...block.rows, ...block.predecessors]) for (const p of Object.values(row.cells)) pointer(p);
+    expect(e.startRowOrdinal).toBe(7);
+    expect(Number(data.raw(e.startRowOrdinal, 'INPUT_INDEX'))).toBe(24400);
+    expect(data.raw(339, 'CHART_CONFIRMED')).toBe('0');
+  });
+  for (const title of block.ownedTitles.filter(t => !['INPUT_INDEX', 'VISUAL_ANCHOR_INDEX'].includes(t))) {
+    it(`v103 exact native strings and binary64: ${title}`, () => {
+      for (const n of primary) {
+        const expected = data.raw(n, title), actual = at(title, n);
+        if (expected === '') expect(actual, `${n}:${title}`).toBeNull();
+        else { expect(actual, `${n}:${title}`).toBe(Number(expected)); expect(String(actual)).toBe(expected); expect(bits(actual as number)).toBe(bits(Number(expected))); }
+      }
+    });
+  }
+  it('scores 288 direct cells; 64 index cells are translation/presence context, not native origin credit', () => {
+    expect(block.ownedTitles).toHaveLength(11); expect(block.primaryScoringCells).toBe(352);
+    expect(primary.length * (block.ownedTitles.length - 2)).toBe(288);
+    const shift = Number(data.raw(e.startRowOrdinal, 'INPUT_INDEX'));
+    for (const n of primary) {
+      expect(at('INPUT_INDEX', n)).toBe(Number(data.raw(n, 'INPUT_INDEX')) - shift);
+      const native = data.raw(n, 'VISUAL_ANCHOR_INDEX');
+      if (native === '') expect(at('VISUAL_ANCHOR_INDEX', n)).toBeNull();
+      else expect(at('VISUAL_ANCHOR_INDEX', n)).toBe(Number(native) - shift);
+    }
+    for (const [title, value] of [['LINE_SOURCE_X', -90], ['LINE_COPY_X', -60], ['LABEL_COPY_EXACT', 1]] as const) {
+      expect(primary.filter(n => data.raw(n, title) !== '')).toEqual([338]);
+      expect(primary.slice(0, 31).map(n => at(title, n))).toEqual(Array(31).fill(null));
+      expect(at(title, 338)).toBe(value);
+    }
+  });
+  it('binds three frozen visual models to original PNG, source/session, CSV anchor and readable subject/control windows', () => {
+    for (const proof of [regions.originalPng, regions.originalCsv, regions.sourceObservation, regions.sessionReceipt, regions.manualInspection]) assertBound(proof);
+    expect(regions.originalCsv).toEqual(block.csv);
+    const png = bytes(regions.originalPng.path);
+    expect(png.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1706, 993]);
+    for (const p of Object.values(regions.retainedAnchor)) { pointer(p); expect(p.rowOrdinal).toBe(338); }
+    const [a, b] = regions.registration.xTicks;
+    for (const tick of [a, b]) { pointer(tick.time); pointer(tick.ownIndex); }
+    const scale = (b.xPx - a.xPx) / (Number(b.ownIndex.valueRaw) - Number(a.ownIndex.valueRaw));
+    expect(scale).toBe(6); expect(scale).toBe(regions.registration.pixelsPerOwnBar);
+    expect(b.xPx + (Number(data.raw(338, 'INPUT_INDEX')) - Number(b.ownIndex.valueRaw)) * scale).toBe(regions.registration.anchorXPx);
+    expect(regions.facets.map(f => f.frozenModels)).toEqual([
+      { A: 'independent copy retains blue6 dashed y85', B: 'copy snapshots mutated source red2 dotted y65' },
+      { A: 'copy retains yellow/blue solid and blue COPY', B: 'copy inherits mutated source recipe' },
+      { A: 'blue center COPY body', B: 'copy inherits red square source recipe' },
+    ]);
+    const matrix = json<{ sourceCases: { sourceId: string; sourceSha256: string; visualFacets: { facetId: string; modelA: string; modelB: string; pixelWindow: unknown }[] }[] }>('v103/CASE-MATRIX-v1.json');
+    const spec = matrix.sourceCases.find(c => c.sourceId === e.id)!;
+    const manifest = json<{ sources: { sourceId: string; sha256: string; visualFacets: unknown[]; plots: { title: string; sourcePlotOrdinal: number }[] }[] }>('v103/bundle-manifest-v1.json').sources.find(c => c.sourceId === e.id)!;
+    expect([spec.sourceSha256, manifest.sha256]).toEqual([block.sourceSha256, block.sourceSha256]);
+    expect(spec.visualFacets).toEqual(manifest.visualFacets);
+    expect(manifest.plots.map(p => p.title)).toEqual(e.replay.result.plots.map(p => p.title));
+    expect(manifest.plots.map(p => p.sourcePlotOrdinal)).toEqual(Array.from({ length: 11 }, (_, i) => i));
+    for (const [i, f] of regions.facets.entries()) {
+      expect(f.frozenModels).toEqual({ A: spec.visualFacets[i].modelA, B: spec.visualFacets[i].modelB });
+      expect(f.frozenPixelWindow).toEqual(spec.visualFacets[i].pixelWindow);
+    }
+    const assessment = json<{ facets: { facetId: string; outcome: string; visualMap: Proof }[]; held: string }>(e.folder + 'facet-assessment-v1.json');
+    expect(assessment.facets).toHaveLength(3);
+    for (const [i, f] of regions.facets.entries()) {
+      expect([f.outcome, f.verdict, f.modelAVerdict, f.modelBVerdict]).toEqual(['SUPPORTED_A', 'SUPPORTED', 'SUPPORTED', 'REFUTED']);
+      expect(f.notObservedCauses).toEqual([]);
+      expect(assessment.facets[i]).toMatchObject({ facetId: f.facetId, outcome: 'SUPPORTED_A' }); assertBound(assessment.facets[i].visualMap);
+      expect(f.manualFinding.actualSubjectRegionsPx).toHaveLength(1); expect(f.manualFinding.actualControlRegionsPx).toHaveLength(2);
+      for (const [x1, y1, x2, y2] of [f.derivedWindowPx, ...f.manualFinding.actualSubjectRegionsPx, ...f.manualFinding.actualControlRegionsPx]) {
+        expect(x1).toBeGreaterThanOrEqual(0); expect(y1).toBeGreaterThanOrEqual(0);
+        expect(x2).toBeLessThanOrEqual(1706); expect(y2).toBeLessThanOrEqual(993);
+        expect(x2).toBeGreaterThan(x1); expect(y2).toBeGreaterThan(y1);
+      }
+    }
+    expect(assessment.held).toBe('All absent/clipped/overlapping/unreadable controls; native frame/font/DPI/zoom; historical holds and universal raster/API claims');
+    expect(regions.nativeFrameId).toBeNull();
+    expect(regions.exposedAppearanceMetadata).toMatchObject({ zoom: null, dpi: null, resolvedFont: null });
+    expect(regions.registration.uncertaintyPx).toEqual({ x: 2, y: 3, strokeEdge: 1 });
   });
 });

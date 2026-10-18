@@ -1691,3 +1691,20 @@ an empty old band and deleted right fill with positive parent/left-fill controls
 Each retained fill boundary follows both parent segments and connects their
 corresponding left/right endpoints; equal bounds alone cannot witness a filled band.
 Frozen windows and original PNG hashes bound these classes; raster metrics stay held.
+
+Drawing paint traces retain text alignment and baseline at fillText, including
+save/restore. Copy appearance checks bind those fields to each object's column;
+text coordinates alone do not establish centered ink.
+Copy and constructor captions compare their recorded font recipes at their own
+positions. Line dashes bind each copy to its constructor and distinguish long
+dashes from the dotted source without certifying native font sizes or dash periods.
+
+V103 copy appearance locks compare full source/copy/constructor RGBA patches at
+independent anchors through web and native painters in one viewport. Local
+copy/control equality includes executing opacity and body extents; native
+absolute glyph, alpha, DPI and raster metrics remain held.
+
+V103 copy/control equality also requires an independent primitive appearance
+reference for each object, including body, border and caption ink. Original PNG
+component colors, areas and bounds bind the native facts; local normal-font
+metrics instantiate those recipes without claiming native font/DPI equivalence.
