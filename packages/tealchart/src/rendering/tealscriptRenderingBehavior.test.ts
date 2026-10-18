@@ -1047,11 +1047,11 @@ describe('TealScript rendering behavior matrix', () => {
     const tableText = ctx.calls.findIndex((call) => call.op === 'fillText' && call.text === 'ATR');
 
     expect(firstFill).toBeGreaterThanOrEqual(0);
-    expect(polyFill).toBeGreaterThan(firstFill);
-    expect(lineStroke).toBeGreaterThan(polyFill);
-    // Native v93 witnesses the box covering the line. Polyline precedence
-    // remains the existing engine policy, without native parity credit here.
-    expect(boxFill).toBeGreaterThan(lineStroke);
+    expect(lineStroke).toBeGreaterThan(firstFill);
+    expect(polyFill).toBeGreaterThan(lineStroke);
+    // Native v102 pins line < polyline < box. The remaining ordering assertions
+    // retain engine policy without additional native intersection credit.
+    expect(boxFill).toBeGreaterThan(polyFill);
     expect(labelText).toBeGreaterThan(boxFill);
     expect(tableText).toBeGreaterThan(labelText);
     expect(ctx.calls).toContainEqual(expect.objectContaining({ op: 'setLineDash', segments: [2, 4] }));

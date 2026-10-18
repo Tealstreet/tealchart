@@ -4,6 +4,8 @@ passes must keep each script together, and native plots share the same ordering.
 Background stripes remain beneath fills. Shared drawing paint puts lines after
 linefills and boxes after lines, then labels. Captured tables cover intersected
 fill only: table-vs-label/box/line/linefill intersections remain unobserved.
+V102 additionally pins polylines above lines and below boxes in both creation
+directions. Polyline-label and actual table intersections stay UNDECIDED.
 Screenshot/region bindings certify these bounded precedence checks, not pixel parity.
 
 Pine Style controls on web retain coded plots separately from display overrides.
@@ -285,7 +287,7 @@ Tables share all nine anchors, auto and percent sizing, merged-cell skipping
 and cell/frame paints with web. Polylines share straight/curved paths,
 closure/fill, point coordinate resolution and arrowhead/stroke styles.
 Linefills resolve their two handles inside the routed pane and paint beneath
-boxes, polylines, lines, labels and tables, in web order. The inherited
+lines, polylines, boxes, labels and tables, in web order. The inherited
 trace-undetermined label clamping/table sizing rules remain in
 `pineVisualNormalizationRegister.ts`; native support does not resolve those TV
 raster questions. `nativeDrawingWorklet.test.ts` exercises serialized mobile

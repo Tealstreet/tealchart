@@ -75,3 +75,24 @@ Other2m closed rows/developing snapshots and prior holds retain their exclusions
 The [complete v99 return](https://github.com/Tealstreet/tealscript-oracle/blob/bc913c6cc44b40611f84fabc362975df0aa73574/v99/captures/v99/RESPONSE-v99-v6.md) resolves batch77's frozen cast discriminator: ARRAY_EQ_SELF is0 on all64 rows, refuting copied-token identity and supporting stable-initializer folding for the captured sources. Direct literal `color(na)` pairs and unchanged root cast/var aliases compare true. Array/history missing values still compare false at runtime, including to themselves. Equality follows the source's actual previous branch, preserving ordinary DF equality and missing-branch refusal; no row-parity outcome is fitted. The emitter folds only proven stable root cast initializers and pure direct casts in root execution, guarding reassignments, user calls and local/function shadowing. It does not make NaN reflexively equal globally.
 
 V6 literal-cast and explicit typed-color NA origins publish0/0/0/100 independently of NA1, including the newly captured typed-color NA getters. A private engine marker preserves that provenance through arrays/history; it is not a proposed native payload and runtime equality still rejects it as missing. Gradient failures, fixnan warmup and explicit missing nz replacements retain their prior missing-result transport and blank getters. This leaves missingness, NZ fallback, gradients and v5 behavior separate. Every non-index cell of the complete v98 cast and both v99 cast sources compares exactly. Absolute indices and uncaptured own-origin initialization remain excluded. Replay uses captured context rows and rebases phase/index; v99 startup guards stay local on the unscored first bar so an absent prior array is not fabricated. This establishes the bounded cast behavior, not universal optimizer/storage identity or historical-hold closure. The older observation-only countermodels remain frozen v98 evidence; they are not production adapters.
+
+
+V102 stacking consumes only the four returned v5/v6 false/true sources at
+`8606897ec777cca3ad18e755b7c0d99a486d777e`. Their 384 primary source plot cells
+each include 32 absolute-index context cells, which earn no replay parity credit.
+Original-source replay checks the ten supported numeric/blank properties and
+chart time exactly (352 comparisons each), from a phase-zero closed suffix
+through its unique anchor; no source/index rewrite, output seed or invented prefix.
+The 21 unreturned sources and other/developing rows receive no score.
+
+Native PNG/region bindings pin polyline above line and box above polyline in both
+creation directions, and the false/true default/explicit plot-fill controls.
+Shared web/native drawing paint follows those witnessed pairs. Polyline-label
+and actual table intersections remain UNDECIDED, with explicit hold assertions;
+no generic group completeness, raster, font or hidden-identity parity is claimed.
+
+## V102 copy appearance v5
+
+The [v102 v6 return](https://github.com/Tealstreet/tealscript-oracle/blob/db3199acaebfa812fae9066c983d14bc54fc831e/v102/captures/v102/RESPONSE-v102-v6.md) binds the unchanged v5 copy source to its original CSV, PNG and derived region map. Its earliest 32 certified closed rows yield 448 exact numeric/blank property comparisons plus 32 timestamp controls; the 32 absolute-index cells and all other/developing rows receive no primary parity credit. Replay retains the exact source, aligns the four eight-phase cycles, and excludes its local following context bar. The per-bar construction/deletion body has no carried prefix state; relative getters do not establish the omitted own-origin prefix.
+
+A separate replay through the source-owned closed visual anchor locks the emitted line/box/label copy fields to the three PNG-bound appearance verdicts. Copies retain the original blue thick dashed line, yellow solid-blue-border box with independent blue text, and blue centered large label with independent white text while the source objects change. These are finite appearance-output contracts, not exact raster, font, DPI, native token or cross-session identity claims. The original PNG/region uncertainty and all historical holds remain intact. The [v14 return](https://github.com/Tealstreet/tealscript-oracle/blob/6fba2a043155ecfd52bec4fbffb9f03144066ab3/v102/captures/v102/RESPONSE-v102-v14.md) consumed the v6 copy slot at native source entry before Save/Add: no CSV or rendering PNG exists. All14 numeric properties and all three appearance cases remain UNDECIDED/HELD, with zero transferred credit. Partial editor text is not executed source or rendering evidence. The engine already matches this bounded v5 evidence; the new tests are mutation-proven regression locks.

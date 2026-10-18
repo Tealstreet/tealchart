@@ -39,10 +39,11 @@ describe('ledger13 existing documented contracts', () => {
       'first = table.new(position.top_right, 1, 1)\nsecond = table.new(position.top_left, 1, 1)\n',
       'first, second',
     ],
+    // Independent pairs keep this collection-order control separate from same-pair replacement.
     [
       489,
       'linefill',
-      'a = line.new(0, 1, 1, 1)\nb = line.new(0, 0, 1, 0)\nfirst = linefill.new(a, b, color.red)\nsecond = linefill.new(a, b, color.blue)\n',
+      'a = line.new(0, 1, 1, 1)\nb = line.new(0, 0, 1, 0)\nfirst = linefill.new(a, b, color.red)\nc = line.new(0, 3, 1, 3)\nd = line.new(0, 2, 1, 2)\nsecond = linefill.new(c, d, color.blue)\n',
       'first, second',
     ],
   ] as const)

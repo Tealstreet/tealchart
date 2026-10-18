@@ -1,3 +1,9 @@
+V102 coordinate v5 locks use the unchanged source and eight original closed
+predecessors. Final point fields and +40 translated controls agree with the
+original PNG/map; numeric getters do not certify pixels or intermediate modes.
+Coincident box/label initial coordinates leave ignored setters indistinguishable;
+v5 box xloc, transient label time mode and universal raster metrics remain held.
+
 V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
 Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
 literal-cast/root-initializer comparisons fold separately from runtime missing
@@ -68,6 +74,8 @@ Missing/nonpositive volume and original unanchored startup remain separate holds
 V93 linefill locks cover same-execution counts/parent identities and endpoint tracking.
 PNG-bound output fields cover red/blue and source-line deletion; no native color
 getter, recalculation identity, all-object deletion, or pixel parity is claimed.
+
+V102 same-pair linefill references target a shared live fill, so deleting the earlier reference removes the replacement. Native internal handle/token equality remains unobserved. Vertical `line.get_price` returns `na`; nonvertical getters extrapolate independently of `extend` and read current endpoints. Original-source CSV locks exclude absolute indices and developing rows. PNG-bound live tracking and post-delete blue-fill absence are separate from the held pre-delete appearance and line-price visual facets. Mobile worker regeneration belongs to batch composition after these engine edits.
 
 V92 footprint captures keep all requested facets (a)-(e) NOT OBSERVED/HELD with
 zero facet credit. Closed-row regressions cover pointwise presence/getters and
@@ -3374,6 +3382,10 @@ A successful table.new call automatically deletes older tables at its position,
 including empty replacements. Replaced references become missing for na checks
 and their cells stop consuming the table allocation budget. Capacity validation
 preserves the previous table if the requested replacement itself is invalid.
+Native v102 v5 table relocation replaces the occupied destination table,
+invalidating its aliases and releasing its cells through the existing deletion path.
+Use effective pane plus position, preserve the moving table itself, and keep
+visual placement/appearance held when the native PNG has no readable table.
 Identical table.merge_cells ranges remain idempotent as captured in native v3
 scalar-07; this does not settle arbitrary overlapping ranges.
 

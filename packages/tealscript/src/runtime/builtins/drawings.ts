@@ -701,24 +701,25 @@ export function registerLineFillBuiltins(builtins: BuiltinRegistry, runtime: Dra
       return Number.NaN;
     }
 
-    const id = `linefill_${callId}_${ctx.bar_index}`;
-    const duplicateIds = ctx
-      .getDrawings()
-      .filter((existing): existing is LineFillDrawingOutput => (
-        existing.type === 'linefill' && isSameLineFillPair(existing, line1, line2)
-      ))
-      .map((existing) => existing.id);
-    for (const duplicateId of duplicateIds) {
-      ctx.deleteDrawing(duplicateId);
+    const existing = ctx.getDrawings().find((drawing): drawing is LineFillDrawingOutput => (
+      drawing.type === 'linefill' && isSameLineFillPair(drawing, line1, line2)
+    ));
+    const color = runtime.toNullableColor(orderedCallArg(args, namedArgs, lineFillNewArgs, 2));
+    if (existing) {
+      existing.line1 = line1;
+      existing.line2 = line2;
+      existing.color = color;
+      return existing.id;
     }
 
+    const id = `linefill_${callId}_${ctx.bar_index}`;
     ctx.addDrawing({
       id,
       type: 'linefill',
       barIndex: ctx.bar_index,
       line1,
       line2,
-      color: runtime.toNullableColor(orderedCallArg(args, namedArgs, lineFillNewArgs, 2)),
+      color,
     });
 
     return id;
@@ -1345,6 +1346,11 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
   builtins.set('table.set_position', (args, namedArgs, ctx) => {
     withTable(callArg(args, namedArgs, 0, 'table_id'), ctx, (table) => {
       table.position = runtime.toStringValue(callArg(args, namedArgs, 1, 'position', undefined, ['table_id']));
+      for (const previous of ctx.getDrawings()) {
+        if (previous.type === 'table' && previous.id !== table.id && sameTableLocation(ctx, previous, table)) {
+          ctx.deleteDrawing(previous.id);
+        }
+      }
     });
     return undefined;
   });
