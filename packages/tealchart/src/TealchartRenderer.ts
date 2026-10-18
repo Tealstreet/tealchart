@@ -3179,7 +3179,7 @@ export class TealchartRenderer {
           ctx.textBaseline = 'middle';
           ctx.fillText(plot.char ?? '●', x, y);
         } else {
-          const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
+          const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'plotarrowup' : 'plotarrowdown') : shape || 'circle';
           this.drawShape(x, y, markerShape, markerSize);
         }
       }

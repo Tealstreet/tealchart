@@ -24,7 +24,7 @@ export interface StylePaint { kind: 'stroke' | 'fill' | 'text'; color: string; c
 export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
   const { result, bars } = executeStyle(entry);
   const plots = result.plots.map(p => ({ ...p, scriptId: 's' })) as PlotOutput[];
-  const arrow = entry.id.includes('plotarrow');
+  const arrow = result.plots.some(plot => plot.type === 'plotarrow');
   const height = arrow ? 1000 : 100;
   const min = arrow ? Math.min(...bars.map(b => b.low)) - 100 : 0;
   const max = arrow ? Math.max(...bars.map(b => b.high)) + 100 : 100;

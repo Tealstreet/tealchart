@@ -425,10 +425,15 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
           expect(near((low + high) / 2, anchor + (negative ? -1 : 1) * (high - low + 4))).toBe(true);
           const phase = Number(e.csv.raw(row, 'INPUT_INDEX')) % 32, size = phase === 0 ? 12 : phase === 8 ? 16 : 24;
           const x = trace.x(row), y = (low + high) / 2;
-          // Local triangle/size controls admit both directions; native sign-direction remains held.
+          // V104 supplies the shafted glyph; this older plate still admits both directions.
           expectAlternativeFootprint(matches[0], [1, -1].map<StylePaint>(direction => ({ ...matches[0], kind: 'fill', commands: [
-            { op: 'M', x, y: y - direction * size / 2 }, { op: 'L', x: x + size / 2, y: y + direction * size / 2 },
-            { op: 'L', x: x - size / 2, y: y + direction * size / 2 }, { op: 'Z', x: 0, y: 0 },
+            { op: 'M', x, y: y - direction * size / 2 },
+            { op: 'L', x: x + size * 0.2, y: y - direction * size * 0.3 },
+            { op: 'L', x: x + size * 0.1, y: y - direction * size * 0.3 },
+            { op: 'L', x: x + size * 0.1, y: y + direction * size / 2 },
+            { op: 'L', x: x - size * 0.1, y: y + direction * size / 2 },
+            { op: 'L', x: x - size * 0.1, y: y - direction * size * 0.3 },
+            { op: 'L', x: x - size * 0.2, y: y - direction * size * 0.3 }, { op: 'Z', x: 0, y: 0 },
           ] })));
 
         }

@@ -12,6 +12,22 @@ export function getPlotMarkerGeometry(x: number, y: number, shape: string, size:
   const half = size / 2;
   const geometry: PlotMarkerGeometry = { polygons: [], lines: [], boxes: [], strokeWidth: 2 };
   switch (shape) {
+    case 'plotarrowup':
+    case 'plotarrowdown': {
+      const direction = shape === 'plotarrowup' ? 1 : -1;
+      const headY = y - direction * size * 0.3;
+      const tailY = y + direction * half;
+      geometry.polygons.push([
+        [x, y - direction * half],
+        [x + size * 0.2, headY],
+        [x + size * 0.1, headY],
+        [x + size * 0.1, tailY],
+        [x - size * 0.1, tailY],
+        [x - size * 0.1, headY],
+        [x - size * 0.2, headY],
+      ]);
+      break;
+    }
     case 'square':
       geometry.boxes.push({ x: x - half, y: y - half, width: size, height: size });
       break;

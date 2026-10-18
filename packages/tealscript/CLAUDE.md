@@ -4925,3 +4925,8 @@ COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay 
 V103 styles replay seven unchanged sources at their own closed retained anchors.
 Exact non-index cells include intentional blanks; one build event is not32 getter
 observations. PNG-bound topology remains separate from plotarrow sign-direction held.
+
+V104 arrow-direction replay scores 288 unchanged numeric/blank cells plus64
+SOURCE_BOOL plotchar exports in the own retained closed block. Absolute-index
+translations are64 observed exclusions; earlier blocks and the developing row
+earn no primary credit. The separate v103 sign-direction hold stays unchanged.

@@ -1717,3 +1717,8 @@ native PNGs. Both polyline versions witness open endpoint chevrons. Relative
 plotarrow heights are supported; direction and universal raster metrics stay held.
 Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
 style/position swaps without claiming hidden creation order for disjoint subjects.
+
+V104 v6 plotarrow sign-direction is bound to its own closed CSV signs and PNG
+tip narrowing, shoulders and shaft through web and native painters. Use separate
+plotarrow glyphs; plotshape arrows retain their existing marker geometry. The older
+v103 sign-direction facet and universal native raster metrics remain held.
