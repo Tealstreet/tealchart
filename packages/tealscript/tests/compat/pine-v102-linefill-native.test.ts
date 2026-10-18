@@ -5,14 +5,14 @@ import { executeLinefill, linefillCapture, linefillEntries, linefillJson, linefi
 
 const hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 const lock = JSON.parse(readFileSync(new URL('../../oracle-fixtures.json', import.meta.url), 'utf8'));
-describe('v102 linefill: three returned sources and bounded native observations', () => {
+describe('v102 linefill: six returned sources and bounded native observations', () => {
   it('binds the append-only pin and every immutable request/native/derived dependency', () => {
     expect(lock.revision).toBe(linefillRevision);
-    expect(linefillEntries.map((entry: { id: string }) => entry.id).sort()).toEqual(['v102-line-price-v5', 'v102-line-price-vertical-v5', 'v102-linefill-sloped-v5']);
-    const path = linefillCapture + 'artifact-integrity-v12.json';
+    expect(linefillEntries.map((entry: { id: string }) => entry.id).sort()).toEqual(['v102-line-price-v5', 'v102-line-price-v6', 'v102-line-price-vertical-v5', 'v102-line-price-vertical-v6', 'v102-linefill-sloped-v5', 'v102-linefill-sloped-v6']);
+    const path = linefillCapture + 'artifact-integrity-v26.json';
     const artifacts = linefillJson(path).artifacts;
-    expect(artifacts).toHaveLength(565);
-    expect(linefillJson(linefillCapture + 'facet-capabilities-v12.json').held).toEqual([
+    expect(artifacts).toHaveLength(1048);
+    expect(linefillJson(linefillCapture + 'facet-capabilities-v26.json').held).toEqual([
       'Every absent/clipped/nonintersecting/already obscured/precision-ambiguous visual property',
       'Unexposed independent editor arrays, native frame/feed/execution IDs, full private inventory and actual backend calculation count',
       'Historical preservation/semantic holds and universal color/identity/raster/font contracts',
@@ -137,6 +137,17 @@ describe('v102 linefill and price: numeric alternatives, bounded appearance and 
         ? ['LIVE_TRACKING_ORANGE_BAND', 'NO_VISIBLE_BLUE_G_AFTER_OLD_DELETE'] : []);
       expect(region.exposedAppearanceMetadata).toMatchObject({ zoom: null, dpi: null, resolvedFont: null });
       expect(region.nativeFrameId).toBeNull();
+      if (entry.id === 'v102-line-price-v6') {
+        const correction = linefillJson(linefillCapture + entry.id + '/visual-timing-correction-v1.json');
+        const trigger = linefillJson(correction.nativeExportTrigger.path);
+        const session = linefillJson(correction.nativeSession.path);
+        expect(correction.nativeAdditionalActions).toBe(0);
+        expect(correction.unchangedStatus).toContain('visually UNDECIDED');
+        const clockBar = (utc: string) => Math.floor(Date.parse(utc) / 120000);
+        expect([clockBar(session.screenshotAtUtc), clockBar(session.screenshotCompletedAtUtc)]).toEqual([clockBar(trigger.startedAtUtc), clockBar(trigger.startedAtUtc)]);
+        expect(session.nativeFrameAsOfClock).toBeNull();
+      }
+
     });
   }
 });

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-export const stackRevision = '6fba2a043155ecfd52bec4fbffb9f03144066ab3';
+export const stackRevision = 'f47a4e34ce33441ad37add124d9572119826138d';
 export const stackCapture = 'v102/captures/v102/';
 const oracleRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../oracle-probes');
 interface FixtureProof { path: string; bytes: number; sha256: string }

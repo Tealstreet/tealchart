@@ -23,7 +23,7 @@ interface Facet { caseId: string; verdict: string; supportedCandidate?: string; 
   subproperties?: { property: string; verdict: string; cause?: string; regionsPx?: number[][] }[];
   visibleLinesByRegion?: Record<string, string[]> }
 const root = 'v102/captures/v102/';
-const revision = '6fba2a043155ecfd52bec4fbffb9f03144066ab3';
+const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const read = (path: string) => bytes(path).toString('utf8');
 const json = <T>(path: string): T => JSON.parse(read(path)) as T;
@@ -38,8 +38,8 @@ function verify(p: Proof) {
   expect(bytes(p.path).length, p.path).toBe(p.bytes);
   expect(hash(bytes(p.path)), p.path).toBe(p.sha256);
 }
-const entries = ['box-text-layout', 'table-relocation'].map((family) => {
-  const id = `v102-${family}-v5`, folder = root + id + '/';
+const entries = ['box-text-layout', 'table-relocation'].flatMap((family) => [5, 6].map((version) => {
+  const id = `v102-${family}-v${version}`, folder = root + id + '/';
   const block = json<Block>(folder + 'native-cell-block-v1.json');
   const numeric = json<Numeric>(folder + 'numeric-results-v1.json');
   const [headers, ...rows] = csv(block.csv.path), [maskHeaders, ...mask] = csv(block.closureMask.path);
@@ -57,27 +57,28 @@ const entries = ['box-text-layout', 'table-relocation'].map((family) => {
   const output = (title: string) => result.plots.find((p) => p.title === title)!.values;
   const map = json<{ originalPng: Proof; originalCsv: Proof; sourceSha256: string; facets: Facet[];
     visualAnchor: Record<string, Pointer>; derivedCalibration: { coordinateUncertaintyPx: { x: number; y: number } } }>(folder + 'derived-region-map-v1.json');
-  return { id, family, folder, block, numeric, headers, rows, maskHeaders, mask, cell, firstIndex, start, origin, source, compiled, result, output, map };
-});
+  return { id, family, version, folder, block, numeric, headers, rows, maskHeaders, mask, cell, firstIndex, start, origin, source, compiled, result, output, map };
+}));
 
 describe('v102 native text and table finite contracts', () => {
-  it('binds family captures, original PNGs, region maps and canonical v9 integrity/validation', () => {
+  it('binds family captures, original PNGs, region maps and canonical v26 integrity/validation', () => {
     expect(lock.revision).toBe(revision);
     const common = ['v102/REQUEST-v102-v1.md', 'v102/CASE-MATRIX-v1.json', 'v102/bundle-manifest-v1.json',
-      ...['RESPONSE-v102-v9.md', 'attempt-inventory-v9.json', 'numeric-controls-v9.json', 'facet-capabilities-v9.json',
-        'numeric-contracts-v1.json', 'artifact-integrity-v9.json', 'validation-result-v9.json'].map((p) => root + p)];
-    const integrity = json<{ artifacts: Proof[] }>(root + 'artifact-integrity-v9.json');
+      ...['RESPONSE-v102-v26.md', 'attempt-inventory-v26.json', 'numeric-controls-v26.json', 'facet-capabilities-v26.json',
+        'numeric-contracts-v1.json', 'artifact-integrity-v26.json', 'validation-result-v26.json'].map((p) => root + p)];
+    const integrity = json<{ artifacts: Proof[] }>(root + 'artifact-integrity-v26.json');
     const pinned = lock.files.filter((p) => common.includes(p.path) || entries.some((s) => p.path.startsWith(s.folder))
       || entries.some((s) => p.path === `v102/sources/${s.id}.pine`));
-    expect(pinned).toHaveLength(88);
+    const relevant = (p: Proof) => common.includes(p.path) || entries.some(e => p.path.startsWith(e.folder) || p.path === `v102/sources/${e.id}.pine`);
+    expect(pinned.map(p => p.path).sort()).toEqual([...integrity.artifacts.filter(relevant).map(p => p.path), root + 'artifact-integrity-v26.json'].sort());
     for (const p of pinned) {
       verify(p);
-      if (p.path !== root + 'artifact-integrity-v9.json') expect(integrity.artifacts.find((f) => f.path === p.path), p.path).toEqual(p);
+      if (p.path !== root + 'artifact-integrity-v26.json') expect(integrity.artifacts.find((f) => f.path === p.path), p.path).toEqual(p);
     }
-    expect(json(root + 'validation-result-v9.json')).toMatchObject({ status: 'PASS' });
-    const inventory = json<{ attempts: { source: { sourceId: string } }[] }>(root + 'attempt-inventory-v9.json');
+    expect(json(root + 'validation-result-v26.json')).toMatchObject({ status: 'PASS' });
+    const inventory = json<{ attempts: { source: { sourceId: string } }[] }>(root + 'attempt-inventory-v26.json');
     for (const family of ['box-text-layout', 'table-relocation']) {
-      expect(inventory.attempts.some((a) => a.source.sourceId === `v102-${family}-v6`)).toBe(false);
+      expect(inventory.attempts.some((a) => a.source.sourceId === `v102-${family}-v6`)).toBe(true);
     }
 
   });
@@ -116,7 +117,7 @@ describe('v102 native text and table finite contracts', () => {
     });
 
     it('re-derives earliest32 phase0 closed rows before the unique anchor, retaining all other raw observations as excluded', () => {
-      expect(s.rows).toHaveLength(s.family === 'box-text-layout' ? 312 : 313);
+      expect(s.rows).toHaveLength(s.version === 6 ? s.family === 'box-text-layout' ? 329 : 330 : s.family === 'box-text-layout' ? 312 : 313);
       const eligible = s.rows.map((_, i) => {
         const m = Object.fromEntries(s.maskHeaders.map((h, j) => [h, s.mask[i][j]]));
         const closed = Number(s.cell(i, 'time')) * 1000 + 120000 <= Date.parse(m.export_utc) && s.cell(i, 'CHART_CONFIRMED') === '1';
@@ -169,6 +170,16 @@ describe('v102 native text and table finite contracts', () => {
           expect(r.expectedRaw ?? '').toBe(s.cell(r.rowOrdinal - 1, property.title));
         }
       }
+      if (s.version === 6 && s.family === 'table-relocation') {
+        const observation = json<{ facets: { excludedDevelopingRow?: { targets: Record<string, Pointer>; status: string; primaryScoringCredit: number } }[] }>(s.folder + 'derived-region-map-v1.json').facets[0].excludedDevelopingRow!;
+        expect(observation).toMatchObject({ status: 'OBSERVED / EXCLUDED', primaryScoringCredit: 0 });
+        for (const [title, raw] of Object.entries({ CREATED_DELTA: '2', COLLISION_DELTA: '1', OLD_TABLE_NA: '1', FINAL_DELTA: '0', CHART_CONFIRMED: '0' })) {
+          const target = observation.targets[title];
+          expect(target.valueRaw).toBe(raw);
+          expect(s.cell(target.rowOrdinal - 1, title)).toBe(raw);
+          expect(s.block.primaryRowOrdinals).not.toContain(target.rowOrdinal);
+        }
+      }
       if (s.family === 'table-relocation') {
         const alternative = s.numeric.numericAlternatives[0];
         expect(alternative).toMatchObject({ id: 'table-collision-lifecycle', supportedVariantIds: ['INVALIDATE_REPLACE'], observation: 'ONLY_REGISTERED_VARIANT' });
@@ -188,14 +199,20 @@ describe('v102 native text and table finite contracts', () => {
         expect(facet.supportedCandidate ?? null).toBeNull();
         expect({ verdict: facet.verdict, parityCredit: 0 }).toEqual({ verdict: 'UNDECIDED', parityCredit: 0 });
       }
-      const assessment = json<{ cases: { caseId: string; visual: { verdict: string; cause: string | null } | null }[] }>(s.folder + 'facet-assessment-v2.json');
+      const assessment = json<{ cases: { caseId: string; visual: { verdict: string; cause: string | null } | null }[] }>(s.folder + (s.version === 6 ? 'facet-assessment-v3.json' : 'facet-assessment-v2.json'));
       for (const f of s.map.facets) {
         const visual = assessment.cases.find((c) => c.caseId === f.caseId)!.visual;
         if (visual) expect(visual.verdict).toBe(f.verdict);
         else {
-          expect(f.caseId).toBe('v102-table-relocation-v5:same-position-retain-vs-replace');
+          expect(f.caseId).toBe(`v102-table-relocation-v${s.version}:same-position-retain-vs-replace`);
           expect(f.verdict).toBe('UNDECIDED');
         }
+      }
+      if (s.version === 6 && s.family === 'box-text-layout') {
+        const formatting = json<{ cases: { caseId: string; verdict: string; visual: { verdict: string; artifact: Proof; cause: string } }[] }>(s.folder + 'facet-assessment-v3.json').cases.find(c => c.caseId.endsWith(':bold-italic-explicit'))!;
+        expect(formatting).toMatchObject({ verdict: 'UNDECIDED', visual: { verdict: 'UNDECIDED' } });
+        verify(formatting.visual.artifact);
+        expect(formatting.visual.cause).toContain('no independent same-word none-format control');
       }
       if (s.family === 'box-text-layout') {
         expect(s.map.facets[2].subproperties!.map((p) => [p.property, p.verdict])).toEqual([
@@ -214,6 +231,7 @@ describe('v102 native text and table finite contracts', () => {
         expect(wide).toHaveLength(2);
         for (const b of wide) expect(b).toMatchObject({ text: 'ALPHA BETA\nOMEGA', textColor: '#2962FF', textSize: 'normal',
           textHalign: 'left', textValign: 'top', textWrap: 'auto', textFontFamily: 'monospace' });
+        if (s.version === 6) expect(wide[0].textFormatting).toBe(wide[1].textFormatting);
       });
       it('encodes the separately witnessed vertical top/bottom subfacet without horizontal/wrap credit', () => {
         const boxes = s.result.drawings.filter((d): d is BoxDrawingOutput => d.type === 'box' && d.top === 45);

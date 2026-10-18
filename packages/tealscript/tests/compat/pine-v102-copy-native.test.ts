@@ -37,7 +37,7 @@ interface RegionMap {
     regions: { role: string; originalPngRectPx: number[]; visible: string }[]; visibleTextLiterals?: string[] }[];
   exposedAppearanceMetadata: { zoom: null; dpi: null; resolvedFont: null }; preservedUnobserved: string[]; scope: string;
 }
-const revision = '6fba2a043155ecfd52bec4fbffb9f03144066ab3';
+const revision = 'f47a4e34ce33441ad37add124d9572119826138d';
 const round = 'v102/captures/v102/';
 const bytes = (path: string) => readFileSync(new URL(`../../oracle-probes/${path}`, import.meta.url));
 const text = (path: string) => bytes(path).toString('utf8');

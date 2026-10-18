@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 
-export const linefillRevision = '6fba2a043155ecfd52bec4fbffb9f03144066ab3';
+export const linefillRevision = 'f47a4e34ce33441ad37add124d9572119826138d';
 export const linefillCapture = 'v102/captures/v102/';
 const oracleRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../oracle-probes');
 interface FixtureProof { path: string; bytes: number; sha256: string }
@@ -27,7 +27,7 @@ export function linefillTable(path: string) {
 export interface LinefillEntry {
   id: string; report: any; block: any; csv: ReturnType<typeof linefillTable>; sourcePath: string; regions: any;
 }
-export const linefillEntries: LinefillEntry[] = linefillJson(linefillCapture + 'numeric-controls-v12.json').sources.filter((entry: { sourceId: string }) => /^v102-(linefill-sloped|line-price|line-price-vertical)-v[56]$/.test(entry.sourceId)).map((entry: { sourceId: string; report: { path: string } }) => {
+export const linefillEntries: LinefillEntry[] = linefillJson(linefillCapture + 'numeric-controls-v26.json').sources.filter((entry: { sourceId: string }) => /^v102-(linefill-sloped|line-price|line-price-vertical)-v[56]$/.test(entry.sourceId)).map((entry: { sourceId: string; report: { path: string } }) => {
   const report = linefillJson(entry.report.path);
   const block = linefillJson(report.nativeBlock.path);
   return { id: entry.sourceId, report, block, csv: linefillTable(block.csv.path),
