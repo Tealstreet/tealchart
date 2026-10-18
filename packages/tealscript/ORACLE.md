@@ -136,7 +136,7 @@ contains one event and 31 intentional blanks. These counts include time, phase,
 scale and presence controls; they are not new numeric drawing getter observations.
 
 The shared v102 loader and independent v103 revision literal use the append-only
-287ebfc1 pin. The v13 captures first landed at 1aad8cc2.
+811a4d79 pin. The v13 captures first landed at 1aad8cc2.
 V102's occluded polyline-label/table cases retain their original
 UNDECIDED verdicts. V5 table precedence, polyline arrow
 topology, universal raster/font metrics and historical context holds receive no
@@ -236,3 +236,19 @@ footprints and arrow tips, plot value lanes and CSV phase rows, and individual
 square/glyph anchors. Palette-preserving real-painter swaps go RED, including
 plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
 order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+## V104 finite glyph advance
+
+The v6 glyph slot at oracle `811a4d79` supplies one retained four-label plate:
+monospace I/W body widths agree within the preregistered edge uncertainty, while
+default-font I/W controls differ. Original source, CSV, PNG and map bindings are
+separate from the local font recipes exercised through web and native painters.
+The append-only fixture union includes v4 integrity dependencies; other v104
+slots receive no scoring credit from the glyph lock.
+
+The fixed A-31..A block contains 384 native cells. Unchanged-source replay
+compares 351 numeric/blank cells exactly, including 186 intentional blanks;
+33 absolute-index cells remain translated context. Four position getters each
+contribute one build observation, not 32 repeated getters. Original predecessors
+remain context; developing rows are excluded. Native font identity, fractional
+advances, padding, DPI/frame/zoom and universal raster claims stay held.
