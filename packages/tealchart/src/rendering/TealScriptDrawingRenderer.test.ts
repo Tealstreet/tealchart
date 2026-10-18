@@ -282,8 +282,9 @@ describe('TealScriptDrawingRenderer', () => {
 
     expect(events).toContain('moveTo:0,110');
     expect(events).toContain('lineTo:120,10');
-    expect(events.filter((event) => event === 'fill')).toHaveLength(2);
-    expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
+    expect(events.filter((event) => event === 'stroke')).toHaveLength(3);
+    expect(events.filter((event) => event === 'fill')).toHaveLength(0);
+    expect(events.filter((event) => event === 'closePath')).toHaveLength(0);
     expect(events.filter((event) => event === 'setLineDash:').length).toBeGreaterThanOrEqual(3);
   });
 
@@ -437,9 +438,9 @@ describe('TealScriptDrawingRenderer', () => {
     expect(events).toContain('moveTo:0,110');
     expect(events).toContain('lineTo:60,60');
     expect(events).toContain('lineTo:120,90');
-    expect(events.filter((event) => event === 'stroke')).toHaveLength(1);
-    expect(events.filter((event) => event === 'fill')).toHaveLength(2);
-    expect(events.filter((event) => event === 'closePath')).toHaveLength(2);
+    expect(events.filter((event) => event === 'stroke')).toHaveLength(3);
+    expect(events.filter((event) => event === 'fill')).toHaveLength(0);
+    expect(events.filter((event) => event === 'closePath')).toHaveLength(0);
   });
 
   it('passes curved polyline segments through every supplied point', () => {
@@ -1141,13 +1142,13 @@ describe('Documented merged table dimensions', () => {
 });
 
 // Authority: Pine v6 line.style_arrow_* endpoints and linefill.new remarks 1-2.
-function filledVertices(events: string[]): string[][] {
+function paintedVertices(events: string[], kind: 'fill' | 'stroke' = 'fill'): string[][] {
   let vertices: string[] = [];
   const fills: string[][] = [];
   for (const event of events) {
     if (event === 'beginPath') vertices = [];
     else if (event.startsWith('moveTo:') || event.startsWith('lineTo:')) vertices.push(event);
-    else if (event === 'fill') fills.push([...vertices]);
+    else if (event === kind) fills.push([...vertices]);
   }
   return fills;
 }
@@ -1172,8 +1173,8 @@ describe('Documented line arrows and linefill parents', () => {
         );
         const first = reverse ? '120,10' : '0,110';
         const second = reverse ? '0,110' : '120,10';
-        expect(filledVertices(events).map((vertices) => vertices[0])).toEqual(
-          endpoints.map((end) => `moveTo:${end === 'first' ? first : second}`),
+        expect(paintedVertices(events, 'stroke').filter(vertices => vertices.length === 3).map(vertices => vertices[1])).toEqual(
+          endpoints.map((end) => `lineTo:${end === 'first' ? first : second}`),
         );
         expect(events.filter((event) => event === 'setLineDash:').length).toBeGreaterThan(0);
       });
@@ -1186,12 +1187,12 @@ describe('Documented line arrows and linefill parents', () => {
     const second = makeLine('line-2', { y1: 4, y2: 4 });
     const viewport = { startTime: 1000, endTime: 3000, priceMin: 0, priceMax: 20 };
     renderer.render(partitionTealScriptDrawings([first, second, makeLinefill()]), bars, viewport, pane);
-    expect(filledVertices(events)).toEqual([['moveTo:0,110', 'lineTo:120,110', 'lineTo:120,170', 'lineTo:0,170']]);
+    expect(paintedVertices(events)).toEqual([['moveTo:0,110', 'lineTo:120,110', 'lineTo:120,170', 'lineTo:0,170']]);
     Object.assign(first, { x1: 1, y1: 13, x2: 2, y2: 15 });
     Object.assign(second, { x1: 0, y1: 8, x2: 1, y2: 7 });
     events.length = 0;
     renderer.render(partitionTealScriptDrawings([first, second, makeLinefill()]), bars, viewport, pane);
-    expect(filledVertices(events)).toEqual([['moveTo:60,80', 'lineTo:120,60', 'lineTo:60,140', 'lineTo:0,130']]);
+    expect(paintedVertices(events)).toEqual([['moveTo:60,80', 'lineTo:120,60', 'lineTo:60,140', 'lineTo:0,130']]);
   });
   for (const [extend, start, end] of [
     ['left', 0, 90],
@@ -1211,7 +1212,7 @@ describe('Documented line arrows and linefill parents', () => {
         { startTime: 0, endTime: 4000, priceMin: 0, priceMax: 20 },
         pane,
       );
-      expect(filledVertices(events)).toEqual([
+      expect(paintedVertices(events)).toEqual([
         [`moveTo:${start},110`, `lineTo:${end},110`, `lineTo:${end},170`, `lineTo:${start},170`],
       ]);
     });

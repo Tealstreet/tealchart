@@ -1656,3 +1656,7 @@ fixed duration there.
 Native v102's extend.both arrow-both line keeps heads on the supplied endpoints.
 The shared painter extends its shaft independently. Other captured lines/boxes
 cover the four extension modes; universal arrow metrics remain held.
+
+Native v102 arrow-both heads are open stroked chevrons with a continuing shaft
+and empty interior. The shared line/polyline head primitive uses its width/color;
+only the captured v6 line earns native topology credit, with metrics held.

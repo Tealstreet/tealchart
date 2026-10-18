@@ -482,13 +482,13 @@ export function paintTealScriptDrawings(
     const perpX = -unitY;
     const perpY = unitX;
 
-    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
     ctx.beginPath();
-    ctx.moveTo(tip.x, tip.y);
-    ctx.lineTo(baseX + perpX * halfWidth, baseY + perpY * halfWidth);
+    ctx.moveTo(baseX + perpX * halfWidth, baseY + perpY * halfWidth);
+    ctx.lineTo(tip.x, tip.y);
     ctx.lineTo(baseX - perpX * halfWidth, baseY - perpY * halfWidth);
-    ctx.closePath();
-    ctx.fill();
+    ctx.stroke();
   }
 
   function renderPolylineDrawings(

@@ -38,13 +38,13 @@ for (const channel of ['web', 'native'] as const) describe(`v102 original PNG-bo
       expect(border).toBeDefined();
       expect(border.dash.length > 0).toBe(i % 2 !== 0);
     }
-    const heads = paints.filter(p => p.kind === 'fill' && p.color === '#F23645');
+    const heads = paints.filter(p => p.kind === 'stroke' && p.color === '#F23645' && p.points.length === 3);
     expect(heads).toHaveLength(2);
     const supplied = [(last - 100) / last * 1000, (last - 60) / last * 1000];
     for (const [i, head] of heads.entries()) {
-      expect(head.points[0].x).toBe(supplied[i]);
-      expect(Math.round(head.points[0].y)).toBe(19);
-      expect(head.points.slice(1).every(p => i === 0 ? p.x > supplied[i] : p.x < supplied[i])).toBe(true);
+      expect(head.points[1].x).toBe(supplied[i]);
+      expect(Math.round(head.points[1].y)).toBe(19);
+      expect(head.points.filter((_p, index) => index !== 1).every(p => i === 0 ? p.x > supplied[i] : p.x < supplied[i])).toBe(true);
     }
   });
   it('width setters reach the same thick class as constructor4 while thin box controls stay thin', () => {

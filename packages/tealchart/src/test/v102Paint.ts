@@ -10,6 +10,7 @@ import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScript
 export interface FixturePaint { kind: 'fill' | 'stroke'; color: string; width: number; dash: number[]; points: { x: number; y: number }[] }
 export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry>, 'result' | 'bars'>, channel: 'web' | 'native' | 'plots', rectangles = false) {
   const paints: FixturePaint[] = [];
+  const closedPaths: { x: number; y: number }[][] = [];
   let points: { x: number; y: number }[] = [];
   let dash: number[] = [];
   const states: Partial<CanvasContext>[] = [];
@@ -18,7 +19,7 @@ export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry
     fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: 'left', textBaseline: 'top',
     lineDashOffset: 0, globalAlpha: 1, lineCap: 'butt', lineJoin: 'miter',
     beginPath: () => { points = []; }, moveTo: (x, y) => { points.push({ x, y }); }, lineTo: (x, y) => { points.push({ x, y }); },
-    quadraticCurveTo: noop, bezierCurveTo: noop, arc: noop, rect: (x, y, w, h) => { if (rectangles) points.push({ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }); }, roundRect: noop, closePath: noop, clip: noop, scale: noop, translate: noop,
+    quadraticCurveTo: noop, bezierCurveTo: noop, arc: noop, rect: (x, y, w, h) => { if (rectangles) points.push({ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }); }, roundRect: noop, closePath: () => { closedPaths.push([...points]); }, clip: noop, scale: noop, translate: noop,
     fill: () => paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] }),
     fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: rectangles ? [{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }] : [{ x, y }] }),
     stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] }),
@@ -50,5 +51,5 @@ export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry
       passes: ['indicator-price-content', 'indicator-content'],
     });
   }
-  return { paints, result, bars };
+  return { paints, closedPaths, result, bars };
 }
