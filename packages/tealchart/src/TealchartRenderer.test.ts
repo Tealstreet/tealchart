@@ -3783,18 +3783,22 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(stroke).toHaveBeenCalled();
     });
 
-    it('renders Pine line arrowhead styles at the requested endpoints', () => {
-      const fillStyles: unknown[] = [];
+    it.each(['none', 'both'] as const)('renders Pine line arrowhead styles at the requested endpoints (%s)', (extend) => {
+      type Vertex = { op: 'moveTo' | 'lineTo'; x: number; y: number };
+      const strokes: { points: Vertex[]; width: number }[] = [];
+      let points: Vertex[] = [];
       const fill = vi.fn();
-      const stroke = vi.fn();
+      const closePath = vi.fn();
       const ctx = createMockCtx();
-      ctx.fill = vi.fn(() => {
-        fillStyles.push(ctx.fillStyle);
-        fill();
-      });
-      ctx.stroke = stroke;
+      ctx.beginPath = () => { points = []; };
+      ctx.moveTo = (x: number, y: number) => { points.push({ op: 'moveTo', x, y }); };
+      ctx.lineTo = (x: number, y: number) => { points.push({ op: 'lineTo', x, y }); };
+      ctx.stroke = () => {
+        if (ctx.strokeStyle === '#00FF00') strokes.push({ points: [...points], width: ctx.lineWidth });
+      };
+      ctx.fill = fill;
+      ctx.closePath = closePath;
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
-
       const bars = makeBars(20);
       const viewport = TealchartRenderer.calculateViewport(bars);
       const layout: UnifiedPaneLayout = {
@@ -3820,7 +3824,7 @@ describe('TealchartRenderer coordinate transforms', () => {
           x2: 12,
           y2: bars[12]!.close,
           xloc: 'bar_index',
-          extend: 'none',
+          extend,
           color: '#00FF00',
           style: 'arrow_both',
           width: 2,
@@ -3841,9 +3845,25 @@ describe('TealchartRenderer coordinate transforms', () => {
         drawings,
       );
 
-      expect(stroke).toHaveBeenCalled();
-      expect(fill).toHaveBeenCalledTimes(2);
-      expect(fillStyles).toEqual(['#00FF00', '#00FF00']);
+      const { width, margins } = renderer.getOptions();
+      const endpoints = [8, 12].map(index => ({
+        x: margins.left + (bars[index]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime) * (width - margins.left),
+        y: renderer.publicPriceToYWithLayout(bars[index]!.close, viewport, layout),
+      }));
+      expect(strokes).toHaveLength(3);
+      expect(strokes.map(stroke => stroke.width)).toEqual([2, 2, 2]);
+      for (const [index, head] of strokes.slice(1).entries()) {
+        expect(head.points.map(point => point.op)).toEqual(['moveTo', 'lineTo', 'lineTo']);
+        const [firstBranch, tip, secondBranch] = head.points;
+        expect({ x: tip.x, y: tip.y }).toEqual(endpoints[index]);
+        const inward = { x: endpoints[1 - index].x - tip.x, y: endpoints[1 - index].y - tip.y };
+        const branches = [firstBranch, secondBranch].map(point => ({ x: point.x - tip.x, y: point.y - tip.y }));
+        for (const branch of branches) expect(branch.x * inward.x + branch.y * inward.y).toBeGreaterThan(0);
+        const sides = branches.map(branch => branch.x * inward.y - branch.y * inward.x);
+        expect(sides[0] * sides[1]).toBeLessThan(0);
+      }
+      expect(fill).not.toHaveBeenCalled();
+      expect(closePath).not.toHaveBeenCalled();
     });
 
     it('skips Pine line arrowheads for zero-length drawing segments', () => {
