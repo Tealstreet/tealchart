@@ -1717,3 +1717,10 @@ native PNGs. Both polyline versions witness open endpoint chevrons. Relative
 plotarrow heights are supported; direction and universal raster metrics stay held.
 Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
 style/position swaps without claiming hidden creation order for disjoint subjects.
+
+V104's isolated v6 blue dashed lanes at widths1/4/8 have proportional painted
+periods in their original PNG. Pine drawing and plot painters scale each own
+stroke recipe by its width, including native Skia effects and serialized drawing
+worklets. Dotted styles, boxes, polylines, plots and hlines extend the shared rule
+by inference, with separate regression gates; this capture credits only v6 lines.
+Exact native pixel periods, phase resets, clipping and universal dash ratios stay held.

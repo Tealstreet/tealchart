@@ -17,7 +17,7 @@ function independentCopyPatch(object: 'line' | 'box' | 'label') {
   ctx.fillStyle = '#0F0F0F'; ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = blue; ctx.strokeStyle = blue;
   if (object === 'line') {
-    ctx.lineWidth = 6; ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 6; ctx.setLineDash([36, 24]);
     ctx.beginPath(); ctx.moveTo(12, 12); ctx.lineTo(72, 12); ctx.stroke();
   } else if (object === 'box') {
     ctx.fillStyle = '#FDD835'; ctx.fillRect(12, 12, 60, 80);
@@ -178,7 +178,7 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
         ]);
         expect(atBox[0].font, `box font at ${offset}`).toBe(constructorText.font);
       }
-      expect(paints.find(p => p.kind === 'stroke' && p.points[0]?.x === x(-90) && p.points[0]?.y === 50)).toMatchObject({ color: blue, width: 4, dash: [6, 4] });
+      expect(paints.find(p => p.kind === 'stroke' && p.points[0]?.x === x(-90) && p.points[0]?.y === 50)).toMatchObject({ color: blue, width: 4, dash: [24, 16] });
       expect(paints.some(p => p.kind === 'fill' && p.color === '#00BCD4' && p.points[0]?.x === x(-90))).toBe(true);
     });
     it(`${channel}: blue center label and white COPY text match constructor, independently of red square SRC`, () => {
