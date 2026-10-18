@@ -4,7 +4,8 @@ import type { StyleEntry } from '../../../tealscript/tests/fixtures/v103Styles';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { NativeViewportSharedValues } from '../mobile/render/nativeSharedViewport';
 
-import { DashPathEffect, Path, Skia, Text } from '@shopify/react-native-skia';
+import { vi } from 'vitest';
+import { DashPathEffect, Path, Skia, Text, matchFont } from '@shopify/react-native-skia';
 
 import { executeStyle } from '../../../tealscript/tests/fixtures/v103Styles';
 import { TealchartRenderer } from '../TealchartRenderer';
@@ -67,26 +68,31 @@ export function traceStyles(entry: StyleEntry, channel: StyleChannel) {
       panes: [{ id: 'main', type: 'main', top: 0, height: arrow ? height : 0, yMin: min, yMax: max }, { id: 'study', type: 'indicator', top: 0, height: arrow ? 0 : height, yMin: min, yMax: max }] });
     const sharedViewport = { startTime: { value: viewport.startTime }, endTime: { value: viewport.endTime }, priceMin: { value: min }, priceMax: { value: max } } as NativeViewportSharedValues;
     const visibleBars = bars.map((bar, sourceIndex) => ({ ...bar, sourceIndex, interval: sourceIndex ? bar.time - bars[sourceIndex - 1].time : bars[1].time - bar.time, x: sourceIndex / (bars.length - 1) * 1000 }));
-    const tree = NativeIndicatorPlotLayerImpl({ frame, bars, plots, visibleBars, totalBarCount: bars.length,
-      indicatorPaneInfo: { s: { overlay: arrow, paneId: arrow ? 'main' : 'study' } }, sharedViewport, paneRangeOverrides: { value: {} } as SharedValue<any>, textFont: Skia.Font(undefined, 12),
-      staticProjection: channel === 'native-static' ? createNativeChartProjection({ frame, viewport }) : undefined });
-    for (const node of nativePrimitives(tree)) {
-      if (node.type === Text) {
-        const text = resolved<string>(node.props.text), font = node.props.font, metrics = font.getMetrics();
-        const x = resolved<number>(node.props.x), y = resolved<number>(node.props.y);
-        paints.push({ kind: 'text', color: resolved(node.props.color), commands: [{ op: 'T', x, y, text,
-          anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2,
-          anchorOffsetX: font.measureText(text).width / 2, anchorOffsetY: -(-metrics.ascent - metrics.descent) / 2 }], dash: [], globalAlpha: node.opacity, font: `${font.getSize()}px sans-serif`, textAlign: 'left', textBaseline: 'alphabetic' });
+    // Preserve each requested size; the shared mock reports 12 for every font.
+    const fontFactory = vi.mocked(matchFont), originalFontFactory = fontFactory.getMockImplementation()!;
+    fontFactory.mockImplementation(style => ({ ...originalFontFactory(style), getSize: () => style?.fontSize ?? 12 }));
+    try {
+      const tree = NativeIndicatorPlotLayerImpl({ frame, bars, plots, visibleBars, totalBarCount: bars.length,
+        indicatorPaneInfo: { s: { overlay: arrow, paneId: arrow ? 'main' : 'study' } }, sharedViewport, paneRangeOverrides: { value: {} } as SharedValue<any>, textFont: Skia.Font(undefined, 12),
+        staticProjection: channel === 'native-static' ? createNativeChartProjection({ frame, viewport }) : undefined });
+      for (const node of nativePrimitives(tree)) {
+        if (node.type === Text) {
+          const text = resolved<string>(node.props.text), font = node.props.font, metrics = font.getMetrics();
+          const x = resolved<number>(node.props.x), y = resolved<number>(node.props.y);
+          paints.push({ kind: 'text', color: resolved(node.props.color), commands: [{ op: 'T', x, y, text,
+            anchorX: x + font.measureText(text).width / 2, anchorY: y - (-metrics.ascent - metrics.descent) / 2,
+            anchorOffsetX: font.measureText(text).width / 2, anchorOffsetY: -(-metrics.ascent - metrics.descent) / 2 }], dash: [], globalAlpha: node.opacity, font: `${font.getSize()}px sans-serif`, textAlign: 'left', textBaseline: 'alphabetic' });
+        }
+        if (node.type !== Path) continue;
+        const path = resolved<any>(node.props.path);
+        const commands = (['moveTo', 'lineTo', 'close', 'addCircle', 'addRect'] as const).flatMap(name =>
+          path[name].mock.calls.map((args: any[], i: number) => ({ order: path[name].mock.invocationCallOrder[i], op: { moveTo: 'M', lineTo: 'L', close: 'Z', addCircle: 'C', addRect: 'R' }[name],
+            x: name === 'addRect' ? args[0].x : args[0] ?? 0, y: name === 'addRect' ? args[0].y : args[1] ?? 0, w: name === 'addRect' ? args[0].width : args[2], h: name === 'addRect' ? args[0].height : undefined })))
+          .sort((a, b) => a.order - b.order);
+        const effect = nativePrimitives(node.props.children).find(p => p.type === DashPathEffect);
+        paints.push({ kind: node.props.style === 'stroke' ? 'stroke' : 'fill', color: resolved(node.props.color), commands, dash: resolved<number[]>(effect?.props.intervals ?? []), globalAlpha: node.opacity, lineWidth: resolved<number>(node.props.strokeWidth ?? 1) });
       }
-      if (node.type !== Path) continue;
-      const path = resolved<any>(node.props.path);
-      const commands = (['moveTo', 'lineTo', 'close', 'addCircle', 'addRect'] as const).flatMap(name =>
-        path[name].mock.calls.map((args: any[], i: number) => ({ order: path[name].mock.invocationCallOrder[i], op: { moveTo: 'M', lineTo: 'L', close: 'Z', addCircle: 'C', addRect: 'R' }[name],
-          x: name === 'addRect' ? args[0].x : args[0] ?? 0, y: name === 'addRect' ? args[0].y : args[1] ?? 0, w: name === 'addRect' ? args[0].width : args[2], h: name === 'addRect' ? args[0].height : undefined })))
-        .sort((a, b) => a.order - b.order);
-      const effect = nativePrimitives(node.props.children).find(p => p.type === DashPathEffect);
-      paints.push({ kind: node.props.style === 'stroke' ? 'stroke' : 'fill', color: resolved(node.props.color), commands, dash: resolved<number[]>(effect?.props.intervals ?? []), globalAlpha: node.opacity, lineWidth: resolved<number>(node.props.strokeWidth ?? 1) });
-    }
+    } finally { fontFactory.mockImplementation(originalFontFactory); }
   }
   const x = (row: number) => (Number(entry.csv.raw(row, 'time')) * 1000 - viewport.startTime) / (viewport.endTime - viewport.startTime) * 1000;
   return { paints, x, result, bars, viewport, height };

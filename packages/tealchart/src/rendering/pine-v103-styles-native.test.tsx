@@ -22,15 +22,12 @@ const recipeValue = (e: typeof entries[number], row: number, title: string) => {
   if (title === 'LARGE_SQUARE') return phase === 4 ? 60 : null;
   return phase === 2 ? 30 : null;
 };
-const inkCache = new Map<string, boolean>();
-const expectVisiblePaint = (paint: StylePaint) => {
+interface InkFootprint { width: number; height: number; aspect: number; area: number }
+const inkCache = new Map<string, InkFootprint>();
+const paintedFootprint = (paint: StylePaint): InkFootprint => {
   const key = JSON.stringify(paint);
   const cached = inkCache.get(key);
-  if (cached === true) return;
-  if (cached !== undefined) {
-    expect(cached, key).toBe(true);
-    return;
-  }
+  if (cached !== undefined) return cached;
   expect(paint.color).toMatch(/^#[0-9a-f]{6}([0-9a-f]{2})?$/i);
   const colorAlpha = Number.parseInt(paint.color.slice(7) || 'ff', 16) / 255;
   expect(paint.globalAlpha).toBeGreaterThan(0);
@@ -41,11 +38,12 @@ const expectVisiblePaint = (paint: StylePaint) => {
     if (command.op === 'R' || command.op === 'C') expect(command.w).toBeGreaterThan(0);
     if (command.op === 'R') expect(command.h).toBeGreaterThan(0);
   }
+  const extent = paint.commands.filter(c => c.op !== 'Z');
   const padding = 32;
-  const minX = Math.floor(Math.min(...paint.commands.map(c => c.x - (c.w ?? 0))) - padding);
-  const minY = Math.floor(Math.min(...paint.commands.map(c => c.y - (c.h ?? c.w ?? 0))) - padding);
-  const maxX = Math.ceil(Math.max(...paint.commands.map(c => c.x + (c.w ?? 0))) + padding);
-  const maxY = Math.ceil(Math.max(...paint.commands.map(c => c.y + (c.h ?? c.w ?? 0))) + padding);
+  const minX = Math.floor(Math.min(...extent.map(c => c.x - (c.w ?? 0))) - padding);
+  const minY = Math.floor(Math.min(...extent.map(c => c.y - (c.h ?? c.w ?? 0))) - padding);
+  const maxX = Math.ceil(Math.max(...extent.map(c => c.x + (c.w ?? 0))) + padding);
+  const maxY = Math.ceil(Math.max(...extent.map(c => c.y + (c.h ?? c.w ?? 0))) + padding);
   const ctx = createCanvas(maxX - minX, maxY - minY).getContext('2d');
   ctx.translate(-minX, -minY);
   ctx.fillStyle = paint.color; ctx.strokeStyle = paint.color;
@@ -66,9 +64,48 @@ const expectVisiblePaint = (paint: StylePaint) => {
   if (paint.kind === 'stroke') ctx.stroke();
   else if (paint.kind === 'fill') ctx.fill();
   const pixels = ctx.getImageData(0, 0, maxX - minX, maxY - minY).data;
-  const visible = pixels.some((value, i) => i % 4 === 3 && value > 0);
-  inkCache.set(key, visible);
-  expect(visible, key).toBe(true);
+  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity, area = 0;
+  for (let i = 3; i < pixels.length; i += 4) {
+    if (!pixels[i]) continue;
+    const x = ((i - 3) / 4) % (maxX - minX), y = Math.floor((i - 3) / 4 / (maxX - minX));
+    left = Math.min(left, x); right = Math.max(right, x);
+    top = Math.min(top, y); bottom = Math.max(bottom, y);
+    area += pixels[i] / 255;
+  }
+  expect(area, key).toBeGreaterThan(0);
+  const width = right - left + 1, height = bottom - top + 1;
+  const footprint = { width, height, aspect: width / height, area };
+  inkCache.set(key, footprint);
+  return footprint;
+};
+const expectVisiblePaint = (paint: StylePaint) => { paintedFootprint(paint); };
+const footprintChecks = new Map<string, InkFootprint>();
+const bandGlyphChecks = new Set<string>();
+const expectGlyphFootprint = (paint: StylePaint, reference: StylePaint) => {
+  const key = JSON.stringify([paint, reference]), cached = footprintChecks.get(key);
+  if (cached !== undefined) return cached;
+  const actual = paintedFootprint(paint), expected = paintedFootprint(reference);
+  expect(actual.width).toBe(expected.width);
+  expect(actual.height).toBe(expected.height);
+  expect(actual.aspect).toBeCloseTo(expected.aspect, 8);
+  expect(actual.area).toBeCloseTo(expected.area, 8);
+  footprintChecks.set(key, actual);
+  return actual;
+};
+const expectAlternativeFootprint = (paint: StylePaint, references: StylePaint[]) => {
+  const key = JSON.stringify([paint, references]);
+  if (footprintChecks.has(key)) return;
+  const actual = paintedFootprint(paint), expected = references.map(paintedFootprint);
+  expect(expected.some(reference => actual.width === reference.width && actual.height === reference.height &&
+    near(actual.aspect, reference.aspect) && near(actual.area, reference.area)), JSON.stringify({ actual, expected })).toBe(true);
+  footprintChecks.set(key, actual);
+};
+const expectCircleFootprints = (paints: StylePaint[], radius: number) => {
+  for (const glyph of paints.flatMap(stylePaintGlyphs).filter(p => p.commands[0].op === 'C')) {
+    const { x, y } = glyph.commands[0];
+    // Native supports circle/square classes; these sizes are independent local constructor controls.
+    expectGlyphFootprint(glyph, { ...glyph, kind: 'fill', commands: [{ op: 'C', x, y, w: radius }] });
+  }
 };
 const expectVisibleColors = (trace: ReturnType<typeof traceStyles>, ...hexes: string[]) => {
   for (const hex of hexes) for (const paint of color(trace.paints, hex)) {
@@ -230,11 +267,30 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       for (const id of ['plot-fill-false', 'plot-fill-true', 'hline-fill-positive']) facet(name, id);
       const e = entry(name), trace = traceStyles(e, channel);
       expectVisibleColors(trace, '#fdd835', '#00bcd4', '#9c27b0');
-      for (const paint of trace.paints.filter(p => p.kind === 'fill').flatMap(stylePaintGlyphs)) {
+      for (const paint of trace.paints.filter(p => p.kind === 'fill' && ['#fdd835', '#00bcd4', '#9c27b0'].includes(p.color.slice(0, 7).toLowerCase())).flatMap(stylePaintGlyphs)) {
+        const key = JSON.stringify([e.id, e.first, e.anchor, trace.viewport, paint]);
+        if (bandGlyphChecks.has(key)) continue;
+        const vertices = paint.commands.filter(c => c.op === 'M' || c.op === 'L');
+        expect(paint.commands.map(c => c.op)).toEqual(['M', 'L', 'L', 'L', 'Z']);
+        const left = Math.min(...vertices.map(c => c.x)), right = Math.max(...vertices.map(c => c.x));
+        const row = e.first + Math.round(left / 1000 * (e.anchor - e.first));
+        expect(row).toBeGreaterThanOrEqual(e.first);
+        expect(row).toBeLessThan(e.anchor);
+        expect(near(left, trace.x(row))).toBe(true);
+        let next = row + 1;
+        if (paint.color.slice(0, 7).toLowerCase() === '#00bcd4') while (next <= e.anchor && e.csv.raw(next, 'P60') === '') next++;
+        expect(next).toBeLessThanOrEqual(e.anchor);
+        expect(near(right, trace.x(next))).toBe(true);
         const ys = paint.commands.filter(c => c.op === 'M' || c.op === 'L').map(c => c.y);
         for (const [low, high, hex] of [[60, 80, '#fdd835'], [20, 40, '#00bcd4'], [4, 10, '#9c27b0']] as const) {
           if (near(Math.min(...ys), low) && near(Math.max(...ys), high)) expect(paint.color.slice(0, 7).toLowerCase()).toBe(hex);
         }
+        const [low, high] = paint.color.slice(0, 7).toLowerCase() === '#fdd835' ? [60, 80] : paint.color.slice(0, 7).toLowerCase() === '#00bcd4' ? [20, 40] : [4, 10];
+        expectGlyphFootprint(paint, { ...paint, commands: [
+          { op: 'M', x: trace.x(row), y: high }, { op: 'L', x: trace.x(next), y: high },
+          { op: 'L', x: trace.x(next), y: low }, { op: 'L', x: trace.x(row), y: low }, { op: 'Z', x: 0, y: 0 },
+        ] });
+        bandGlyphChecks.add(key);
       }
       const polygons = (hex: string) => color(trace.paints, hex).filter(p => p.kind === 'fill').flatMap(p => {
         const islands: { x: number; y: number }[][] = [];
@@ -262,6 +318,8 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       facet('plot-controls-v6', 'circle-join');
       const e = entry('plot-controls-v6'), trace = traceStyles(e, channel);
       expectVisibleColors(trace, '#2962ff', '#00bcd4');
+      expectCircleFootprints(blue(trace.paints), 3);
+      expectCircleFootprints(color(trace.paints, '#00bcd4'), 3);
       const joins = segments(blue(trace.paints).filter(p => p.kind === 'stroke'));
       for (const [title, hex] of [['JOIN', '#2962ff'], ['NOJOIN', '#00bcd4']]) {
         const circles = color(trace.paints, hex).flatMap(p => p.commands.filter(c => c.op === 'C'));
@@ -288,6 +346,7 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       for (const id of ['show-last', 'trackprice']) facet('plot-controls-v6', id);
       const e = entry('plot-controls-v6'), trace = traceStyles(e, channel);
       expectVisibleColors(trace, '#ff9800', '#f23645');
+      expectCircleFootprints(color(trace.paints, '#ff9800'), 6);
       const orange = color(trace.paints, '#ff9800').flatMap(p => p.commands.filter(c => c.op === 'C'));
       expect(orange).toHaveLength(4);
       expect(orange.every(c => c.x > trace.x(e.anchor - 10) && near(c.y, 35))).toBe(true);
@@ -305,13 +364,31 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
       const small = squares.filter(c => near(c.y + (c.h ?? 0) / 2, 20));
       const large = squares.filter(c => near(c.y + (c.h ?? 0) / 2, 40));
       expect(small.length).toBeGreaterThan(4); expect(large.length).toBeGreaterThan(4);
-      expect(Math.min(...large.map(c => c.w!))).toBeGreaterThan(Math.max(...small.map(c => c.w!)));
+      const footprints = { small: [] as InkFootprint[], large: [] as InkFootprint[] };
+      for (const glyph of blue(trace.paints).flatMap(stylePaintGlyphs)) {
+        expect(glyph.kind).toBe('fill');
+        expect(glyph.commands).toHaveLength(1);
+        const c = glyph.commands[0];
+        expect(c.op).toBe('R');
+        const y = c.y + c.h! / 2, x = c.x + c.w! / 2;
+        expect(near(y, 20) || near(y, 40)).toBe(true);
+        const group = near(y, 20) ? 'small' : 'large', side = group === 'small' ? 6 : 12;
+        const ink = expectGlyphFootprint(glyph, { ...glyph, commands: [{ op: 'R', x: x - side / 2, y: y - side / 2, w: side, h: side }] });
+        expect(Math.abs(ink.width - ink.height)).toBeLessThanOrEqual(1);
+        footprints[group].push(ink);
+      }
+      for (const dimension of ['width', 'height', 'area'] as const) {
+        expect(Math.min(...footprints.large.map(ink => ink[dimension]))).toBeGreaterThan(Math.max(...footprints.small.map(ink => ink[dimension])));
+      }
       for (const [title, rectangles] of [['SMALL_SQUARE', small], ['LARGE_SQUARE', large]] as const) {
         expect(rectangles).toHaveLength(replayRows(e).filter(row => recipeValue(e, row, title) !== null).length);
         for (const row of replayRows(e)) {
           const match = rectangles.filter(c => near(c.x + c.w! / 2, trace.x(row)));
           expect(match).toHaveLength(recipeValue(e, row, title) === null ? 0 : 1);
         }
+      }
+      for (const glyph of color(trace.paints, '#ff9800').flatMap(stylePaintGlyphs)) {
+        expectGlyphFootprint(glyph, { ...glyph, font: '24px sans-serif' });
       }
       const chars = color(trace.paints, '#ff9800').filter(p => p.kind === 'text').flatMap(p => p.commands);
       expect(chars.length).toBeGreaterThan(4); expect(chars.every(c => c.text === 'X')).toBe(true);
@@ -346,6 +423,14 @@ for (const channel of ['web', 'web-pane', 'web-unified', 'native', 'native-stati
           const anchor = (trace.viewport.priceMax - (negative ? bar.high : bar.low)) / (trace.viewport.priceMax - trace.viewport.priceMin) * trace.height;
           // Constructor-to-painter placement is a local control; negative head direction stays held.
           expect(near((low + high) / 2, anchor + (negative ? -1 : 1) * (high - low + 4))).toBe(true);
+          const phase = Number(e.csv.raw(row, 'INPUT_INDEX')) % 32, size = phase === 0 ? 12 : phase === 8 ? 16 : 24;
+          const x = trace.x(row), y = (low + high) / 2;
+          // Local triangle/size controls admit both directions; native sign-direction remains held.
+          expectAlternativeFootprint(matches[0], [1, -1].map<StylePaint>(direction => ({ ...matches[0], kind: 'fill', commands: [
+            { op: 'M', x, y: y - direction * size / 2 }, { op: 'L', x: x + size / 2, y: y + direction * size / 2 },
+            { op: 'L', x: x - size / 2, y: y + direction * size / 2 }, { op: 'Z', x: 0, y: 0 },
+          ] })));
+
         }
       }
       const height = (row: number) => {
