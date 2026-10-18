@@ -4889,3 +4889,7 @@ V102 v6 style locks score exact non-index primary cells with CSV offsets project
 from source-indexed plot values. Gap pixels and both v5 entry stops stay held.
 The three exact omitted-formatting sources refuse with CE10165; they earn no
 runtime or appearance credit. Explicit formatting calls retain their old locks.
+
+V103 v5 extension/stroke and v5/v6 retained-linefill locks replay original phase-aligned
+suffixes through each one-time closed build. Absolute indices remain excluded.
+COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay held.

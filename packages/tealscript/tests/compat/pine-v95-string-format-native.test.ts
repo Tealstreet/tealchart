@@ -25,7 +25,7 @@ interface Numeric {
   selectedBlockDataRowOrdinals: number[]; closedRowsAvailable: number; strictOwnIndexZeroPrefixAvailable: boolean;
   records: NumericRecord[]; comparisonCounts: Record<string, number>; facets: Facet[];
 }
-const pin = 'f47a4e34ce33441ad37add124d9572119826138d';
+const pin = 'ac9d6992d6d84e296c58dca98fb6b707224d55a1';
 const directory = 'v95/captures/v95/';
 const folder = (v: number) => `${directory}v95-string-format-v${v}/attempt-v1/`;
 const sourcePath = (v: number) => `v95/sources/v95-string-format-v${v}.pine`;
