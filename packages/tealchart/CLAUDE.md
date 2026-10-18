@@ -1667,3 +1667,6 @@ only the captured v6 line earns native topology credit, with metrics held.
 Drawing paint traces retain text alignment and baseline at fillText, including
 save/restore. Copy appearance checks bind those fields to each object's column;
 text coordinates alone do not establish centered ink.
+Copy and constructor captions compare their recorded font recipes at their own
+positions. Line dashes bind each copy to its constructor and distinguish long
+dashes from the dotted source without certifying native font sizes or dash periods.

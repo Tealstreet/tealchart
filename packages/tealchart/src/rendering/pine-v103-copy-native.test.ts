@@ -28,17 +28,27 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       expect(copy6.regions.facets[0]).toMatchObject({ outcome: 'SUPPORTED_A', frozenModels: { A: 'independent copy retains blue6 dashed y85' } });
       const { paints } = trace();
       const lines = paints.filter(p => p.kind === 'stroke' && p.points.length === 2);
+      expect(lines).toHaveLength(3);
+      const constructor = lines.find(p => p.points[0].x === x(-30))!;
       for (const offset of [-60, -30]) {
         const line = lines.find(p => p.points[0].x === x(offset));
         expect(line).toMatchObject({ color: blue, width: 6 });
         expect(line!.dash.length).toBeGreaterThan(0);
+        expect(line!.dash).toEqual(constructor.dash);
+        expect(line!.dash).toHaveLength(2);
+        expect(line!.dash.every(value => value > 0)).toBe(true);
+        expect(line!.dash[0]).toBeGreaterThan(line!.dash[1]);
         expect(line!.points).toEqual([{ x: x(offset), y: 15 }, { x: x(offset + 15), y: 15 }]);
       }
       const source = lines.find(p => p.points[0].x === x(-90));
       expect(source).toMatchObject({ color: red, width: 2 });
       expect(source!.points.every(p => p.y === 35)).toBe(true);
+      expect(source!.points).toEqual([{ x: x(-90), y: 35 }, { x: x(-75), y: 35 }]);
       expect(source!.dash.length).toBeGreaterThan(0);
       expect(source!.dash).not.toEqual(lines.find(p => p.points[0].x === x(-60))!.dash);
+      expect(source!.dash).toHaveLength(2);
+      expect(source!.dash.every(value => value > 0)).toBe(true);
+      expect(source!.dash[0]).toBeLessThan(source!.dash[1]);
     });
     it(`${channel}: yellow fill, solid thick blue border and blue COPY text survive source mutations`, () => {
       expect(copy6.regions.facets[1]).toMatchObject({ outcome: 'SUPPORTED_A', frozenModels: { A: 'copy retains yellow/blue solid and blue COPY' } });
@@ -54,12 +64,17 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       expect(texts.find(t => t.text === 'SRC' && t.y > 50 && t.y < 70)?.color).toBe(red);
       const boxTexts = texts.filter(t => t.y > 50 && t.y < 70);
       expect(boxTexts).toHaveLength(3);
+      const constructorCenterX = x(-30) + (x(-15) - x(-30)) / 2;
+      const constructorText = boxTexts.find(t => t.x === constructorCenterX)!;
+      expect(constructorText).toBeDefined();
+      expect(constructorText.font).not.toBe('');
       for (const [offset, text, color] of [[-90, 'SRC', red], [-60, 'COPY', blue], [-30, 'COPY', blue]] as const) {
         const centerX = x(offset) + (x(offset + 15) - x(offset)) / 2;
         const atBox = boxTexts.filter(t => t.x > x(offset) && t.x < x(offset + 15));
         expect(atBox, `box at ${offset}`).toEqual([
           expect.objectContaining({ text, color, x: centerX, y: 60, textAlign: 'center', textBaseline: 'middle' }),
         ]);
+        expect(atBox[0].font, `box font at ${offset}`).toBe(constructorText.font);
       }
       expect(paints.find(p => p.kind === 'stroke' && p.points[0]?.x === x(-90) && p.points[0]?.y === 50)).toMatchObject({ color: blue, width: 4, dash: [6, 4] });
       expect(paints.some(p => p.kind === 'fill' && p.color === '#00BCD4' && p.points[0]?.x === x(-90))).toBe(true);
@@ -83,6 +98,9 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
       const labelTexts = texts.filter(t => t.y > 70);
       expect(labelBodies).toHaveLength(3);
       expect(labelTexts).toHaveLength(3);
+      const constructorText = labelTexts.find(t => t.x === x(-22) && t.y === 88)!;
+      expect(constructorText).toBeDefined();
+      expect(constructorText.font).not.toBe('');
       for (const [offset, shape, color, text, textAlign] of [
         [-82, 'rect', red, 'SRC', 'left'],
         [-52, 'roundRect', blue, 'COPY', 'center'],
@@ -97,7 +115,7 @@ describe('v103 v6 copy: original PNG models through the real drawing painters', 
         expect(atText, `label text at ${offset}`).toEqual([
           expect.objectContaining({ text, color: '#FFFFFF', textAlign, textBaseline: 'middle' }),
         ]);
-        if (text === 'COPY') expect(atText[0]).toMatchObject({ x: x(offset), y: 88 });
+        if (text === 'COPY') expect(atText[0]).toMatchObject({ x: x(offset), y: 88, font: constructorText.font });
       }
     });
   }
