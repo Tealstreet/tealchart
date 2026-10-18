@@ -9,7 +9,6 @@ import {
   resolveLineDrawingSegment,
   resolvePolylineDrawingPoints,
 } from './TealScriptDrawingCoordinates';
-import { pineLineDash } from './pineLineDash';
 import { drawingFont, fontSizeForDrawing } from './TealScriptDrawingText';
 
 export interface TealScriptDrawingRendererOptions {
@@ -191,7 +190,13 @@ export function paintTealScriptDrawings(
       if (box.borderColor && box.borderWidth !== 0) {
         ctx.strokeStyle = box.borderColor;
         ctx.lineWidth = Math.max(1, box.borderWidth);
-        ctx.setLineDash(pineLineDash(box.borderStyle, ctx.lineWidth, 4));
+        if (box.borderStyle === 'dashed') {
+          ctx.setLineDash([6, 4]);
+        } else if (box.borderStyle === 'dotted') {
+          ctx.setLineDash([2, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
         ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
       }
 
@@ -426,7 +431,13 @@ export function paintTealScriptDrawings(
 
       ctx.strokeStyle = line.color;
       ctx.lineWidth = Math.max(1, line.width);
-      ctx.setLineDash(pineLineDash(line.style, ctx.lineWidth, 4));
+      if (line.style === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (line.style === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
       ctx.beginPath();
       ctx.moveTo(extended.start.x, extended.start.y);
       ctx.lineTo(extended.end.x, extended.end.y);
@@ -498,7 +509,13 @@ export function paintTealScriptDrawings(
       if (points.length < 2) continue;
 
       ctx.lineWidth = Math.max(1, polyline.lineWidth);
-      ctx.setLineDash(pineLineDash(polyline.lineStyle, ctx.lineWidth, 4));
+      if (polyline.lineStyle === 'dashed') {
+        ctx.setLineDash([6, 4]);
+      } else if (polyline.lineStyle === 'dotted') {
+        ctx.setLineDash([2, 4]);
+      } else {
+        ctx.setLineDash([]);
+      }
 
       ctx.beginPath();
       drawPolylinePath(points, polyline.curved, polyline.closed);

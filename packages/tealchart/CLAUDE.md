@@ -1,32 +1,12 @@
-V104 plain stepline v5/v6 turns at adjacent source points’ projected-X midpoint in
-both painters, including gapped bars; regular and index-projected slots retain
-their preceding half-slot turn.
-Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
-PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
-
-V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
-right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
-Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
-these eight frozen alternatives. V5 layout stopped before Save and earns zero credit;
-resolved fonts, exact glyph metrics, frame identity and universal composition stay held.
-Local box-text replay derives maximal whole-word lines from the canvas font's
-measurements at the frozen source width. Keep native PNG line observations fixed,
-and retain per-position literal/font/alignment checks across host font fallbacks.
-
 Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
 passes must keep each script together, and native plots share the same ordering.
 Background stripes remain beneath fills. Shared drawing paint puts lines after
-linefills and boxes after lines, then labels. Those v93 captures show tables covering
-intersected fill only; table-vs-label/box/line/linefill intersections were unobserved there.
+linefills and boxes after lines, then labels. Captured tables cover intersected
+fill only: table-vs-label/box/line/linefill intersections remain unobserved.
 V102 additionally pins polylines above lines and below boxes in both creation
-directions. V102's polyline-label and table-intersection maps retain UNDECIDED.
+directions. Polyline-label and actual table intersections stay UNDECIDED.
 Screenshot/region bindings certify these bounded precedence checks, not pixel parity.
-
-V103 independently witnesses labels above polylines in both creation orders in
-v5/v6, and v6 tables above isolated line/polyline/box/label/linefill subjects with
-visible outside controls. These seven plates close their own pairs only; v102's
-occluded evidence, v5 table precedence and universal raster/font metrics stay held.
 
 Pine Style controls on web retain coded plots separately from display overrides.
 Reselecting a plot sets all display locations; Defaults resets coded inputs and
@@ -1683,63 +1663,3 @@ cover the four extension modes; universal arrow metrics remain held.
 Native v102 arrow-both heads are open stroked chevrons with a continuing shaft
 and empty interior. The shared line/polyline head primitive uses its width/color;
 only the captured v6 line earns native topology credit, with metrics held.
-
-V103 visible-gap PNG/map locks bind finite linebr/areabr holes and marker offset
-displacement in v5/v6, plus the v6 dashed-with-break stroke class. Keep the
-continuous line/area controls separate. CSV screen alignment does not shift the
-engine source arrays; painters apply offset once. Exact step turn placement,
-native raster metrics and dash periods remain held despite readable lanes.
-
-Native v103 table plates retain B/C after destination replacement and show zero
-cell dimensions auto-size like omitted dimensions. Original PNG/map controls
-bound these alternatives; resolved fonts, exact metrics and stopped v5 stay held.
-
-V103 v5 extension/stroke rows bind each line and box to its own lane through both
-painters. Separate v5/v6 retained-linefill PNGs witness a single blue current band,
-an empty old band and deleted right fill with positive parent/left-fill controls.
-Each retained fill boundary follows both parent segments and connects their
-corresponding left/right endpoints; equal bounds alone cannot witness a filled band.
-Frozen windows and original PNG hashes bound these classes; raster metrics stay held.
-
-Drawing paint traces retain text alignment and baseline at fillText, including
-save/restore. Copy appearance checks bind those fields to each object's column;
-text coordinates alone do not establish centered ink.
-Copy and constructor captions compare their recorded font recipes at their own
-positions. Line dashes bind each copy to its constructor and distinguish long
-dashes from the dotted source without certifying native font sizes or dash periods.
-
-V103 copy appearance locks compare full source/copy/constructor RGBA patches at
-independent anchors through web and native painters in one viewport. Local
-copy/control equality includes executing opacity and body extents; native
-absolute glyph, alpha, DPI and raster metrics remain held.
-
-V103 copy/control equality also requires an independent primitive appearance
-reference for each object, including body, border and caption ink. Original PNG
-component colors, areas and bounds bind the native facts; local normal-font
-metrics instantiate those recipes without claiming native font/DPI equivalence.
-
-V103 styles bind closed dashed triangles, fillgaps, plot controls and markers to
-native PNGs. Both polyline versions witness open endpoint chevrons. Relative
-plotarrow heights are supported; direction and universal raster metrics stay held.
-Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
-style/position swaps without claiming hidden creation order for disjoint subjects.
-
-V104's isolated v6 blue dashed lanes at widths1/4/8 have proportional painted
-periods in their original PNG. Pine drawing and plot painters scale each own
-stroke recipe by its width, including native Skia effects and serialized drawing
-worklets. Dotted styles, boxes, polylines, plots and hlines extend the shared rule
-by inference, with separate regression gates; this capture credits only v6 lines.
-Exact native pixel periods, phase resets, clipping and universal dash ratios stay held.
-
-V104 v5 wrap/alignment locks bind each of three boxes to its source position,
-complete caption and independently painted local raster. Whole-word wrap counts
-use active font measurements; native glyph metrics remain unobserved.
-
-V104 v5 vertical alignment binds complete EDGE ink to left/top, middle/center
-and right/bottom equal-height boxes. Compare complete per-object local rasters
-under system and DejaVu-only fonts; exact native font/padding metrics stay held.
-
-V104 v6 plotarrow sign-direction is bound to its own closed CSV signs and PNG
-tip narrowing, shoulders and shaft through web and native painters. Use separate
-plotarrow glyphs; plotshape arrows retain their existing marker geometry. The older
-v103 sign-direction facet and universal native raster metrics remain held.

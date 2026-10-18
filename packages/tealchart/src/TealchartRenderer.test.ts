@@ -1543,8 +1543,7 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       (renderer as any).renderHline(plot, { startTime: 0, endTime: 1, priceMin: 50, priceMax: 150 });
 
-      // Local width-scaled recipe inferred from v104 lines; native absolute lengths stay held.
-      expect(setLineDash).toHaveBeenCalledWith([4, 6]);
+      expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
     });
 
@@ -1605,7 +1604,7 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       (renderer as any).renderHlineInPane(plot, paneOffset);
 
-      expect(setLineDash).toHaveBeenCalledWith([18, 12]);
+      expect(setLineDash).toHaveBeenCalledWith([6, 4]);
       expect(stroke).toHaveBeenCalled();
       expect(ctx.strokeStyle).toBe('#ff0000');
       expect(ctx.lineWidth).toBe(3);
@@ -3778,7 +3777,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         drawings,
       );
 
-      expect(setLineDash).toHaveBeenCalledWith([18, 12]);
+      expect(setLineDash).toHaveBeenCalledWith([6, 4]);
       expect(moveTo).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
       expect(lineTo.mock.calls.at(-1)?.[0]).toBe(renderer.getOptions().width - renderer.getOptions().margins.right);
       expect(stroke).toHaveBeenCalled();
@@ -4145,7 +4144,7 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(fillRect).toHaveBeenCalled();
       expect(strokeRect).toHaveBeenCalled();
-      expect(setLineDash).toHaveBeenCalledWith([4, 8]);
+      expect(setLineDash).toHaveBeenCalledWith([2, 4]);
       expect(fillText).toHaveBeenCalledWith('Zone', expect.any(Number), expect.any(Number));
     });
 

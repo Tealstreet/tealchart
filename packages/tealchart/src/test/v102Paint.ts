@@ -10,9 +10,6 @@ import { paintNativeTealScriptDrawings } from '../mobile/render/nativeTealScript
 export interface FixturePaint { kind: 'fill' | 'stroke'; color: string; width: number; dash: number[]; points: { x: number; y: number }[] }
 export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry>, 'result' | 'bars'>, channel: 'web' | 'native' | 'plots', rectangles = false) {
   const paints: FixturePaint[] = [];
-  const texts: { text: string; x: number; y: number; color: string; font: string; textAlign: CanvasContext['textAlign']; textBaseline: CanvasContext['textBaseline'] }[] = [];
-  const bodies: { shape: 'rect' | 'roundRect'; color: string; points: { x: number; y: number }[] }[] = [];
-  let shape: 'rect' | 'roundRect' | undefined;
   const closedPaths: { x: number; y: number }[][] = [];
   let points: { x: number; y: number }[] = [];
   let dash: number[] = [];
@@ -21,17 +18,14 @@ export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry
   const ctx: CanvasContext = {
     fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: 'left', textBaseline: 'top',
     lineDashOffset: 0, globalAlpha: 1, lineCap: 'butt', lineJoin: 'miter',
-    beginPath: () => { points = []; shape = undefined; }, moveTo: (x, y) => { points.push({ x, y }); }, lineTo: (x, y) => { points.push({ x, y }); },
-    quadraticCurveTo: noop, bezierCurveTo: noop, arc: noop, rect: (x, y, w, h) => { shape = 'rect'; if (rectangles) points.push({ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }); }, roundRect: (x, y, w, h) => { shape = 'roundRect'; if (rectangles) points.push({ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }); }, closePath: () => { closedPaths.push([...points]); }, clip: noop, scale: noop, translate: noop,
-    fill: () => {
-      paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] });
-      if (shape) bodies.push({ shape, color: String(ctx.fillStyle), points: [...points] });
-    },
+    beginPath: () => { points = []; }, moveTo: (x, y) => { points.push({ x, y }); }, lineTo: (x, y) => { points.push({ x, y }); },
+    quadraticCurveTo: noop, bezierCurveTo: noop, arc: noop, rect: (x, y, w, h) => { if (rectangles) points.push({ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }); }, roundRect: noop, closePath: () => { closedPaths.push([...points]); }, clip: noop, scale: noop, translate: noop,
+    fill: () => paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] }),
     fillRect: (x, y, w, h) => paints.push({ kind: 'fill', color: String(ctx.fillStyle), width: ctx.lineWidth, dash: [...dash], points: rectangles ? [{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }] : [{ x, y }] }),
     stroke: () => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), width: ctx.lineWidth, dash: [...dash], points: [...points] }),
     strokeRect: (x, y, w, h) => paints.push({ kind: 'stroke', color: String(ctx.strokeStyle), width: ctx.lineWidth, dash: [...dash], points: rectangles ? [{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }] : [{ x, y }] }),
-    fillText: (text, x, y) => texts.push({ text, x, y, color: String(ctx.fillStyle), font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
-    save: () => states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font, textAlign: ctx.textAlign, textBaseline: ctx.textBaseline }),
+    fillText: noop,
+    save: () => states.push({ fillStyle: ctx.fillStyle, strokeStyle: ctx.strokeStyle, lineWidth: ctx.lineWidth, globalAlpha: ctx.globalAlpha, font: ctx.font }),
     restore: () => Object.assign(ctx, states.pop()), setLineDash: values => { dash = [...values]; }, getLineDash: () => [...dash],
     measureText: text => ({ width: text.length * 7 }) as TextMetrics,
   };
@@ -57,5 +51,5 @@ export function traceEntry({ result, bars }: Pick<ReturnType<typeof executeEntry
       passes: ['indicator-price-content', 'indicator-content'],
     });
   }
-  return { paints, texts, bodies, closedPaths, result, bars };
+  return { paints, closedPaths, result, bars };
 }

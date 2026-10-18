@@ -1068,7 +1068,7 @@ describe('TealScript rendering behavior matrix', () => {
     expect(boxFill).toBeGreaterThan(polyFill);
     expect(labelText).toBeGreaterThan(boxFill);
     expect(tableText).toBeGreaterThan(labelText);
-    expect(ctx.calls).toContainEqual(expect.objectContaining({ op: 'setLineDash', segments: [4, 8] }));
+    expect(ctx.calls).toContainEqual(expect.objectContaining({ op: 'setLineDash', segments: [2, 4] }));
     expect(ctx.calls).toContainEqual(expect.objectContaining({ op: 'stroke', strokeStyle: '#2962ff', lineWidth: 2 }));
     expect(ctx.calls).toContainEqual(expect.objectContaining({
       op: 'fillText',
