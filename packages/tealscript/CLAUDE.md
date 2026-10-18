@@ -7,6 +7,11 @@ V6 box-text locks preserve whole-recipe equivalence and the vertical subfacet;
 wrap, horizontal alignment and isolated bold/italic effects remain held. All four
 v6 table appearance cases remain held despite the exact3/2/1/2 numeric vector.
 
+V103 polyline-label v5/v6 and isolated table-over-line/polyline/box/label/linefill v6 plates match
+the existing drawing order. Replay uses an original phase-aligned exported prefix,
+keeps eight predecessors, and translates absolute indices as excluded context.
+Original PNG/maps witness each pair; other versions/groups and raster metrics stay held.
+
 V99 v6 cast/typed-NA color origins expose0/0/0/100 while na remains true.
 Keep their internal provenance separate from missing gradient/nz/fixnan results. Stable direct
 literal-cast/root-initializer comparisons fold separately from runtime missing

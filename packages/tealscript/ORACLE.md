@@ -111,3 +111,27 @@ The loader rejects manifest revision drift; review and update its literal togeth
 with the manifest when adopting new captures.
 The web/native recorders share `tealchart/src/test/v102Paint.ts`; family adapters
 retain the recorded fields used by their finite paint contracts.
+
+## V103 isolated stacking pairs
+
+The [v13 return](https://github.com/Tealstreet/tealscript-oracle/blob/1aad8cc2b41f53bd85b0c5558b36365d371b7244/v103/captures/v103/RESPONSE-v103-v13.md)
+adds independent v5/v6 polyline-label plates and v6 table-over-line/polyline/box/label/linefill
+plates. Labels cover both orange lanes despite opposite creation orders; each
+opaque table covers its single subject while that subject remains visible outside.
+The unchanged engine already matches. Real web/native painter and bitmap locks
+bind these seven finite verdicts to their original PNGs and derived maps.
+
+Each source contributes 32 closed rows and eight original closed predecessors.
+The unchanged source executes an actual phase-aligned exported prefix through its
+one-time retained anchor, with neither fabricated history nor native output seeds.
+Of 1,792 native primary positions, 1,561 numeric/blank cells compare exactly and
+231 absolute-index positions remain translated context. Each build-marker channel
+contains one event and 31 intentional blanks. These counts include time, phase,
+scale and presence controls; they are not new numeric drawing getter observations.
+
+The shared v102 loader and independent v103 revision literal use the append-only
+1aad8cc2 pin. V102's occluded polyline-label/table cases retain their original
+UNDECIDED verdicts. V5 table precedence, polyline arrow
+topology, universal raster/font metrics and historical context holds receive no
+credit from these seven captures. The table-over-label PNG leaves its middle label
+line obscured; only the visible upper/lower body controls receive visual credit.
