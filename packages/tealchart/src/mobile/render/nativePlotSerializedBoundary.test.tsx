@@ -12,6 +12,7 @@ import * as SkiaModule from '@shopify/react-native-skia';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { nativePictureRects } from '../../test/nativePictureRects';
+import { transformNativeWorklet } from '../../test/transformNativeWorklet';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { createNativeChartProjection } from './nativeProjection';
 
@@ -24,7 +25,6 @@ const sourceCache = new Map<string, Record<string, unknown>>();
 const NATIVE_SERIALIZED_BOUNDARY_TIMEOUT_MS = 90_000;
 let nativePlotModule: Record<string, unknown>;
 const require = createRequire(import.meta.url);
-const babel = require('@babel/core') as { transformSync(source: string, options: unknown): { code: string } };
 interface Worklet {
   (...args: unknown[]): unknown;
   name: string;
@@ -78,17 +78,7 @@ function loadNativeModule(file: string, cache = new Map<string, Record<string, u
   if (cache.has(file)) return cache.get(file)!;
   const exports: Record<string, unknown> = {};
   cache.set(file, exports);
-  const { code } = babel.transformSync(readFileSync(file, 'utf8'), {
-    filename: file,
-    configFile: false,
-    babelrc: false,
-    plugins: [
-      ['@babel/plugin-transform-typescript', { isTSX: file.endsWith('.tsx') }],
-      'react-native-worklets/plugin',
-      ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }],
-      '@babel/plugin-transform-modules-commonjs',
-    ],
-  });
+  const code = transformNativeWorklet(readFileSync(file, 'utf8'), file);
   new Function('require', 'exports', code)((name: string) => {
     if (name === 'react')
       return { ...React, useMemo: (factory: () => unknown) => factory(), memo: (component: unknown) => component };
