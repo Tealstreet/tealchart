@@ -1199,8 +1199,8 @@ export function paintTealScriptDrawings(
   }
 
   renderLineFillDrawings(drawingPartition, bars, viewport, pane);
-  renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
   renderLineDrawings(drawingPartition.lines, bars, viewport, pane);
+  renderPolylineDrawings(drawingPartition.polylines, bars, viewport, pane);
   renderBoxDrawings(drawingPartition.boxes, bars, viewport, pane);
   renderLabelDrawings(drawingPartition.labels, bars, viewport, pane);
   renderTableDrawings(drawingPartition.tables, pane);

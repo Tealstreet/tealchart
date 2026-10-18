@@ -13,7 +13,8 @@ import { describe, expect, it, vi } from 'vitest';
 // and JS-only helper calls that ordinary draw-call tests cannot detect.
 const require = createRequire(import.meta.url);
 const babel = require('@babel/core') as { transformSync(source: string, options: unknown): { code: string } };
-interface Worklet extends Function {
+interface Worklet {
+  (...args: unknown[]): unknown;
   __initData?: { code: string };
   __closure?: Record<string, unknown> | unknown[];
 }
@@ -42,7 +43,7 @@ function onUI(value: unknown, cache = new Map<unknown, unknown>()): unknown {
   if (cache.has(value)) return cache.get(value);
   if (typeof value === 'function' && (value as Worklet).__initData) {
     const worklet = value as Worklet;
-    const fn = new Function(`return (${worklet.__initData!.code})`)() as Function;
+    const fn = new Function(`return (${worklet.__initData!.code})`)() as Worklet;
     // Worklets 0.13 serializes closures as arrays; older plugins use objects.
     const closure: Record<string, unknown> | unknown[] = Array.isArray(worklet.__closure) ? [] : {};
     const callable = (...args: unknown[]) => fn.apply({ __closure: closure }, args);
@@ -348,7 +349,9 @@ describe('all drawing families in the serialized native painter', () => {
     expect(drawPath).toHaveBeenCalledTimes(5);
     expect(drawRect).toHaveBeenCalledTimes(6);
     expect(drawText.mock.calls.map((call) => call[0])).toEqual(['Box', 'Label', 'Label', 'Cell']);
-    expect(drawPath.mock.calls[1]![0].cubicTo.mock.calls.map((call: number[]) => call.slice(4))).toEqual([
+    expect(drawPath.mock.calls[1]![0].cubicTo.mock.calls).toEqual([]);
+    expect(drawPath.mock.calls[2]![0].cubicTo.mock.calls).toEqual([]);
+    expect(drawPath.mock.calls[3]![0].cubicTo.mock.calls.map((call: number[]) => call.slice(4))).toEqual([
       [60, 0],
       [120, 40],
       [0, 50],
