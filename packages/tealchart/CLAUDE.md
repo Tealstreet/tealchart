@@ -1,3 +1,9 @@
+V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
+right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
+Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
+these eight frozen alternatives. V5 layout stopped before Save and earns zero credit;
+resolved fonts, exact glyph metrics, frame identity and universal composition stay held.
+
 Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
 passes must keep each script together, and native plots share the same ordering.
