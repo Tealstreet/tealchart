@@ -48,57 +48,93 @@ for (const entry of entries) for (const channel of ['web', 'native'] as const) i
   }
 });
 
-for (const entry of entries) for (const channel of channels) for (const colored of [false, true]) for (const transition of entry.certificate.transitions) {
-  it(`${entry.id} ${channel} paints each own phase${transition.phase} directed turn and directed arms (${colored ? 'series' : 'constant'})`, () => {
+const sourcePalettes = {
+  constant: ['#2962ff'],
+  series: ['#00aa00', '#2962ff'],
+  scalar: ['#2962ff'],
+  'scalar-alpha': ['#2962ff80'],
+  'source-alpha': ['#00aa0080', '#2962ffbf', '#ff8800ff'],
+};
+
+for (const entry of entries) for (const channel of channels) for (const [mode, palette] of Object.entries(sourcePalettes)) for (const transition of entry.certificate.transitions) {
+  it(`${entry.id} ${channel} paints each own phase${transition.phase} directed turn and directed arms (${mode})`, () => {
     bound(entry.regions.originalPng);
-    const trace = traceStep(entry, channel, colored ? {
-      color: entry.csv.rows.slice(entry.first - 1, entry.anchor).map((_, i) => i % 2 ? '#2962ff' : '#00aa00'),
-    } : {});
+    const colorAt = (row: number) => palette[(row - entry.first) % palette.length];
+    const trace = traceStep(entry, channel, palette.length > 1 ? {
+      color: entry.csv.rows.slice(entry.first - 1, entry.anchor).map((_, i) => palette[i % palette.length]),
+    } : mode.startsWith('scalar') ? { color: palette[0] } : {}, true);
     const slot = trace.x(entry.primary[1]) - trace.x(entry.primary[0]);
-    const pixel = (x: number, y: number) => {
-      const i = (y * trace.ink.width + x) * 4;
-      return [...trace.ink.data.slice(i, i + 4)];
-    };
-    const ownColor = (row: number) => {
-      const color = colored && (row - entry.first) % 2 === 0 ? '#00aa00' : '#2962ff';
-      const observed = Array.isArray(trace.plot.color) ? trace.plot.color[row - entry.first] : trace.plot.color;
-      expect(observed?.toLowerCase()).toBe(color);
-      return [1, 3, 5].map(index => parseInt(color.slice(index, index + 2), 16));
-    };
     const row = transition.inputIndex.rowOrdinal;
     const turn = trace.x(row) - slot / 2;
     const incoming = transition.phase === 8 ? 75 : 25;
     const outgoing = 100 - incoming;
+    for (const ownRow of [row - 1, row, row + 1]) {
+      const observed = Array.isArray(trace.plot.color) ? trace.plot.color[ownRow - entry.first] : trace.plot.color;
+      expect(observed?.toLowerCase()).toBe(colorAt(ownRow));
+    }
+
+    // Source row j owns centre(j-1) -> half-slot(j) -> centre(j), including alpha.
+    // Construct from raw source phases/times and literal colours, never recorded paths.
+    const reference = createCanvas(trace.ink.width, trace.ink.height).getContext('2d');
+    reference.lineWidth = 1;
+    reference.lineCap = reference.lineJoin = 'round';
+    const levelAt = (ownRow: number) => {
+      const phase = Number(entry.csv.raw(ownRow, 'PHASE32'));
+      return phase >= 8 && phase < 24 ? 25 : 75;
+    };
+    const sampleRows = [row - 1, row, row + 1, row + 2];
+    const appendSample = (ownRow: number, move: boolean) => {
+      if (move) reference.moveTo(trace.x(ownRow - 1), levelAt(ownRow - 1));
+      const halfSlot = trace.x(ownRow) - slot / 2;
+      reference.lineTo(halfSlot, levelAt(ownRow - 1));
+      reference.lineTo(halfSlot, levelAt(ownRow));
+      reference.lineTo(trace.x(ownRow), levelAt(ownRow));
+    };
+    if (mode.startsWith('scalar')) {
+      reference.strokeStyle = palette[0];
+      reference.beginPath();
+      sampleRows.forEach((ownRow, i) => appendSample(ownRow, i === 0));
+      reference.stroke();
+    } else if (channel.startsWith('native')) {
+      // Native groups source-colour subpaths in first-source-occurrence order.
+      for (const color of palette) {
+        reference.strokeStyle = color;
+        reference.beginPath();
+        sampleRows.filter(ownRow => colorAt(ownRow) === color).forEach(ownRow => appendSample(ownRow, true));
+        reference.stroke();
+      }
+    } else {
+      for (const ownRow of sampleRows) {
+        reference.strokeStyle = colorAt(ownRow);
+        reference.beginPath();
+        appendSample(ownRow, true);
+        reference.stroke();
+      }
+    }
     const regions = [
-      { name: 'vertical', x0: Math.floor(turn) - 2, x1: Math.ceil(turn) + 2, y0: 30, y1: 70, color: ownColor(row), minimum: 30 },
-      { name: 'incoming arm', x0: Math.floor(turn - slot * 0.75), x1: Math.floor(turn - slot * 0.25), y0: incoming - 2, y1: incoming + 3, color: ownColor(row), minimum: 1 },
-      { name: 'outgoing arm', x0: Math.ceil(turn + slot * 0.25), x1: Math.ceil(turn + slot * 0.75), y0: outgoing - 2, y1: outgoing + 3, color: ownColor(row), minimum: 1 },
+      { name: 'vertical', x0: Math.floor(turn) - 2, x1: Math.ceil(turn) + 2, y0: 22, y1: 78 },
+      { name: 'incoming arm', x0: Math.ceil(turn - slot) + 2, x1: Math.floor(turn) - 2, y0: incoming - 3, y1: incoming + 4 },
+      { name: 'outgoing arm', x0: Math.ceil(turn) + 2, x1: Math.floor(turn + slot) - 2, y0: outgoing - 3, y1: outgoing + 4 },
     ];
     for (const region of regions) {
       expect(region.x0).toBeGreaterThanOrEqual(0);
       expect(region.x1).toBeLessThanOrEqual(trace.ink.width);
-      let ownInk = 0;
+      const width = region.x1 - region.x0, height = region.y1 - region.y0;
+      expect(width).toBeGreaterThan(0);
+      expect(height).toBeGreaterThan(0);
+      const expected = reference.getImageData(region.x0, region.y0, width, height);
+      const actual: number[] = [];
       for (let y = region.y0; y < region.y1; y++) for (let x = region.x0; x < region.x1; x++) {
-        const rgba = pixel(x, y);
-        if (rgba[3] >= 100 && (region.name !== 'vertical' || region.color.every((value, index) => Math.abs(value - rgba[index]) <= 2))) ownInk++;
+        const i = (y * trace.ink.width + x) * 4;
+        actual.push(...trace.ink.data.slice(i, i + 4));
       }
-      expect(ownInk, `phase${transition.phase} own${transition.ownIndex} ${region.name} visible ink`).toBeGreaterThan(region.minimum);
+      expect(actual).toHaveLength(expected.data.length);
+      const differences = actual.flatMap((value, i) => value === expected.data[i] ? [] : [{ x: region.x0 + Math.floor(i / 4) % width, y: region.y0 + Math.floor(i / 4 / width), component: i % 4, actual: value, expected: expected.data[i] }]);
+      // Evaluate every owned patch even when another patch fails.
+      expect.soft(differences, `phase${transition.phase} own${transition.ownIndex} ${region.name} source-owned RGBA and geometry ${JSON.stringify(differences.slice(0, 12))}`).toEqual([]);
+      expect([...expected.data].filter((value, i) => i % 4 === 3 && value > 0).length).toBeGreaterThan(1);
     }
-    // This local primitive fixes paint visibility; native credit remains location/direction only.
-    const reference = createCanvas(trace.ink.width, trace.ink.height).getContext('2d');
-    reference.strokeStyle = '#' + ownColor(row).map(value => value.toString(16).padStart(2, '0')).join('');
-    reference.lineWidth = 1;
-    reference.lineCap = 'round';
-    reference.beginPath();
-    reference.moveTo(turn, incoming);
-    reference.lineTo(turn, outgoing);
-    reference.stroke();
-    const vertical = regions[0];
-    const expected = reference.getImageData(vertical.x0, vertical.y0, vertical.x1 - vertical.x0, vertical.y1 - vertical.y0);
-    const actual = [];
-    for (let y = vertical.y0; y < vertical.y1; y++) for (let x = vertical.x0; x < vertical.x1; x++) actual.push(...pixel(x, y));
-    expect(actual, `phase${transition.phase} own${transition.ownIndex} exact vertical RGBA`).toEqual([...expected.data]);
     const center = Math.round(trace.x(row));
-    expect(pixel(center, 50)[3], `phase${transition.phase} bar-centre alternative remains blank`).toBe(0);
+    expect(trace.ink.data[(50 * trace.ink.width + center) * 4 + 3], `phase${transition.phase} bar-centre alternative remains blank`).toBe(0);
   });
 }

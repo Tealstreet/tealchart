@@ -20,10 +20,17 @@ import { resolved } from './nativePlotPaintHarness';
 export type StepChannel = 'web' | 'web-pane' | 'web-unified' | 'web-index' | 'native' | 'native-static';
 export interface StepCommand { op: string; x: number; y: number }
 export interface StepPaint { kind: 'stroke' | 'fill'; color: string; commands: StepCommand[]; dash: number[] }
-export function traceStep(entry: StepEntry, channel: StepChannel, variant: Partial<PlotOutput> = {}) {
+export function traceStep(entry: StepEntry, channel: StepChannel, variant: Partial<PlotOutput> = {}, focusTurns = false) {
   const { result, bars } = executeStep(entry);
   const plot = { ...result.plots.find(p => p.title === 'STEP')!, ...variant, scriptId: 's' } as PlotOutput;
   const viewport = { startTime: bars[0].time, endTime: bars[bars.length - 1].time, priceMin: 0, priceMax: 100 };
+  const interval = bars[1].time - bars[0].time;
+  // Keep adjacent colour samples visible with enough pixels per half-slot.
+  if (focusTurns) {
+    const falling = entry.certificate.transitions.find((transition: any) => transition.phase === 24)!;
+    viewport.endTime = Number(entry.csv.raw(falling.inputIndex.rowOrdinal, 'time')) * 1000 + interval * 1.2;
+    viewport.startTime = viewport.endTime - interval * 80;
+  }
   const paints: StepPaint[] = [];
   const canvas = createCanvas(1000, 100);
   const ink = canvas.getContext('2d');
@@ -53,8 +60,8 @@ export function traceStep(entry: StepEntry, channel: StepChannel, variant: Parti
     }, { s: { overlay: false } });
     else if (channel === 'web-index') renderer.renderExternalOverlayContent({ bars, viewport, plots: [plot],
       projection: { panes: [{ id: 'main', type: 'main', heightRatio: 1, fixedRange: true, top: 0, bottom: 100, height: 100, yMin: 0, yMax: 100 }],
-        barSpacingPx: 1000 / (bars.length - 1),
-        barIndexToX: i => i * 1000 / (bars.length - 1),
+        barSpacingPx: focusTurns ? interval * 1000 / (viewport.endTime - viewport.startTime) : 1000 / (bars.length - 1),
+        barIndexToX: i => focusTurns ? (bars[0].time + i * interval - viewport.startTime) * 1000 / (viewport.endTime - viewport.startTime) : i * 1000 / (bars.length - 1),
         timeToX: t => (t - viewport.startTime) * 1000 / (viewport.endTime - viewport.startTime),
         valueToY: v => 100 - v }, indicatorPaneInfo: { s: { overlay: true } },
     });
@@ -66,7 +73,7 @@ export function traceStep(entry: StepEntry, channel: StepChannel, variant: Parti
     const frame = createNativeChartFrameFromPanes({ dimensions: { width: 1000, height: 120, margins: { left: 0, right: 0, top: 0, bottom: 20 } },
       panes: [{ id: 'main', type: 'main', top: 0, height: 0, yMin: 0, yMax: 100 }, { id: 'study', type: 'indicator', top: 0, height: 100, yMin: 0, yMax: 100 }] });
     const sharedViewport = { startTime: { value: viewport.startTime }, endTime: { value: viewport.endTime }, priceMin: { value: 0 }, priceMax: { value: 100 } } as NativeViewportSharedValues;
-    const visibleBars = bars.map((bar, sourceIndex) => ({ ...bar, sourceIndex, interval: sourceIndex ? bar.time - bars[sourceIndex - 1].time : bars[1].time - bar.time, x: sourceIndex / (bars.length - 1) * 1000 }));
+    const visibleBars = bars.map((bar, sourceIndex) => ({ ...bar, sourceIndex, interval: sourceIndex ? bar.time - bars[sourceIndex - 1].time : bars[1].time - bar.time, x: focusTurns ? (bar.time - viewport.startTime) * 1000 / (viewport.endTime - viewport.startTime) : sourceIndex / (bars.length - 1) * 1000 }));
     const tree = NativeIndicatorPlotLayerImpl({ frame, bars, plots: [plot], visibleBars, totalBarCount: bars.length,
       indicatorPaneInfo: { s: { overlay: false, paneId: 'study' } }, sharedViewport,
       paneRangeOverrides: { value: {} } as SharedValue<any>, textFont: Skia.Font(undefined, 12),
