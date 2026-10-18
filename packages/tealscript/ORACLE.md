@@ -104,8 +104,10 @@ The [v26 return](https://github.com/Tealstreet/tealscript-oracle/blob/f47a4e34ce
 
 V6 coordinates add the observed box.set_xloc delta0. Box text retains complete paired-recipe matching and the vertical alignment subfacet; wrapping, horizontal alignment and isolated bold/italic effects remain held. All four v6 table visual facets remain UNDECIDED: the PNG has no independently readable tables. Its primary3/2/1/2 numeric vector is separate from the developing2/1/1/0 vector, which stays excluded. Linefill tracking and post-delete absence have their own v6 PNG; same-pair intermediate appearance and all line-price visuals remain held. The line-price timing correction places Download and PNG in the same clock bar, while preserving visual holds and unknown frame identity. The v6 copy entry stop remains held with no Save/Add or execution credit.
 
-V102 consumers share `tests/fixtures/v102Fixture.ts` for the manifest revision,
-SHA/length-checked reads, CSV decoding and unchanged-source execution. Family
+V102 consumers share `tests/fixtures/v102Fixture.ts` for an independently reviewed
+oracle revision, SHA/length-checked reads, CSV decoding and unchanged-source execution. Family
 consumers retain their own row windows, runtime options, assertions and holds.
+The loader rejects manifest revision drift; review and update its literal together
+with the manifest when adopting new captures.
 The web/native recorders share `tealchart/src/test/v102Paint.ts`; family adapters
 retain the recorded fields used by their finite paint contracts.
