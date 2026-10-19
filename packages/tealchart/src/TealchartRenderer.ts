@@ -1,4 +1,4 @@
-import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { TimeAxisMarker } from './rendering/axisMarkers';
 import type { CanvasContext } from './rendering/CanvasContext';
@@ -36,6 +36,7 @@ import {
   resolveIndicatorOutputSourceTime,
 } from './rendering/indicatorOutputAxisLabels';
 import { appendPlotFillQuad, getPlotFillIndexBounds, getPlotFillSample } from './rendering/plotFillGeometry';
+import { pineLineDash } from './rendering/pineLineDash';
 import { appendPlotAreaBaseline } from './rendering/plotGeometry';
 import {
   getPlotMarkerGeometry,
@@ -48,7 +49,7 @@ import { computeProjectedPriceLineLabelBounds } from './rendering/priceLineLayou
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
-import { getDecimalPlacesFromPrecision, LineStyle, PlotStyleOverride } from './state/chartState';
+import { getDecimalPlacesFromPrecision, PlotStyleOverride } from './state/chartState';
 import {
   Bar,
   ChartMargins,
@@ -2192,7 +2193,7 @@ export class TealchartRenderer {
       return;
     }
 
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'solid', ctx.lineWidth));
 
     // Draw the line
     ctx.beginPath();
@@ -2250,9 +2251,12 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          // Step line: horizontal then vertical
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' && i > 0
+            ? (this.getPlotX(plot, bars, i - 1, viewport, chartWidth, this.getPlotTime(plot, bars, i - 1)) + x) / 2
+            : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }
@@ -2461,7 +2465,7 @@ export class TealchartRenderer {
     ctx.lineWidth = 1;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'solid', ctx.lineWidth));
     ctx.beginPath();
 
     let isDrawing = false;
@@ -2653,7 +2657,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
-    ctx.setLineDash(this.lineStyleToDashPattern('dotted'));
+    ctx.setLineDash(pineLineDash('dotted', ctx.lineWidth));
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
     ctx.lineTo(options.width - margins.right, y);
@@ -3019,7 +3023,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'dashed', ctx.lineWidth));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
@@ -3179,7 +3183,7 @@ export class TealchartRenderer {
           ctx.textBaseline = 'middle';
           ctx.fillText(plot.char ?? '●', x, y);
         } else {
-          const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
+          const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'plotarrowup' : 'plotarrowdown') : shape || 'circle';
           this.drawShape(x, y, markerShape, markerSize);
         }
       }
@@ -5156,21 +5160,6 @@ export class TealchartRenderer {
     }
   }
 
-  /**
-   * Convert LineStyle to canvas setLineDash pattern
-   */
-  private lineStyleToDashPattern(lineStyle: LineStyle | PlotLineStyle): number[] {
-    switch (lineStyle) {
-      case 'dashed':
-        return [6, 4];
-      case 'dotted':
-        return [2, 3];
-      case 'solid':
-      default:
-        return [];
-    }
-  }
-
   private shouldRenderPlot(plot: Pick<PlotOutput, 'display'>): boolean {
     return plot.display === undefined || (plot.display & 1) !== 0;
   }
@@ -5219,7 +5208,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'dashed', ctx.lineWidth));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);
@@ -5291,7 +5280,7 @@ export class TealchartRenderer {
     ctx.lineWidth = effectiveLinewidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.setLineDash(this.lineStyleToDashPattern(effectiveLineStyle));
+    ctx.setLineDash(pineLineDash(effectiveLineStyle, ctx.lineWidth));
 
     const isStepLine = this.plotStyleUsesStepLine(style);
 
@@ -5345,8 +5334,12 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' && i > 0
+            ? (this.getPlotX(plot, bars, i - 1, viewport, chartWidth, this.getPlotTime(plot, bars, i - 1)) + x) / 2
+            : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }
@@ -6004,7 +5997,7 @@ export class TealchartRenderer {
     ctx.lineWidth = linewidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'solid'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'solid', ctx.lineWidth));
 
     const isStepLine = this.plotStyleUsesStepLine(style);
 
@@ -6059,8 +6052,12 @@ export class TealchartRenderer {
         isDrawing = true;
       } else {
         if (isStepLine) {
-          ctx.lineTo(x, lastY);
-          ctx.lineTo(x, y);
+          const turnX = style === 'stepline' && i > 0
+            ? (this.getPlotX(plot, bars, i - 1, viewport, chartWidth, this.getPlotTime(plot, bars, i - 1)) + x) / 2
+            : x;
+          ctx.lineTo(turnX, lastY);
+          ctx.lineTo(turnX, y);
+          if (style === 'stepline') ctx.lineTo(x, y);
         } else {
           ctx.lineTo(x, y);
         }
@@ -6163,7 +6160,7 @@ export class TealchartRenderer {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
-    ctx.setLineDash(this.lineStyleToDashPattern(plot.lineStyle ?? 'dashed'));
+    ctx.setLineDash(pineLineDash(plot.lineStyle ?? 'dashed', ctx.lineWidth));
 
     ctx.beginPath();
     ctx.moveTo(margins.left, y);

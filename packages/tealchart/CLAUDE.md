@@ -1,3 +1,9 @@
+V104 plain stepline v5/v6 turns at adjacent source points’ projected-X midpoint in
+both painters, including gapped bars; regular and index-projected slots retain
+their preceding half-slot turn.
+Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
+PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
+
 V103 v6 box-text captures now isolate finite complete-word wrapping versus nowrap,
 right/bottom alignment versus left/top controls, and none/bold/italic/both setters.
 Unchanged-source CSV replay and original PNG/map-bound web/native painter locks cover
@@ -1717,3 +1723,23 @@ native PNGs. Both polyline versions witness open endpoint chevrons. Relative
 plotarrow heights are supported; direction and universal raster metrics stay held.
 Style locks bind each CSV bar/value or drawing footprint, rejecting palette-preserving
 style/position swaps without claiming hidden creation order for disjoint subjects.
+
+V104's isolated v6 blue dashed lanes at widths1/4/8 have proportional painted
+periods in their original PNG. Pine drawing and plot painters scale each own
+stroke recipe by its width, including native Skia effects and serialized drawing
+worklets. Dotted styles, boxes, polylines, plots and hlines extend the shared rule
+by inference, with separate regression gates; this capture credits only v6 lines.
+Exact native pixel periods, phase resets, clipping and universal dash ratios stay held.
+
+V104 v5 wrap/alignment locks bind each of three boxes to its source position,
+complete caption and independently painted local raster. Whole-word wrap counts
+use active font measurements; native glyph metrics remain unobserved.
+
+V104 v5 vertical alignment binds complete EDGE ink to left/top, middle/center
+and right/bottom equal-height boxes. Compare complete per-object local rasters
+under system and DejaVu-only fonts; exact native font/padding metrics stay held.
+
+V104 v6 plotarrow sign-direction is bound to its own closed CSV signs and PNG
+tip narrowing, shoulders and shaft through web and native painters. Use separate
+plotarrow glyphs; plotshape arrows retain their existing marker geometry. The older
+v103 sign-direction facet and universal native raster metrics remain held.

@@ -1,3 +1,7 @@
+V104 plain stepline v5/v6 turns at the preceding half source slot in both painters.
+Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
+PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
+
 V103 noncoincident-point v5/v6 captures distinguish all five applied point setters
 and copied fields after later point mutation through their own original PNG/maps.
 Keep 958 exact numeric/blank cells separate from 66 translated absolute-index cells.
@@ -4925,3 +4929,16 @@ COUNT/PARENT getters supply one event and 31 blanks each; v102 entry stops stay 
 V103 styles replay seven unchanged sources at their own closed retained anchors.
 Exact non-index cells include intentional blanks; one build event is not32 getter
 observations. PNG-bound topology remains separate from plotarrow sign-direction held.
+
+V104 v5 box wrap/alignment replay preserves each build's three getter values
+and intentional blanks. Absolute indices are observed exclusions; four modulo8
+cycles use original closed bars without synthesizing an own-origin prefix.
+
+V104 v5 vertical alignment adds one retained build with 8/8/7 span getters.
+Its 319 exact cells include 155 intentional blanks; the 33 absolute-index cells
+stay observed exclusions, and unrelated v11 slots receive no credit.
+
+V104 arrow-direction replay scores 288 unchanged numeric/blank cells plus64
+SOURCE_BOOL plotchar exports in the own retained closed block. Absolute-index
+translations are64 observed exclusions; earlier blocks and the developing row
+earn no primary credit. The separate v103 sign-direction hold stays unchanged.

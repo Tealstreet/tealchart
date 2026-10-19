@@ -9,7 +9,7 @@ vi.mock('react', async (importOriginal) => ({
 }));
 
 describe('native PlotArrow audit gaps', () => {
-  it('suppresses null arrow colors and matches the web triangle glyph', () => {
+  it('suppresses null arrow colors and matches the web shafted glyph', () => {
     const harness = nativePlotHarness([
       testPlot({
         type: 'plotarrow',
@@ -19,9 +19,18 @@ describe('native PlotArrow audit gaps', () => {
         maxHeight: 16,
       }),
     ]);
-    const p = harness.paths().find((p) => p.props.color === 'red')!;
+    const paths = harness.paths();
+    expect(paths).toHaveLength(1);
+    const p = paths.find((p) => p.props.color === 'red')!;
     expect(p.path.close).toHaveBeenCalledTimes(1);
-    expect(p.path.lineTo).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(p.path.lineTo).mock.calls).toEqual([
+      [3.2, 205.2],
+      [1.6, 205.2],
+      [1.6, 218],
+      [-1.6, 218],
+      [-1.6, 205.2],
+      [-3.2, 205.2],
+    ]);
     expect(p.path.moveTo).toHaveBeenCalledWith(0, 202); // low y=190, anchor=210, tip=202
   });
 });

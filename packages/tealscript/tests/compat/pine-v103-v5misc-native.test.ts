@@ -7,7 +7,7 @@ const hash = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('h
 
 describe('v103 v5 extension/stroke and v5/v6 retained linefill native evidence', () => {
   it('pins the independently reviewed revision, v21/v22 integrity/validation and exact frozen models', () => {
-    expect(revision).toBe('287ebfc19e282245be4df55fc6a9d0f5b876d817');
+    expect(revision).toBe('04a6378c310ef405448e5eea719bf4bc0e699e1a');
     expect(lock.revision).toBe(revision);
     for (const version of [21, 22]) {
       const integrity = capture + `artifact-integrity-v${version}.json`;

@@ -135,8 +135,8 @@ Of 1,792 native primary positions, 1,561 numeric/blank cells compare exactly and
 contains one event and 31 intentional blanks. These counts include time, phase,
 scale and presence controls; they are not new numeric drawing getter observations.
 
-The shared v102 loader and independent v103 revision literal use the append-only
-287ebfc1 pin. The v13 captures first landed at 1aad8cc2.
+These captures originally used the append-only 287ebfc1 pin for the shared v102
+loader and independent v103 revision literal. The v13 captures first landed at 1aad8cc2.
 V102's occluded polyline-label/table cases retain their original
 UNDECIDED verdicts. V5 table precedence, polyline arrow
 topology, universal raster/font metrics and historical context holds receive no
@@ -198,7 +198,7 @@ no retroactive execution credit. This is a mutation-proven regression lock.
 
 ## V103 plot and polyline style controls
 
-The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/287ebfc19e282245be4df55fc6a9d0f5b876d817/v103/captures/v103/RESPONSE-v103-v29.md)
+The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v103/captures/v103/RESPONSE-v103-v29.md)
 separately binds seven unchanged sources: v6 polyline fill/style, plot/hline
 fillgaps overloads, plot controls, markers, plotarrow height, and v5/v6 polyline
 arrows. Each uses the unique retained closed anchor A and own A-31..A, with
@@ -236,3 +236,68 @@ footprints and arrow tips, plot value lanes and CSV phase rows, and individual
 square/glyph anchors. Palette-preserving real-painter swaps go RED, including
 plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
 order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+## V104 width-dependent dash periods
+
+The [v5 return](https://github.com/Tealstreet/tealscript-oracle/blob/5c8a503d7b6cc1c161f75d484b5340ebc459a55b/v104/captures/v104/RESPONSE-v104-v5.md) binds the unchanged v6 source, original CSV and PNG. Its three separated blue horizontal lanes own widths1/4/8, identical spans29, and different value anchors85/65/40. Independent native PNG profiles establish period ratios1:4:8 (SUPPORTED_B), refuting constant period. Real web/native painter commands and per-lane raster profiles lock each lane's own width, position and period; swapped lanes and one-sided faults are separately rejected.
+
+Replay uses only actual captured OHLC/time/volume from the first observed modulo8-zero row through the owned closed build. The selected A-31..A block yields288 exact non-index numeric/blank cells and64 translated index-context cells with zero absolute-origin credit. Each build getter supplies one finite event and31 intentional blanks. No output seeds, invented bars or native outputs enter execution. Other/developing/context rows receive no primary credit.
+
+Dotted strokes, boxes, polylines, plot/hline styles and earlier Pine versions inherit width scaling through the shared recipe as an explicit inference, separately regression-tested without additional native credit. Existing width1 recipe lengths and dash/gap proportions are retained as engine policy, not native-certified absolute metrics. The older copy comparison's local constructor recipe and width2 worklet expectation follow this same inferred correction; neither older capture certified a numeric period. Native DPI, absolute pixel lengths, phase/reset/clipping laws and historical holds remain held.
+
+## V104 finite glyph advance
+
+The v6 glyph slot at oracle `811a4d79` supplies one retained four-label plate:
+monospace I/W body widths agree within the preregistered edge uncertainty, while
+default-font I/W controls differ. Original source, CSV, PNG and map bindings are
+separate from the local font recipes exercised through web and native painters.
+The append-only fixture union includes v4 integrity dependencies; other v104
+slots receive no scoring credit from the glyph lock.
+
+The fixed A-31..A block contains 384 native cells. Unchanged-source replay
+compares 351 numeric/blank cells exactly, including 186 intentional blanks;
+33 absolute-index cells remain translated context. Four position getters each
+contribute one build observation, not 32 repeated getters. Original predecessors
+remain context; developing rows are excluded. Native font identity, fractional
+advances, padding, DPI/frame/zoom and universal raster claims stay held.
+
+## V104 v5 box wrapping and alignment
+
+The [v104 return](https://github.com/Tealstreet/tealscript-oracle/blob/1faebe5ac656714b4177c9acbdb5e1e411e8e9b2/v104/captures/v104/RESPONSE-v104-v2.md)
+binds two unchanged sources, each with one retained closed build and its fixed
+A−31..A block. Exact replay scores 638 cells, including 310 intentional blanks;
+66 absolute-index cells remain observed exclusions. Three span getters per source
+are one build event each, not 32 independent getter observations.
+
+Original PNG and region-map bindings retain complete wrapped/nowrap captions and
+three position-bound EDGE alternatives. Real web/native painters additionally
+match an independent local canvas reference at the frozen source coordinates.
+Local line choices use active font measurement, tested with system and DejaVu-only
+fonts. Exact native glyph/DPI/padding metrics, hidden frame identity, unrelated v104
+slots and universal composition remain held with zero added credit.
+
+The [v104 vertical delta](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v104/captures/v104/RESPONSE-v104-v11.md)
+adds the separate v5 top/center/bottom plate: 319 exact cells (155 intentional
+blanks), 33 excluded absolute-index cells and one retained build. Its original
+PNG certifies each complete EDGE caption and six box top/bottom boundaries;
+the third box is seven bars wide, while the first two are eight. Independent
+web/native local raster references bind those same identities across host fonts.
+The combined three-source score is 957 exact cells, 465 blanks and 99 excluded
+index cells. No other v11 source earns credit here; native raster metrics stay held.
+
+V104 step-turn v5/v6 at oracle `735d1b50` supplies two independent PNG/CSV/certificate
+joins for phase8 and phase24: native plain stepline turns occur at X(t)-b/2.
+Both web and native painters use that half-slot boundary and retain the sample
+centre after the vertical. `steplinebr` and `stepline_diamond` remain unchanged.
+The locks score 640 exact primary values/blanks, with 128 translated absolute-index
+context cells excluded from numeric credit. Each source replays an original
+modulo32-aligned exported prefix through its own retained anchor, preserving eight
+original predecessors and giving startup/developing/other rows zero credit.
+Raw PNG samples preserve their encoded channels without ICC conversion.
+The former centre-turn synthetic PNG is replaced by an independent exact
+half-slot raster constructor; the drift tolerance is not increased.
+
+Composition controls combine those unchanged replay inputs with local dashed/dotted,
+width1/4/8 and scalar/series-colour plot overrides through all six painter routes.
+They bind each own half-slot turn to its width-scaled pattern and painted ink,
+without native dashed-stepline, absolute period or phase/reset credit.

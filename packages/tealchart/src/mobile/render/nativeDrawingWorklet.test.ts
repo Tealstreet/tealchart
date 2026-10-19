@@ -106,7 +106,7 @@ describe('native drawing serialized worklets', () => {
     expect(drawPath).toHaveBeenCalledOnce();
     expect(drawPath.mock.calls[0]![0].moveTo).toHaveBeenCalledWith(10, 10);
     expect(drawPath.mock.calls[0]![0].lineTo).toHaveBeenCalledWith(20, 20);
-    expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith([6, 4], 0);
+    expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith([12, 8], 0);
   });
 });
 

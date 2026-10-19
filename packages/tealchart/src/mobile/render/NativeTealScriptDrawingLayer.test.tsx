@@ -99,6 +99,7 @@ describe('native TealScript lines', () => {
         ),
     ).toBe(true);
   });
+  // Local width-scaled recipes infer v104's shared rule; native absolute lengths stay held.
   it.each(['dashed', 'dotted', 'arrow_left', 'arrow_right', 'arrow_both'] as const)(
     'paints %s strokes and arrowheads',
     (style) => {
@@ -107,7 +108,7 @@ describe('native TealScript lines', () => {
         style === 'arrow_both' ? 3 : style.startsWith('arrow_') ? 2 : 1,
       );
       if (style === 'dashed' || style === 'dotted')
-        expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(style === 'dashed' ? [6, 4] : [2, 4], 0);
+        expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(style === 'dashed' ? [18, 12] : [6, 12], 0);
     },
   );
   it('reprojects after pan/zoom without scaling the stroke', () => {
@@ -213,7 +214,7 @@ describe('native TealScript boxes', () => {
   it.each(['solid', 'dashed', 'dotted'] as const)('paints %s borders', (borderStyle) => {
     expect(paint([{ ...box, borderStyle, text: '' }]).calls.filter((call) => call.kind === 'drawRect')).toHaveLength(2);
     if (borderStyle !== 'solid')
-      expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(borderStyle === 'dashed' ? [6, 4] : [2, 4], 0);
+      expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(borderStyle === 'dashed' ? [12, 8] : [4, 8], 0);
   });
   it.each(['left', 'center', 'right'] as const)('keeps %s multiline text inside a box', (textHalign) => {
     const calls = paint([{ ...box, text: 'A\nBB', textHalign, textValign: 'bottom' }]).calls.filter(
@@ -363,7 +364,7 @@ describe('native TealScript polylines', () => {
         lineStyle === 'arrow_both' ? 3 : lineStyle.startsWith('arrow_') ? 2 : 1,
       );
       if (lineStyle === 'dashed' || lineStyle === 'dotted')
-        expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(lineStyle === 'dashed' ? [6, 4] : [2, 4], 0);
+        expect(Skia.PathEffect.MakeDash).toHaveBeenCalledWith(lineStyle === 'dashed' ? [12, 8] : [4, 8], 0);
     },
   );
   it('resolves chart.point time coordinates and drops invalid points', () => {
