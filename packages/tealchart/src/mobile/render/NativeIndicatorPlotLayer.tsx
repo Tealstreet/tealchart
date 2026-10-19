@@ -316,8 +316,8 @@ function getNativeIndicatorLinePath({
           value: point.value,
         });
 
-    const turnX = style === 'stepline'
-      ? nativeIndicatorPointX({ frame, point: { ...point, time: point.time - point.interval / 2 }, projection, sharedViewport })
+    const turnX = style === 'stepline' && index > 0
+      ? (nativeIndicatorPointX({ frame, point: points[index - 1], projection, sharedViewport }) + x) / 2
       : x;
 
     if (colorFilter !== undefined) {

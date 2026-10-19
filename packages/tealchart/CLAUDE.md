@@ -1,4 +1,6 @@
-V104 plain stepline v5/v6 turns at the preceding half source slot in both painters.
+V104 plain stepline v5/v6 turns at adjacent source points’ projected-X midpoint in
+both painters, including gapped bars; regular and index-projected slots retain
+their preceding half-slot turn.
 Each phase8/phase24 turn is tied to its own raw CSV row, directed arms and native
 PNG/ruler certificate. Break/diamond step variants are unchanged and uncredited.
 
