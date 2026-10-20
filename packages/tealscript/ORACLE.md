@@ -98,6 +98,12 @@ The [v102 v6 return](https://github.com/Tealstreet/tealscript-oracle/blob/db3199
 A separate replay through the source-owned closed visual anchor locks the emitted line/box/label copy fields to the three PNG-bound appearance verdicts. Copies retain the original blue thick dashed line, yellow solid-blue-border box with independent blue text, and blue centered large label with independent white text while the source objects change. These are finite appearance-output contracts, not exact raster, font, DPI, native token or cross-session identity claims. The original PNG/region uncertainty and all historical holds remain intact. The [v14 return](https://github.com/Tealstreet/tealscript-oracle/blob/6fba2a043155ecfd52bec4fbffb9f03144066ab3/v102/captures/v102/RESPONSE-v102-v14.md) consumed the v6 copy slot at native source entry before Save/Add: no CSV or rendering PNG exists. All14 numeric properties and all three appearance cases remain UNDECIDED/HELD, with zero transferred credit. Partial editor text is not executed source or rendering evidence. The engine already matches this bounded v5 evidence; the new tests are mutation-proven regression locks.
 
 
+## V103 copy appearance v6
+
+The [v19 return](https://github.com/Tealstreet/tealscript-oracle/blob/0bda1a440f03f92334f5f95babaa5021bc7a7e15/v103/captures/v103/RESPONSE-v103-v19.md) supplies a separate successful v6 execution. Rows307–338 are its32 closed primary rows, with eight original predecessors299–306; row339 is developing and excluded. Unchanged-source replay starts at the first captured phase-zero row7 and stops at the owned anchor338. Nine plot columns provide288 exact value/blank comparisons. The64 cells in INPUT_INDEX and VISUAL_ANCHOR_INDEX are translated index/presence context, never own-origin credit. Each of the three build getters has one finite event and31 intentional blanks.
+
+The original PNG and frozen region map directly distinguish independent copies from mutated-source appearance: blue6 dashed line at85, yellow box with solid blue border and blue COPY text, and blue centered COPY label with white text. Copy and independent-constructor patches match in the native PNG; real web/native painter gates check the corresponding strokes, fills, text and label body classes. This is a regression lock with production mutations. It does not recover the original v102 v6 entry stop, hidden identities, omitted prefix, font/DPI/zoom, universal raster metrics or historical holds.
+
 ## V102 v6 twins
 
 The [v26 return](https://github.com/Tealstreet/tealscript-oracle/blob/f47a4e34ce33441ad37add124d9572119826138d/v102/captures/v102/RESPONSE-v102-v26.md) separately binds v6 coordinate, box-text, table-relocation, linefill and both line-price sources. Their192 selected rows provide2,688 exact non-index cells, including2,240 registered property cells; all192 absolute indices remain context only. Coordinate replay retains eight actual closed predecessors. No v5 result substitutes for a v6 export.
@@ -111,3 +117,187 @@ The loader rejects manifest revision drift; review and update its literal togeth
 with the manifest when adopting new captures.
 The web/native recorders share `tealchart/src/test/v102Paint.ts`; family adapters
 retain the recorded fields used by their finite paint contracts.
+
+## V103 isolated stacking pairs
+
+The [v13 return](https://github.com/Tealstreet/tealscript-oracle/blob/1aad8cc2b41f53bd85b0c5558b36365d371b7244/v103/captures/v103/RESPONSE-v103-v13.md)
+adds independent v5/v6 polyline-label plates and v6 table-over-line/polyline/box/label/linefill
+plates. Labels cover both orange lanes despite opposite creation orders; each
+opaque table covers its single subject while that subject remains visible outside.
+The unchanged engine already matches. Real web/native painter and bitmap locks
+bind these seven finite verdicts to their original PNGs and derived maps.
+
+Each source contributes 32 closed rows and eight original closed predecessors.
+The unchanged source executes an actual phase-aligned exported prefix through its
+one-time retained anchor, with neither fabricated history nor native output seeds.
+Of 1,792 native primary positions, 1,561 numeric/blank cells compare exactly and
+231 absolute-index positions remain translated context. Each build-marker channel
+contains one event and 31 intentional blanks. These counts include time, phase,
+scale and presence controls; they are not new numeric drawing getter observations.
+
+These captures originally used the append-only 287ebfc1 pin for the shared v102
+loader and independent v103 revision literal. The v13 captures first landed at 1aad8cc2.
+V102's occluded polyline-label/table cases retain their original
+UNDECIDED verdicts. V5 table precedence, polyline arrow
+topology, universal raster/font metrics and historical context holds receive no
+credit from these seven captures. The table-over-label PNG leaves its middle label
+line obscured; only the visible upper/lower body controls receive visual credit.
+
+## V103 visible gap captures
+
+The v5/v6 visible-gap locks use oracle `c1d406006d80e2edc4d16d2952b503bf9dff0dc4`
+and the original RESPONSE-v103-v6 sources, CSVs, PNGs and derived maps. The
+unique retained closed anchor selects A-31..A, with eight original predecessors.
+Replay uses only actual main-chart OHLCV/time, starting at an observed phase-zero
+row so the translated local index preserves modulo eight. Both absolute-index
+channels are context projections and receive no native parity credit. There is
+no own-origin startup claim, invented timestamp continuity or native-output seed.
+
+OFFSET1's raw CSV is SCREEN_ALIGNED, independently distinguished from the
+refuted SOURCE_SERIES prediction. Numeric comparison samples the engine source
+at destination minus offset; the real plot painters separately apply the offset.
+The original PNGs/map support four finite line/area holes and four marker pairs
+per version, plus the v6 dashed-stroke class on three nonmissing falling segments.
+Web legacy, indicator-pane and unified painters and both native projection routes
+consume the replayed outputs. They assert topology, displacement and stroke class,
+not exact native raster or dash-period equality. The two step-half-bar facets
+remain UNDECIDED because the preregistered uncertainty cannot separate the models.
+Developing, other closed and replay-context rows receive zero primary credit;
+native frame, font, DPI, zoom, unreturned slots and historical holds remain held.
+
+## V103 noncoincident point setters v1
+
+The [v18 return](https://github.com/Tealstreet/tealscript-oracle/blob/cd1fcda33e7bae9198823468495f6cb6feb05145/v103/captures/v103/RESPONSE-v103-v18.md)
+independently captures v5 and v6 line first/second points, box top-left/bottom-right
+points, label points and copied fields after subsequent point mutations. Each
+version's original PNG and frozen map separate all six model A outcomes from
+ignored setters and later live point fields. Real web and native painters replay
+the unchanged source into a canvas and check the assigned and competing locations.
+These finite position checks do not establish exact native raster or font metrics.
+
+Each 32-row block contributes 479 exact numeric/blank comparisons and 33 translated
+absolute-index context cells. The eight getter channels each contain one closed
+build event and 31 intentional blanks. Replay starts at the first actual exported
+modulo8-zero input and retains the exported prefix through the unique closed anchor,
+including its eight original predecessors; no invented bars, output seed or source
+rewrite supplies the build guard. Every other closed/developing row stays excluded.
+The label's intermediate time-mode getter delta is numeric only; its final index-mode
+pixels do not observe the intermediate mode flag. All historical holds remain intact.
+The engine already matches these captures; tests lock the regression with mutations.
+
+The [v103 v22 return](https://github.com/Tealstreet/tealscript-oracle/blob/ac9d6992d6d84e296c58dca98fb6b707224d55a1/v103/captures/v103/RESPONSE-v103-v22.md)
+binds the v5 extend-stroke plate and separate retained-replacement v5/v6 plates.
+Their 96 selected closed rows supply 861 exact non-index cells (489 present,
+372 intentional blanks); 99 absolute-index cells remain excluded. Each linefill
+COUNT/PARENT channel supplies one event and 31 blanks. Original PNGs and frozen
+windows distinguish row-owned extension/stroke/width classes, a single blue fill
+following moved parents, and deletion of the independent right replacement with
+positive parent/left-fill controls through both painters. Raster metrics, hidden
+handle identity and a universal alpha law remain held; v102 v5 entry stops receive
+no retroactive execution credit. This is a mutation-proven regression lock.
+
+## V103 plot and polyline style controls
+
+The [complete v103 return](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v103/captures/v103/RESPONSE-v103-v29.md)
+separately binds seven unchanged sources: v6 polyline fill/style, plot/hline
+fillgaps overloads, plot controls, markers, plotarrow height, and v5/v6 polyline
+arrows. Each uses the unique retained closed anchor A and own A-31..A, with
+eight original closed predecessors retained. Exact replay supplies real exported
+OHLC/time/volume from an earlier modulo32-aligned closed row through A; no source,
+index expression or native result seeds the engine. The two absolute-index
+columns translate only as context, yielding 2,048 exact scored cells (1,562 finite
+and486 intentional blanks), with448 index cells excluded. COUNT has one build
+event per polyline source; its31 blanks are not31 additional getter observations.
+Other closed rows and developing snapshots receive no primary score.
+
+Original PNGs and their SHA-bound region maps independently support26 finite
+visual facets. Real web/native painters lock filled closed dashed triangles,
+copied point fields and deletion; plot fill holes versus bridging and positive
+hline fill; adjacent circle joins, old-tail suppression and tracker presence;
+relative square size, absolute upper-square placement and literal X; relative
+positive arrow heights; and v5/v6 open stroked polyline chevrons on the supplied
+first/last/both endpoints. Both arrow versions earn their own native evidence;
+no line-to-polyline or version-to-version transfer is used. The26 facets are
+qualitative topology/visibility/location classes, not exact dash periods, marker
+metrics, glyph raster, color compositing or universal pixel equivalence.
+
+The plotarrow sign-direction facet remains UNDECIDED with zero visual credit;
+a direction-only painter mutation stays GREEN. Native font/DPI/zoom and hidden
+frame identity remain unobserved. Marker PNG axes are actually expanded, and
+show_last PNG tails include a developing bar: tests assert historical suppression
+and a positive tail, without treating the last-four-closed marker positions as
+native pixel witnesses. Full CSV series values remain separate from visibility.
+The existing engine and painters already match these finite observations;
+production-fault mutations establish regression coverage without an engine fix
+or mobile worker regeneration. Historic holds1/2/7/8/13/14/21 remain unchanged.
+
+Each style assertion attaches to its source-owned spatial identity: triangle
+footprints and arrow tips, plot value lanes and CSV phase rows, and individual
+square/glyph anchors. Palette-preserving real-painter swaps go RED, including
+plot/hline fill colors and X/square positions. Equivalent disjoint polyline paint
+order stays GREEN; this capture does not witness hidden creation/traversal order.
+
+## V104 width-dependent dash periods
+
+The [v5 return](https://github.com/Tealstreet/tealscript-oracle/blob/5c8a503d7b6cc1c161f75d484b5340ebc459a55b/v104/captures/v104/RESPONSE-v104-v5.md) binds the unchanged v6 source, original CSV and PNG. Its three separated blue horizontal lanes own widths1/4/8, identical spans29, and different value anchors85/65/40. Independent native PNG profiles establish period ratios1:4:8 (SUPPORTED_B), refuting constant period. Real web/native painter commands and per-lane raster profiles lock each lane's own width, position and period; swapped lanes and one-sided faults are separately rejected.
+
+Replay uses only actual captured OHLC/time/volume from the first observed modulo8-zero row through the owned closed build. The selected A-31..A block yields288 exact non-index numeric/blank cells and64 translated index-context cells with zero absolute-origin credit. Each build getter supplies one finite event and31 intentional blanks. No output seeds, invented bars or native outputs enter execution. Other/developing/context rows receive no primary credit.
+
+Dotted strokes, boxes, polylines, plot/hline styles and earlier Pine versions inherit width scaling through the shared recipe as an explicit inference, separately regression-tested without additional native credit. Existing width1 recipe lengths and dash/gap proportions are retained as engine policy, not native-certified absolute metrics. The older copy comparison's local constructor recipe and width2 worklet expectation follow this same inferred correction; neither older capture certified a numeric period. Native DPI, absolute pixel lengths, phase/reset/clipping laws and historical holds remain held.
+
+## V104 finite glyph advance
+
+The v6 glyph slot at oracle `811a4d79` supplies one retained four-label plate:
+monospace I/W body widths agree within the preregistered edge uncertainty, while
+default-font I/W controls differ. Original source, CSV, PNG and map bindings are
+separate from the local font recipes exercised through web and native painters.
+The append-only fixture union includes v4 integrity dependencies; other v104
+slots receive no scoring credit from the glyph lock.
+
+The fixed A-31..A block contains 384 native cells. Unchanged-source replay
+compares 351 numeric/blank cells exactly, including 186 intentional blanks;
+33 absolute-index cells remain translated context. Four position getters each
+contribute one build observation, not 32 repeated getters. Original predecessors
+remain context; developing rows are excluded. Native font identity, fractional
+advances, padding, DPI/frame/zoom and universal raster claims stay held.
+
+## V104 v5 box wrapping and alignment
+
+The [v104 return](https://github.com/Tealstreet/tealscript-oracle/blob/1faebe5ac656714b4177c9acbdb5e1e411e8e9b2/v104/captures/v104/RESPONSE-v104-v2.md)
+binds two unchanged sources, each with one retained closed build and its fixed
+A−31..A block. Exact replay scores 638 cells, including 310 intentional blanks;
+66 absolute-index cells remain observed exclusions. Three span getters per source
+are one build event each, not 32 independent getter observations.
+
+Original PNG and region-map bindings retain complete wrapped/nowrap captions and
+three position-bound EDGE alternatives. Real web/native painters additionally
+match an independent local canvas reference at the frozen source coordinates.
+Local line choices use active font measurement, tested with system and DejaVu-only
+fonts. Exact native glyph/DPI/padding metrics, hidden frame identity, unrelated v104
+slots and universal composition remain held with zero added credit.
+
+The [v104 vertical delta](https://github.com/Tealstreet/tealscript-oracle/blob/04a6378c310ef405448e5eea719bf4bc0e699e1a/v104/captures/v104/RESPONSE-v104-v11.md)
+adds the separate v5 top/center/bottom plate: 319 exact cells (155 intentional
+blanks), 33 excluded absolute-index cells and one retained build. Its original
+PNG certifies each complete EDGE caption and six box top/bottom boundaries;
+the third box is seven bars wide, while the first two are eight. Independent
+web/native local raster references bind those same identities across host fonts.
+The combined three-source score is 957 exact cells, 465 blanks and 99 excluded
+index cells. No other v11 source earns credit here; native raster metrics stay held.
+
+V104 step-turn v5/v6 at oracle `735d1b50` supplies two independent PNG/CSV/certificate
+joins for phase8 and phase24: native plain stepline turns occur at X(t)-b/2.
+Both web and native painters use that half-slot boundary and retain the sample
+centre after the vertical. `steplinebr` and `stepline_diamond` remain unchanged.
+The locks score 640 exact primary values/blanks, with 128 translated absolute-index
+context cells excluded from numeric credit. Each source replays an original
+modulo32-aligned exported prefix through its own retained anchor, preserving eight
+original predecessors and giving startup/developing/other rows zero credit.
+Raw PNG samples preserve their encoded channels without ICC conversion.
+The former centre-turn synthetic PNG is replaced by an independent exact
+half-slot raster constructor; the drift tolerance is not increased.
+
+Composition controls combine those unchanged replay inputs with local dashed/dotted,
+width1/4/8 and scalar/series-colour plot overrides through all six painter routes.
+They bind each own half-slot turn to its width-scaled pattern and painted ink,
+without native dashed-stepline, absolute period or phase/reset credit.
