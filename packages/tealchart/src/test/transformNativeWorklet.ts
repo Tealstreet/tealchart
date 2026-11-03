@@ -31,7 +31,8 @@ export function transformNativeWorklet(source: string, filename: string): string
     babelrc: false,
     plugins: [
       removeLegacyTypeArguments,
-      '@babel/plugin-transform-typescript',
+      // Babel 7 parses JSX in TypeScript only when told; the worklets plugin needs Babel 7.
+      ['@babel/plugin-transform-typescript', { isTSX: filename.endsWith('.tsx'), allExtensions: true }],
       'react-native-worklets/plugin',
       ...(filename.endsWith('.tsx') ? [['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]] : []),
       '@babel/plugin-transform-modules-commonjs',
