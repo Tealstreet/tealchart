@@ -80,3 +80,11 @@ git branch -d feat/my-change
 Native oracle tests require the pinned public fixtures. Run `yarn oracle:fetch`
 from `packages/tealscript` before testing; see [ORACLE.md](packages/tealscript/ORACLE.md).
 Capture requests and raw evidence belong in [tealscript-oracle](https://github.com/Tealstreet/tealscript-oracle).
+
+## Paint test dependency
+
+`@napi-rs/canvas` is pinned to `1.0.11` in the chart package and `yarn.lock`.
+Newer versions change color serialization and raster output, so upgrades require
+reviewing the original paint assertions and Linux snapshot results together.
+Keep the manifest and lock entry aligned: Yarn Classic's `--frozen-lockfile` can
+resolve an unmatched manifest range without writing the missing lock entry.
