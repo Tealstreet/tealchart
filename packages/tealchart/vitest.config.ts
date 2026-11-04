@@ -4,7 +4,6 @@ import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
 
 const testFiles = ['./src/**/*.test.{js,jsx,ts,tsx}'];
-const glyphFontTests = ['./src/rendering/pine-v104-glyph-native.test.ts'];
 
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
@@ -42,18 +41,7 @@ export default defineConfig({
     clearMocks: true,
     mockReset: true,
     restoreMocks: true,
+    include: testFiles,
     exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.{idea,git,cache,output,temp}/**'],
-    projects: [
-      {
-        extends: true,
-        test: { name: 'chart', include: testFiles, exclude: glyphFontTests },
-      },
-      {
-        extends: true,
-        // Canvas font aliases are native process state, outside Vitest's module isolation.
-        // Keep this fixture's font registry changes out of the other paint tests.
-        test: { name: 'glyph-fonts', include: glyphFontTests, pool: 'forks', isolate: true },
-      },
-    ],
   },
 });

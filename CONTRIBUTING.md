@@ -88,7 +88,3 @@ Newer versions change color serialization and raster output, so upgrades require
 reviewing the original paint assertions and Linux snapshot results together.
 Keep the manifest and lock entry aligned: Yarn Classic's `--frozen-lockfile` can
 resolve an unmatched manifest range without writing the missing lock entry.
-
-The glyph font fixture runs in its own forked test project. Its process-wide font
-aliases and DejaVu-only registry must not affect other paint snapshots; listing
-font families and reloading a directory does not restore the prior alias state.
