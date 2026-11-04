@@ -384,9 +384,9 @@ export const VISUAL_SNAPSHOT_DRIFT_BASELINE: VisualSnapshotDriftBaselineEntry[] 
   {
     name: 'plotchar-star',
     platform: 'linux',
-    differingPixels: 822,
+    differingPixels: 986,
     totalPixels: 120000,
-    differingPixelRatio: 0.00685,
+    differingPixelRatio: 0.008216666666666667,
     channelTolerance: 16,
     maxDifferingPixelRatio: 0.08,
     width: 400,
