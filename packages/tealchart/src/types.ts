@@ -1248,6 +1248,15 @@ export interface TealchartWidgetOptions {
    * tab visibility changes, laptop sleep, etc.) and automatically refetch.
    */
   gapDetection?: GapDetectionOptions;
+  /** Recovery decisions for host diagnostics; hosts control reporting volume. */
+  onDatafeedRecovery?: (event: {
+    decision: string;
+    reason: string;
+    symbol: string;
+    resolution: string;
+    guid?: string;
+    retryInMs?: number;
+  }) => void;
   /**
    * Whether to show TP/SL bracket buttons on position lines.
    * When enabled, position lines show draggable TP (take profit) and SL (stop loss) buttons.

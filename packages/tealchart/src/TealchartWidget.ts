@@ -262,6 +262,15 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Subscription tracking
   private _barSubscriptionGuid: string | null = null;
+  private _barGapRepair: {
+    guid: string;
+    firstLiveTime: number;
+    target: number;
+    historyTime: number;
+    failures: number;
+    inFlight: boolean;
+    timer?: ReturnType<typeof setTimeout>;
+  } | null = null;
 
   // Historical data loading
   private _isLoadingMoreBars = false;
@@ -844,7 +853,9 @@ export class TealchartWidget implements ITealchartWebWidget {
    * fails. Only the datafeed's cache-reset callback passes this, and only it
    * needs to: see the error handler below.
    */
-  private _loadBars(resubscribeOnError = false): void {
+  private _loadBars(resubscribeOnError = false, repair: typeof this._barGapRepair = null): void {
+    if (!repair) this._cancelBarGapRepair();
+    else repair.inFlight = true;
     if (!this._symbolInfo) {
       this._logger?.warn(LogCategory.Datafeed, '_loadBars called but no symbolInfo');
       return;
@@ -859,7 +870,8 @@ export class TealchartWidget implements ITealchartWebWidget {
     // request would write its bars and re-subscribe behind the transition.
     const resolveGeneration = this._resolveSymbolRequestId;
     const isSuperseded = () =>
-      this._disposed || requestId !== this._loadBarsRequestId || resolveGeneration !== this._resolveSymbolRequestId;
+      this._disposed || requestId !== this._loadBarsRequestId || resolveGeneration !== this._resolveSymbolRequestId ||
+      (repair !== null && (this._barGapRepair !== repair || !repair.inFlight));
     // A fresh page is a fresh paging state. Leaving these behind stranded the
     // backfill below: a request in flight from the last page never clears its
     // own flag once its response is discarded as stale, and a market that had
@@ -867,7 +879,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._clearQueuedLeftHistoryBackfill();
     this._isLoadingMoreBars = false;
     this._hasMoreHistoricalData = true;
-    this._isLoadingBars = true;
+    if (!repair) this._isLoadingBars = true;
     this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
     const now = Date.now();
@@ -896,7 +908,12 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars, this._interval), 'history load');
+        const history = dedupeBarsByTime(normalizeDatafeedBars(bars, this._interval), 'history load');
+        const historyTime = history.at(-1)?.time ?? 0;
+        // Repair history may lag live candles that arrived while it was in flight.
+        const normalizedBars = repair
+          ? dedupeBarsByTime([...this._bars, ...history, ...this._bars.filter(bar => bar.time >= repair.firstLiveTime)])
+          : history;
 
         // Atomic data transition: set all state before markDirty so it renders in one frame
         this._bars = normalizedBars;
@@ -908,7 +925,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._drawings = [];
 
         // Restore viewport from viewScale or calculate default (first load)
-        if (normalizedBars.length > 0) {
+        if (!repair && normalizedBars.length > 0) {
           const vp = this._viewportController.handleBarsLoaded(normalizedBars, intervalToMs(this._interval));
           this._viewport = vp;
         }
@@ -925,7 +942,8 @@ export class TealchartWidget implements ITealchartWebWidget {
           this._tealScriptManager.setBars(normalizedBars);
         }
 
-        this._subscribeToBars();
+        if (repair) this._settleBarGapRepair(repair, historyTime);
+        else this._subscribeToBars();
         this._setReady();
 
         // Clean up old widget DOM now that we have bars to paint.
@@ -965,13 +983,9 @@ export class TealchartWidget implements ITealchartWebWidget {
         // The other callers either null the guid first (so they strand nothing)
         // or would re-subscribe under a CHANGED symbol — and `_handleNewBar` has
         // no market-key guard, so the new symbol's ticks would land on the old
-        // symbol's series. `_handleRecoveryNeeded` additionally reaches
-        // `_handleNewBar` without `_triggerRecovery`'s backoff, so re-subscribing
-        // there would retry once per tick, forever, against a venue serving ticks
-        // but failing history.
-        if (resubscribeOnError) {
-          this._subscribeToBars();
-        }
+        // symbol's series. Gap repair retains its existing subscription instead.
+        if (repair) this._settleBarGapRepair(repair);
+        else if (resubscribeOnError) this._subscribeToBars();
       },
     );
   }
@@ -994,6 +1008,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   }
 
   private _subscribeToBars(): void {
+    this._cancelBarGapRepair();
     if (!this._symbolInfo) {
       this._logger?.warn(LogCategory.Datafeed, '_subscribeToBars called but no symbolInfo');
       return;
@@ -1047,22 +1062,15 @@ export class TealchartWidget implements ITealchartWebWidget {
         // this request is discarded while the new resolve is still in flight.
         // That is why `_startDataLoad` passes the same flag for
         // `reason === 'reset'`: this call alone does not cover the reconnect.
+        this._reportDatafeedRecovery('reset', 'cache-reset');
         this._loadBars(true);
       },
     );
   }
 
   private _handleNewBar(bar: Bar): void {
-    // Check for bar gap before processing
-    if (this._gapDetectionManager && this._bars.length > 0) {
-      const gapEvent = this._gapDetectionManager.checkBarGap(bar.time);
-      if (gapEvent) {
-        // Gap detected - trigger recovery and return
-        // The recovery will refetch all bars including this one
-        this._handleRecoveryNeeded(gapEvent);
-        return;
-      }
-    }
+    const gapEvent = this._bars.length > 0 ? this._gapDetectionManager?.checkBarGap(bar.time) : null;
+    const previousBarTime = this._bars.at(-1)?.time ?? 0;
 
     if (this._bars.length === 0) {
       this._bars.push(bar);
@@ -1092,7 +1100,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Record the bar time for gap detection and reset retry state on successful bar
     if (this._gapDetectionManager) {
       this._gapDetectionManager.recordBar(bar.time);
-      // Reset retry state - successful bar means gap is resolved
+      // Live-feed recovery does not spend the separate history-repair budget.
       this._gapDetectionManager.resetRetryState();
     }
 
@@ -1122,6 +1130,23 @@ export class TealchartWidget implements ITealchartWebWidget {
     // the last-trade / order / position lines. The worker's PLOTS callback (if
     // any) coalesces into the same RAF, so indicators repaint here too.
     this._scheduler.markDirty(DIRTY.BARS | DIRTY.LINES);
+    if (gapEvent && this._barGapRepair) {
+      this._barGapRepair.target = Math.max(this._barGapRepair.target, bar.time - intervalToMs(this._interval));
+    }
+    // A cache-reset load must settle and re-arm its one-shot subscription.
+    // Live ticks still publish while that load owns the history request.
+    if (gapEvent && !this._isLoadingBars && !this._barGapRepair && this._barSubscriptionGuid) {
+      this._barGapRepair = {
+        guid: this._barSubscriptionGuid,
+        firstLiveTime: bar.time,
+        target: bar.time - intervalToMs(this._interval),
+        historyTime: previousBarTime,
+        failures: 0,
+        inFlight: false,
+      };
+      this._reportDatafeedRecovery('repair-start', gapEvent.reason);
+      this._loadBars(false, this._barGapRepair);
+    }
   }
 
   private _loadMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
@@ -1250,12 +1275,54 @@ export class TealchartWidget implements ITealchartWebWidget {
     }
   }
 
+  private _reportDatafeedRecovery(decision: string, reason: string, retryInMs?: number): void {
+    try {
+      this._options.onDatafeedRecovery?.({
+        decision, reason, symbol: this._symbol, resolution: this._interval,
+        guid: this._barSubscriptionGuid ?? undefined, retryInMs,
+      });
+    } catch {
+      // Diagnostics cannot interrupt live bars or repair.
+    }
+  }
+
+  private _cancelBarGapRepair(): void {
+    if (this._barGapRepair?.timer !== undefined) clearTimeout(this._barGapRepair.timer);
+    this._barGapRepair = null;
+  }
+
+  private _settleBarGapRepair(repair: NonNullable<typeof this._barGapRepair>, historyTime?: number): void {
+    if (
+      this._barGapRepair !== repair || this._barSubscriptionGuid !== repair.guid ||
+      this._disposed || !repair.inFlight
+    ) return;
+    repair.inFlight = false;
+    if (historyTime !== undefined && historyTime >= repair.target) {
+      this._reportDatafeedRecovery('repair-complete', 'history-caught-up');
+      this._cancelBarGapRepair();
+      return;
+    }
+    if (historyTime !== undefined && historyTime > repair.historyTime) {
+      repair.historyTime = historyTime;
+      repair.failures = 0;
+    }
+    const delay = Math.min(5_000 * 2 ** Math.min(repair.failures++, 4), 60_000);
+    this._reportDatafeedRecovery('repair-retry', historyTime === undefined ? 'history-failed' : 'history-stale', delay);
+    repair.timer = setTimeout(() => {
+      repair.timer = undefined;
+      if (!this._disposed && this._barGapRepair === repair && this._barSubscriptionGuid === repair.guid) {
+        this._loadBars(false, repair);
+      }
+    }, delay);
+  }
+
   /**
    * Handle recovery needed from gap detection
    * Clears bars and refetches the visible region
    */
   private _handleRecoveryNeeded(event: GapDetectionEvent): void {
     this._logger?.info(LogCategory.GapDetection, `Recovery triggered: ${event.reason}`, event.details);
+    this._reportDatafeedRecovery('reset', event.reason);
 
     // Stop gap detection while recovering
     this._gapDetectionManager?.stop();
@@ -2684,6 +2751,8 @@ export class TealchartWidget implements ITealchartWebWidget {
     resolveSymbolName?: string; // The symbol name to pass to resolveSymbol (may include exchange prefix)
     reason: 'symbol' | 'interval' | 'reset';
   }): void {
+    this._cancelBarGapRepair();
+    if (options.reason === 'reset') this._reportDatafeedRecovery('reset', 'reset-data');
     // Stop gap detection during transition
     this._gapDetectionManager?.stop();
 
@@ -2956,6 +3025,7 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Remove the widget and clean up
    */
   remove(): void {
+    this._cancelBarGapRepair();
     // Mark as disposed to invalidate all in-flight async callbacks
     this._disposed = true;
     this._clearQueuedLeftHistoryBackfill();

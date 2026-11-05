@@ -91,6 +91,10 @@ erases; remove them before Worklets serializes bodies. JSX uses its own plugin.
 
 ## Architecture
 
+Live gap repair does not supersede an in-flight history reset. Ticks still publish;
+the reset owns completion and subscription replacement so the datafeed's one-shot
+cache-reset callback is re-armed on both success and failure.
+
 `PriceLineManager` accepts an optional host pointer-event predicate before
 financial down/drag handlers mutate state. Hosted frames require the original
 trusted DOM event; omitted predicates retain ordinary Tealchart behavior.
@@ -1743,3 +1747,9 @@ V104 v6 plotarrow sign-direction is bound to its own closed CSV signs and PNG
 tip narrowing, shoulders and shaft through web and native painters. Use separate
 plotarrow glyphs; plotshape arrows retain their existing marker geometry. The older
 v103 sign-direction facet and universal native raster metrics remain held.
+
+Live bar gaps repair history without replacing the live subscription. One read is
+in flight per widget; stale or failed history retries after 5 s, doubling to 60 s
+until history advances through the gap. Live ticks survive a late history response;
+symbol/interval/reset transitions and removal retire the repair and its timer.
+Hosts may observe `onDatafeedRecovery` decisions without enabling debug logging.

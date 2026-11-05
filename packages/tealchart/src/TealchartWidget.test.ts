@@ -5340,4 +5340,233 @@ describe('TealchartWidget viewport history coverage', () => {
     widget.remove();
   });
 
+  it.each([false, true, 'empty'])(
+    'keeps one live subscription during history-gap repair (stale history=%s)',
+    async (staleHistory) => {
+      const { GapDetectionManager } =
+        await vi.importActual<typeof import('./GapDetectionManager')>('./GapDetectionManager');
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed, { symbol: 'HYPERLIQUID:ENA-PERP', interval: '1' as ResolutionString });
+      const oldHistory = makeBars(20, Date.UTC(2026, 10, 5, 12, 50), 60_000, 1);
+      const liveBar = { ...oldHistory.at(-1)!, time: Date.UTC(2026, 10, 5, 13, 17) };
+      completeInit(datafeed, oldHistory, { ...defaultSymbolInfo, name: 'ENA-PERP', full_name: 'HYPERLIQUID:ENA-PERP' });
+      const gap = new GapDetectionManager(() => {});
+      gap.setInterval(60_000);
+      gap.recordBar(oldHistory.at(-1)!.time);
+      (widget as unknown as { _gapDetectionManager: InstanceType<typeof GapDetectionManager> })._gapDetectionManager =
+        gap;
+      try {
+        for (let tick = 0; tick < 20; tick++) {
+          const before = datafeed._getBarsCalls.length;
+          datafeed._subscribeCb?.(liveBar);
+          if (datafeed._getBarsCalls.length > before) {
+            datafeed._getBarsCb?.(
+              staleHistory === 'empty' ? [] : staleHistory ? oldHistory : [...oldHistory, liveBar],
+              {},
+            );
+          }
+        }
+        expect(datafeed._subscribeCalls).toHaveLength(1);
+        expect(datafeed._unsubscribeCalls).toHaveLength(0);
+        expect(datafeed._getBarsCalls.filter((x) => x.periodParams.firstDataRequest)).toHaveLength(2);
+        expect((widget as unknown as { _bars: Bar[] })._bars).toHaveLength(21);
+        expect((widget as unknown as { _bars: Bar[] })._bars.at(-1)?.time).toBe(liveBar.time);
+      } finally {
+        widget.remove();
+      }
+    },
+  );
+
+  it('backs off stale history independently of live ticks and cancels repair on removal', async () => {
+    vi.useFakeTimers();
+    const { GapDetectionManager } =
+      await vi.importActual<typeof import('./GapDetectionManager')>('./GapDetectionManager');
+    const datafeed = createMockDatafeed();
+    const events: string[] = [];
+    const widget = createWidget(datafeed, {
+      interval: '1' as ResolutionString,
+      onDatafeedRecovery: (event) => events.push(event.decision),
+    });
+    const history = makeBars(20, Date.UTC(2026, 10, 5, 12, 50), 60_000);
+    const tick = { ...history.at(-1)!, time: Date.UTC(2026, 10, 5, 13, 17), close: 777 };
+    completeInit(datafeed, history);
+    const gap = new GapDetectionManager(() => {});
+    gap.setInterval(60_000);
+    gap.recordBar(history.at(-1)!.time);
+    const state = widget as unknown as { _gapDetectionManager: InstanceType<typeof GapDetectionManager>; _bars: Bar[] };
+    state._gapDetectionManager = gap;
+    const loads = () => datafeed._getBarsCalls.filter((call) => call.periodParams.firstDataRequest).length;
+    try {
+      datafeed._subscribeCb?.(tick);
+      for (let i = 0; i < 20; i++) datafeed._subscribeCb?.({ ...tick, close: 777 + i });
+      expect(loads()).toBe(2);
+      datafeed._getBarsCb?.(history, {});
+      expect(state._bars.at(-1)?.close).toBe(796);
+      vi.advanceTimersByTime(4_999);
+      expect(loads()).toBe(2);
+      vi.advanceTimersByTime(1);
+      expect(loads()).toBe(3);
+      datafeed._getBarsCb?.(history, {});
+      vi.advanceTimersByTime(9_999);
+      expect(loads()).toBe(3);
+      vi.advanceTimersByTime(1);
+      expect(loads()).toBe(4);
+      datafeed._getBarsCb?.([...history, { ...tick, time: tick.time - 60_000 }], {});
+      expect(events.at(-1)).toBe('repair-complete');
+      vi.advanceTimersByTime(60_000);
+      expect(loads()).toBe(4);
+      expect(datafeed._subscribeCalls).toHaveLength(1);
+      expect(datafeed._unsubscribeCalls).toHaveLength(0);
+      datafeed._subscribeCb?.({ ...tick, time: tick.time + 4 * 60_000 });
+      datafeed._getBarsErrCb?.('temporary history failure');
+      widget.remove();
+      vi.advanceTimersByTime(120_000);
+      expect(loads()).toBe(5);
+    } finally {
+      widget.remove();
+      vi.useRealTimers();
+    }
+  });
+
+  it('discards repair history after a symbol switch without restoring the old feed', async () => {
+    const { GapDetectionManager } =
+      await vi.importActual<typeof import('./GapDetectionManager')>('./GapDetectionManager');
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
+    const history = makeBars(20, Date.UTC(2026, 10, 5, 12, 50), 60_000);
+    completeInit(datafeed, history);
+    const gap = new GapDetectionManager(() => {});
+    gap.setInterval(60_000);
+    gap.recordBar(history.at(-1)!.time);
+    (widget as unknown as { _gapDetectionManager: InstanceType<typeof GapDetectionManager> })._gapDetectionManager =
+      gap;
+    datafeed._subscribeCb?.({ ...history.at(-1)!, time: Date.UTC(2026, 10, 5, 13, 17) });
+    const oldResult = datafeed._getBarsCb!;
+    widget.setSymbol('ETHUSDT');
+    oldResult(history, {});
+    expect(widget.symbol()).toBe('ETHUSDT');
+    expect(datafeed._subscribeCalls).toHaveLength(1);
+    datafeed._resolveSymbolCb?.({ ...defaultSymbolInfo, name: 'ETHUSDT' });
+    datafeed._getBarsCb?.(makeBars(20), {});
+    expect(datafeed._subscribeCalls).toHaveLength(2);
+    widget.remove();
+  });
+});
+
+describe('review 8970 independent ownership probes', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return null;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    clearChartStoreCache();
+  });
+  const setup = async () => {
+    const { GapDetectionManager } =
+      await vi.importActual<typeof import('./GapDetectionManager')>('./GapDetectionManager');
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
+    const history = makeBars(20, Date.UTC(2026, 10, 5, 12, 50), 60_000);
+    completeInit(datafeed, history);
+    const state = widget as any;
+    state._gapDetectionManager = new GapDetectionManager((event) => state._handleRecoveryNeeded(event));
+    state._gapDetectionManager.setInterval(60_000);
+    state._gapDetectionManager.recordBar(history.at(-1)!.time);
+    const tick = { ...history.at(-1)!, time: Date.UTC(2026, 10, 5, 13, 17), close: 777 };
+    return { datafeed, widget, state, history, tick };
+  };
+  it('review_8970_resolution_switch_retires_retry_and_late_history', async () => {
+    const { datafeed, widget, state, history, tick } = await setup();
+    datafeed._subscribeCb?.(tick);
+    const staleResult = datafeed._getBarsCb!;
+    staleResult(history, {});
+    const loads = datafeed._getBarsCalls.length;
+    widget.chart().setResolution('5');
+    vi.advanceTimersByTime(60_000);
+    expect(datafeed._getBarsCalls).toHaveLength(loads);
+    staleResult(makeBars(2, 99), {});
+    expect(state._bars.at(-1).time).toBe(tick.time);
+    datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+    datafeed._getBarsCb?.(makeBars(20, 1000000, 300000), {});
+    expect(datafeed._subscribeCalls).toHaveLength(2);
+    expect(datafeed._unsubscribeCalls).toHaveLength(1);
+    expect(state._barGapRepair).toBeNull();
+    widget.remove();
+  });
+  it('review_8970_real_feed_loss_supersedes_repair_and_restores_ticks', async () => {
+    const { datafeed, widget, state, history, tick } = await setup();
+    datafeed._subscribeCb?.(tick);
+    const staleResult = datafeed._getBarsCb!;
+    state._gapDetectionManager.start();
+    vi.advanceTimersByTime(120_000);
+    expect(datafeed._unsubscribeCalls).toHaveLength(1);
+    const recovery = datafeed._getBarsCb!;
+    staleResult(makeBars(1, 99), {});
+    expect(state._bars.at(-1).time).toBe(tick.time);
+    recovery([...history, tick], {});
+    expect(datafeed._subscribeCalls).toHaveLength(2);
+    datafeed._subscribeCb?.({ ...tick, close: 888 });
+    expect(state._bars.at(-1).close).toBe(888);
+    expect(state._barGapRepair).toBeNull();
+    widget.remove();
+  });
+  it('review_8970_reset_without_gap_rearms_one_shot_callback', async () => {
+    const { datafeed, widget, state, history } = await setup();
+    const register = datafeed.subscribeBars.bind(datafeed);
+    datafeed.subscribeBars = (info, resolution, onTick, guid, onReset) => {
+      let spent = false;
+      register(info, resolution, onTick, guid, () => {
+        if (!spent) {
+          spent = true;
+          onReset();
+        }
+      });
+    };
+    state._subscribeToBars();
+    const before = datafeed._subscribeCalls.length;
+    datafeed._resetCb?.();
+    datafeed._getBarsCb?.(history, {});
+    expect(datafeed._subscribeCalls).toHaveLength(before + 1);
+    const loads = datafeed._getBarsCalls.length;
+    datafeed._resetCb?.();
+    expect(datafeed._getBarsCalls.length).toBeGreaterThan(loads);
+    widget.remove();
+  });
+  it.each(['success', 'error'] as const)('review_8970_gap_during_reset_rearms_callback_after_%s', async (result) => {
+    const { datafeed, widget, state, history, tick } = await setup();
+    // Model the real datafeed's reset callback, which is one-shot for each subscription.
+    const register = datafeed.subscribeBars.bind(datafeed);
+    datafeed.subscribeBars = (info, resolution, onTick, guid, onReset) => {
+      let spent = false;
+      register(info, resolution, onTick, guid, () => {
+        if (!spent) {
+          spent = true;
+          onReset();
+        }
+      });
+    };
+    state._subscribeToBars();
+    const before = datafeed._subscribeCalls.length;
+    const loadsBeforeReset = datafeed._getBarsCalls.length;
+    datafeed._resetCb?.();
+    const resetResult = datafeed._getBarsCb;
+    datafeed._subscribeCb?.(tick);
+    expect(datafeed._getBarsCalls).toHaveLength(loadsBeforeReset + 1);
+    expect(datafeed._getBarsCb).toBe(resetResult);
+    expect(state._bars.at(-1).close).toBe(tick.close);
+    expect(state._barGapRepair).toBeNull();
+    if (result === 'success') datafeed._getBarsCb?.([...history, tick], {});
+    else datafeed._getBarsErrCb?.('temporary');
+    const loads = datafeed._getBarsCalls.length;
+    datafeed._resetCb?.();
+    expect(datafeed._getBarsCalls.length).toBeGreaterThan(loads);
+    expect(datafeed._subscribeCalls.length).toBeGreaterThan(before);
+    widget.remove();
+  });
 });
