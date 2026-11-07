@@ -104,16 +104,13 @@ must state that the change is docs-only.
 When the PR branch is ready:
 
 1. Push the branch and open one PR.
-2. Run the CodeRabbit review loop.
-3. Fix or explicitly reply to every CodeRabbit thread.
-4. Wait for CI and CodeRabbit to be green.
-5. Merge with maintainer/admin privileges once the gates are green.
-6. Delete the merged branch.
-7. Return to latest `master` and cut the next phase branch.
+2. Wait for green CI and the repo's required approving review.
+3. Merge with maintainer/admin privileges once the gates are green.
+4. Delete the merged branch.
+5. Return to latest `master` and cut the next phase branch.
 
-CodeRabbit review may run in a background agent when the next work is genuinely
-non-blocking and branch-safe. If the next epic depends on the current PR, wait
-for the PR to merge before continuing.
+If the next epic depends on the current PR, wait for the PR to merge before
+continuing.
 
 ## Branch Safety
 
@@ -152,7 +149,7 @@ An epic phase is complete when:
 - planned work is committed,
 - focused and full verification gates pass,
 - docs and compatibility inventory are updated where relevant,
-- CI and CodeRabbit are green,
+- CI is green and the repo's required approving review is in place,
 - the PR is merged,
 - the next branch is cut from updated `master`.
 
