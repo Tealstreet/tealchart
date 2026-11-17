@@ -12,6 +12,7 @@ import {
   rect,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
+import { formatPriceWithPrecision } from '../state/chartState';
 import { safeToFixed } from '../utils/safeNumber';
 import { formatPriceByMagnitude } from '../utils/priceFormatters';
 import { Component } from './Component';
@@ -51,6 +52,7 @@ export interface IndicatorPaneInfo {
 export interface ChartLegendOptions extends ComponentOptions {
   symbol: string;
   interval: ResolutionString;
+  pricePrecision?: number;
   exchangeName?: string;
   avoidLeftTools?: boolean;
   chromeMetrics?: ChartChromeMetrics;
@@ -304,6 +306,14 @@ export class ChartLegend extends Component<ChartLegendState> {
     if (interval === this.options.interval) return;
     this.options.interval = interval;
     this.render();
+  }
+
+  setPricePrecision(pricePrecision?: number): void {
+    if (pricePrecision === this.options.pricePrecision) return;
+    this.options.pricePrecision = pricePrecision;
+    if (this.state.latestBar) {
+      this.updateOHLCValues(this.state.latestBar, this.state.previousBar);
+    }
   }
 
   setAvoidLeftTools(avoidLeftTools: boolean): void {
@@ -727,6 +737,10 @@ export class ChartLegend extends Component<ChartLegendState> {
   // ============================================================================
 
   private formatPrice(price: number): string {
+    const precision = this.options.pricePrecision;
+    if (precision !== undefined && Number.isFinite(precision) && precision > 0) {
+      return formatPriceWithPrecision(price, precision);
+    }
     return formatPriceByMagnitude(price);
   }
 
