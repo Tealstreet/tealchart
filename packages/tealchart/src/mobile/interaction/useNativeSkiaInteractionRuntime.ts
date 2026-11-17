@@ -25,9 +25,9 @@ import type {
   NativePriceAutoScaleSharedValues,
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
+  NativeViewportGestureMetrics,
   NativeViewportGestureOwner,
   NativeViewportGestureOwnerState,
-  NativeViewportGestureMetrics,
 } from './nativeViewportGestureState';
 
 import { useMemo } from 'react';
@@ -96,6 +96,9 @@ export function useNativeSkiaInteractionRuntime({
   const tradeLineRows = useSharedValue<NativeTradeLineRow[]>([]);
   const sharedPriceAxisTagSources = useSharedValue<NativePriceAxisTagSource[]>([]);
   const orderDragActive = useSharedValue(false);
+  const orderTouchArmed = useSharedValue(false);
+  const orderTouchSequence = useSharedValue(0);
+  const orderTouchStartedAt = useSharedValue(0);
   const orderDragStartPrice = useSharedValue(0);
   const orderDragPricePerPixel = useSharedValue(0);
   const activeOrderDragObjectId = useSharedValue('');
@@ -181,13 +184,25 @@ export function useNativeSkiaInteractionRuntime({
   );
   const orderDragState = useMemo<NativeOrderDragInteractionState>(
     () => ({
+      touchArmed: orderTouchArmed,
+      touchSequence: orderTouchSequence,
+      touchStartedAt: orderTouchStartedAt,
       active: orderDragActive,
       activeObjectId: activeOrderDragObjectId,
       activePrice: activeOrderDragPrice,
       startPrice: orderDragStartPrice,
       pricePerPixel: orderDragPricePerPixel,
     }),
-    [activeOrderDragObjectId, activeOrderDragPrice, orderDragActive, orderDragPricePerPixel, orderDragStartPrice],
+    [
+      activeOrderDragObjectId,
+      activeOrderDragPrice,
+      orderDragActive,
+      orderDragPricePerPixel,
+      orderDragStartPrice,
+      orderTouchArmed,
+      orderTouchSequence,
+      orderTouchStartedAt,
+    ],
   );
   const bracketDragState = useMemo<NativeBracketDragSharedValues>(
     () => ({

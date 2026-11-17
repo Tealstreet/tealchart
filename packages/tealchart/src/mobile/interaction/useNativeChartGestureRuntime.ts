@@ -62,6 +62,7 @@ export interface NativeChartGestureRuntimeInput {
   chartPanGestureState: NativeChartPanGestureState;
   clearNativeBracketDrag: () => void;
   commitBracketMove: Parameters<typeof createNativeBracketDragGesture>[0]['commitBracketMove'];
+  beginOrderMove: Parameters<typeof createNativeOrderDragGesture>[0]['beginOrderMove'];
   commitOrderMove: Parameters<typeof createNativeOrderDragGesture>[0]['commitOrderMove'];
   commitPanViewport: (nextViewport: Viewport) => void;
   commitTradeLineAction: (
@@ -162,6 +163,7 @@ export function useNativeChartGestureRuntime({
   chartPanGestureState,
   clearNativeBracketDrag,
   commitBracketMove,
+  beginOrderMove,
   commitOrderMove,
   commitPanViewport,
   commitTradeLineAction,
@@ -221,6 +223,7 @@ export function useNativeChartGestureRuntime({
   const stableClearNativeBracketDrag = useLatestNativeCallback(clearNativeBracketDrag);
   const stableCommitBracketMove = useLatestNativeCallback(commitBracketMove);
   const stableCommitOrderMove = useLatestNativeCallback(commitOrderMove);
+  const stableBeginOrderMove = useLatestNativeCallback(beginOrderMove);
   const stableCommitPanViewport = useLatestNativeCallback(commitPanViewport);
   const stableCommitTradeLineAction = useLatestNativeCallback(commitTradeLineAction);
   const stableOnDrawingEditDragBegin = useLatestNativeCallback(onDrawingEditDragBegin);
@@ -489,6 +492,7 @@ export function useNativeChartGestureRuntime({
 
   const orderDragGesture = useMemo<GestureType>(() => {
     return createNativeOrderDragGesture({
+      beginOrderMove: stableBeginOrderMove,
       commitOrderMove: stableCommitOrderMove,
       onSelectTradeLine,
       controlZones,
@@ -502,6 +506,8 @@ export function useNativeChartGestureRuntime({
       tradeLineRows,
     });
   }, [
+    stableBeginOrderMove,
+    stableCommitOrderMove,
     chartInteractionFrame,
     controlZones,
     resetViewVisible,

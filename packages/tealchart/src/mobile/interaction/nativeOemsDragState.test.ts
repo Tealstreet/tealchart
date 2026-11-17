@@ -1,6 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 import type { NativeOrderDragZone, NativeTradeLineActionZone } from '../utils/tradeLineLayout';
+import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
 
 import { describe, expect, it } from 'vitest';
 
@@ -17,8 +18,6 @@ import {
   releaseNativeOrderDragGesture,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
-  type NativeBracketDragInteractionState,
-  type NativeOrderDragInteractionState,
   updateNativeBracketDragState,
   updateNativeOrderDragState,
 } from './nativeOemsDragState';
@@ -29,6 +28,9 @@ function shared<T>(value: T): SharedValue<T> {
 
 function createOrderDragState(): NativeOrderDragInteractionState {
   return {
+    touchArmed: shared(false),
+    touchSequence: shared(0),
+    touchStartedAt: shared(0),
     active: shared(false),
     activeObjectId: shared(''),
     activePrice: shared(0),
@@ -92,6 +94,20 @@ function positionLine(id: string, price: number, isPending = false): PositionLin
 }
 
 describe('native OEMS drag state', () => {
+  it('clears retained pre-upgrade state without a touchArmed shared value', () => {
+    const state = createOrderDragState();
+    delete state.touchArmed;
+    delete state.touchSequence;
+    delete state.touchStartedAt;
+    state.active.value = true;
+    state.activeObjectId.value = 'old-order';
+    expect(() => clearNativeOrderDragState(state)).not.toThrow();
+    expect(state.active.value).toBe(false);
+    expect(state.activeObjectId.value).toBe('');
+    state.active.value = true;
+    expect(() => finalizeNativeOrderDragState(state, false)).not.toThrow();
+    expect(state.active.value).toBe(false);
+  });
   it('starts, updates, and clears order drag state', () => {
     const state = createOrderDragState();
     const zone: NativeOrderDragZone = { objectId: 'order-1', price: 100, x1: 10, x2: 90 };
