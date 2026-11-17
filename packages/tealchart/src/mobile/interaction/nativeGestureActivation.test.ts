@@ -22,13 +22,10 @@ import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
-import {
-  createNativeCrosshairLongPressGesture,
-  createNativeCrosshairPanGesture,
-} from './nativeCrosshairGestures';
+import { createNativeCrosshairLongPressGesture, createNativeCrosshairPanGesture } from './nativeCrosshairGestures';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
-import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import {
   NATIVE_RESET_VIEW_HIT_SIZE,
   resolveNativeResetViewButtonLayout,
@@ -92,7 +89,9 @@ function gestureMetrics(): NativeViewportGestureMetrics {
   };
 }
 
-function viewportGestureOwner(owner: NativeViewportGestureOwnerState['owner']['value'] = 'none'): NativeViewportGestureOwnerState {
+function viewportGestureOwner(
+  owner: NativeViewportGestureOwnerState['owner']['value'] = 'none',
+): NativeViewportGestureOwnerState {
   return {
     owner: shared(owner),
   };
@@ -117,6 +116,9 @@ function mockStateManager() {
 
 function createOrderDragState(active = false): NativeOrderDragInteractionState {
   return {
+    touchArmed: shared(false),
+    touchSequence: shared(0),
+    touchStartedAt: shared(0),
     active: shared(active),
     activeObjectId: shared(''),
     activePrice: shared(0),
@@ -676,7 +678,10 @@ describe('native gesture activation', () => {
 
     const manager = mockStateManager();
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }] },
+      {
+        changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }],
+        allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }],
+      },
       manager,
     );
     expect(manager.failed).toBe(false);
@@ -688,7 +693,10 @@ describe('native gesture activation', () => {
     gesture.handlers.onFinalize({}, true);
     crosshair.visible.value = false;
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }] },
+      {
+        changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }],
+        allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }],
+      },
       mockStateManager(),
     );
     gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 150 }, true);
@@ -1007,6 +1015,7 @@ describe('native gesture activation', () => {
       { x1: 130, x2: 156, y1: centerY - 10, y2: centerY + 10 },
     ];
     const orderDragGesture = createNativeOrderDragGesture({
+      beginOrderMove: () => {},
       commitOrderMove: () => {},
       controlZones,
       frame,
@@ -1231,7 +1240,10 @@ describe('native gesture activation', () => {
     }) as any;
     const priceDown = mockStateManager();
     priceScaleGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }], allTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }] },
+      {
+        changedTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }],
+        allTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }],
+      },
       priceDown,
     );
     expect(priceDown.failed).toBe(false);
@@ -1636,9 +1648,11 @@ describe('native gesture activation', () => {
     const orderDragZones = shared([{ objectId: 'order-1', price, x1: 40, x2: 120 }]);
     const tradeLineActionZones = shared([]);
     const commitOrderMove = vi.fn();
+    const beginOrderMove = vi.fn();
     const orderDragState = createOrderDragState();
     const orderDragGesture = createNativeOrderDragGesture({
       commitOrderMove,
+      beginOrderMove,
       frame,
       orderDragState,
       orderDragZones,
@@ -1654,21 +1668,68 @@ describe('native gesture activation', () => {
       accepted,
     );
     expect(accepted.failed).toBe(false);
+    expect(beginOrderMove).not.toHaveBeenCalled();
 
     orderDragGesture.handlers.onEnd({ translationX: 0, translationY: 0 });
     expect(commitOrderMove).not.toHaveBeenCalled();
 
+    orderDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: centerY }], allTouches: [{ x: 80, y: centerY }] },
+      mockStateManager(),
+    );
     orderDragGesture.handlers.onBegin({ x: 80, y: centerY });
+    expect(beginOrderMove).toHaveBeenCalledWith('order-1', price, expect.objectContaining({ sequence: 2 }));
     orderDragGesture.handlers.onUpdate({ translationY: 3 });
     orderDragGesture.handlers.onEnd({ translationX: 0, translationY: 3 });
     expect(commitOrderMove).not.toHaveBeenCalled();
     expect(orderDragState.active.value).toBe(false);
     expect(orderDragState.activeObjectId.value).toBe('');
 
+    orderDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: centerY }], allTouches: [{ x: 80, y: centerY }] },
+      mockStateManager(),
+    );
     orderDragGesture.handlers.onBegin({ x: 80, y: centerY });
     orderDragGesture.handlers.onUpdate({ translationY: 8 });
     orderDragGesture.handlers.onEnd({ translationX: 0, translationY: 8 });
-    expect(commitOrderMove).toHaveBeenCalledWith('order-1', expect.any(Number));
+    expect(commitOrderMove).toHaveBeenCalledWith(
+      'order-1',
+      expect.any(Number),
+      expect.objectContaining({ sequence: 3 }),
+    );
+    expect(beginOrderMove.mock.invocationCallOrder[0]).toBeLessThan(commitOrderMove.mock.invocationCallOrder[0]);
+  });
+
+  it('refuses retained pre-upgrade state without throwing or issuing an edit', () => {
+    const state = createOrderDragState(true);
+    delete state.touchArmed;
+    delete state.touchSequence;
+    delete state.touchStartedAt;
+    const begin = vi.fn(),
+      commit = vi.fn(),
+      manager = mockStateManager();
+    const gesture = createNativeOrderDragGesture({
+      beginOrderMove: begin,
+      commitOrderMove: commit,
+      frame,
+      orderDragState: state,
+      sharedViewport: sharedViewport(viewportValue),
+      orderDragZones: shared([]),
+      tradeLineRows: shared([]),
+      tradeLineActionZones: shared([]),
+      tradeLabelHeight: 18,
+    }) as any;
+    expect(() => {
+      gesture.handlers.onTouchesDown({ changedTouches: [{ x: 80, y: 88 }], allTouches: [{ x: 80, y: 88 }] }, manager);
+      gesture.handlers.onBegin({ x: 80, y: 88 });
+      gesture.handlers.onUpdate({ translationY: 8 });
+      gesture.handlers.onEnd({ translationY: 8 });
+      gesture.handlers.onFinalize({}, false);
+    }).not.toThrow();
+    expect(manager.failed).toBe(true);
+    expect(begin).not.toHaveBeenCalled();
+    expect(commit).not.toHaveBeenCalled();
+    expect(state.active.value).toBe(false);
   });
 
   it('selects row-only order touches without starting an order move', () => {
@@ -1684,6 +1745,7 @@ describe('native gesture activation', () => {
     const onSelectTradeLine = vi.fn();
     const orderDragState = createOrderDragState();
     const orderDragGesture = createNativeOrderDragGesture({
+      beginOrderMove: () => {},
       commitOrderMove,
       frame,
       onSelectTradeLine,
@@ -1795,19 +1857,13 @@ describe('canvas tap vs pane maximize double tap', () => {
     // On a cancel button: double-tap maximize must stand down so chrome keeps
     // the tap sequence.
     const onButton = mockStateManager();
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] },
-      onButton,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] }, onButton);
     expect(onButton.failed).toBe(true);
 
     // On open plot, where the single tap would only toggle the crosshair, the
     // double tap stays armed.
     const onPlot = mockStateManager();
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
-      onPlot,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] }, onPlot);
     expect(onPlot.failed).toBe(false);
   });
 
@@ -1819,10 +1875,7 @@ describe('canvas tap vs pane maximize double tap', () => {
     const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ drawingTapEnabled: true })) as any;
     const manager = mockStateManager();
 
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
-      manager,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] }, manager);
 
     expect(manager.failed).toBe(false);
   });
@@ -1846,14 +1899,15 @@ describe('canvas tap vs pane maximize double tap', () => {
   it('stands down on the crosshair context-menu button', () => {
     const crosshair = createCrosshair(true);
     crosshair.y.value = 78;
-    const gesture = createNativePaneMaximizeTapGesture(
-      paneMaximizeInput({ crosshair, hasContextMenu: true }),
-    ) as any;
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ crosshair, hasContextMenu: true })) as any;
     const button = resolveNativeCrosshairContextMenuButtonLayout(multiPaneFrame, crosshair.y.value, 2);
     const manager = mockStateManager();
 
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: button.centerX, y: button.centerY }], allTouches: [{ x: button.centerX, y: button.centerY }] },
+      {
+        changedTouches: [{ x: button.centerX, y: button.centerY }],
+        allTouches: [{ x: button.centerX, y: button.centerY }],
+      },
       manager,
     );
 
@@ -2199,7 +2253,10 @@ describe('canvas tap vs pane maximize double tap', () => {
     }) as any;
 
     panGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }], allTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }] },
+      {
+        changedTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }],
+        allTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }],
+      },
       mockStateManager(),
     );
     expect(owner.owner.value).toBe('paneDivider');
@@ -2255,10 +2312,7 @@ describe('canvas tap vs pane maximize double tap', () => {
     const manager = mockStateManager();
     const y = multiPaneFrame.mainPane.bottom + 6;
 
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 128, y }], allTouches: [{ x: 128, y }] },
-      manager,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 128, y }], allTouches: [{ x: 128, y }] }, manager);
     gesture.handlers.onBegin({ x: 128, y });
     gesture.handlers.onUpdate({ translationX: -55, translationY: -112 });
     gesture.handlers.onEnd({ translationX: -55, translationY: -112 });

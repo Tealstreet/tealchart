@@ -1,3 +1,4 @@
+import './canvasTestFonts';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { ComputedPane } from '../types';
 import type { TableEntry } from '../../../tealscript/tests/fixtures/v103Table';

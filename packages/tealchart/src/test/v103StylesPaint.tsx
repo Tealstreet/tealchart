@@ -1,3 +1,4 @@
+import './canvasTestFonts';
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { StyleEntry } from '../../../tealscript/tests/fixtures/v103Styles';

@@ -1,8 +1,5 @@
 import type { SharedValue } from 'react-native-reanimated';
-import type {
-  OrderLineRenderData,
-  PositionLineRenderData,
-} from '../../types';
+import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 import type {
   NativeOrderDragZone,
   NativeTradeLineActionZone,
@@ -19,9 +16,25 @@ export interface NativeOrderDragSharedValues {
 }
 
 export interface NativeOrderDragInteractionState extends NativeOrderDragSharedValues {
+  // Optional only for retained pre-upgrade state during Fast Refresh. It never
+  // grants a new gesture: the financial handlers require all three fields.
+  touchArmed?: SharedValue<boolean>;
+  touchSequence?: SharedValue<number>;
+  touchStartedAt?: SharedValue<number>;
   active: SharedValue<boolean>;
   startPrice: SharedValue<number>;
   pricePerPixel: SharedValue<number>;
+}
+
+export function hasNativeOrderTouchState(
+  state: NativeOrderDragInteractionState,
+): state is NativeOrderDragInteractionState & {
+  touchArmed: SharedValue<boolean>;
+  touchSequence: SharedValue<number>;
+  touchStartedAt: SharedValue<number>;
+} {
+  'worklet';
+  return !!state.touchArmed && !!state.touchSequence && !!state.touchStartedAt;
 }
 
 export interface NativeBracketDragSharedValues {
@@ -55,6 +68,7 @@ export const NATIVE_BRACKET_DRAG_THRESHOLD = 5;
 
 export function clearNativeOrderDragState(state: NativeOrderDragInteractionState): void {
   'worklet';
+  if (state.touchArmed) state.touchArmed.value = false;
   if (!state.active.value && !state.activeObjectId.value) return;
   state.activeObjectId.value = '';
   state.active.value = false;
@@ -185,7 +199,9 @@ export function updateNativeBracketDragState(
   state.activePrice.value = state.startPrice.value - translationY * state.pricePerPixel.value;
   state.activeDragCurrentX.value = state.activeDragStartX.value + translationX;
   state.activeDragCurrentY.value = state.activeDragStartY.value + translationY;
-  state.activePartialPercent.value = state.activePartialEnabled.value ? calculatePartialBracketPercentFromDelta(translationX) : 100;
+  state.activePartialPercent.value = state.activePartialEnabled.value
+    ? calculatePartialBracketPercentFromDelta(translationX)
+    : 100;
   return true;
 }
 

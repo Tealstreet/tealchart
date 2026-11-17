@@ -1,32 +1,25 @@
-import type {
-  ExecutionLineRenderData,
-  OrderLineRenderData,
-  PositionLineRenderData,
-} from '../../types';
+import type { OemsActionSettlement } from '../../interaction/oemsActionManager';
 import type { TealchartApi } from '../../TealchartApi';
+import type { ExecutionLineRenderData, OrderLineRenderData, PositionLineRenderData } from '../../types';
+import type { NativeTradeLineActionType, NativeTradeLineObjectType } from '../utils/tradeLineLayout';
 import type {
   NativeBracketDragInteractionState,
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
-import type {
-  NativeTradeLineActionType,
-  NativeTradeLineObjectType,
-} from '../utils/tradeLineLayout';
+import type { NativeOemsTradingLineState } from './nativeOemsLineState';
+import type { NativeOrderMoveGesture } from './nativeOrderMoveLease';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
-import type { OemsActionSettlement } from '../../interaction/oemsActionManager';
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
 import { reuseNativeRenderList } from '../utils/nativeLineSnapshotReuse';
-import {
-  getNativeOrderObjectId,
-  getNativePositionObjectId,
-} from '../utils/tradeLineLayout';
+import { getNativeOrderObjectId, getNativePositionObjectId } from '../utils/tradeLineLayout';
 import {
   clearNativeBracketDragState,
   clearNativeOrderDragState,
+  hasNativeOrderTouchState,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
 } from './nativeOemsDragState';
@@ -40,8 +33,8 @@ import {
   applyNativePositionActionState,
   confirmNativeOrderLineSnapshots,
   confirmNativePositionLineSnapshots,
-  type NativeOemsTradingLineState,
 } from './nativeOemsLineState';
+import { createNativeOrderMoveLease } from './nativeOrderMoveLease';
 
 /** Long enough that a normal venue round trip never hits it, short enough that a
  *  stranded preview is not left on the chart. */
@@ -163,6 +156,7 @@ export interface NativeOemsLineRuntimeInput {
 }
 
 export interface NativeOemsLineRuntime {
+  beginOrderMove: (objectId: string, price: number, gesture: NativeOrderMoveGesture) => void;
   clearNativeBracketDrag: () => void;
   clearNativeOrderDrag: () => void;
   commitBracketMove: (
@@ -172,7 +166,7 @@ export interface NativeOemsLineRuntime {
     price: number,
     partialPercent?: number,
   ) => void;
-  commitOrderMove: (objectId: string, nextPrice: number) => void;
+  commitOrderMove: (objectId: string, nextPrice: number, gesture: NativeOrderMoveGesture) => void;
   commitTradeLineAction: (
     objectType: NativeTradeLineObjectType,
     objectId: string,
@@ -195,9 +189,9 @@ export function useNativeOemsLineRuntime({
   const oemsActionsRef = useRef<OemsActionManager<NativeOemsTradingLineState> | null>(null);
   // Built once, so the settle handler is reached through a ref that each render
   // refreshes - see where it is assigned for why the settle is load-bearing.
-  const onOemsActionSettledRef = useRef<((settlement: OemsActionSettlement<NativeOemsTradingLineState>) => void) | null>(
-    null,
-  );
+  const onOemsActionSettledRef = useRef<
+    ((settlement: OemsActionSettlement<NativeOemsTradingLineState>) => void) | null
+  >(null);
   if (!oemsActionsRef.current) {
     oemsActionsRef.current = new OemsActionManager<NativeOemsTradingLineState>({
       priceTolerance: () => pricePrecisionRef.current,
@@ -208,6 +202,20 @@ export function useNativeOemsLineRuntime({
   const oemsActions = oemsActionsRef.current;
   const latestOrderLinesRef = useRef<OrderLineRenderData[]>([]);
   const latestPositionLinesRef = useRef<PositionLineRenderData[]>([]);
+  const orderMoveLease = useMemo(
+    () => createNativeOrderMoveLease<OrderLineRenderData>(() => Date.now(), orderDragState.touchSequence?.value ?? 0),
+    [chartApi, orderDragState],
+  );
+  // A first queued begin has not advanced the lease's sequence floor yet.
+  // Fence callbacks by this chart/state lifetime as well as by the touch lease.
+  const orderMoveLifetime = useMemo(() => ({ active: false }), [orderMoveLease]);
+  useLayoutEffect(() => {
+    orderMoveLifetime.active = true;
+    return () => {
+      orderMoveLifetime.active = false;
+      orderMoveLease.retire();
+    };
+  }, [orderMoveLease, orderMoveLifetime]);
   // Set only between an order commit and the projection carrying its price.
   const orderHandoffRef = useRef<NativeOemsDragHandoff | null>(null);
   // Set only between a bracket commit and the projection carrying its price.
@@ -224,7 +232,6 @@ export function useNativeOemsLineRuntime({
     confirmNativeOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);
     confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);
   }, [oemsActions, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
-
 
   // Rebuilt every render on purpose: the action-state pass reads live manager
   // state, and memoising the build would strand a pending order at its old
@@ -253,10 +260,11 @@ export function useNativeOemsLineRuntime({
   }, [rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
   const clearNativeOrderDrag = useCallback(() => {
+    orderMoveLease.retire();
     orderHandoffRef.current = null;
     orderHandoffSeqRef.current += 1;
     clearNativeOrderDragState(orderDragState);
-  }, [orderDragState]);
+  }, [orderDragState, orderMoveLease]);
 
   /**
    * Hands the line back a frame late, on purpose.
@@ -322,17 +330,67 @@ export function useNativeOemsLineRuntime({
     [bracketDragInteractionState],
   );
 
-
   const clearNativeBracketDrag = useCallback(() => {
     bracketHandoffSeqRef.current += 1;
     clearNativeBracketDragState(bracketDragInteractionState);
   }, [bracketDragInteractionState]);
 
+  const beginOrderMove = useCallback(
+    (objectId: string, price: number, gesture: NativeOrderMoveGesture) => {
+      if (!orderMoveLifetime.active) return;
+      if (!hasNativeOrderTouchState(orderDragState)) return;
+      if (
+        !gesture ||
+        orderDragState.touchSequence.value !== gesture.sequence ||
+        orderDragState.touchStartedAt.value !== gesture.startedAt ||
+        orderDragState.activeObjectId.value !== objectId ||
+        orderDragState.touchArmed.value
+      )
+        return;
+      const line = latestOrderLinesRef.current.find((candidate) => getNativeOrderObjectId(candidate) === objectId);
+      const captured = line?.callbacks?.onMove ? { ...line, callbacks: { ...line.callbacks } } : undefined;
+      if (!orderMoveLease.begin(objectId, gesture, captured)) return;
+      line?.callbacks?.onMoving?.(price);
+    },
+    [orderMoveLease, orderMoveLifetime, orderDragState],
+  );
+
   const commitOrderMove = useCallback(
-    (objectId: string, nextPrice: number) => {
+    (objectId: string, nextPrice: number, gesture: NativeOrderMoveGesture) => {
+      if (!orderMoveLifetime.active) return;
+      if (!hasNativeOrderTouchState(orderDragState)) {
+        orderMoveLease.retire();
+        return;
+      }
+      const captured = orderMoveLease.consume(objectId, gesture);
+      if (!captured) {
+        if (
+          gesture &&
+          orderDragState.touchSequence.value === gesture.sequence &&
+          orderDragState.touchStartedAt.value === gesture.startedAt
+        )
+          clearNativeOrderDrag();
+        return;
+      }
+      if (
+        orderDragState.touchSequence.value !== gesture.sequence ||
+        orderDragState.touchStartedAt.value !== gesture.startedAt ||
+        orderDragState.activeObjectId.value !== objectId ||
+        orderDragState.active.value
+      )
+        return;
+      const current = latestOrderLinesRef.current.find((line) => getNativeOrderObjectId(line) === objectId);
+      if (!current || current.callbacks?.onMove !== captured.callbacks?.onMove) {
+        if (
+          orderDragState.touchSequence.value === gesture.sequence &&
+          orderDragState.touchStartedAt.value === gesture.startedAt
+        )
+          clearNativeOrderDrag();
+        return;
+      }
       const result = startNativeOrderMoveAction({
         manager: oemsActions,
-        orderLines: latestOrderLinesRef.current,
+        orderLines: [{ ...current, callbacks: captured.callbacks }],
         objectId,
         nextPrice,
       });
@@ -347,7 +405,7 @@ export function useNativeOemsLineRuntime({
         forceUpdate();
       }
     },
-    [clearNativeOrderDrag, forceUpdate, oemsActions],
+    [clearNativeOrderDrag, forceUpdate, oemsActions, orderMoveLease, orderMoveLifetime, orderDragState],
   );
 
   const commitBracketMove = useCallback(
@@ -493,6 +551,7 @@ export function useNativeOemsLineRuntime({
     clearNativeBracketDrag,
     clearNativeOrderDrag,
     commitBracketMove,
+    beginOrderMove,
     commitOrderMove,
     commitTradeLineAction,
     lineSnapshot,

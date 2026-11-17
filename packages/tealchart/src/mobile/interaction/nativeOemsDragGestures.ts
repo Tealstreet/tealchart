@@ -13,6 +13,7 @@ import type {
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
+import type { NativeOrderMoveGesture } from './nativeOrderMoveLease';
 
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
@@ -22,13 +23,14 @@ import {
   beginNativeBracketDragState,
   beginNativeOrderDragState,
   clearNativeBracketDragState,
-  releaseNativeBracketDragGesture,
-  releaseNativeOrderDragGesture,
   clearNativeOrderDragState,
   finalizeNativeBracketDragState,
   finalizeNativeOrderDragState,
   getNativeBracketDragCommit,
   getNativeOrderDragCommit,
+  hasNativeOrderTouchState,
+  releaseNativeBracketDragGesture,
+  releaseNativeOrderDragGesture,
   updateNativeBracketDragState,
   updateNativeOrderDragState,
 } from './nativeOemsDragState';
@@ -62,7 +64,8 @@ function getLiveNativePricePerPixel(sharedViewport: NativeViewportSharedValues, 
 }
 
 export interface NativeOrderDragGestureInput {
-  commitOrderMove: (objectId: string, nextPrice: number) => void;
+  beginOrderMove: (objectId: string, price: number, gesture: NativeOrderMoveGesture) => void;
+  commitOrderMove: (objectId: string, nextPrice: number, gesture: NativeOrderMoveGesture) => void;
   onSelectTradeLine?: (objectType: NativeTradeLineObjectType, objectId: string) => void;
   controlZones?: readonly NativeGestureControlZone[];
   resetViewVisible?: SharedValue<boolean>;
@@ -76,6 +79,7 @@ export interface NativeOrderDragGestureInput {
 }
 
 export function createNativeOrderDragGesture({
+  beginOrderMove,
   commitOrderMove,
   onSelectTradeLine,
   controlZones = [],
@@ -90,9 +94,15 @@ export function createNativeOrderDragGesture({
 }: NativeOrderDragGestureInput) {
   if (!frame) return Gesture.Pan().enabled(false);
   return Gesture.Pan()
+    .maxPointers(1)
     .minDistance(2)
     .onTouchesDown((event, stateManager) => {
+      if (!hasNativeOrderTouchState(orderDragState)) {
+        stateManager.fail();
+        return;
+      }
       if (orderDragState.active.value) return;
+      orderDragState.touchArmed.value = false;
       if (!isNativeInitialSingleTouch(event)) {
         stateManager.fail();
         return;
@@ -138,9 +148,20 @@ export function createNativeOrderDragGesture({
       }
       if (!zone) {
         stateManager.fail();
+        return;
       }
+      if (orderDragState.touchSequence.value >= Number.MAX_SAFE_INTEGER) {
+        stateManager.fail();
+        return;
+      }
+      orderDragState.touchSequence.value += 1;
+      orderDragState.touchStartedAt.value = Date.now();
+      orderDragState.touchArmed.value = true;
     })
     .onBegin((event) => {
+      if (!hasNativeOrderTouchState(orderDragState)) return;
+      if (!orderDragState.touchArmed.value || orderDragState.active.value) return;
+      orderDragState.touchArmed.value = false;
       const zone = findNativeOrderDragZone({
         zones: orderDragZones.value,
         rows: tradeLineRows.value,
@@ -151,15 +172,25 @@ export function createNativeOrderDragGesture({
         tradeLabelHeight,
       });
       if (!zone) return;
+      // Claim the native state before either JS notification can rerender the chart.
+      beginNativeOrderDragState(orderDragState, zone, getLiveNativePricePerPixel(sharedViewport, frame));
       if (onSelectTradeLine) {
         runOnJS(onSelectTradeLine)('order', zone.objectId);
       }
-      beginNativeOrderDragState(orderDragState, zone, getLiveNativePricePerPixel(sharedViewport, frame));
+      runOnJS(beginOrderMove)(zone.objectId, zone.price, {
+        sequence: orderDragState.touchSequence.value,
+        startedAt: orderDragState.touchStartedAt.value,
+      });
     })
     .onUpdate((event) => {
+      if (!hasNativeOrderTouchState(orderDragState)) return;
       updateNativeOrderDragState(orderDragState, event.translationY);
     })
     .onEnd((event) => {
+      if (!hasNativeOrderTouchState(orderDragState)) {
+        clearNativeOrderDragState(orderDragState);
+        return;
+      }
       const payload = getNativeOrderDragCommit(orderDragState, event.translationY);
       if (!payload) {
         clearNativeOrderDragState(orderDragState);
@@ -167,9 +198,13 @@ export function createNativeOrderDragGesture({
       }
       // Gesture over, preview not - see `releaseNativeOrderDragGesture`.
       releaseNativeOrderDragGesture(orderDragState);
-      runOnJS(commitOrderMove)(payload.objectId, payload.price);
+      runOnJS(commitOrderMove)(payload.objectId, payload.price, {
+        sequence: orderDragState.touchSequence.value,
+        startedAt: orderDragState.touchStartedAt.value,
+      });
     })
     .onFinalize((_event, success) => {
+      if (orderDragState.touchArmed) orderDragState.touchArmed.value = false;
       finalizeNativeOrderDragState(orderDragState, success);
     });
 }

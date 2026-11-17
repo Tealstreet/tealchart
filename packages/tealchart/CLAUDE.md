@@ -12,6 +12,9 @@ resolved fonts, exact glyph metrics, frame identity and universal composition st
 Local box-text replay derives maximal whole-word lines from the canvas font's
 measurements at the frozen source width. Keep native PNG line observations fixed,
 and retain per-position literal/font/alignment checks across host font fallbacks.
+Raster fixture helpers register generic sans-serif/monospace aliases from
+installed host families before measuring and painting; do not rely on platform
+font fallback or relax glyph-ink assertions when an alias is missing.
 
 Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time
@@ -1040,6 +1043,27 @@ versus action-applied line snapshots extracted from `ChartCore`. Both normal
 second pending-action or reconciliation manager. The runtime receives registered
 adapter callbacks from its owner. Frame transports keep those functions in the
 parent and resolve gestures by the stable adapter ID.
+
+Native order moves require a touch-down-issued sequence and timestamp. A begin
+consumes the native arm before hopping to JS; begin/update/end callbacks cannot
+re-arm a completed gesture. The tracked `nativeOrderMoveLease.ts` captures the admitted line and
+consumes its commit once, before invoking business callbacks. Its 15-second age
+limit starts at the physical touch, including queued JS delivery. Re-renders do
+not renew it, and chart replacement starts above the native sequence already
+issued. A replacement line callback cannot inherit the captured intent. Retained
+Fast Refresh state missing the new touch shared values clears safely and refuses
+financial callbacks until the native state is rebuilt.
+Begin and commit also capture an effect-owned chart/state lifetime fence. Layout
+cleanup closes it before queued callbacks can first arrive after unmount or
+replacement; ordinary per-drag retirement does not close the live chart. Effect
+setup admits the same live instance again during StrictMode effect replay.
+After callback identity is rechecked, the move action uses current line state
+with the captured callbacks so a TP/SL update during the drag is not rolled back
+in the optimistic preview.
+The lease and native-hook regression suites ship beside the implementation;
+consumer checkouts must not supply untracked copies of this financial guard.
+Capture depends on the required `onMove` callback; the optional `onMoving`
+preview notification never decides whether an admitted order may commit.
 
 `rendering/priceLineLayout.ts` is the shared measurement/collision/clipping pass.
 `TealchartRenderer.computeExternalPriceLineLabelBounds` supplies existing
