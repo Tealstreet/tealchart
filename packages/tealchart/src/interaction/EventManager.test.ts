@@ -1440,6 +1440,33 @@ describe.each([320, 375])('EventManager touch intent at %ipx', (width) => {
     expect(onCrossHairMoved).not.toHaveBeenCalled();
   });
 
+  it.each(['pendingDrawing', 'drawing'] as const)(
+    'keeps extra fingers claimed during %s without starting pinch',
+    (mode) => {
+      const onDrawingDragMove = vi.fn();
+      const { container, touch, flush, onViewportChangeInternal } = setup({
+        onDrawingDragPending: () => mode === 'pendingDrawing',
+        onDrawingDragStart: () => mode === 'drawing',
+        onDrawingDragMove,
+      });
+      dispatchTouchEvent(container, 'touchstart', [touch(80, 100)]);
+      const secondStart = dispatchTouchEvent(
+        container,
+        'touchstart',
+        [touch(80, 100), touch(180, 100, 2)],
+        [touch(180, 100, 2)],
+      );
+      const secondMove = dispatchTouchEvent(container, 'touchmove', [touch(60, 100), touch(200, 100, 2)]);
+      expect({ startCanceled: secondStart.defaultPrevented, moveCanceled: secondMove.defaultPrevented }).toEqual({
+        startCanceled: true,
+        moveCanceled: true,
+      });
+      flush();
+      expect(onViewportChangeInternal).not.toHaveBeenCalled();
+      expect(onDrawingDragMove).not.toHaveBeenCalled();
+    },
+  );
+
   it('retains explicitly hit-tested price-axis zoom', () => {
     const { container, touch, flush, onViewportChangeInternal } = setup();
     dispatchTouchEvent(container, 'touchstart', [touch(width - 20, 100)]);
