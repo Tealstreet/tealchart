@@ -220,3 +220,28 @@ describe('queued order moves across chart lifetimes', () => {
     expect(f.onMove.mock.calls).toEqual([[111], [112]]);
   });
 });
+
+it('preserves the latest TP/SL state while committing the captured order callback', async () => {
+  const f = fixture();
+  let finish!: (accepted: boolean) => void;
+  f.onMove.mockReturnValue(
+    new Promise<boolean>((resolve) => {
+      finish = resolve;
+    }),
+  );
+  source.orders = [{ ...source.orders[0], brackets: { takeProfit: 130, stopLoss: 90 } }];
+  f.rerender(f.input);
+  const gesture = f.touch(1);
+  act(() => f.result.current.beginOrderMove('order-1', 100, gesture));
+  source.orders = [{ ...source.orders[0], brackets: { takeProfit: 160, stopLoss: 80 } }];
+  f.rerender(f.input);
+  f.state.active.value = false;
+  act(() => f.result.current.commitOrderMove('order-1', 110, gesture));
+  f.rerender(f.input);
+  try {
+    expect(f.onMove).toHaveBeenCalledExactlyOnceWith(110);
+    expect(f.result.current.lineSnapshot.orderLines[0].brackets).toEqual({ takeProfit: 160, stopLoss: 80 });
+  } finally {
+    await act(async () => finish(false));
+  }
+});

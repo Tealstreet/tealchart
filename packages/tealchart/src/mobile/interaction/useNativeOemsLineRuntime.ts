@@ -390,7 +390,7 @@ export function useNativeOemsLineRuntime({
       }
       const result = startNativeOrderMoveAction({
         manager: oemsActions,
-        orderLines: [captured],
+        orderLines: [{ ...current, callbacks: captured.callbacks }],
         objectId,
         nextPrice,
       });

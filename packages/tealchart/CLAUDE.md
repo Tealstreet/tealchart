@@ -1057,6 +1057,9 @@ Begin and commit also capture an effect-owned chart/state lifetime fence. Layout
 cleanup closes it before queued callbacks can first arrive after unmount or
 replacement; ordinary per-drag retirement does not close the live chart. Effect
 setup admits the same live instance again during StrictMode effect replay.
+After callback identity is rechecked, the move action uses current line state
+with the captured callbacks so a TP/SL update during the drag is not rolled back
+in the optimistic preview.
 The lease and native-hook regression suites ship beside the implementation;
 consumer checkouts must not supply untracked copies of this financial guard.
 Capture depends on the required `onMove` callback; the optional `onMoving`
