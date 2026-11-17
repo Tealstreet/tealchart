@@ -168,6 +168,12 @@ web chrome has always worked this way.
 Grow small targets inward with hit slop only. Slop pushed past the canvas edge
 buys nothing, because the gesture layer never sees touches outside it.
 
+**Web touch intent:** `EventManager` leaves a single-finger plot touch unclaimed
+until movement exceeds the tap threshold. Horizontal-dominant movement claims
+chart pan; vertical/diagonal movement stays with page scrolling for that gesture.
+Pinch and explicitly hit-tested drawing/axis gestures retain chart ownership.
+Keep `touchmove` non-passive and cancel claimed moves synchronously before RAF.
+
 **Native gesture release rule:** Mobile Skia gestures must not clear preview,
 override, or ownership state directly on gesture finalize when that state masks a
 React/Skia propagation seam. Commit the target first, then release the visual

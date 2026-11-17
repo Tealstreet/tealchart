@@ -1289,7 +1289,7 @@ describe.each([320, 375])('EventManager touch intent at %ipx', (width) => {
     document.body.innerHTML = '';
   });
 
-  function setup() {
+  function setup(overrides: Partial<EventManagerCallbacks> = {}) {
     const container = createContainer(width);
     const onViewportChangeInternal = vi.fn();
     const onViewportChange = vi.fn();
@@ -1311,6 +1311,7 @@ describe.each([320, 375])('EventManager touch intent at %ipx', (width) => {
       onDrawingInput,
       onContextMenu,
       onCrossHairMoved,
+      ...overrides,
     });
     manager = new EventManager(container, callbacks);
     const touch = (x: number, y: number, identifier = 1) =>
@@ -1425,6 +1426,61 @@ describe.each([320, 375])('EventManager touch intent at %ipx', (width) => {
     expect(dispatchTouchEvent(container, 'touchmove', [touch(140, 102)]).defaultPrevented).toBe(true);
     flush();
     expect(onViewportChangeInternal).toHaveBeenCalledOnce();
+  });
+
+  it('preserves a tap, then allows a vertical swipe with its crosshair locked', () => {
+    const { container, touch, flush, onDrawingInput, onCrossHairMoved } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchend', [], [touch(100, 100)]).defaultPrevented).toBe(true);
+    expect(onDrawingInput).toHaveBeenCalledOnce();
+    onCrossHairMoved.mockClear();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(101, 140)]).defaultPrevented).toBe(false);
+    flush();
+    expect(onCrossHairMoved).not.toHaveBeenCalled();
+  });
+
+  it('retains explicitly hit-tested price-axis zoom', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(width - 20, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(width - 20, 140)]).defaultPrevented).toBe(true);
+    flush();
+    expect(onViewportChangeInternal).toHaveBeenCalledOnce();
+  });
+
+  it('does not steal a page-owned swipe when a second finger arrives', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(80, 100)]);
+    dispatchTouchEvent(container, 'touchmove', [touch(82, 140)]);
+    expect(
+      dispatchTouchEvent(container, 'touchstart', [touch(82, 140), touch(180, 140, 2)], [touch(180, 140, 2)])
+        .defaultPrevented,
+    ).toBe(false);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(60, 140), touch(200, 140, 2)]).defaultPrevented).toBe(
+      false,
+    );
+    flush();
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+  });
+
+  it('leaves interactive overlay touches uncanceled and does not pan them', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup({ isOverInteractiveElement: () => true });
+    expect(dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]).defaultPrevented).toBe(false);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(140, 100)]).defaultPrevented).toBe(false);
+    flush();
+    expect(dispatchTouchEvent(container, 'touchend', [], [touch(140, 100)]).defaultPrevented).toBe(false);
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+  });
+
+  it('retires a queued chart move before the next page-owned gesture', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    dispatchTouchEvent(container, 'touchmove', [touch(140, 100)]);
+    dispatchTouchEvent(container, 'touchend', [], [touch(140, 100)]);
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    dispatchTouchEvent(container, 'touchmove', [touch(100, 140)]);
+    flush();
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
   });
 
   it('keeps touchmove non-passive so claimed gestures can cancel browser defaults', () => {

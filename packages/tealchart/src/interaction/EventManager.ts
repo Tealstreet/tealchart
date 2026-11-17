@@ -300,6 +300,7 @@ export class EventManager {
   private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null =
     null;
   private isTouchDragging = false;
+  private touchPanIntent: 'pending' | 'chart' | 'page' = 'pending';
   private touchCrosshairLocked = false;
   private crosshairPinned = false;
   private touchCrosshairPosition = { x: 0, y: 0 };
@@ -1323,6 +1324,7 @@ export class EventManager {
       const drawingDragOptions = getTouchDrawingDragOptions(firstTouch);
       this.touchStart = { x, y, time: Date.now(), drawingDragOptions };
       this.isTouchDragging = false;
+      this.touchPanIntent = 'pending';
       this.touchYPanUnlocked = false;
 
       const dims = this.callbacks.getDimensions();
@@ -1387,6 +1389,7 @@ export class EventManager {
       }
     } else if (
       e.touches.length === 2 &&
+      this.touchPanIntent !== 'page' &&
       this.state.dragMode !== 'drawing' &&
       this.state.dragMode !== 'pendingDrawing'
     ) {
@@ -1396,9 +1399,9 @@ export class EventManager {
       const touch2 = e.touches[1];
       this.pinchStartDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
       this.pinchStartViewport = { ...this.callbacks.getViewport() };
+      this.touchPanIntent = 'chart';
+      if (e.cancelable) e.preventDefault();
     }
-
-    e.preventDefault();
   }
 
   private handleTouchMove(e: TouchEvent): void {
@@ -1410,8 +1413,27 @@ export class EventManager {
       });
     }
 
-    // preventDefault must be synchronous
-    e.preventDefault();
+    if (this.touchPanIntent === 'page') return;
+    if (e.touches.length === 1 && this.touchStart) {
+      if (this.state.dragMode === 'pan' && this.touchPanIntent === 'pending') {
+        const rect = this.container.getBoundingClientRect();
+        const dx = e.touches[0].clientX - rect.left - this.touchStart.x;
+        const dy = e.touches[0].clientY - rect.top - this.touchStart.y;
+        if (Math.hypot(dx, dy) <= TOUCH_TAP_THRESHOLD) return;
+        this.clearLongPressTimer();
+        // Latch ownership before RAF: vertical intent belongs to the page.
+        this.touchPanIntent = e.cancelable && Math.abs(dx) > Math.abs(dy) ? 'chart' : 'page';
+        if (this.touchPanIntent === 'page') {
+          this.isTouchDragging = true;
+          return;
+        }
+      }
+    } else if (e.touches.length !== 2 || !this.pinchStartViewport) {
+      return;
+    }
+
+    // Claimed drawing/axis gestures, horizontal pans and pinches cancel synchronously.
+    if (e.cancelable) e.preventDefault();
 
     // Store touch event data and defer heavy processing to RAF
     this._pendingTouchEvent = e;
@@ -1420,6 +1442,7 @@ export class EventManager {
   }
 
   private processTouchMove(e: TouchEvent): void {
+    if (this.touchPanIntent === 'page') return;
     const rect = this.container.getBoundingClientRect();
 
     if (e.touches.length === 1 && this.touchStart) {
@@ -1498,6 +1521,10 @@ export class EventManager {
   }
 
   private handleTouchEnd(e: TouchEvent): void {
+    const cancelDefault =
+      e.type === 'touchend' &&
+      this.touchPanIntent !== 'page' &&
+      (this.touchStart !== null || this.pinchStartViewport !== null);
     const endedTouches = Array.from(e.changedTouches);
     // Remove ended touches
     for (const touch of endedTouches) {
@@ -1535,7 +1562,12 @@ export class EventManager {
         invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, endX, endY, 'touch', drawingDragOptions);
       }
 
-      if (!this.isTouchDragging && e.type === 'touchend' && duration < TOUCH_TAP_TIMEOUT) {
+      if (
+        !this.isTouchDragging &&
+        e.type === 'touchend' &&
+        duration < TOUCH_TAP_TIMEOUT &&
+        endDistance <= TOUCH_TAP_THRESHOLD
+      ) {
         // This was a tap, not a drag
         this.handleTap(this.touchStart.x, this.touchStart.y);
       } else if (this.state.isDragging) {
@@ -1575,7 +1607,16 @@ export class EventManager {
       this.state.dragStartViewport = { ...this.callbacks.getViewport() };
     }
 
-    e.preventDefault();
+    if (e.touches.length === 0) {
+      this.touchPanIntent = 'pending';
+      this.pinchStartDistance = 0;
+      this.pinchStartViewport = null;
+      if (this._pendingEventType === 'touchmove') {
+        this._pendingTouchEvent = null;
+        this._pendingEventType = 'none';
+      }
+    }
+    if (cancelDefault && e.cancelable) e.preventDefault();
     this.scheduleRender();
   }
 
