@@ -1,7 +1,8 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Bar } from '../../types';
 
-import { Pressable, Text } from 'react-native';
+import { isValidElement } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import { LOADING_DOT_COUNT } from '../../constants';
@@ -80,6 +81,36 @@ const frameWithIndicatorPane = createNativeChartFrameFromPanes({
 });
 
 describe('NativeChartLegendOverlay', () => {
+  it.each([320, 375, 1024])('wraps intact OHLC pairs inside the %ipx native plot', (width) => {
+    const sizedFrame = createNativeChartFrameFromPanes({
+      dimensions: { width, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
+      panes: [{ id: 'main', type: 'main', top: 36, height: 352, yMin: 12000, yMax: 130000 }],
+    });
+    const legend = NativeChartLegendOverlayImpl({
+      bars: [{ time: 1, open: 12345.67, high: 123456.78, low: 12000.12, close: 12345.89, volume: 1 }],
+      downColor: '#f04465', frame: sizedFrame, interval: '60', isLoading: false, leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98', pricePrecision: 0.1, symbol: 'BTCUSDT', textColor: '#f0f3fa', upColor: '#12c48b',
+    });
+    const views = collectElementsByType(legend, View);
+    const ohlc = views.find((view) => {
+      const children = view.props.children;
+      return Array.isArray(children) && children.length === 4 &&
+        children.every((child) => isValidElement(child) && ['O', 'H', 'L', 'C'].includes(String(child.key)));
+    });
+    expect(ohlc).toBeDefined();
+    const rowStyle = Object.assign({}, ...[ohlc!.props.style].flat());
+    expect(rowStyle.flexDirection).toBe('row');
+    expect(rowStyle.flexWrap).toBe('wrap');
+    const block = views.map((view) => Object.assign({}, ...[view.props.style].flat()))
+      .find((style) => typeof style.left === 'number' && typeof style.maxWidth === 'number');
+    expect(block).toBeDefined();
+    expect(block!.left + block!.maxWidth).toBeLessThanOrEqual(sizedFrame.priceAxisHitLeft);
+    expect(collectElementsByType(ohlc, Text).map((text) => text.props.children)).toEqual([
+      'O', '12,345.7', 'H', '123,456.8', 'L', '12,000.1', 'C', '12,345.9',
+    ]);
+    expect(ohlc!.props.pointerEvents).toBe('none');
+  });
+
   it('renders symbol, interval, and OHLC values', () => {
     const texts = collectElementsByType(renderLegend(false), Text).map((element) => element.props.children);
 

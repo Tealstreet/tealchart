@@ -547,7 +547,7 @@ function NativeChartLegendOverlayView({
           </View>
           {isLoading && <NativeLegendLoadingDots color={mutedTextColor} />}
           {ohlcItems.length > 0 && (
-            <View pointerEvents="none" style={styles.row}>
+            <View pointerEvents="none" style={[styles.row, styles.ohlcRow]}>
               {ohlcItems.map(([label, value]) => (
                 <View key={label} style={styles.ohlcItem}>
                   <Text style={[styles.ohlcLabel, { color: mutedTextColor }]}>{label}</Text>
@@ -883,6 +883,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginRight: 6,
+  },
+  ohlcRow: {
+    flexWrap: 'wrap',
   },
   ohlcLabel: {
     fontSize: 10,
