@@ -1,9 +1,10 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Bar } from '../../types';
 
-import { isValidElement } from 'react';
+import { createElement, isValidElement } from 'react';
+import { cleanup, render } from '@testing-library/react';
 import { Pressable, Text, View } from 'react-native';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LOADING_DOT_COUNT } from '../../constants';
 
@@ -81,6 +82,37 @@ const frameWithIndicatorPane = createNativeChartFrameFromPanes({
 });
 
 describe('NativeChartLegendOverlay', () => {
+  afterEach(cleanup);
+
+  it.each([320, 375])('keeps mounted native OHLC values and wrapping through live ticks at %ipx', (width) => {
+    const props = {
+      bars: [{ time: 1, open: 1.23456789, high: 1.23456799, low: 1.23456701, close: 1.23456791, volume: 1 }],
+      downColor: '#f04465',
+      frame: createNativeChartFrameFromPanes({
+        dimensions: { width, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
+        panes: [{ id: 'main', type: 'main', top: 36, height: 352, yMin: 1, yMax: 2 }],
+      }),
+      interval: '60', isLoading: false, leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98', pricePrecision: 1e-8, symbol: 'PRECISE', textColor: '#f0f3fa', upColor: '#12c48b',
+    } satisfies Parameters<typeof NativeChartLegendOverlayImpl>[0];
+    const view = render(createElement(NativeChartLegendOverlayImpl, props));
+    const row = [...view.container.querySelectorAll<HTMLElement>('div[data-style]')].find((element) =>
+      element.children.length === 4 && [...element.children].every((child, index) =>
+        child.firstElementChild?.textContent === ['O', 'H', 'L', 'C'][index]));
+    expect(row).toBeDefined();
+    if (!row) throw new Error('Missing mounted OHLC row');
+    const rowStyle: unknown = JSON.parse(row.dataset.style ?? 'null');
+    expect(Object.assign({}, ...[rowStyle].flat())).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
+    const values = [...row.children].map((item) => item.lastElementChild);
+    expect(values.map((item) => item?.textContent)).toEqual(['1.23456789', '1.23456799', '1.23456701', '1.23456791']);
+    view.rerender(createElement(NativeChartLegendOverlayImpl, {
+      ...props, bars: [{ ...props.bars[0], close: 1.23456792 }],
+    }));
+    expect([...row.children].map((item) => item.lastElementChild)).toEqual(values);
+    expect(values[3]?.textContent).toBe('1.23456792');
+    expect(row.dataset.pointerEvents).toBe('none');
+  });
+
   it.each([320, 375, 1024])('wraps intact OHLC pairs inside the %ipx native plot', (width) => {
     const sizedFrame = createNativeChartFrameFromPanes({
       dimensions: { width, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
