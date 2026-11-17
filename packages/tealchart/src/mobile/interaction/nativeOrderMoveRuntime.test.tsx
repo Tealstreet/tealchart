@@ -14,7 +14,7 @@ vi.mock('../../TealchartApi', () => ({
 
 afterEach(cleanup);
 
-function fixture() {
+function fixture(preview = true) {
   const onMoving = vi.fn();
   const onMove = vi.fn();
   source.orders = [
@@ -23,7 +23,7 @@ function fixture() {
       price: 100,
       cancellable: true,
       brackets: {},
-      callbacks: { onMoving, onMove },
+      callbacks: preview ? { onMoving, onMove } : { onMove },
     } as OrderLineRenderData,
   ];
   const state = {
@@ -57,6 +57,26 @@ function fixture() {
 }
 
 describe('native order move hook admission', () => {
+  it('commits once when the admitted line has onMove without the optional preview callback', () => {
+    const f = fixture(false);
+    const first = f.touch(1);
+    act(() => f.result.current.beginOrderMove('order-1', 100, first));
+    f.state.active.value = false;
+    act(() => f.result.current.commitOrderMove('order-1', 110, first));
+    f.rerender(f.input);
+    act(() => {
+      f.result.current.beginOrderMove('order-1', 100, first);
+      f.result.current.commitOrderMove('order-1', 120, first);
+    });
+    expect(f.onMoving).not.toHaveBeenCalled();
+    expect(f.onMove).toHaveBeenCalledExactlyOnceWith(110);
+    const second = f.touch(2);
+    act(() => f.result.current.beginOrderMove('order-1', 110, second));
+    f.state.active.value = false;
+    act(() => f.result.current.commitOrderMove('order-1', 115, second));
+    expect(f.onMove.mock.calls).toEqual([[110], [115]]);
+  });
+
   it('consumes once across a rerender and accepts a distinct next touch', () => {
     const f = fixture();
     const first = f.touch(1);

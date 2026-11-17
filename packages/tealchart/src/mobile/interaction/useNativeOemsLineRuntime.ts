@@ -338,7 +338,7 @@ export function useNativeOemsLineRuntime({
       )
         return;
       const line = latestOrderLinesRef.current.find((candidate) => getNativeOrderObjectId(candidate) === objectId);
-      const captured = line?.callbacks?.onMoving ? { ...line, callbacks: { ...line.callbacks } } : undefined;
+      const captured = line?.callbacks?.onMove ? { ...line, callbacks: { ...line.callbacks } } : undefined;
       if (!orderMoveLease.begin(objectId, gesture, captured)) return;
       line?.callbacks?.onMoving?.(price);
     },

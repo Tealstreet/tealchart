@@ -1052,6 +1052,8 @@ Fast Refresh state missing the new touch shared values clears safely and refuses
 financial callbacks until the native state is rebuilt.
 The lease and native-hook regression suites ship beside the implementation;
 consumer checkouts must not supply untracked copies of this financial guard.
+Capture depends on the required `onMove` callback; the optional `onMoving`
+preview notification never decides whether an admitted order may commit.
 
 `rendering/priceLineLayout.ts` is the shared measurement/collision/clipping pass.
 `TealchartRenderer.computeExternalPriceLineLabelBounds` supplies existing
