@@ -6,7 +6,6 @@ import { analyze } from './analyzer';
 import type { AnalysisContext, AnalyzeOptions, SecurityCallSite } from './analyzer';
 import { type RequestContextSelection, emit, RUNTIME_HELPERS } from './emitter';
 import {
-  NumericSeries, ValueSeries,
   SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
   Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, PivotPointLevels, Range, Rising, Falling, Max, Min,
   MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev, Covariance, Correlation, COG, Median, Mode,
@@ -14,7 +13,8 @@ import {
   DEMA, TEMA, Cum, HMA, WMA, VWMA, SWMA, ALMA, CCI, CMO, WPR,
   AccumulationDistribution, IntradayIntensityIndex, NegativeVolumeIndex, PositiveVolumeIndex, PriceVolumeTrend,
   WilliamsAccumulationDistribution, WilliamsVariableAccumulationDistribution, BarIndex,
-} from './index';
+} from './ta-classes';
+import { NumericSeries, ValueSeries } from './runtime';
 import * as arrFuncs from '../arrays';
 import * as mapFuncs from '../maps';
 import * as udtFuncs from '../objects';
