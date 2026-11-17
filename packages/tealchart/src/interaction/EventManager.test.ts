@@ -1,22 +1,22 @@
 // @vitest-environment jsdom
-import type { EventManagerCallbacks } from './EventManager';
 import type { Viewport } from '../types';
+import type { EventManagerCallbacks } from './EventManager';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
-import { EventManager } from './EventManager';
 import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../viewport/timeRangeConstraints';
+import { EventManager } from './EventManager';
 
-function createContainer(): HTMLElement {
+function createContainer(width = 800): HTMLElement {
   const container = document.createElement('div');
   Object.defineProperty(container, 'getBoundingClientRect', {
     value: () => ({
       left: 0,
       top: 0,
-      right: 800,
+      right: width,
       bottom: 600,
-      width: 800,
+      width,
       height: 600,
     }),
   });
@@ -66,14 +66,16 @@ function dispatchTouchEvent(
   type: string,
   touches: Touch[],
   changedTouches: Touch[] = touches,
-): void {
-  const event = new Event(type, { bubbles: true, cancelable: true }) as TouchEvent;
+  cancelable = true,
+): TouchEvent {
+  const event = new Event(type, { bubbles: true, cancelable }) as TouchEvent;
   Object.defineProperties(event, {
     touches: { value: touches },
     targetTouches: { value: touches },
     changedTouches: { value: changedTouches },
   });
   target.dispatchEvent(event);
+  return event;
 }
 
 function dispatchPointerEvent(
@@ -1259,5 +1261,175 @@ describe('EventManager drawing drag routing', () => {
 
     manager.dispose();
     vi.unstubAllGlobals();
+  });
+});
+
+describe.each([320, 375])('EventManager touch intent at %ipx', (width) => {
+  let manager: EventManager;
+  let frames: Map<number, FrameRequestCallback>;
+  let nextFrame: number;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    frames = new Map();
+    nextFrame = 0;
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.set(++nextFrame, callback);
+      return nextFrame;
+    });
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => frames.delete(id));
+  });
+
+  afterEach(() => {
+    manager?.dispose();
+    clearChartStoreCache();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    document.body.innerHTML = '';
+  });
+
+  function setup() {
+    const container = createContainer(width);
+    const onViewportChangeInternal = vi.fn();
+    const onViewportChange = vi.fn();
+    const onDrawingInput = vi.fn();
+    const onContextMenu = vi.fn();
+    const onCrossHairMoved = vi.fn();
+    const callbacks = createCallbacks({
+      getDimensions: () => ({
+        width,
+        height: 600,
+        priceAxisWidth: 60,
+        timeAxisHeight: 24,
+        topMargin: 20,
+        leftMargin: 0,
+      }),
+      getPaneAtY: () => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 576 }),
+      onViewportChangeInternal,
+      onViewportChange,
+      onDrawingInput,
+      onContextMenu,
+      onCrossHairMoved,
+    });
+    manager = new EventManager(container, callbacks);
+    const touch = (x: number, y: number, identifier = 1) =>
+      createTouch(container, { clientX: x, clientY: y, identifier });
+    const flush = () => {
+      const pending = [...frames.values()];
+      frames.clear();
+      for (const callback of pending) callback(0);
+    };
+    return {
+      container,
+      touch,
+      flush,
+      onViewportChangeInternal,
+      onViewportChange,
+      onDrawingInput,
+      onContextMenu,
+      onCrossHairMoved,
+    };
+  }
+
+  it('leaves a single-finger start and sub-threshold movement available to the page', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    expect(dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]).defaultPrevented).toBe(false);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(104, 102)]).defaultPrevented).toBe(false);
+    flush();
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [-2, 40],
+    [3, -40],
+    [20, 30],
+    [20, 20],
+  ])('yields vertical/diagonal intent (%i,%i) for the whole gesture', (dx, dy) => {
+    const {
+      container,
+      touch,
+      flush,
+      onViewportChangeInternal,
+      onViewportChange,
+      onDrawingInput,
+      onContextMenu,
+      onCrossHairMoved,
+    } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(100 + dx, 100 + dy)]).defaultPrevented).toBe(false);
+    flush();
+    // Later horizontal drift must not steal an already-scrolling page.
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(200, 120)]).defaultPrevented).toBe(false);
+    flush();
+    vi.advanceTimersByTime(600);
+    expect(dispatchTouchEvent(container, 'touchend', [], [touch(200, 120)]).defaultPrevented).toBe(false);
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+    expect(onViewportChange).not.toHaveBeenCalled();
+    expect(onDrawingInput).not.toHaveBeenCalled();
+    expect(onContextMenu).not.toHaveBeenCalled();
+    expect(onCrossHairMoved).not.toHaveBeenCalled();
+  });
+
+  it('claims horizontal pan synchronously before its RAF viewport update', () => {
+    const { container, touch, flush, onViewportChangeInternal, onViewportChange } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(130, 103)]).defaultPrevented).toBe(true);
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+    flush();
+    expect(onViewportChangeInternal).toHaveBeenCalledWith(expect.objectContaining({ startTime: expect.any(Number) }));
+    expect(onViewportChangeInternal.mock.calls[0][0].startTime).not.toBe(0);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(132, 180)]).defaultPrevented).toBe(true);
+    flush();
+    dispatchTouchEvent(container, 'touchend', [], [touch(132, 180)]);
+    expect(onViewportChange).toHaveBeenCalledOnce();
+  });
+
+  it('preserves two-finger pinch and releases ownership for the next vertical swipe', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(80, 100)]);
+    expect(
+      dispatchTouchEvent(container, 'touchstart', [touch(80, 100), touch(180, 100, 2)], [touch(180, 100, 2)])
+        .defaultPrevented,
+    ).toBe(true);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(60, 100), touch(200, 100, 2)]).defaultPrevented).toBe(
+      true,
+    );
+    flush();
+    expect(onViewportChangeInternal).toHaveBeenCalledOnce();
+    const viewport = onViewportChangeInternal.mock.calls[0][0];
+    expect(viewport.endTime - viewport.startTime).toBeLessThan(100);
+    dispatchTouchEvent(container, 'touchend', [], [touch(60, 100), touch(200, 100, 2)]);
+    onViewportChangeInternal.mockClear();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(102, 140)]).defaultPrevented).toBe(false);
+    flush();
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+  });
+
+  it('does not mutate the chart after the browser owns a non-cancelable first move', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    dispatchTouchEvent(container, 'touchmove', [touch(140, 102)], undefined, false);
+    flush();
+    expect(onViewportChangeInternal).not.toHaveBeenCalled();
+  });
+
+  it('clears page intent on cancellation so the next horizontal pan works', () => {
+    const { container, touch, flush, onViewportChangeInternal } = setup();
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    dispatchTouchEvent(container, 'touchmove', [touch(102, 140)]);
+    flush();
+    expect(dispatchTouchEvent(container, 'touchcancel', [], [touch(102, 140)]).defaultPrevented).toBe(false);
+    dispatchTouchEvent(container, 'touchstart', [touch(100, 100)]);
+    expect(dispatchTouchEvent(container, 'touchmove', [touch(140, 102)]).defaultPrevented).toBe(true);
+    flush();
+    expect(onViewportChangeInternal).toHaveBeenCalledOnce();
+  });
+
+  it('keeps touchmove non-passive so claimed gestures can cancel browser defaults', () => {
+    const listener = vi.spyOn(HTMLElement.prototype, 'addEventListener');
+    setup();
+    expect(listener).toHaveBeenCalledWith('touchmove', expect.any(Function), { capture: true, passive: false });
   });
 });
