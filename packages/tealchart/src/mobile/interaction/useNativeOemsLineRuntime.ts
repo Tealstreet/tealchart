@@ -10,7 +10,7 @@ import type {
 import type { NativeOemsTradingLineState } from './nativeOemsLineState';
 import type { NativeOrderMoveGesture } from './nativeOrderMoveLease';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
@@ -206,7 +206,16 @@ export function useNativeOemsLineRuntime({
     () => createNativeOrderMoveLease<OrderLineRenderData>(() => Date.now(), orderDragState.touchSequence?.value ?? 0),
     [chartApi, orderDragState],
   );
-  useEffect(() => () => orderMoveLease.retire(), [orderMoveLease]);
+  // A first queued begin has not advanced the lease's sequence floor yet.
+  // Fence callbacks by this chart/state lifetime as well as by the touch lease.
+  const orderMoveLifetime = useMemo(() => ({ active: false }), [orderMoveLease]);
+  useLayoutEffect(() => {
+    orderMoveLifetime.active = true;
+    return () => {
+      orderMoveLifetime.active = false;
+      orderMoveLease.retire();
+    };
+  }, [orderMoveLease, orderMoveLifetime]);
   // Set only between an order commit and the projection carrying its price.
   const orderHandoffRef = useRef<NativeOemsDragHandoff | null>(null);
   // Set only between a bracket commit and the projection carrying its price.
@@ -328,6 +337,7 @@ export function useNativeOemsLineRuntime({
 
   const beginOrderMove = useCallback(
     (objectId: string, price: number, gesture: NativeOrderMoveGesture) => {
+      if (!orderMoveLifetime.active) return;
       if (!hasNativeOrderTouchState(orderDragState)) return;
       if (
         !gesture ||
@@ -342,11 +352,12 @@ export function useNativeOemsLineRuntime({
       if (!orderMoveLease.begin(objectId, gesture, captured)) return;
       line?.callbacks?.onMoving?.(price);
     },
-    [orderMoveLease, orderDragState],
+    [orderMoveLease, orderMoveLifetime, orderDragState],
   );
 
   const commitOrderMove = useCallback(
     (objectId: string, nextPrice: number, gesture: NativeOrderMoveGesture) => {
+      if (!orderMoveLifetime.active) return;
       if (!hasNativeOrderTouchState(orderDragState)) {
         orderMoveLease.retire();
         return;
@@ -394,7 +405,7 @@ export function useNativeOemsLineRuntime({
         forceUpdate();
       }
     },
-    [clearNativeOrderDrag, forceUpdate, oemsActions, orderMoveLease, orderDragState],
+    [clearNativeOrderDrag, forceUpdate, oemsActions, orderMoveLease, orderMoveLifetime, orderDragState],
   );
 
   const commitBracketMove = useCallback(

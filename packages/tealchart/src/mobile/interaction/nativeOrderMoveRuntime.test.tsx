@@ -14,7 +14,7 @@ vi.mock('../../TealchartApi', () => ({
 
 afterEach(cleanup);
 
-function fixture(preview = true) {
+function fixture(preview = true, strictMode = false) {
   const onMoving = vi.fn();
   const onMove = vi.fn();
   source.orders = [
@@ -45,6 +45,7 @@ function fixture(preview = true) {
   };
   const hook = renderHook((props: NativeOemsLineRuntimeInput) => useNativeOemsLineRuntime(props), {
     initialProps: input,
+    reactStrictMode: strictMode,
   });
   const touch = (sequence: number, startedAt = Date.now()) => {
     state.touchSequence.value = sequence;
@@ -152,5 +153,70 @@ describe('native order move hook admission', () => {
     ).not.toThrow();
     expect(f.onMoving).not.toHaveBeenCalled();
     expect(f.onMove).not.toHaveBeenCalled();
+  });
+});
+
+describe('reviewer: queued delivery after hook disposal', () => {
+  it('does not invoke financial callbacks when begin and end first drain after unmount', () => {
+    const f = fixture();
+    const gesture = f.touch(1);
+    const queuedBegin = f.result.current.beginOrderMove;
+    const queuedCommit = f.result.current.commitOrderMove;
+    // Native issued this touch; the JS callbacks have not run when the owner retires.
+    f.state.active.value = false; // native end released the gesture; JS delivery remains queued
+    f.unmount();
+    act(() => queuedBegin('order-1', 100, gesture));
+    f.state.active.value = false;
+    act(() => queuedCommit('order-1', 120, gesture));
+    expect(f.onMove).not.toHaveBeenCalled();
+    expect(f.onMoving).not.toHaveBeenCalled();
+  });
+  it('does retire a begin already delivered before unmount (control)', () => {
+    const f = fixture();
+    const gesture = f.touch(1);
+    const queuedCommit = f.result.current.commitOrderMove;
+    act(() => f.result.current.beginOrderMove('order-1', 100, gesture));
+    f.unmount();
+    f.state.active.value = false;
+    act(() => queuedCommit('order-1', 120, gesture));
+    expect(f.onMove).not.toHaveBeenCalled();
+  });
+});
+
+describe('queued order moves across chart lifetimes', () => {
+  it.each(['chart', 'drag-state'])('rejects old callbacks first delivered after %s replacement', (replacement) => {
+    const f = fixture();
+    const gesture = f.touch(1);
+    const queuedBegin = f.result.current.beginOrderMove;
+    const queuedCommit = f.result.current.commitOrderMove;
+    f.state.active.value = false;
+    f.rerender(
+      replacement === 'chart'
+        ? { ...f.input, chartApi: {} as TealchartApi }
+        : { ...f.input, orderDragState: { ...f.state } },
+    );
+    act(() => {
+      queuedBegin('order-1', 100, gesture);
+      queuedCommit('order-1', 120, gesture);
+    });
+    expect(f.onMoving).not.toHaveBeenCalled();
+    expect(f.onMove).not.toHaveBeenCalled();
+    const next = f.touch(2);
+    act(() => f.result.current.beginOrderMove('order-1', 100, next));
+    f.state.active.value = false;
+    act(() => f.result.current.commitOrderMove('order-1', 115, next));
+    expect(f.onMove).toHaveBeenCalledExactlyOnceWith(115);
+  });
+
+  it('admits distinct touches after StrictMode effect replay and ordinary drag cleanup', () => {
+    const f = fixture(true, true);
+    for (const sequence of [1, 2]) {
+      const gesture = f.touch(sequence);
+      act(() => f.result.current.beginOrderMove('order-1', 100, gesture));
+      f.state.active.value = false;
+      act(() => f.result.current.commitOrderMove('order-1', 110 + sequence, gesture));
+      act(() => f.result.current.clearNativeOrderDrag());
+    }
+    expect(f.onMove.mock.calls).toEqual([[111], [112]]);
   });
 });

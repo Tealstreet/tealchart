@@ -1053,6 +1053,10 @@ not renew it, and chart replacement starts above the native sequence already
 issued. A replacement line callback cannot inherit the captured intent. Retained
 Fast Refresh state missing the new touch shared values clears safely and refuses
 financial callbacks until the native state is rebuilt.
+Begin and commit also capture an effect-owned chart/state lifetime fence. Layout
+cleanup closes it before queued callbacks can first arrive after unmount or
+replacement; ordinary per-drag retirement does not close the live chart. Effect
+setup admits the same live instance again during StrictMode effect replay.
 The lease and native-hook regression suites ship beside the implementation;
 consumer checkouts must not supply untracked copies of this financial guard.
 Capture depends on the required `onMove` callback; the optional `onMoving`
