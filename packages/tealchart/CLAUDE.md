@@ -171,7 +171,8 @@ buys nothing, because the gesture layer never sees touches outside it.
 **Web touch intent:** `EventManager` leaves a single-finger plot touch unclaimed
 until movement exceeds the tap threshold. Horizontal-dominant movement claims
 chart pan; vertical/diagonal movement stays with page scrolling for that gesture.
-Pinch and explicitly hit-tested drawing/axis gestures retain chart ownership.
+Pinch and explicitly hit-tested drawing/axis gestures retain chart ownership,
+including cancellation of extra fingers when drawing deliberately blocks pinch.
 Keep `touchmove` non-passive and cancel claimed moves synchronously before RAF.
 
 **Native gesture release rule:** Mobile Skia gestures must not clear preview,

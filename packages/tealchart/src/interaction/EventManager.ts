@@ -1352,6 +1352,8 @@ export class EventManager {
           : isOverPriceAxis
             ? 'priceAxisZoom'
             : 'pan';
+      // Hit-tested drawing and axis gestures already have an explicit owner.
+      if (this.state.dragMode !== 'pan') this.touchPanIntent = 'chart';
       // Save crosshair position at touch start for tracking during drag
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
@@ -1400,8 +1402,8 @@ export class EventManager {
       this.pinchStartDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
       this.pinchStartViewport = { ...this.callbacks.getViewport() };
       this.touchPanIntent = 'chart';
-      if (e.cancelable) e.preventDefault();
     }
+    if (this.touchPanIntent === 'chart' && e.cancelable) e.preventDefault();
   }
 
   private handleTouchMove(e: TouchEvent): void {
@@ -1428,7 +1430,7 @@ export class EventManager {
           return;
         }
       }
-    } else if (e.touches.length !== 2 || !this.pinchStartViewport) {
+    } else if ((e.touches.length !== 2 || !this.pinchStartViewport) && this.touchPanIntent !== 'chart') {
       return;
     }
 
