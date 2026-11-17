@@ -80,6 +80,42 @@ const frameWithIndicatorPane = createNativeChartFrameFromPanes({
 });
 
 describe('NativeChartLegendOverlay', () => {
+  it.each([320, 375])('allows a long native symbol to shrink beside its interval at %ipx', (width) => {
+    const sizedFrame = createNativeChartFrameFromPanes({
+      dimensions: { width, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
+      panes: [{ id: 'main', type: 'main', top: 36, height: 352, yMin: 100, yMax: 120 }],
+    });
+    const symbol = 'LONG-SYMBOL-'.repeat(12);
+    const legend = NativeChartLegendOverlayImpl({
+      bars, frame: sizedFrame, symbol, interval: '60', isLoading: false, leftToolRailLayout: null,
+      downColor: '#f04465', upColor: '#12c48b', mutedTextColor: '#8a8f98', textColor: '#f0f3fa', pricePrecision: 0.1,
+    });
+    const texts = collectElementsByType(legend, Text);
+    const caption = texts.find((element) => element.props.children === symbol);
+    expect(caption).toBeDefined();
+    expect(Object.assign({}, ...[caption!.props.style].flat()).flexShrink).toBe(1);
+    expect(caption!.props.numberOfLines).toBe(1);
+    expect(caption!.props.ellipsizeMode).toBe('tail');
+    expect(texts.some((element) => element.props.children === '1h')).toBe(true);
+    expect(caption!.props.children).toBe(symbol);
+  });
+
+  it('keeps the ordinary wide native caption and interval unchanged', () => {
+    const sizedFrame = createNativeChartFrameFromPanes({
+      dimensions: { width: 1024, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
+      panes: [{ id: 'main', type: 'main', top: 36, height: 352, yMin: 100, yMax: 120 }],
+    });
+    const legend = NativeChartLegendOverlayImpl({
+      bars, frame: sizedFrame, symbol: 'BTCUSDT', interval: '60', isLoading: false, leftToolRailLayout: null,
+      downColor: '#f04465', upColor: '#12c48b', mutedTextColor: '#8a8f98', textColor: '#f0f3fa', pricePrecision: 0.1,
+    });
+    const texts = collectElementsByType(legend, Text);
+    const caption = texts.find((element) => element.props.children === 'BTCUSDT');
+    expect(caption!.props.numberOfLines).toBe(1);
+    expect(Object.assign({}, ...[caption!.props.style].flat()).fontSize).toBe(11);
+    expect(texts.some((element) => element.props.children === '1h')).toBe(true);
+  });
+
   it('renders symbol, interval, and OHLC values', () => {
     const texts = collectElementsByType(renderLegend(false), Text).map((element) => element.props.children);
 
