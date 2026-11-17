@@ -1043,13 +1043,15 @@ parent and resolve gestures by the stable adapter ID.
 
 Native order moves require a touch-down-issued sequence and timestamp. A begin
 consumes the native arm before hopping to JS; begin/update/end callbacks cannot
-re-arm a completed gesture. `nativeOrderMoveLease` captures the admitted line and
+re-arm a completed gesture. The tracked `nativeOrderMoveLease.ts` captures the admitted line and
 consumes its commit once, before invoking business callbacks. Its 15-second age
 limit starts at the physical touch, including queued JS delivery. Re-renders do
 not renew it, and chart replacement starts above the native sequence already
 issued. A replacement line callback cannot inherit the captured intent. Retained
 Fast Refresh state missing the new touch shared values clears safely and refuses
 financial callbacks until the native state is rebuilt.
+The lease and native-hook regression suites ship beside the implementation;
+consumer checkouts must not supply untracked copies of this financial guard.
 
 `rendering/priceLineLayout.ts` is the shared measurement/collision/clipping pass.
 `TealchartRenderer.computeExternalPriceLineLabelBounds` supplies existing
