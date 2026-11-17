@@ -12,6 +12,9 @@ resolved fonts, exact glyph metrics, frame identity and universal composition st
 Local box-text replay derives maximal whole-word lines from the canvas font's
 measurements at the frozen source width. Keep native PNG line observations fixed,
 and retain per-position literal/font/alignment checks across host font fallbacks.
+Raster fixture helpers register generic sans-serif/monospace aliases from
+installed host families before measuring and painting; do not rely on platform
+font fallback or relax glyph-ink assertions when an alias is missing.
 
 Native v93 z-order captures require default fills below plots and hlines above
 both; explicit_plot_zorder keeps plots/hlines/fills in call order. Web price/time

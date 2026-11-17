@@ -1,3 +1,4 @@
+import './canvasTestFonts';
 import type { BoxTextEntry } from '../../../tealscript/tests/fixtures/v103BoxText';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { ComputedPane } from '../types';
