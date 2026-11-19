@@ -304,8 +304,11 @@ describe('AnimatedBracketDragPreview', () => {
     for (const sample of samples) {
       expect(sample).toEqual(samples[0]);
     }
-    // Started near the price axis, so the ladder anchors toward the open chart.
-    expect(Math.max(...samples[0].chips)).toBeLessThanOrEqual(startX);
+    // Started near the price axis, so the ladder runs leftward into the open
+    // chart rather than being shoved back over it in reverse order.
+    for (let index = 1; index < samples[0].chips.length; index += 1) {
+      expect(samples[0].chips[index]).toBeLessThan(samples[0].chips[index - 1]);
+    }
   });
 
   it('uses the compact bracket label when partial mode is full size', () => {

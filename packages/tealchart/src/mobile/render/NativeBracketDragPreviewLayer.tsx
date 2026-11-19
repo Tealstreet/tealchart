@@ -8,7 +8,11 @@ import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@sho
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
-import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
+import {
+  PARTIAL_BRACKET_PERCENTS,
+  resolvePartialBracketLadderDirection,
+  resolvePartialBracketMarkers,
+} from '../../interaction/partialBrackets';
 import { getNativeDarkLabelBackgroundColor, NATIVE_PRICE_AXIS_TAG_TEXT_COLOR } from '../utils/nativeColor';
 import { NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
@@ -146,6 +150,7 @@ export function NativePartialMarker({
   activeColor,
   axisCharacterWidth,
   dragState,
+  ladderDirection,
   markerIndex,
   markerBaselineY,
   markerTop,
@@ -156,6 +161,7 @@ export function NativePartialMarker({
   activeColor: SharedValue<string>;
   axisCharacterWidth: number;
   dragState: NativeBracketDragSharedValues;
+  ladderDirection: SharedValue<number>;
   markerIndex: number;
   markerBaselineY: SharedValue<number>;
   markerTop: SharedValue<number>;
@@ -178,6 +184,7 @@ export function NativePartialMarker({
         characterWidth: axisCharacterWidth,
         paddingX: PARTIAL_MARKER_PADDING_X,
         minGap: PARTIAL_MARKER_MIN_GAP,
+        ladderDirection: ladderDirection.value,
       })[markerIndex],
   );
   const markerX = useDerivedValue(() => resolved.value.centerX - resolved.value.width / 2);
@@ -225,6 +232,7 @@ export function NativePartialMarker({
 
 export function NativePartialBoundaryLine({
   dragState,
+  ladderDirection,
   markerIndex,
   zoneBottom,
   zoneLeft,
@@ -232,6 +240,7 @@ export function NativePartialBoundaryLine({
   zoneTop,
 }: {
   dragState: NativeBracketDragSharedValues;
+  ladderDirection: SharedValue<number>;
   markerIndex: number;
   zoneBottom: SharedValue<number>;
   zoneLeft: SharedValue<number>;
@@ -250,6 +259,7 @@ export function NativePartialBoundaryLine({
         characterWidth: 0,
         paddingX: 0,
         minGap: 0,
+        ladderDirection: ladderDirection.value,
       })[markerIndex].centerX,
   );
   const markerLineStart = useDerivedValue(() => ({ x: markerX.value, y: zoneTop.value }));
@@ -362,16 +372,27 @@ export function AnimatedBracketDragPreview({
     ),
   );
   const zoneWidth = useDerivedValue(() => Math.max(1, zoneRight.value - zoneLeft.value));
-  // The drawn zone follows the arm being dragged, matching the one-sided marker
-  // ladder above it. zoneLeft/zoneRight stay two-sided because they are also the
+  // Fixed for the whole drag: it reads only the start and the zone. Taking the
+  // side from the finger's offset swapped the chips across the origin whenever
+  // the finger wobbled over it, so the chip under the thumb kept moving.
+  const ladderDirection = useDerivedValue(() =>
+    resolvePartialBracketLadderDirection({
+      dragStartX: dragState.activeDragStartX.value,
+      zoneLeft: zoneLeft.value,
+      zoneRight: zoneRight.value,
+      bandCount: PARTIAL_BRACKET_PERCENTS.length,
+    }),
+  );
+  // The drawn zone is the anchored arm, matching the one-sided marker ladder
+  // above it. zoneLeft/zoneRight stay two-sided because they are also the
   // bounds the ladder is clamped inside.
   const armLeft = useDerivedValue(() =>
-    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+    ladderDirection.value < 0
       ? zoneLeft.value
       : clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value),
   );
   const armRight = useDerivedValue(() =>
-    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+    ladderDirection.value < 0
       ? clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value)
       : zoneRight.value,
   );
@@ -448,6 +469,7 @@ export function AnimatedBracketDragPreview({
           <NativePartialBoundaryLine
             key={`partial-line-${percent}`}
             dragState={dragState}
+            ladderDirection={ladderDirection}
             markerIndex={index + 1}
             zoneBottom={zoneBottom}
             zoneLeft={zoneLeft}
@@ -461,6 +483,7 @@ export function AnimatedBracketDragPreview({
             activeColor={color}
             axisCharacterWidth={axisCharacterWidth}
             dragState={dragState}
+            ladderDirection={ladderDirection}
             markerIndex={index}
             markerBaselineY={markerBaselineY}
             markerTop={markerTop}
