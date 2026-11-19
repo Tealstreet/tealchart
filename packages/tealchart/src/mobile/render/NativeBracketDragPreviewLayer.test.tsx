@@ -266,6 +266,48 @@ describe('AnimatedBracketDragPreview', () => {
     expect(boundaries).toHaveLength(NATIVE_BRACKET_PARTIAL_MARKER_TEXTS.length - 1);
   });
 
+  // The ladder used to pick its side from the sign of the finger's offset, so
+  // a finger wobbling across the drag origin swapped the chips from one side
+  // to the other mid-drag and the one under the thumb was never the one aimed at.
+  it('keeps the partial chips horizontally still while the finger crosses the drag origin', () => {
+    const dragState = bracketDragState();
+    dragState.activePartialEnabled.value = true;
+
+    const layer = AnimatedBracketDragPreview({
+      axisFont: matchFont({ fontSize: 11 }),
+      dragState,
+      frame,
+      pricePrecision: 0,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+    });
+    const markers = collectElementsByType(layer, NativePartialMarker);
+    const boundaries = collectElementsByType(layer, NativePartialBoundaryLine);
+    const chipXs = () =>
+      markers.map((marker) => {
+        const group = NativePartialMarker(marker.props as Parameters<typeof NativePartialMarker>[0]);
+        const [chip] = group.props.children as ReactElement[];
+        return chip.props.x.value as number;
+      });
+    const boundaryXs = () =>
+      boundaries.map((boundary) => {
+        const line = NativePartialBoundaryLine(boundary.props as Parameters<typeof NativePartialBoundaryLine>[0]);
+        return line.props.p1.value.x as number;
+      });
+
+    const startX = dragState.activeDragStartX.value;
+    const samples = [-160, -60, -10, 0, 10, 60, 160].map((offset) => {
+      dragState.activeDragCurrentX.value = startX + offset;
+      return { boundaries: boundaryXs(), chips: chipXs() };
+    });
+
+    for (const sample of samples) {
+      expect(sample).toEqual(samples[0]);
+    }
+    // Started near the price axis, so the ladder anchors toward the open chart.
+    expect(Math.max(...samples[0].chips)).toBeLessThanOrEqual(startX);
+  });
+
   it('uses the compact bracket label when partial mode is full size', () => {
     const dragState = bracketDragState();
     dragState.activePartialEnabled.value = true;
