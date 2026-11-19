@@ -375,7 +375,7 @@ export function AnimatedBracketDragPreview({
   // Fixed for the whole drag: it reads only the start and the zone. Taking the
   // side from the finger's offset swapped the chips across the origin whenever
   // the finger wobbled over it, so the chip under the thumb kept moving.
-  const ladderDirection = useDerivedValue(() =>
+  const ladderDirection = useDerivedValue<number>(() =>
     resolvePartialBracketLadderDirection({
       dragStartX: dragState.activeDragStartX.value,
       zoneLeft: zoneLeft.value,
