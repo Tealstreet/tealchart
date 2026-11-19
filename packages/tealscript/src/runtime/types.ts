@@ -1,4 +1,5 @@
 import type { Program } from '../parser/ast';
+import type { HistoryRequirement } from '../semantic/historyRequirement';
 import type {
   AlertOutput,
   ChartInfo,
@@ -69,6 +70,12 @@ export interface IndicatorDeclarationMetadata {
     box: number;
     polyline: number;
   };
+  /**
+   * Bars the script needs before its longest lookback produces a value, so a
+   * chart host can load that much history ahead of the first visible bar.
+   * A static estimate; see `estimateHistoryRequirement`.
+   */
+  historyRequirement?: HistoryRequirement;
 }
 
 export interface RuntimeProfile {
