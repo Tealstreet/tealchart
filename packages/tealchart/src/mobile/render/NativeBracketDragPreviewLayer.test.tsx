@@ -5,6 +5,7 @@ import { matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
 import { PARTIAL_BRACKET_PERCENTS } from '../../interaction/partialBrackets';
+import { resolveNativePartialBracketLadderDirection } from '../interaction/nativePartialBracketZone';
 
 import {
   AnimatedBracketDragPreview,
@@ -83,6 +84,7 @@ function bracketDragState(): NativeBracketDragSharedValues {
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
+    activeLadderDirection: shared(1),
     activeColor: shared('#12c48b'),
     activeLineColor: shared('#f97316'),
   };
@@ -269,46 +271,77 @@ describe('AnimatedBracketDragPreview', () => {
   // The ladder used to pick its side from the sign of the finger's offset, so
   // a finger wobbling across the drag origin swapped the chips from one side
   // to the other mid-drag and the one under the thumb was never the one aimed at.
-  it('keeps the partial chips horizontally still while the finger crosses the drag origin', () => {
-    const dragState = bracketDragState();
-    dragState.activePartialEnabled.value = true;
-
-    const layer = AnimatedBracketDragPreview({
-      axisFont: matchFont({ fontSize: 11 }),
-      dragState,
-      frame,
-      pricePrecision: 0,
-      resolvedPriceAxisTags: shared([]),
-      sharedViewport,
-    });
-    const markers = collectElementsByType(layer, NativePartialMarker);
-    const boundaries = collectElementsByType(layer, NativePartialBoundaryLine);
-    const chipXs = () =>
-      markers.map((marker) => {
-        const group = NativePartialMarker(marker.props as Parameters<typeof NativePartialMarker>[0]);
-        const [chip] = group.props.children as ReactElement[];
-        return chip.props.x.value as number;
+  describe('partial chips hold still for the whole drag', () => {
+    function partialChipXs(layerFrame: typeof frame, dragState: NativeBracketDragSharedValues) {
+      const layer = AnimatedBracketDragPreview({
+        axisFont: matchFont({ fontSize: 11 }),
+        dragState,
+        frame: layerFrame,
+        pricePrecision: 0,
+        resolvedPriceAxisTags: shared([]),
+        sharedViewport,
       });
-    const boundaryXs = () =>
-      boundaries.map((boundary) => {
-        const line = NativePartialBoundaryLine(boundary.props as Parameters<typeof NativePartialBoundaryLine>[0]);
-        return line.props.p1.value.x as number;
+      const markers = collectElementsByType(layer, NativePartialMarker);
+      const boundaries = collectElementsByType(layer, NativePartialBoundaryLine);
+      return () => ({
+        boundaries: boundaries.map((boundary) => {
+          const line = NativePartialBoundaryLine(boundary.props as Parameters<typeof NativePartialBoundaryLine>[0]);
+          return line.props.p1.value.x as number;
+        }),
+        chips: markers.map((marker) => {
+          const group = NativePartialMarker(marker.props as Parameters<typeof NativePartialMarker>[0]);
+          const [chip] = group.props.children as ReactElement[];
+          return chip.props.x.value as number;
+        }),
+      });
+    }
+
+    function startedPartialDrag() {
+      const dragState = bracketDragState();
+      dragState.activePartialEnabled.value = true;
+      dragState.activeLadderDirection.value = resolveNativePartialBracketLadderDirection(
+        frame,
+        dragState.activeDragStartX.value,
+      );
+      return dragState;
+    }
+
+    it('while the finger crosses the drag origin', () => {
+      const dragState = startedPartialDrag();
+      const read = partialChipXs(frame, dragState);
+      const startX = dragState.activeDragStartX.value;
+      const samples = [-160, -60, -10, 0, 10, 60, 160].map((offset) => {
+        dragState.activeDragCurrentX.value = startX + offset;
+        return read();
       });
 
-    const startX = dragState.activeDragStartX.value;
-    const samples = [-160, -60, -10, 0, 10, 60, 160].map((offset) => {
-      dragState.activeDragCurrentX.value = startX + offset;
-      return { boundaries: boundaryXs(), chips: chipXs() };
+      for (const sample of samples) {
+        expect(sample).toEqual(samples[0]);
+      }
+      // Started near the price axis, so the ladder runs leftward into the open
+      // chart rather than being shoved back over it in reverse order.
+      for (let index = 1; index < samples[0].chips.length; index += 1) {
+        expect(samples[0].chips[index]).toBeLessThan(samples[0].chips[index - 1]);
+      }
     });
 
-    for (const sample of samples) {
-      expect(sample).toEqual(samples[0]);
-    }
-    // Started near the price axis, so the ladder runs leftward into the open
-    // chart rather than being shoved back over it in reverse order.
-    for (let index = 1; index < samples[0].chips.length; index += 1) {
-      expect(samples[0].chips[index]).toBeLessThan(samples[0].chips[index - 1]);
-    }
+    // Deriving the side in the preview re-read the live frame, so a resize
+    // mid-drag could flip the ladder with the finger at rest.
+    it('when the frame changes mid-drag', () => {
+      const dragState = startedPartialDrag();
+      dragState.activeDragCurrentX.value = dragState.activeDragStartX.value + 10;
+      // Wide enough that a drag starting here would now take the right side.
+      const resizedFrame = createNativeChartFrameFromPanes({
+        dimensions: { width: 900, height: 420, margins: { bottom: 32, left: 62, right: 90, top: 24 } },
+        panes: [{ id: 'main', type: 'main', top: 24, height: 364, yMin: 63000, yMax: 64000 }],
+      });
+      const { chips } = partialChipXs(resizedFrame, dragState)();
+
+      expect(resolveNativePartialBracketLadderDirection(resizedFrame, dragState.activeDragStartX.value)).toBe(1);
+      for (let index = 1; index < chips.length; index += 1) {
+        expect(chips[index]).toBeLessThan(chips[index - 1]);
+      }
+    });
   });
 
   it('uses the compact bracket label when partial mode is full size', () => {

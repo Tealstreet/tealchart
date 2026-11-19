@@ -8,11 +8,8 @@ import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@sho
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
-import {
-  PARTIAL_BRACKET_PERCENTS,
-  resolvePartialBracketLadderDirection,
-  resolvePartialBracketMarkers,
-} from '../../interaction/partialBrackets';
+import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
+import { resolveNativePartialBracketZone } from '../interaction/nativePartialBracketZone';
 import { getNativeDarkLabelBackgroundColor, NATIVE_PRICE_AXIS_TAG_TEXT_COLOR } from '../utils/nativeColor';
 import { NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
@@ -25,8 +22,6 @@ import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
 import { getNativePriceAxisTagFloor, isNativeMainPaneVisible, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
 
-const PARTIAL_ZONE_HALF_WIDTH = 220;
-const PARTIAL_MARKER_INTERVAL = 55;
 const PARTIAL_MARKER_HEIGHT = 18;
 const PARTIAL_MARKER_PADDING_X = 6;
 const PARTIAL_MARKER_MIN_GAP = 8;
@@ -36,7 +31,6 @@ const PARTIAL_MAIN_LABEL_HEIGHT = 22;
 // drag zone - the old 5px put them directly under the thumb.
 const PARTIAL_THUMB_CLEARANCE = 44;
 const PARTIAL_SURFACE_GAP = 6;
-const PARTIAL_PREVIEW_INSET_X = 8;
 export const NATIVE_BRACKET_PARTIAL_MARKER_TEXTS = PARTIAL_BRACKET_PERCENTS.map((percent) => `${percent}%`);
 
 function clampWorklet(value: number, min: number, max: number): number {
@@ -150,7 +144,6 @@ export function NativePartialMarker({
   activeColor,
   axisCharacterWidth,
   dragState,
-  ladderDirection,
   markerIndex,
   markerBaselineY,
   markerTop,
@@ -161,7 +154,6 @@ export function NativePartialMarker({
   activeColor: SharedValue<string>;
   axisCharacterWidth: number;
   dragState: NativeBracketDragSharedValues;
-  ladderDirection: SharedValue<number>;
   markerIndex: number;
   markerBaselineY: SharedValue<number>;
   markerTop: SharedValue<number>;
@@ -184,7 +176,7 @@ export function NativePartialMarker({
         characterWidth: axisCharacterWidth,
         paddingX: PARTIAL_MARKER_PADDING_X,
         minGap: PARTIAL_MARKER_MIN_GAP,
-        ladderDirection: ladderDirection.value,
+        ladderDirection: dragState.activeLadderDirection.value,
       })[markerIndex],
   );
   const markerX = useDerivedValue(() => resolved.value.centerX - resolved.value.width / 2);
@@ -232,7 +224,6 @@ export function NativePartialMarker({
 
 export function NativePartialBoundaryLine({
   dragState,
-  ladderDirection,
   markerIndex,
   zoneBottom,
   zoneLeft,
@@ -240,7 +231,6 @@ export function NativePartialBoundaryLine({
   zoneTop,
 }: {
   dragState: NativeBracketDragSharedValues;
-  ladderDirection: SharedValue<number>;
   markerIndex: number;
   zoneBottom: SharedValue<number>;
   zoneLeft: SharedValue<number>;
@@ -259,7 +249,7 @@ export function NativePartialBoundaryLine({
         characterWidth: 0,
         paddingX: 0,
         minGap: 0,
-        ladderDirection: ladderDirection.value,
+        ladderDirection: dragState.activeLadderDirection.value,
       })[markerIndex].centerX,
   );
   const markerLineStart = useDerivedValue(() => ({ x: markerX.value, y: zoneTop.value }));
@@ -355,50 +345,26 @@ export function AnimatedBracketDragPreview({
     clampWorklet(Math.max(entryY.value, y.value), frame.mainPane.top, frame.mainPane.bottom),
   );
   const zoneHeight = useDerivedValue(() => Math.max(1, zoneBottom.value - zoneTop.value));
-  const partialBoundsLeft = frame.contentLeft + PARTIAL_PREVIEW_INSET_X;
-  const partialBoundsRight = Math.max(partialBoundsLeft, frame.priceAxisLeft - PARTIAL_PREVIEW_INSET_X);
-  const zoneLeft = useDerivedValue(() =>
-    clampWorklet(
-      dragState.activeDragStartX.value - PARTIAL_ZONE_HALF_WIDTH,
-      partialBoundsLeft,
-      Math.max(partialBoundsLeft, partialBoundsRight - PARTIAL_MARKER_INTERVAL),
-    ),
-  );
-  const zoneRight = useDerivedValue(() =>
-    clampWorklet(
-      dragState.activeDragStartX.value + PARTIAL_ZONE_HALF_WIDTH,
-      Math.min(partialBoundsRight, zoneLeft.value + PARTIAL_MARKER_INTERVAL),
-      partialBoundsRight,
-    ),
-  );
+  const partialZone = useDerivedValue(() => resolveNativePartialBracketZone(frame, dragState.activeDragStartX.value));
+  const zoneLeft = useDerivedValue(() => partialZone.value.zoneLeft);
+  const zoneRight = useDerivedValue(() => partialZone.value.zoneRight);
   const zoneWidth = useDerivedValue(() => Math.max(1, zoneRight.value - zoneLeft.value));
-  // Fixed for the whole drag: it reads only the start and the zone. Taking the
-  // side from the finger's offset swapped the chips across the origin whenever
-  // the finger wobbled over it, so the chip under the thumb kept moving.
-  const ladderDirection = useDerivedValue<number>(() =>
-    resolvePartialBracketLadderDirection({
-      dragStartX: dragState.activeDragStartX.value,
-      zoneLeft: zoneLeft.value,
-      zoneRight: zoneRight.value,
-      bandCount: PARTIAL_BRACKET_PERCENTS.length,
-    }),
-  );
-  // The drawn zone is the anchored arm, matching the one-sided marker ladder
-  // above it. zoneLeft/zoneRight stay two-sided because they are also the
-  // bounds the ladder is clamped inside.
+  // The drawn zone is the arm the ladder is pinned to for this drag, matching
+  // the one-sided marker ladder above it. zoneLeft/zoneRight stay two-sided
+  // because they are also the bounds the ladder is clamped inside.
   const armLeft = useDerivedValue(() =>
-    ladderDirection.value < 0
+    dragState.activeLadderDirection.value < 0
       ? zoneLeft.value
       : clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value),
   );
   const armRight = useDerivedValue(() =>
-    ladderDirection.value < 0
+    dragState.activeLadderDirection.value < 0
       ? clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value)
       : zoneRight.value,
   );
   const armWidth = useDerivedValue(() => Math.max(1, armRight.value - armLeft.value));
   const dragOrigin = useDerivedValue(() => ({
-    x: clampWorklet(dragState.activeDragStartX.value, partialBoundsLeft, partialBoundsRight),
+    x: clampWorklet(dragState.activeDragStartX.value, partialZone.value.boundsLeft, partialZone.value.boundsRight),
     y: entryY.value,
   }));
   const zoneLeftOnBracket = useDerivedValue(() => ({ x: armLeft.value, y: y.value }));
@@ -469,7 +435,6 @@ export function AnimatedBracketDragPreview({
           <NativePartialBoundaryLine
             key={`partial-line-${percent}`}
             dragState={dragState}
-            ladderDirection={ladderDirection}
             markerIndex={index + 1}
             zoneBottom={zoneBottom}
             zoneLeft={zoneLeft}
@@ -483,7 +448,6 @@ export function AnimatedBracketDragPreview({
             activeColor={color}
             axisCharacterWidth={axisCharacterWidth}
             dragState={dragState}
-            ladderDirection={ladderDirection}
             markerIndex={index}
             markerBaselineY={markerBaselineY}
             markerTop={markerTop}

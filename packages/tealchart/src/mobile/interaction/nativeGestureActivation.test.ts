@@ -143,6 +143,7 @@ function createBracketDragState(active = false): NativeBracketDragInteractionSta
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
+    activeLadderDirection: shared(1),
     activeColor: shared(''),
     activeLineColor: shared(''),
     startPrice: shared(0),
