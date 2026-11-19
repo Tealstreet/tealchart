@@ -34,6 +34,7 @@ import {
   updateNativeBracketDragState,
   updateNativeOrderDragState,
 } from './nativeOemsDragState';
+import { resolveNativePartialBracketLadderDirection } from './nativePartialBracketZone';
 import {
   findNativeBracketDragZone,
   findNativeOrderDragZone,
@@ -289,6 +290,7 @@ export function createNativeBracketDragGesture({
         getLiveNativePricePerPixel(sharedViewport, frame),
         event.x,
         event.y,
+        resolveNativePartialBracketLadderDirection(frame, event.x),
       );
     })
     .onUpdate((event) => {

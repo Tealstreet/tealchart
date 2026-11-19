@@ -61,6 +61,34 @@ export const PARTIAL_BRACKET_PERCENTS = [...DEFAULT_PARTIAL_BRACKET_PERCENTS];
 /** Enough to read as present without competing with the active marker. */
 export const PARTIAL_BRACKET_DIMMED_OPACITY = 0.35;
 
+/**
+ * Which side of the drag origin the marker ladder is drawn on: 1 right, -1 left.
+ *
+ * Decided from the room around the start, never from the finger, so a caller
+ * can hold it for a whole drag. The side used to follow the sign of the
+ * finger's offset, and a finger wobbling across the origin swapped every chip
+ * to the other side mid-drag. Prefers the right, as the old tie did.
+ */
+export function resolvePartialBracketLadderDirection({
+  dragStartX,
+  zoneLeft,
+  zoneRight,
+  bandCount,
+}: {
+  dragStartX: number;
+  zoneLeft: number;
+  zoneRight: number;
+  bandCount: number;
+}): 1 | -1 {
+  'worklet';
+  const span = (Math.max(1, bandCount) - 1) * PARTIAL_BRACKET_MARKER_INTERVAL;
+  const roomRight = zoneRight - dragStartX;
+  const roomLeft = dragStartX - zoneLeft;
+  if (roomRight >= span) return 1;
+  if (roomLeft >= span) return -1;
+  return roomRight >= roomLeft ? 1 : -1;
+}
+
 export interface PartialBracketMarker {
   percent: number;
   text: string;
@@ -99,6 +127,7 @@ export function resolvePartialBracketMarkers({
   paddingX,
   minGap,
   partialPercents,
+  ladderDirection,
 }: {
   dragStartX: number;
   currentX: number;
@@ -108,6 +137,9 @@ export function resolvePartialBracketMarkers({
   paddingX: number;
   minGap: number;
   partialPercents?: readonly number[] | null;
+  /** Pins the drawn side (see `resolvePartialBracketLadderDirection`); without
+   *  it the side follows the sign of the drag. */
+  ladderDirection?: number;
 }): PartialBracketMarker[] {
   'worklet';
   const deltaX = currentX - dragStartX;
@@ -118,7 +150,7 @@ export function resolvePartialBracketMarkers({
   // active marker by band index instead of percent so a user-configured
   // duplicate (e.g. `[100, 25, 25, 25, 10]`) still highlights exactly one slot.
   const activeIndex = calculatePartialBracketIndexFromDelta(deltaX, percents.length);
-  const direction = deltaX < 0 ? -1 : 1;
+  const direction = ladderDirection === undefined ? (deltaX < 0 ? -1 : 1) : ladderDirection < 0 ? -1 : 1;
 
   const markers: PartialBracketMarker[] = [];
   for (let index = 0; index < percents.length; index += 1) {
