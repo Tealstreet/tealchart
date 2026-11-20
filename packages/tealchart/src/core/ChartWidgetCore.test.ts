@@ -1040,7 +1040,9 @@ describe('ChartWidgetCore live gap backfill', () => {
     historyRequests[1]!.onResult(makeBars(start + 9 * intervalMs, intervalMs, 13));
 
     const bars = core.getBars();
-    expect(bars.at(-2)).toMatchObject({ time: liveTime });
+    // The bar that was live when the request went out closed on the stream; the
+    // venue's mid-bar copy of it must not replace it.
+    expect(bars.at(-2)).toMatchObject({ time: liveTime, close: 1 });
     expect(bars.at(-1)).toMatchObject({ time: nextLive, close: 2 });
     expect(bars).toHaveLength(22);
   });
@@ -1065,6 +1067,21 @@ describe('ChartWidgetCore live gap backfill', () => {
     subscriptions[0]!.onTick({ time: lastLoaded, open: 1, high: 1, low: 1, close: 1, volume: 1 });
     vi.setSystemTime(lastLoaded + intervalMs + 1_000);
     subscriptions[0]!.onTick({ time: lastLoaded + intervalMs, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(1);
+  });
+
+  it('does not fetch when a monthly bar rolls over out of a 31-day month', () => {
+    vi.useFakeTimers();
+    const jan = Date.UTC(2026, 0, 1);
+    const feb = Date.UTC(2026, 1, 1);
+    vi.setSystemTime(jan + 10 * 86_400_000);
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '1M' });
+    core.initialize();
+    historyRequests[0]!.onResult([{ time: jan, open: 1, high: 1, low: 1, close: 1, volume: 1 }]);
+    vi.setSystemTime(feb + 1_000);
+    subscriptions[0]!.onTick({ time: feb, open: 2, high: 2, low: 2, close: 2, volume: 1 });
 
     expect(historyRequests).toHaveLength(1);
   });

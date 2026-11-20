@@ -25,7 +25,7 @@ import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './his
 import { EventEmitter } from '../events/EventEmitter';
 import { PaneManager } from '../rendering/PaneManager';
 import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
-import { intervalToMs } from '../utils/intervalMs';
+import { barCloseTimeMs, intervalToMs } from '../utils/intervalMs';
 import { normalizeDatafeedBar, normalizeDatafeedBars } from '../utils/normalizeDatafeedBars';
 import { normalizeResolution } from '../utils/normalizeResolution';
 import {
@@ -647,7 +647,7 @@ export class ChartWidgetCore {
         // A live stream only carries the bar in progress. Bars that closed while
         // the app was backgrounded or the socket was down never arrive on it, so
         // fetch them — and the final values of the bar the gap started on.
-        const skippedBars = bar.time - lastBar.time > getIntervalMs(this._interval);
+        const skippedBars = bar.time > barCloseTimeMs(this._interval, lastBar.time);
         if (skippedBars || silentForMs > LIVE_SILENCE_BACKFILL_MS) {
           this._backfillLiveGap(lastBar.time);
         }
@@ -691,6 +691,9 @@ export class ChartWidgetCore {
     const intervalMs = getIntervalMs(requestInterval);
     const now = Date.now();
     const countBack = Math.max(2, Math.ceil((now - fromTime) / intervalMs) + 1);
+    // The bar in progress when the request went out: the venue's copy of it is
+    // mid-bar, so it and anything newer stay with the stream.
+    const liveTimeAtRequest = this._bars[this._bars.length - 1]?.time ?? Number.POSITIVE_INFINITY;
     const isCurrent = () =>
       !this._disposed &&
       requestId === this._loadBarsRequestId &&
@@ -713,7 +716,7 @@ export class ChartWidgetCore {
       },
       (bars) => {
         if (!isCurrent()) return;
-        this._mergeLiveGapBars(normalizeDatafeedBars(bars, requestInterval), fromTime);
+        this._mergeLiveGapBars(normalizeDatafeedBars(bars, requestInterval), fromTime, liveTimeAtRequest);
         finish();
       },
       (error) => {
@@ -735,14 +738,13 @@ export class ChartWidgetCore {
     );
   }
 
-  protected _mergeLiveGapBars(fetched: Bar[], fromTime: number): void {
-    const liveBar = this._bars[this._bars.length - 1];
-    if (!liveBar) return;
+  protected _mergeLiveGapBars(fetched: Bar[], fromTime: number, liveTimeAtRequest: number): void {
+    if (this._bars.length === 0) return;
     const byTime = new Map<number, Bar>();
     for (const bar of this._bars) byTime.set(bar.time, bar);
     let changed = false;
     for (const bar of fetched) {
-      if (bar.time < fromTime || bar.time >= liveBar.time) continue;
+      if (bar.time < fromTime || bar.time >= liveTimeAtRequest) continue;
       const existing = byTime.get(bar.time);
       if (existing && barValuesEqual(existing, bar)) continue;
       byTime.set(bar.time, bar);
