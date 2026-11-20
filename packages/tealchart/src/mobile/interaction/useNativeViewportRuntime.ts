@@ -13,6 +13,7 @@ import type { NativeViewportOwnershipState } from './nativeViewportSync';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { AppState } from 'react-native';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 import { runOnJS } from 'react-native-worklets';
 
@@ -30,6 +31,11 @@ import {
   fitNativeRestoredViewportPrice,
   getNativeVisibleBarsBoundingBox,
 } from './nativeAutoScale';
+import {
+  isNativeViewportAtLiveEdge,
+  NATIVE_LIVE_EDGE_RESUME_WINDOW_MS,
+  resolveNativeLiveEdgeResumeViewport,
+} from './nativeLiveEdgeResume';
 import { resetNativeViewportGestureActiveFlags, syncNativeViewportGestureMetrics } from './nativeViewportGestureState';
 import {
   applyNativeViewportSync,
@@ -343,6 +349,19 @@ export function useNativeViewportRuntime({
     earliestBarTime: number | undefined;
     viewport: Viewport;
   } | null>(null);
+
+  // AGT-104: a hand-placed view at the live edge when the app left the
+  // foreground follows the bars printed while it was away (and the backfill
+  // that fills them in) once it returns. A view scrolled into history stays put.
+  const liveEdgeResumeRef = useRef<{ dataKey: string; pinnedLastBarTime: number; until: number } | null>(null);
+  const liveEdgeBackgroundRef = useRef<{ dataKey: string; pinnedLastBarTime: number } | null>(null);
+  const [liveEdgeResumeEpoch, setLiveEdgeResumeEpoch] = useState(0);
+  const liveEdgeFollowingRef = useRef(false);
+  const liveEdgeStateRef = useRef<{ bars: readonly Bar[]; dataKey: string; viewport: Viewport | null }>({
+    bars,
+    dataKey,
+    viewport: null,
+  });
 
   useEffect(() => {
     priceAutoScale.bars.value = autoScaleBars;
@@ -707,6 +726,8 @@ export function useNativeViewportRuntime({
     // Touching the chart in the gap before bars arrive settles the question the
     // deferred restore fit was holding open.
     pendingRestorePriceFitRef.current = null;
+    // The user took the view back; a resume must not drag it to the live edge.
+    liveEdgeResumeRef.current = null;
     setViewportOwnership(beginNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
@@ -741,6 +762,8 @@ export function useNativeViewportRuntime({
   const applyNativeViewport = useCallback(
     (nextViewport?: Viewport | null, options: NativeApplyViewportOptions = {}): boolean => {
       if (!nextViewport) return false;
+      // Anything else placing the view (a layout restore) settles where it goes.
+      if (!liveEdgeFollowingRef.current) liveEdgeResumeRef.current = null;
       const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
       // Decided BEFORE the fit, and from the CALLER's viewport rather than the
       // fitted one. A window that starts before the earliest loaded bar is a
@@ -833,6 +856,69 @@ export function useNativeViewportRuntime({
       viewportGestureOwner,
     ],
   );
+
+  // The settled view, never the overscanned render candidate: a pan that still
+  // fits inside the candidate's window leaves the candidate a screen away from
+  // what the user sees.
+  useLayoutEffect(() => {
+    liveEdgeStateRef.current = { bars: viewportBars, dataKey, viewport: hasDataViewport ? viewport : null };
+  }, [dataKey, hasDataViewport, viewport, viewportBars]);
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (next) => {
+      if (next === 'background') {
+        const { bars: heldBars, dataKey: heldKey, viewport: heldViewport } = liveEdgeStateRef.current;
+        const last = heldBars[heldBars.length - 1];
+        liveEdgeBackgroundRef.current =
+          last && isNativeViewportAtLiveEdge(heldViewport, heldBars)
+            ? { dataKey: heldKey, pinnedLastBarTime: last.time }
+            : null;
+        return;
+      }
+      if (next !== 'active') return;
+      const pinned = liveEdgeBackgroundRef.current;
+      liveEdgeBackgroundRef.current = null;
+      if (!pinned) return;
+      liveEdgeResumeRef.current = { ...pinned, until: Date.now() + NATIVE_LIVE_EDGE_RESUME_WINDOW_MS };
+      setLiveEdgeResumeEpoch((epoch) => epoch + 1);
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useLayoutEffect(() => {
+    const resume = liveEdgeResumeRef.current;
+    if (!resume) return;
+    if (resume.dataKey !== dataKey || Date.now() > resume.until) {
+      liveEdgeResumeRef.current = null;
+      return;
+    }
+    // An auto-owned view already keeps its offset from the newest bar; only a
+    // hand-placed one is left behind. Never fight a gesture in progress.
+    const ownership = viewportOwnershipRef.current;
+    if (!ownership.hasManualViewport || ownership.nativeViewportOwned || !barsMatchRequestedData || isLoading) return;
+    const followed = resolveNativeLiveEdgeResumeViewport({
+      bars: viewportBars,
+      intervalMs: intervalToMs(loadedBarsInterval),
+      pinnedLastBarTime: resume.pinnedLastBarTime,
+      viewport,
+    });
+    if (!followed) return;
+    resume.pinnedLastBarTime = viewportBars[viewportBars.length - 1]!.time;
+    liveEdgeFollowingRef.current = true;
+    try {
+      applyNativeViewport(followed, { fitPriceToBars: true, neverDeferPriceFit: true });
+    } finally {
+      liveEdgeFollowingRef.current = false;
+    }
+  }, [
+    applyNativeViewport,
+    barsMatchRequestedData,
+    dataKey,
+    isLoading,
+    liveEdgeResumeEpoch,
+    loadedBarsInterval,
+    viewport,
+    viewportBars,
+  ]);
 
   // The first bars that can actually be measured re-frame a layout restored
   // before them. Nothing else would: the restore claimed a manual viewport, so

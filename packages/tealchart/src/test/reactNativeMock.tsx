@@ -180,3 +180,20 @@ export const Alert = {
     Alert.lastButtons = buttons ?? [];
   },
 };
+
+type AppStateListener = (next: string) => void;
+const appStateListeners = new Set<AppStateListener>();
+
+// Tests drive app focus through `AppState.emit`, which updates `currentState`
+// before notifying listeners, as React Native does.
+export const AppState = {
+  currentState: 'active',
+  addEventListener(_type: 'change', listener: AppStateListener) {
+    appStateListeners.add(listener);
+    return { remove: () => appStateListeners.delete(listener) };
+  },
+  emit(next: string): void {
+    AppState.currentState = next;
+    for (const listener of [...appStateListeners]) listener(next);
+  },
+};

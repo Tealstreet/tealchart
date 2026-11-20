@@ -892,6 +892,20 @@ after a resume the account route can refuse until its socket and auth recover;
 a second gap while one is in flight widens the next request instead of racing
 it, and `_loadBars` / dispose cancel all of it (AGT-88).
 
+## Native live-edge resume (`nativeLiveEdgeResume.ts`)
+
+A hand-placed native view (`hasManualViewport`) never follows new bars: only
+the auto-owned path re-anchors on the newest bar. So a user who zoomed at the
+live edge, backgrounded the app and came back found the bars printed meanwhile,
+and the ones the live-gap backfill above filled in, just off the right edge.
+`useNativeViewportRuntime` records at the AppState `background` edge whether
+the newest bar was in view. On the next `active` it follows the newest bar for
+`NATIVE_LIVE_EDGE_RESUME_WINDOW_MS`, which covers the backfill's retries, by
+shifting the window by the bars added and keeping its width. A view scrolled
+into history is left alone, and any gesture after the return cancels the
+follow. Do not make this follow during ordinary foreground printing: Sam asked
+for the reset on refocus only (AGT-104).
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
