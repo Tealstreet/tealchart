@@ -135,9 +135,9 @@ import {
 } from './mobile/render/nativeIndicatorTail';
 import { resolveNativeIndicatorPlotsTailUpdate } from './mobile/render/nativeIndicatorTailResolver';
 import {
-  canPaintNativeLiveTail,
   getNativeLiveTailFittedRange,
   getNativeLiveTailMarket,
+  routeNativeLatestBar,
   useNativeLiveTailChannel,
 } from './mobile/render/nativeLiveTail';
 import {
@@ -478,13 +478,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeLiveTail = useNativeLiveTailChannel();
   const nativeLiveTailCommitRef = useRef<NativeLiveTailCommit | null>(null);
   const publishNativeLatestBar = nativeLiveTail.onLatestBar;
+  // A rollover waits for its commit (AGT-90); the commit-ref layout effect flushes it.
   const handleNativeLatestBar = useCallback(
     (bar: Bar | null, context: ChartWidgetBarsChangedContext) =>
-      canPaintNativeLiveTail({
+      routeNativeLatestBar({
         bar,
+        channel: { onLatestBar: publishNativeLatestBar },
         commit: nativeLiveTailCommitRef.current,
-        lastTrade: publishNativeLatestBar(bar, context),
-        market: getNativeLiveTailMarket(context),
+        context,
       }),
     [publishNativeLatestBar],
   );
@@ -1956,6 +1957,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       market: nativeRenderLiveMarket,
       time: nativeRenderBars[nativeRenderBars.length - 1]?.time,
     };
+    nativeLiveTail.flushDeferred(nativeLiveTailCommitRef.current);
     nativeIndicatorTailCommitRef.current = {
       bars: nativeRenderBars,
       drawingLive: nativeLiveTailCommitRef.current.drawingLive,

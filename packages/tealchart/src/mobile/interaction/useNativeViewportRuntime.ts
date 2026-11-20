@@ -564,46 +564,55 @@ export function useNativeViewportRuntime({
     sharedViewport,
   ]);
 
-  useLayoutEffect(() => {
-    if (
-      !barsMatchRequestedData ||
-      isLoading ||
-      bars.length === 0 ||
-      settledViewport === null ||
-      viewportOwnershipRef.current.hasManualViewport ||
-      viewportOwnershipRef.current.nativeViewportOwned ||
-      Object.is(loadedBarsRef.current, bars)
-    ) {
-      return;
+  // AGT-90: an auto-owned view follows new bars in the SAME render that brings them.
+  // Following from a layout effect committed the new bars against the old window
+  // first, so each rollover drew a frame or two of the wrong range. The bars the
+  // settled window belongs to are state, so the render-phase update below re-runs
+  // this render before anything commits.
+  const [autoFollow, setAutoFollow] = useState<{
+    bars: readonly Bar[];
+    dataKey: string;
+    followed: Viewport | null;
+    interval: string;
+  }>(() => ({ bars, dataKey, followed: null, interval: loadedBarsInterval }));
+  if (barsMatchRequestedData && !isLoading && bars.length > 0 && !Object.is(autoFollow.bars, bars)) {
+    const ownership = viewportOwnershipRef.current;
+    // A new market's first bars only rebase: the data-load restore frames them.
+    const followed =
+      autoFollow.dataKey === dataKey &&
+      !pendingDataLoadViewport &&
+      settledViewport !== null &&
+      !ownership.hasManualViewport &&
+      !ownership.nativeViewportOwned
+        ? restoreNativeAutoOwnedViewportAcrossBars({
+            autoScaleEnabled: priceAutoScale.active.value,
+            bars,
+            interval,
+            previousBars: autoFollow.bars,
+            previousInterval: autoFollow.interval,
+            viewport: settledViewport,
+          })
+        : null;
+    const moved = followed !== null && settledViewport !== null && !nativeViewportsMatch(followed, settledViewport);
+    setAutoFollow({ bars, dataKey, followed: moved ? followed : null, interval: loadedBarsInterval });
+    if (moved) {
+      setCandidateViewport(followed);
+      setSettledViewport(followed);
     }
+  }
 
-    const nextViewport = restoreNativeAutoOwnedViewportAcrossBars({
-      autoScaleEnabled: priceAutoScale.active.value,
-      bars,
-      interval,
-      previousBars: loadedBarsRef.current,
-      previousInterval: loadedBarsIntervalRef.current,
-      viewport: settledViewport,
-    });
-    if (!nextViewport || nativeViewportsMatch(nextViewport, settledViewport)) return;
-
-    candidateViewportRef.current = nextViewport;
-    setCandidateViewport(nextViewport);
-    setSettledViewport(nextViewport);
-    syncNativeSharedViewportIfChanged(sharedViewport, nextViewport);
-    syncNativeSharedViewportIfChanged(panStartViewport, nextViewport);
-    onViewportChange?.(nextViewport);
-  }, [
-    bars,
-    barsMatchRequestedData,
-    interval,
-    isLoading,
-    onViewportChange,
-    panStartViewport,
-    priceAutoScale,
-    settledViewport,
-    sharedViewport,
-  ]);
+  // The followed window's side effects, once, in the layout phase of the commit that drew it.
+  const appliedAutoFollowRef = useRef<Viewport | null>(null);
+  const autoFollowed = autoFollow.followed;
+  useLayoutEffect(() => {
+    if (!autoFollowed || appliedAutoFollowRef.current === autoFollowed) return;
+    appliedAutoFollowRef.current = autoFollowed;
+    if (settledViewport !== autoFollowed) return;
+    candidateViewportRef.current = autoFollowed;
+    syncNativeSharedViewportIfChanged(sharedViewport, autoFollowed);
+    syncNativeSharedViewportIfChanged(panStartViewport, autoFollowed);
+    onViewportChange?.(autoFollowed);
+  }, [autoFollowed, onViewportChange, panStartViewport, settledViewport, sharedViewport]);
 
   useEffect(() => {
     if (!barsMatchRequestedData || isLoading || bars.length === 0 || Object.is(loadedBarsRef.current, bars)) return;
