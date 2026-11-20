@@ -906,6 +906,18 @@ into history is left alone, and any gesture after the return cancels the
 follow. Do not make this follow during ordinary foreground printing: Sam asked
 for the reset on refocus only (AGT-104).
 
+## Native rollover follow (`useNativeViewportRuntime`)
+
+An auto-owned native view (no manual viewport, no gesture) keeps its offset from
+the newest bar. It must follow in the SAME render that brings the new bars:
+the bars the settled window belongs to are state (`autoFollow`), and a changed
+`bars` updates the window during render, so React re-runs the render before
+committing and no commit pairs the new bars with the old window. It used to
+follow from a layout effect, which committed one frame of the old range at every
+rollover (AGT-90). The shared viewport is written in that commit's layout phase.
+`nativeRolloverViewport.test.tsx` records each commit and fails on the old shape.
+A new market's first bars only rebase; the data-load restore frames them.
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
@@ -1508,6 +1520,14 @@ Rules that keep it correct:
 - **A new last-bar consumer must read the live channel**, or it shows the
   committed bar until the next dispatch. React state `bars` is no longer updated
   per tick; only the core's own array is.
+- **A rollover is never published ahead of its commit.** The tail applies only
+  to the committed last bar, so publishing the next slot's bar early left the
+  closing candle on whatever React last committed for it, often its opening
+  values, until the new bars rendered: the rollover glitch of AGT-90.
+  `routeNativeLatestBar` defers a new slot of the committed market, and the
+  commit-ref layout effect in `SkiaTealchart` flushes it (`flushDeferred`) once
+  the committed last bar is that bar. A format change republishes the bar on
+  screen, never a deferred one.
 
 Indicator results take the same route. `MobileIndicatorManager` diffs each
 worker result against the committed plots (`nativeIndicatorTail.ts`): identical
