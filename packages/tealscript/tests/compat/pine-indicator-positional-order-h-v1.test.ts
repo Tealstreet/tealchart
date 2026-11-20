@@ -13,6 +13,11 @@ const expected = {
   timeframe: '60', timeframeGaps: false, explicitPlotZOrder: true, behindChart: false,
   calcBarsCount: 0, maxBarsBack: 2, dynamicRequests: false,
   drawingLimits: { label: 4, line: 5, box: 6, polyline: 7 },
+  // historyRequirement joined the declaration with the history-requirement
+  // estimate: max_bars_back=2 over a lookback-free plot is a declared 2 bars.
+  historyRequirement: {
+    bars: 2, source: 'declared', longestLookback: 0, deepestHistoryOffset: 0, declaredMaxBarsBack: 2, unresolvedLookbacks: 0,
+  },
 };
 const bars = [7, -3].map((close, index) => ({
   time: (index + 1) * 3_600_000, open: close, high: close, low: close, close, volume: 10,

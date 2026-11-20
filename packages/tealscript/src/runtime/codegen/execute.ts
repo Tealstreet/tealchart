@@ -22,6 +22,7 @@ import { pineVersionListDescription, pineVersionRules, pineVersionsWhere } from 
 import { pineColorConstant } from '../../pineColorConstants';
 import { nativeLog10 } from './nativeLog10';
 import type { DeclarationInfo, SecurityCallSite } from './analyzer';
+import { estimateHistoryRequirement, type HistoryRequirement } from '../../semantic/historyRequirement';
 import {
   registerBoxBuiltins,
   registerDrawingConstants,
@@ -5997,6 +5998,24 @@ function requestPointSeriesSpec(
   return { family: 'quandl', key: quandlRequestKey(ticker, column), gaps, lookahead: 'barmerge.lookahead_off', ignoreInvalid };
 }
 
+const historyRequirementCache = new WeakMap<CompiledScript, { key: string; value: HistoryRequirement }>();
+
+/**
+ * The script's warm-up estimate. `compile()` computes it once for default
+ * inputs; numeric input overrides re-estimate it here, cached per override set,
+ * because it walks the whole AST and execution runs on every bar update.
+ */
+function cachedHistoryRequirement(compiled: CompiledScript, inputs?: Map<string, unknown>): HistoryRequirement | undefined {
+  const numericInputs = inputs ? [...inputs].filter(([, value]) => typeof value === 'number') : [];
+  if (numericInputs.length === 0 || !compiled.program) return compiled.historyRequirement;
+  const key = JSON.stringify(numericInputs);
+  const cached = historyRequirementCache.get(compiled);
+  if (cached?.key === key) return cached.value;
+  const value = estimateHistoryRequirement(compiled.program, { inputs });
+  historyRequirementCache.set(compiled, { key, value });
+  return value;
+}
+
 export function executeCompiled(
   compiled: CompiledScript,
   bars: Bar[],
@@ -8316,6 +8335,7 @@ function executeCompiledPass(
     maxBarsBack: undefined,
     dynamicRequests: dynamicRequestsEnabled,
     drawingLimits: { ...DEFAULT_DRAWING_LIMITS },
+    historyRequirement: cachedHistoryRequirement(compiled, inputs),
   };
 
   // Parse indicator declaration metadata from the AST
