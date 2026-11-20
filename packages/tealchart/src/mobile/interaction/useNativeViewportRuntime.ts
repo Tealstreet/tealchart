@@ -356,7 +356,12 @@ export function useNativeViewportRuntime({
   const liveEdgeResumeRef = useRef<{ dataKey: string; pinnedLastBarTime: number; until: number } | null>(null);
   const liveEdgeBackgroundRef = useRef<{ dataKey: string; pinnedLastBarTime: number } | null>(null);
   const [liveEdgeResumeEpoch, setLiveEdgeResumeEpoch] = useState(0);
-  const liveEdgeStateRef = useRef({ bars, dataKey, viewport: null as Viewport | null });
+  const liveEdgeFollowingRef = useRef(false);
+  const liveEdgeStateRef = useRef<{ bars: readonly Bar[]; dataKey: string; viewport: Viewport | null }>({
+    bars,
+    dataKey,
+    viewport: null,
+  });
 
   useEffect(() => {
     priceAutoScale.bars.value = autoScaleBars;
@@ -757,6 +762,8 @@ export function useNativeViewportRuntime({
   const applyNativeViewport = useCallback(
     (nextViewport?: Viewport | null, options: NativeApplyViewportOptions = {}): boolean => {
       if (!nextViewport) return false;
+      // Anything else placing the view (a layout restore) settles where it goes.
+      if (!liveEdgeFollowingRef.current) liveEdgeResumeRef.current = null;
       const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
       // Decided BEFORE the fit, and from the CALLER's viewport rather than the
       // fitted one. A window that starts before the earliest loaded bar is a
@@ -850,7 +857,12 @@ export function useNativeViewportRuntime({
     ],
   );
 
-  liveEdgeStateRef.current = { bars: viewportBars, dataKey, viewport: candidateViewportRef.current ?? viewport };
+  // The settled view, never the overscanned render candidate: a pan that still
+  // fits inside the candidate's window leaves the candidate a screen away from
+  // what the user sees.
+  useLayoutEffect(() => {
+    liveEdgeStateRef.current = { bars: viewportBars, dataKey, viewport: hasDataViewport ? viewport : null };
+  }, [dataKey, hasDataViewport, viewport, viewportBars]);
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (next) => {
       if (next === 'background') {
@@ -883,16 +895,20 @@ export function useNativeViewportRuntime({
     // hand-placed one is left behind. Never fight a gesture in progress.
     const ownership = viewportOwnershipRef.current;
     if (!ownership.hasManualViewport || ownership.nativeViewportOwned || !barsMatchRequestedData || isLoading) return;
-    const current = candidateViewportRef.current ?? viewport;
     const followed = resolveNativeLiveEdgeResumeViewport({
       bars: viewportBars,
       intervalMs: intervalToMs(loadedBarsInterval),
       pinnedLastBarTime: resume.pinnedLastBarTime,
-      viewport: current,
+      viewport,
     });
     if (!followed) return;
     resume.pinnedLastBarTime = viewportBars[viewportBars.length - 1]!.time;
-    applyNativeViewport(followed, { fitPriceToBars: true, neverDeferPriceFit: true });
+    liveEdgeFollowingRef.current = true;
+    try {
+      applyNativeViewport(followed, { fitPriceToBars: true, neverDeferPriceFit: true });
+    } finally {
+      liveEdgeFollowingRef.current = false;
+    }
   }, [
     applyNativeViewport,
     barsMatchRequestedData,
