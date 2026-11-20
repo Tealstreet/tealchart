@@ -972,3 +972,166 @@ describe('ChartWidgetCore cached first paint', () => {
     expect(historyRequests).toHaveLength(1);
   });
 });
+
+describe('ChartWidgetCore live gap backfill', () => {
+  const intervalMs = 60_000;
+  const start = 1_699_999_980_000; // minute-aligned
+
+  function loadOneMinuteChart() {
+    vi.useFakeTimers();
+    vi.setSystemTime(start + 10 * intervalMs);
+    const feed = createControlledDatafeed();
+    const emitted: Array<{ length: number; source: string }> = [];
+    const indicatorBars: number[] = [];
+    const core = new ChartWidgetCore({
+      datafeed: feed.datafeed,
+      symbol: 'BTC',
+      interval: '1',
+      onBarsChanged: (bars, context) => emitted.push({ length: bars.length, source: context.source }),
+      indicatorManager: {
+        setBars: (bars) => indicatorBars.push(bars.length),
+        updateBar: () => {},
+        getPlots: () => [],
+      },
+    });
+    core.initialize();
+    feed.historyRequests[0]!.onResult(makeBars(start, intervalMs, 10));
+    return { ...feed, core, emitted, indicatorBars };
+  }
+
+  it('fetches the bars a resumed stream skipped and merges them under the live bar', () => {
+    const { core, historyRequests, subscriptions, indicatorBars } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    // Backgrounded for 15 minutes: the next tick belongs to a bar 15 slots later.
+    vi.setSystemTime(start + 24 * intervalMs + 5_000);
+    const liveTime = start + 24 * intervalMs;
+    subscriptions[0]!.onTick({ time: liveTime, open: 500, high: 510, low: 490, close: 505, volume: 1 });
+
+    expect(historyRequests).toHaveLength(2);
+    const backfill = historyRequests[1]!;
+    expect(backfill.periodParams.firstDataRequest).toBe(false);
+    expect(backfill.periodParams.from).toBe(Math.floor(lastLoaded / 1000));
+    expect(backfill.periodParams.to).toBeGreaterThanOrEqual(Math.floor(liveTime / 1000));
+
+    // The venue answers through the live slot with an older copy of it.
+    const fetched = makeBars(lastLoaded, intervalMs, 16).map((bar) =>
+      bar.time === liveTime ? { ...bar, close: 1 } : bar,
+    );
+    backfill.onResult(fetched);
+
+    const bars = core.getBars();
+    expect(bars).toHaveLength(25);
+    for (let i = 1; i < bars.length; i++) expect(bars[i]!.time - bars[i - 1]!.time).toBe(intervalMs);
+    // The pre-gap bar takes its final values from history; the live bar keeps its own.
+    expect(bars[9]).toMatchObject({ time: lastLoaded, close: fetched[0]!.close });
+    expect(bars.at(-1)).toMatchObject({ time: liveTime, close: 505 });
+    expect(indicatorBars.at(-1)).toBe(25);
+  });
+
+  it('keeps ticks that arrive during the backfill', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    const liveTime = start + 20 * intervalMs;
+    vi.setSystemTime(liveTime + 1_000);
+    subscriptions[0]!.onTick({ time: liveTime, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    const nextLive = liveTime + intervalMs;
+    vi.setSystemTime(nextLive + 1_000);
+    subscriptions[0]!.onTick({ time: nextLive, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    historyRequests[1]!.onResult(makeBars(start + 9 * intervalMs, intervalMs, 13));
+
+    const bars = core.getBars();
+    expect(bars.at(-2)).toMatchObject({ time: liveTime });
+    expect(bars.at(-1)).toMatchObject({ time: nextLive, close: 2 });
+    expect(bars).toHaveLength(22);
+  });
+
+  it('refetches the closed bar when the stream was silent across a rollover', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    vi.setSystemTime(lastLoaded + 5_000);
+    subscriptions[0]!.onTick({ time: lastLoaded, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    // Suspended for 50s, resumed inside the very next bar: no slot was skipped.
+    vi.setSystemTime(lastLoaded + intervalMs + 55_000);
+    subscriptions[0]!.onTick({ time: lastLoaded + intervalMs, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(2);
+    expect(historyRequests[1]!.periodParams.from).toBe(Math.floor(lastLoaded / 1000));
+  });
+
+  it('does not fetch on an ordinary rollover', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    vi.setSystemTime(lastLoaded + 50_000);
+    subscriptions[0]!.onTick({ time: lastLoaded, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    vi.setSystemTime(lastLoaded + intervalMs + 1_000);
+    subscriptions[0]!.onTick({ time: lastLoaded + intervalMs, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(1);
+  });
+
+  it('coalesces a second gap into one follow-up request', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    vi.setSystemTime(start + 30 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 30 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    expect(historyRequests).toHaveLength(2);
+
+    historyRequests[1]!.onResult([]);
+    expect(historyRequests).toHaveLength(3);
+    expect(historyRequests[2]!.periodParams.from).toBe(Math.floor((start + 9 * intervalMs) / 1000));
+  });
+
+  it('retries a refused backfill with backoff until it lands', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    const liveTime = start + 20 * intervalMs;
+    vi.setSystemTime(liveTime + 1_000);
+    subscriptions[0]!.onTick({ time: liveTime, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+
+    historyRequests[1]!.onError('proxy token refused');
+    expect(historyRequests).toHaveLength(2);
+    vi.advanceTimersByTime(5_000);
+    expect(historyRequests).toHaveLength(3);
+    historyRequests[2]!.onError('proxy token refused');
+    vi.advanceTimersByTime(9_999);
+    expect(historyRequests).toHaveLength(3);
+    vi.advanceTimersByTime(1);
+    expect(historyRequests).toHaveLength(4);
+    expect(historyRequests[3]!.periodParams.from).toBe(Math.floor((start + 9 * intervalMs) / 1000));
+
+    historyRequests[3]!.onResult(makeBars(start + 9 * intervalMs, intervalMs, 12));
+    expect(core.getBars()).toHaveLength(21);
+  });
+
+  it('gives up after a bounded number of attempts and cancels on dispose', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    for (let i = 0; i < 6; i++) {
+      historyRequests.at(-1)!.onError('down');
+      vi.advanceTimersByTime(60_000);
+    }
+    expect(historyRequests).toHaveLength(7);
+
+    vi.setSystemTime(start + 40 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 40 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    expect(historyRequests).toHaveLength(8);
+    historyRequests.at(-1)!.onError('down');
+    core.dispose();
+    vi.advanceTimersByTime(60_000);
+    expect(historyRequests).toHaveLength(8);
+  });
+
+  it('drops a backfill that an interval change superseded', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    core.setInterval('5');
+    const stale = historyRequests[1]!;
+    historyRequests[2]!.onResult(makeBars(start, 5 * intervalMs, 4));
+
+    stale.onResult(makeBars(start + 9 * intervalMs, intervalMs, 12));
+
+    expect(core.getBars()).toHaveLength(4);
+  });
+});

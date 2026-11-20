@@ -48,6 +48,15 @@ type PlotOutput = {
 
 // Constants
 export const INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
+/**
+ * A rollover after this much stream silence refetches the bar it closed: the
+ * runtime was suspended (iOS backgrounding) or the socket was down, so the
+ * closed bar never received its final ticks.
+ */
+export const LIVE_SILENCE_BACKFILL_MS = 30_000;
+const LIVE_GAP_BACKFILL_MAX_ATTEMPTS = 6;
+const LIVE_GAP_BACKFILL_RETRY_BASE_MS = 5_000;
+const LIVE_GAP_BACKFILL_RETRY_MAX_MS = 60_000;
 
 /**
  * Convert resolution string to milliseconds
@@ -144,6 +153,12 @@ export class ChartWidgetCore {
 
   // Subscription tracking
   protected _barSubscriptionGuid: string | null = null;
+  // Wall-clock receipt of the last live bar, for the rollover silence check.
+  protected _lastLiveBarAt = 0;
+  // Earliest bar time a live-gap backfill must cover; set while one is in flight.
+  protected _liveGapBackfillFrom: number | null = null;
+  protected _liveGapBackfillPending = false;
+  protected _liveGapRetryTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Managers
   protected _paneManager: PaneManager;
@@ -376,6 +391,7 @@ export class ChartWidgetCore {
 
     const requestId = ++this._loadBarsRequestId;
     this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
     this._setLoadingMoreBars(false);
     this._clearQueuedLeftHistoryBackfill();
     const requestSymbol = this._symbol;
@@ -570,6 +586,7 @@ export class ChartWidgetCore {
     }
 
     this._barSubscriptionGuid = `chart_${this._symbol}_${this._interval}_${Date.now()}`;
+    this._lastLiveBarAt = 0;
     const subscriptionGuid = this._barSubscriptionGuid;
     const subscriptionSymbol = this._symbol;
     const subscriptionInterval = this._interval;
@@ -608,6 +625,9 @@ export class ChartWidgetCore {
 
   protected _handleNewBar(bar: Bar): void {
     if (this._disposed) return;
+    const receivedAt = Date.now();
+    const silentForMs = this._lastLiveBarAt ? receivedAt - this._lastLiveBarAt : 0;
+    this._lastLiveBarAt = receivedAt;
     if (this._bars.length === 0) {
       this._bars.push(bar);
     } else {
@@ -624,12 +644,126 @@ export class ChartWidgetCore {
           this._emitRealtimeUpdate();
         }
         this._bars.push(bar);
+        // A live stream only carries the bar in progress. Bars that closed while
+        // the app was backgrounded or the socket was down never arrive on it, so
+        // fetch them — and the final values of the bar the gap started on.
+        const skippedBars = bar.time - lastBar.time > getIntervalMs(this._interval);
+        if (skippedBars || silentForMs > LIVE_SILENCE_BACKFILL_MS) {
+          this._backfillLiveGap(lastBar.time);
+        }
       } else {
         return;
       }
     }
 
     this._queueRealtimeUpdate();
+  }
+
+  /**
+   * Fetches bars from `fromTime` to now and merges them under the live bar.
+   *
+   * The live bar stays authoritative for its own slot: it is newer than any
+   * history response. A second gap while one fetch is in flight widens the
+   * range of a follow-up request instead of racing it.
+   */
+  protected _backfillLiveGap(fromTime: number): void {
+    if (this._disposed || !this._symbolInfo || this._isLoading) return;
+    if (this._liveGapBackfillFrom !== null) {
+      this._liveGapBackfillFrom = Math.min(this._liveGapBackfillFrom, fromTime);
+      this._liveGapBackfillPending = true;
+      return;
+    }
+    this._liveGapBackfillFrom = fromTime;
+    this._liveGapBackfillPending = false;
+    this._requestLiveGap(fromTime, 0);
+  }
+
+  /**
+   * A failed read retries with backoff: right after a resume the account's
+   * route can refuse until its socket and auth recover, which is exactly when
+   * the gap exists.
+   */
+  private _requestLiveGap(fromTime: number, attempt: number): void {
+    if (!this._symbolInfo) return;
+    const requestId = this._loadBarsRequestId;
+    const requestSymbol = this._symbol;
+    const requestInterval = this._interval;
+    const intervalMs = getIntervalMs(requestInterval);
+    const now = Date.now();
+    const countBack = Math.max(2, Math.ceil((now - fromTime) / intervalMs) + 1);
+    const isCurrent = () =>
+      !this._disposed &&
+      requestId === this._loadBarsRequestId &&
+      requestSymbol === this._symbol &&
+      requestInterval === this._interval;
+    const finish = () => {
+      const followUpFrom = this._liveGapBackfillPending ? this._liveGapBackfillFrom : null;
+      this._clearLiveGapBackfill();
+      if (followUpFrom !== null) this._backfillLiveGap(followUpFrom);
+    };
+
+    this._datafeed.getBars(
+      this._symbolInfo,
+      requestInterval,
+      {
+        countBack,
+        from: Math.floor(fromTime / 1000),
+        to: Math.ceil(now / 1000),
+        firstDataRequest: false,
+      },
+      (bars) => {
+        if (!isCurrent()) return;
+        this._mergeLiveGapBars(normalizeDatafeedBars(bars, requestInterval), fromTime);
+        finish();
+      },
+      (error) => {
+        if (!isCurrent()) return;
+        console.error('[ChartWidgetCore] Failed to backfill live bar gap:', error);
+        if (attempt + 1 >= LIVE_GAP_BACKFILL_MAX_ATTEMPTS) {
+          finish();
+          return;
+        }
+        const delay = Math.min(LIVE_GAP_BACKFILL_RETRY_BASE_MS * 2 ** attempt, LIVE_GAP_BACKFILL_RETRY_MAX_MS);
+        this._liveGapRetryTimer = setTimeout(() => {
+          this._liveGapRetryTimer = null;
+          if (!isCurrent() || this._liveGapBackfillFrom === null) return;
+          // The retry covers any gap that arrived while it waited.
+          this._liveGapBackfillPending = false;
+          this._requestLiveGap(this._liveGapBackfillFrom, attempt + 1);
+        }, delay);
+      },
+    );
+  }
+
+  protected _mergeLiveGapBars(fetched: Bar[], fromTime: number): void {
+    const liveBar = this._bars[this._bars.length - 1];
+    if (!liveBar) return;
+    const byTime = new Map<number, Bar>();
+    for (const bar of this._bars) byTime.set(bar.time, bar);
+    let changed = false;
+    for (const bar of fetched) {
+      if (bar.time < fromTime || bar.time >= liveBar.time) continue;
+      const existing = byTime.get(bar.time);
+      if (existing && barValuesEqual(existing, bar)) continue;
+      byTime.set(bar.time, bar);
+      changed = true;
+    }
+    if (!changed) return;
+
+    this._clearPendingRealtimeUpdate();
+    this._bars = [...byTime.values()].sort((a, b) => a.time - b.time);
+    this._emitBarsChanged('history');
+    this._scheduleRender();
+    this._indicatorManager?.setBars(this._bars);
+  }
+
+  protected _clearLiveGapBackfill(): void {
+    this._liveGapBackfillFrom = null;
+    this._liveGapBackfillPending = false;
+    if (this._liveGapRetryTimer !== null) {
+      clearTimeout(this._liveGapRetryTimer);
+      this._liveGapRetryTimer = null;
+    }
   }
 
   protected _emitRealtimeUpdate(): void {
@@ -820,6 +954,7 @@ export class ChartWidgetCore {
     this._loadBarsRequestId += 1;
     this._clearQueuedLeftHistoryBackfill();
     this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
     const subscriptionGuid = this._barSubscriptionGuid;
     this._barSubscriptionGuid = null;
     if (subscriptionGuid) {

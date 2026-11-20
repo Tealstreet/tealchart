@@ -877,6 +877,21 @@ terminal until the chart remounts, so do not read the web backstop as cover for
 both halves — and remember `packages/tealchart` is excluded from `yarn sync`, so
 a fix here reaches mobile only through Copybara into its `vendor/tealchart`.
 
+## Native live-gap backfill (`ChartWidgetCore`)
+
+A live stream carries only the bar in progress, so bars that closed while iOS
+had the app suspended, or while the socket was down, never arrive on it. On
+mobile nothing else refills them: `resetData()` is not wired to the core, and
+`DefaultDatafeed`'s missing-candle check parses TradingView's `SYM_#_RES` guid,
+which the core's `chart_*` guid never matches. So `_handleNewBar` refetches
+from the last held bar to now whenever a rollover skips a slot, or arrives after
+`LIVE_SILENCE_BACKFILL_MS` of stream silence (the closed bar missed its final
+ticks). The fetched bars merge UNDER the live bar, which stays authoritative
+for its own slot. A refused read retries with bounded backoff, because right
+after a resume the account route can refuse until its socket and auth recover;
+a second gap while one is in flight widens the next request instead of racing
+it, and `_loadBars` / dispose cancel all of it (AGT-88).
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
