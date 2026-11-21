@@ -117,6 +117,7 @@ const styles = {
     position: 'absolute',
     top: defaultLegendOrigin.top,
     left: defaultLegendOrigin.left,
+    right: '12px',
     zIndex: '4',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
@@ -130,6 +131,8 @@ const styles = {
 
   mainRow: {
     display: 'flex',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
     alignItems: 'center',
     gap: '8px',
     marginBottom: '2px',
@@ -140,11 +143,15 @@ const styles = {
 
   symbolInfo: {
     display: 'flex',
+    flexWrap: 'wrap',
+    minWidth: '0',
+    maxWidth: '100%',
     alignItems: 'center',
     gap: '4px',
     color: 'var(--tc-text, #d1d4dc)',
     fontWeight: '500',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'normal',
+    overflowWrap: 'anywhere',
   } as Partial<CSSStyleDeclaration>,
 
   dot: {
@@ -157,6 +164,9 @@ const styles = {
 
   ohlcGroup: {
     display: 'flex',
+    // Wrap intact label/value pairs instead of squeezing prices or widening the chart.
+    flexWrap: 'wrap',
+    maxWidth: '100%',
     alignItems: 'center',
     gap: '6px',
   } as Partial<CSSStyleDeclaration>,

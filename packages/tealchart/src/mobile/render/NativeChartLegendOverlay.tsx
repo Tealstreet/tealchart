@@ -540,7 +540,7 @@ function NativeChartLegendOverlayView({
       {isNativeMainPaneVisible(frame) ? (
         <View pointerEvents="box-none" style={[styles.legendBlock, { left, maxWidth, top }]}>
           <View pointerEvents="none" style={styles.row}>
-            <Text numberOfLines={1} style={[styles.symbol, { color: textColor }]}>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.symbol, { color: textColor }]}>
               {symbol}
             </Text>
             <Text style={[styles.meta, { color: mutedTextColor }]}>{formatNativeLegendInterval(interval)}</Text>
@@ -945,6 +945,7 @@ const styles = StyleSheet.create({
     width: 22,
   },
   symbol: {
+    flexShrink: 1,
     fontSize: 11,
     fontWeight: '600',
     marginRight: 6,
