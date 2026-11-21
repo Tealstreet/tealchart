@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   isNativeBarSnapshotPendingRequestedData,
+  nativeBarsBelongToOtherMarket,
   nativeBarsMatchRequestedData,
   shouldDimNativeRenderForTransition,
   shouldHoldNativeRenderSnapshotForTransition,
@@ -91,6 +92,8 @@ describe('native render transition data identity', () => {
         hasDataViewport: true,
         interval: '5',
         isLoading: true,
+        loadFailed: false,
+        previousBarsContext: null,
         previousBarsLength: 250,
         previousHasDataViewport: true,
         previousProjectionReady: true,
@@ -113,6 +116,8 @@ describe('native render transition data identity', () => {
         hasDataViewport: true,
         interval: '5',
         isLoading: false,
+        loadFailed: false,
+        previousBarsContext: null,
         previousBarsLength: 250,
         previousHasDataViewport: true,
         previousProjectionReady: true,
@@ -135,6 +140,8 @@ describe('native render transition data identity', () => {
         hasDataViewport: true,
         interval: '5',
         isLoading: true,
+        loadFailed: false,
+        previousBarsContext: null,
         previousBarsLength: 0,
         previousHasDataViewport: false,
         previousProjectionReady: false,
@@ -159,6 +166,7 @@ describe('native render transition data identity', () => {
         barsLength: 300,
         interval: '5',
         isLoading: true,
+        loadFailed: false,
         symbol: 'BTC',
       }),
     ).toBe(false);
@@ -171,6 +179,7 @@ describe('native render transition data identity', () => {
         barsLength: 0,
         interval: '5',
         isLoading: true,
+        loadFailed: false,
         symbol: 'BTC',
       }),
     ).toBe(true);
@@ -188,6 +197,7 @@ describe('native render transition data identity', () => {
         barsLength: 250,
         interval: '5',
         isLoading: false,
+        loadFailed: false,
         symbol: 'BTC',
       }),
     ).toBe(false);
@@ -205,6 +215,7 @@ describe('native render transition data identity', () => {
         barsLength: 250,
         interval: '5',
         isLoading: false,
+        loadFailed: false,
         symbol: 'BTC',
       }),
     ).toBe(true);
@@ -245,6 +256,8 @@ describe('native render transition during a live gesture', () => {
     hasDataViewport: true,
     interval: '15',
     isLoading: true,
+    loadFailed: false,
+    previousBarsContext: null,
     previousBarsLength: 500,
     previousHasDataViewport: true,
     previousProjectionReady: true,
@@ -299,5 +312,81 @@ describe('native render transition during a live gesture', () => {
         viewportGestureActive: true,
       }),
     ).toBe(true);
+  });
+});
+
+// AGT-127: okx-t's BTCUSD candles stayed on screen under woo-t's BTCUSDT
+// label, faded to 0.7, for as long as woo's history took to load, and for good
+// once it failed. Another symbol's bars are another market's prices.
+describe('native render transition after a market switch', () => {
+  const okx = { interval: '1', requestId: 4, source: 'history' as const, symbol: 'BTCUSD' };
+
+  it('never draws bars that belong to another symbol', () => {
+    expect(
+      nativeBarsBelongToOtherMarket({ barsContext: okx, interval: '1', loadFailed: false, symbol: 'BTCUSDT' }),
+    ).toBe(true);
+    expect(
+      nativeBarsBelongToOtherMarket({ barsContext: okx, interval: '1', loadFailed: false, symbol: 'BTCUSD' }),
+    ).toBe(false);
+  });
+
+  it('keeps the previous interval of the same market faded until its load fails', () => {
+    expect(
+      nativeBarsBelongToOtherMarket({ barsContext: okx, interval: '5', loadFailed: false, symbol: 'BTCUSD' }),
+    ).toBe(false);
+    expect(nativeBarsBelongToOtherMarket({ barsContext: okx, interval: '5', loadFailed: true, symbol: 'BTCUSD' })).toBe(
+      true,
+    );
+  });
+
+  it('does not hold a render snapshot of another symbol while the new one loads', () => {
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({
+        barsContext: okx,
+        barsLength: 300,
+        hasDataViewport: true,
+        interval: '1',
+        isLoading: true,
+        loadFailed: false,
+        previousBarsContext: okx,
+        previousBarsLength: 300,
+        previousHasDataViewport: true,
+        previousProjectionReady: true,
+        projectionReady: true,
+        symbol: 'BTC-PERP',
+      }),
+    ).toBe(false);
+  });
+
+  it('does not hold the previous interval once its replacement failed', () => {
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({
+        barsContext: okx,
+        barsLength: 300,
+        hasDataViewport: true,
+        interval: '5',
+        isLoading: false,
+        loadFailed: true,
+        previousBarsContext: okx,
+        previousBarsLength: 300,
+        previousHasDataViewport: true,
+        previousProjectionReady: true,
+        projectionReady: true,
+        symbol: 'BTCUSD',
+      }),
+    ).toBe(false);
+  });
+
+  it('stops signalling a pending load once the load has failed', () => {
+    expect(
+      shouldDimNativeRenderForTransition({
+        barsContext: okx,
+        barsLength: 300,
+        interval: '1',
+        isLoading: false,
+        loadFailed: true,
+        symbol: 'BTCUSDT',
+      }),
+    ).toBe(false);
   });
 });

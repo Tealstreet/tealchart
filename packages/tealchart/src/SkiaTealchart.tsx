@@ -76,7 +76,7 @@ import React, {
 } from 'react';
 
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
@@ -147,6 +147,7 @@ import {
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
+  nativeBarsBelongToOtherMarket,
   nativeBarsMatchRequestedData,
   shouldDimNativeRenderForTransition,
   shouldHoldNativeRenderSnapshotForTransition,
@@ -204,6 +205,7 @@ const VOLUME_HEIGHT_RATIO = 0.15;
 const NATIVE_CHART_UI_DEFAULTS = { leftToolRailCollapsed: true };
 const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>['anchors'] = [];
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
+const EMPTY_NATIVE_RENDER_BARS: Bar[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
@@ -500,6 +502,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     interval,
     isLoading,
     isLoadingMoreBars,
+    loadFailed,
     requestMoreBars,
     setImperativeTheme,
     symbol,
@@ -1254,6 +1257,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const liveNativeRenderSnapshot = useMemo(
     () => ({
       bars,
+      barsContext,
       hasDataViewport,
       interval: loadedBarsInterval,
       liveMarket: getNativeLiveTailMarket(barsContext),
@@ -1269,6 +1273,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     barsLength: bars.length,
     interval,
     isLoading,
+    loadFailed,
     symbol,
   });
   const shouldHoldNativeRenderSnapshot = shouldHoldNativeRenderSnapshotForTransition({
@@ -1277,6 +1282,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     hasDataViewport,
     interval,
     isLoading,
+    loadFailed,
+    previousBarsContext: nativeRenderSnapshotRef.current.barsContext,
     previousBarsLength: nativeRenderSnapshotRef.current.bars.length,
     previousHasDataViewport: nativeRenderSnapshotRef.current.hasDataViewport,
     previousProjectionReady: Boolean(nativeRenderSnapshotRef.current.projection),
@@ -1284,9 +1291,23 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol,
     viewportGestureActive: nativeViewportGestureActive,
   });
+  // The core keeps the previous market's bars until the new ones land; drawing
+  // them, even faded, put okx-t's candles under woo-t's symbol (AGT-127).
+  const nativeLiveBarsBelongToOtherMarket = nativeBarsBelongToOtherMarket({
+    barsContext,
+    interval,
+    loadFailed,
+    symbol,
+  });
+  const clearedNativeRenderSnapshot = useMemo(
+    () => ({ ...liveNativeRenderSnapshot, bars: EMPTY_NATIVE_RENDER_BARS, hasDataViewport: false, liveMarket: '' }),
+    [liveNativeRenderSnapshot],
+  );
   const nativeRenderSnapshot = shouldHoldNativeRenderSnapshot
     ? nativeRenderSnapshotRef.current
-    : liveNativeRenderSnapshot;
+    : nativeLiveBarsBelongToOtherMarket
+      ? clearedNativeRenderSnapshot
+      : liveNativeRenderSnapshot;
   useEffect(() => {
     if (shouldHoldNativeRenderSnapshot || bars.length === 0 || !hasDataViewport || !projection) return;
     nativeRenderSnapshotRef.current = liveNativeRenderSnapshot;
@@ -2370,6 +2391,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }
       : null;
   const nativeLegendLoading = nativeRenderTransitionPending || isLoadingMoreBars;
+  const nativeChartDataUnavailable = loadFailed && nativeRenderBars.length === 0;
 
   useLayoutEffect(() => {
     if (!resizeFreeze) {
@@ -2515,6 +2537,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               ) : null}
             </Canvas>
           </NativeStableGestureDetector>
+        </View>
+      ) : null}
+      {frame && nativeChartDataUnavailable ? (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.statusOverlay,
+            {
+              height: frame.mainPane.height,
+              left: frame.contentLeft,
+              top: frame.mainPane.top,
+              width: Math.max(0, frame.priceAxisLeft - frame.contentLeft),
+            },
+          ]}
+        >
+          <Text style={[styles.statusText, { color: chromeTheme.mutedTextColor }]}>Chart data unavailable</Text>
         </View>
       ) : null}
       <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
@@ -2727,5 +2765,13 @@ const styles = StyleSheet.create({
   },
   hiddenSnapshotLayer: {
     opacity: 0,
+  },
+  statusOverlay: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+  },
+  statusText: {
+    fontSize: 13,
   },
 });

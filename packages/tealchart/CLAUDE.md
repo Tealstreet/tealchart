@@ -877,6 +877,27 @@ terminal until the chart remounts, so do not read the web backstop as cover for
 both halves — and remember `packages/tealchart` is excluded from `yarn sync`, so
 a fix here reaches mobile only through Copybara into its `vendor/tealchart`.
 
+## Native charts never draw another symbol's bars (AGT-127)
+
+`ChartWidgetCore.setSymbol` keeps the previous market's `_bars` until the new
+ones land, and the native render used to draw them faded to `LOADING_OPACITY`
+(0.7), holding that snapshot through the load. On a mobile account switch the
+previous market is another VENUE: woo-t's BTCUSDT showed okx-t's BTCUSD candles
+for the whole load, and for good once woo's kline read failed, because a failed
+load ended in `loading: false` alone. Now `nativeBarsBelongToOtherMarket` decides
+what may be drawn: a different symbol renders an empty chart (the legend's dots
+still say loading), and `shouldHoldNativeRenderSnapshotForTransition` refuses to
+hold such a snapshot. The previous INTERVAL of the same market keeps its fade
+while the replacement loads. `onLoadFailed` reports a failed resolve or history
+read for the request's own market; `loadFailed` then clears the previous
+interval too and shows "Chart data unavailable" whenever nothing is drawn. A
+failed reset of the same market keeps its bars, as the section above requires.
+
+The core still cannot see a venue change under an UNCHANGED symbol string
+(okx-t BTCUSDT -> woo-t BTCUSDT): it arrives only as the datafeed's reset, which
+looks exactly like a reconnect. Covering it needs a datafeed-supplied source
+identity, not another heuristic here.
+
 ## Native live-gap backfill (`ChartWidgetCore`)
 
 A live stream carries only the bar in progress, so bars that closed while iOS
