@@ -470,6 +470,7 @@ export class TealchartWidgetUI {
     this.legend = new ChartLegend({
       symbol: options.symbol,
       interval: options.interval,
+      pricePrecision: options.renderOptions?.pricePrecision,
       avoidLeftTools: this.shouldAvoidLegendLeftTools(),
       chromeMetrics: this.getLeftToolRailMetrics(),
       onToggleIndicator: options.onToggleIndicator,
@@ -1123,6 +1124,7 @@ export class TealchartWidgetUI {
     applyChromeThemeVars(this.rootEl, this.options.renderOptions);
     this.topBar?.setRenderOptions(this.options.renderOptions);
     this.chartCore?.setRenderOptions(options);
+    this.legend?.setPricePrecision(this.options.renderOptions.pricePrecision);
     this.refreshIndicatorReadouts();
   }
 
