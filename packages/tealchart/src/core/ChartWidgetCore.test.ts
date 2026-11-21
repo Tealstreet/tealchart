@@ -118,7 +118,9 @@ describe('ChartWidgetCore loaded analysis ownership', () => {
     if (snapshot.status !== 'ready') throw new Error('Expected loaded snapshot');
     expect(snapshot.snapshot.bars).toHaveLength(5);
     expect(snapshot.snapshot.bars[0]!.time).toBe(1_000_000);
-    expect(findLoadedSimilarPatterns(result.context, { range: { from: 1_000_000, to: 2_200_000 } }).status).toBe('ready');
+    expect(findLoadedSimilarPatterns(result.context, { range: { from: 1_000_000, to: 2_200_000 } }).status).toBe(
+      'ready',
+    );
     subscriptions[0]!.onTick({ ...makeBars(1_000_000, 5 * 60_000, 10).at(-1)!, close: 110 });
     const afterTick = core.getAnalysisContext({ from: 1_300_000, to: 2_500_000 });
     expect(afterTick).toMatchObject({ status: 'ready', context: { contextRevision: result.context.contextRevision } });
@@ -851,6 +853,53 @@ describe('ChartWidgetCore interval changes during a pending resolve', () => {
   });
 });
 
+// AGT-127: a failed load used to end only in `loading: false`, which hosts
+// could not tell from a finished one, so the previous market's bars stayed up
+// under the new symbol. The failure is reported for the market that failed.
+describe('ChartWidgetCore failed loads', () => {
+  it('reports a failed history load for the market it was requested for', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 60_000, 3));
+    core.setSymbol('BTCUSDT');
+    historyRequests.at(-1)!.onError('[woo] GET /v1/kline failed with 403 Forbidden');
+
+    expect(onLoadFailed).toHaveBeenCalledTimes(1);
+    expect(onLoadFailed).toHaveBeenCalledWith(expect.objectContaining({ symbol: 'BTCUSDT', interval: '1' }));
+  });
+
+  it('reports a symbol that fails to resolve', () => {
+    const controlled = createControlledDatafeed();
+    const datafeed = {
+      ...controlled.datafeed,
+      resolveSymbol(_symbolName: string, _onResolve: unknown, onError: (reason: string) => void) {
+        onError('Unknown symbol');
+      },
+    } as IBasicDataFeed;
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+
+    expect(onLoadFailed).toHaveBeenCalledWith(expect.objectContaining({ symbol: 'BTCUSD', interval: '1' }));
+  });
+
+  it('does not report a failure that a newer request superseded', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+    core.setSymbol('BTCUSDT');
+    historyRequests[0]!.onError('superseded');
+
+    expect(onLoadFailed).not.toHaveBeenCalled();
+  });
+});
+
 // resolveSymbol blocks on the exchange's market list, which candles do not
 // need — so a datafeed that already holds history paints it straight away.
 describe('ChartWidgetCore cached first paint', () => {
@@ -878,7 +927,13 @@ describe('ChartWidgetCore cached first paint', () => {
   // returns another market's history, or nothing at all.
   it('asks the datafeed for the market and window it is about to request', () => {
     const controlled = createControlledDatafeed();
-    const asked: Array<{ symbol: string; resolution: string; countBack: PeriodParams['countBack']; from: number; to: number }> = [];
+    const asked: Array<{
+      symbol: string;
+      resolution: string;
+      countBack: PeriodParams['countBack'];
+      from: number;
+      to: number;
+    }> = [];
     const datafeed = {
       ...controlled.datafeed,
       getCachedBars: (symbol: string, resolution: ResolutionString, periodParams: PeriodParams) => {
