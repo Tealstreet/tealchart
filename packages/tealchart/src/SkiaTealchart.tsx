@@ -220,6 +220,8 @@ const NATIVE_PANE_DIVIDER_DISPOSE_MS = 600;
 interface NativeResizeSnapshot {
   height: number;
   image: SkImage;
+  /** The symbol on screen when the bitmap was taken; another market's must not cover the chart (AGT-127). */
+  symbol: string;
   width: number;
 }
 
@@ -2392,6 +2394,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       : null;
   const nativeLegendLoading = nativeRenderTransitionPending || isLoadingMoreBars;
   const nativeChartDataUnavailable = loadFailed && nativeRenderBars.length === 0;
+  // The frozen layout keeps its size either way; only the bitmap is withheld.
+  const resizeSnapshotDrawn = resizeSnapshotVisible && resizeSnapshot.symbol === symbol;
 
   useLayoutEffect(() => {
     if (!resizeFreeze) {
@@ -2410,13 +2414,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!image) return;
       setResizeSnapshot({
         image,
+        symbol,
         width: frame.dimensions.width,
         height: frame.dimensions.height,
       });
     } catch {
       setResizeSnapshot(null);
     }
-  }, [canvasRef, frame, resizeFreeze, setResizeSnapshot]);
+  }, [canvasRef, frame, resizeFreeze, setResizeSnapshot, symbol]);
 
   useEffect(() => {
     if (resizeFreeze || !resizeSnapshotRef.current || resizeSnapshotClearTimerRef.current !== null) return;
@@ -2468,7 +2473,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       />
       {liveChartMounted ? (
         <View
-          pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'}
+          pointerEvents={resizeSnapshotDrawn ? 'none' : 'auto'}
           style={styles.liveChartLayer}
         >
           <NativeStableGestureDetector gesture={nativeChartGesture}>
@@ -2555,8 +2560,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           <Text style={[styles.statusText, { color: chromeTheme.mutedTextColor }]}>Chart data unavailable</Text>
         </View>
       ) : null}
-      <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
-        {resizeSnapshot ? (
+      <Canvas style={[styles.snapshotLayer, !resizeSnapshotDrawn && styles.hiddenSnapshotLayer]} pointerEvents="none">
+        {resizeSnapshotDrawn ? (
           <SkiaImage
             fit="fill"
             height={Math.max(propHeight ?? resizeSnapshot.height, 1)}
