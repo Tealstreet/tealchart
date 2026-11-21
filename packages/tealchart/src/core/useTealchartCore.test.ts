@@ -26,6 +26,7 @@ function makeState(overrides: Partial<TealchartCoreState> = {}): TealchartCoreSt
     interval: '5',
     isLoading: true,
     isLoadingMoreBars: false,
+    loadFailed: false,
     symbol: 'BTC',
     unifiedLayout: emptyLayout,
     ...overrides,
@@ -175,6 +176,36 @@ describe('tealchartCoreStateReducer', () => {
     });
 
     expect(result).toBe(currentState);
+  });
+});
+
+describe('tealchartCoreStateReducer load failures (AGT-127)', () => {
+  const context = { interval: '1', requestId: 3, symbol: 'BTCUSDT' };
+
+  it('records a failure for the market the chart is on', () => {
+    const state = makeState({ interval: '1', isLoading: false, symbol: 'BTCUSDT' });
+
+    expect(tealchartCoreStateReducer(state, { type: 'loadFailed', context }).loadFailed).toBe(true);
+  });
+
+  it('ignores a failure reported for a market the chart has left', () => {
+    const state = makeState({ interval: '1', isLoading: true, symbol: 'BTC-PERP' });
+
+    expect(tealchartCoreStateReducer(state, { type: 'loadFailed', context })).toBe(state);
+  });
+
+  it('clears the failure once another load starts or the market changes', () => {
+    const failed = makeState({ interval: '1', isLoading: false, loadFailed: true, symbol: 'BTCUSDT' });
+
+    expect(tealchartCoreStateReducer(failed, { type: 'loadingChanged', loading: true, context }).loadFailed).toBe(
+      false,
+    );
+    expect(tealchartCoreStateReducer(failed, { type: 'symbolChanged', symbol: 'ETHUSDT' }).loadFailed).toBe(false);
+    expect(tealchartCoreStateReducer(failed, { type: 'intervalChanged', interval: '5' }).loadFailed).toBe(false);
+    expect(
+      tealchartCoreStateReducer(failed, { type: 'controlledDataContextChanged', symbol: 'BTCUSDT', interval: '1' })
+        .loadFailed,
+    ).toBe(false);
   });
 });
 

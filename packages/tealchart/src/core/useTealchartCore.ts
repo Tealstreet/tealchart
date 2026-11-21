@@ -42,6 +42,8 @@ export interface TealchartCoreState {
   barsContext: ChartWidgetBarsChangedContext | null;
   isLoading: boolean;
   isLoadingMoreBars: boolean;
+  /** The current symbol and interval's last load failed, and nothing has retried it since. */
+  loadFailed: boolean;
   symbol: string;
   interval: string;
   unifiedLayout: UnifiedPaneLayout;
@@ -85,6 +87,10 @@ type TealchartCoreStateAction =
   | {
       type: 'loadingChanged';
       loading: boolean;
+      context: ChartWidgetDataContext;
+    }
+  | {
+      type: 'loadFailed';
       context: ChartWidgetDataContext;
     }
   | {
@@ -172,6 +178,13 @@ export function tealchartCoreStateReducer(
       return {
         ...state,
         isLoading: action.loading,
+        loadFailed: action.loading ? false : state.loadFailed,
+      };
+    case 'loadFailed':
+      if (!dataContextMatches(state, action.context)) return state;
+      return {
+        ...state,
+        loadFailed: true,
       };
     case 'loadingMoreBarsChanged':
       if (!dataContextMatches(state, action.context)) return state;
@@ -185,6 +198,7 @@ export function tealchartCoreStateReducer(
         symbol: action.symbol,
         isLoading: true,
         isLoadingMoreBars: false,
+        loadFailed: false,
       };
     case 'intervalChanged':
       return {
@@ -192,6 +206,7 @@ export function tealchartCoreStateReducer(
         interval: action.interval,
         isLoading: true,
         isLoadingMoreBars: false,
+        loadFailed: false,
       };
     case 'controlledDataContextChanged':
       return {
@@ -200,6 +215,7 @@ export function tealchartCoreStateReducer(
         interval: action.interval,
         isLoading: true,
         isLoadingMoreBars: false,
+        loadFailed: false,
       };
     default:
       return state;
@@ -241,6 +257,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     barsContext: null,
     isLoading: enabled,
     isLoadingMoreBars: false,
+    loadFailed: false,
     symbol: options.symbol,
     interval: normalizeResolution(options.interval, '1h'),
     unifiedLayout: EMPTY_PANE_LAYOUT,
@@ -276,6 +293,9 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       },
       onLoadingChanged: (loading, context) => {
         dispatchCoreState({ type: 'loadingChanged', loading, context });
+      },
+      onLoadFailed: (context) => {
+        dispatchCoreState({ type: 'loadFailed', context });
       },
       onLoadingMoreBarsChanged: (loading, context) => {
         dispatchCoreState({ type: 'loadingMoreBarsChanged', loading, context });
@@ -363,6 +383,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     barsContext: coreState.barsContext,
     isLoading: coreState.isLoading,
     isLoadingMoreBars: coreState.isLoadingMoreBars,
+    loadFailed: coreState.loadFailed,
     symbol: coreState.symbol,
     interval: coreState.interval,
     unifiedLayout: core?.getUnifiedLayout() ?? coreState.unifiedLayout,
