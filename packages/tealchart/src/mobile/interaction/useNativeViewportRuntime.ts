@@ -120,8 +120,29 @@ function normalizeNativeViewport(viewport: Viewport | null, bars: readonly Bar[]
 
 export interface NativeDataLoadViewScaleCapture {
   dataKey: string;
+  /** Re-anchored at the newest bar, so the restore is auto-owned and follows the market. */
+  liveEdge: boolean;
   sourceBars: readonly Bar[];
   viewScale: ViewScaleState;
+}
+
+/** `TealchartRenderer.calculateViewport`'s empty space after the last candle, as a share of the bars' span. */
+const NATIVE_LIVE_EDGE_RIGHT_PADDING = 0.15;
+
+/**
+ * Keep the zoom (candles in view) and drop the scroll position and price fit.
+ *
+ * `rightOffsetBars` is a bar COUNT, so carried to another interval it scales with
+ * the bar size: a 1m view 670 bars behind live opened 670 HOURS back on 1h, where
+ * no bars were loaded, and the restore then fitted the carried padding to the
+ * whole history (AGT-147).
+ */
+export function withNativeLiveEdgeViewScale(viewScale: ViewScaleState): ViewScaleState {
+  return {
+    ...withDefaultPricePadding(viewScale),
+    rightOffsetBars:
+      (viewScale.visibleBarCount * NATIVE_LIVE_EDGE_RIGHT_PADDING) / (1 + NATIVE_LIVE_EDGE_RIGHT_PADDING),
+  };
 }
 
 export function createNativeViewportDataKey(symbol: string, interval: string): string {
@@ -132,6 +153,7 @@ export function createNativeViewportDataKey(symbol: string, interval: string): s
  * The zoom level survives every data load - interval switch or symbol switch -
  * matching web, where `handleBarsLoaded` always restores from the captured view
  * scale. Only the price fit is symbol-specific, and that is what this drops.
+ * An interval switch drops more: see `withNativeLiveEdgeViewScale`.
  */
 export function shouldResetNativeViewScalePricePadding({
   nextSymbol,
@@ -175,6 +197,7 @@ export function captureNativeDataLoadViewScale({
   hasDataViewport,
   interval,
   resetPricePadding = false,
+  resetToLiveEdge = false,
   viewport,
 }: {
   bars: readonly Bar[];
@@ -182,14 +205,20 @@ export function captureNativeDataLoadViewScale({
   hasDataViewport: boolean;
   interval: string;
   resetPricePadding?: boolean;
+  resetToLiveEdge?: boolean;
   viewport: Viewport;
 }): NativeDataLoadViewScaleCapture | null {
   if (!hasDataViewport || bars.length === 0) return null;
   const viewScale = captureViewScale(viewport, [...bars], intervalToMs(interval));
   return {
     dataKey,
+    liveEdge: resetToLiveEdge,
     sourceBars: bars,
-    viewScale: resetPricePadding ? withDefaultPricePadding(viewScale) : viewScale,
+    viewScale: resetToLiveEdge
+      ? withNativeLiveEdgeViewScale(viewScale)
+      : resetPricePadding
+        ? withDefaultPricePadding(viewScale)
+        : viewScale,
   };
 }
 
@@ -303,6 +332,7 @@ export function useNativeViewportRuntime({
   const dataKey = createNativeViewportDataKey(symbol, interval);
   const previousDataKeyRef = useRef(dataKey);
   const previousSymbolRef = useRef(symbol);
+  const previousIntervalRef = useRef(interval);
   const loadedBarsRef = useRef<readonly Bar[]>(bars);
   const loadedBarsIntervalRef = useRef(loadedBarsInterval);
   // State, not a ref. `pendingDataLoadViewport` below is derived from this, and
@@ -432,6 +462,7 @@ export function useNativeViewportRuntime({
     if (previousDataKeyRef.current === dataKey) return;
     const previousSymbol = previousSymbolRef.current;
     const symbolChanged = shouldResetNativeViewScalePricePadding({ nextSymbol: symbol, previousSymbol });
+    const intervalChanged = previousIntervalRef.current !== interval;
 
     pendingSharedViewportSyncEpochRef.current = null;
     pendingSharedViewportSyncTargetRef.current = null;
@@ -440,12 +471,18 @@ export function useNativeViewportRuntime({
     // for; letting it fire on the next one would frame that market with another
     // layout's window and claim it as a manual viewport.
     pendingRestorePriceFitRef.current = null;
-    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
+    resetNativeViewportGestureActiveFlags({
+      panActive,
+      pinchActive,
+      priceScaleActive,
+      timeScaleActive,
+      viewportGestureOwner,
+    });
 
-    // A hand-scaled price axis belongs to the market it was scaled on, so a new
-    // market gets a clean slate and auto-scale back. An interval switch is the
-    // same market, and a deliberate price scale stands.
-    if (symbolChanged) {
+    // A hand-scaled price axis belongs to the market and interval it was scaled on,
+    // so either change gets a clean slate and auto-scale back. Keeping it across an
+    // interval switch carried a dragged axis to a range no candle trades in (AGT-147).
+    if (symbolChanged || intervalChanged) {
       setViewportOwnership(createNativeViewportOwnershipState());
       priceAutoScale.active.value = autoScaleEnabled;
     } else {
@@ -459,6 +496,7 @@ export function useNativeViewportRuntime({
       hasDataViewport,
       interval: loadedBarsIntervalRef.current,
       resetPricePadding: symbolChanged,
+      resetToLiveEdge: intervalChanged,
       viewport: candidateViewportRef.current ?? viewport,
     });
     setPendingDataLoadViewScale(capture);
@@ -480,6 +518,7 @@ export function useNativeViewportRuntime({
 
     previousDataKeyRef.current = dataKey;
     previousSymbolRef.current = symbol;
+    previousIntervalRef.current = interval;
   }, [
     autoScaleEnabled,
     autoViewport,
@@ -503,14 +542,16 @@ export function useNativeViewportRuntime({
   useLayoutEffect(() => {
     if (!pendingDataLoadViewport) return;
 
+    const restoredAtLiveEdge = pendingDataLoadViewScale?.liveEdge === true;
     setPendingDataLoadViewScale(null);
     loadedBarsRef.current = bars;
     loadedBarsIntervalRef.current = loadedBarsInterval;
-    setViewportOwnership(
-      cancelNativeViewportOwnership(
-        commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
-      ),
+    const restoredOwnership = cancelNativeViewportOwnership(
+      commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
     );
+    // A live-edge restore is the chart's own placement, not the user's: it stays
+    // auto-owned so it follows new bars instead of freezing while they print past it.
+    setViewportOwnership(restoredAtLiveEdge ? { ...restoredOwnership, hasManualViewport: false } : restoredOwnership);
     candidateViewportRef.current = pendingDataLoadViewport;
     setCandidateViewport(pendingDataLoadViewport);
     setSettledViewport(pendingDataLoadViewport);
@@ -532,6 +573,7 @@ export function useNativeViewportRuntime({
     loadedBarsInterval,
     onRequestMoreBars,
     onViewportChange,
+    pendingDataLoadViewScale,
     pendingDataLoadViewport,
     requestNativeRenderViewportSync,
   ]);
@@ -666,9 +708,24 @@ export function useNativeViewportRuntime({
     });
     setViewportOwnership(result.state);
     if (result.type === 'confirmed') {
-      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
+      resetNativeViewportGestureActiveFlags({
+        panActive,
+        pinchActive,
+        priceScaleActive,
+        timeScaleActive,
+        viewportGestureOwner,
+      });
     }
-  }, [panActive, panStartViewport, pinchActive, priceScaleActive, sharedViewport, timeScaleActive, viewport, viewportGestureOwner]);
+  }, [
+    panActive,
+    panStartViewport,
+    pinchActive,
+    priceScaleActive,
+    sharedViewport,
+    timeScaleActive,
+    viewport,
+    viewportGestureOwner,
+  ]);
 
   useEffect(() => {
     if (!projection) return;
@@ -753,7 +810,13 @@ export function useNativeViewportRuntime({
     setSettledViewport(autoViewport);
     syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
     syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
-    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
+    resetNativeViewportGestureActiveFlags({
+      panActive,
+      pinchActive,
+      priceScaleActive,
+      timeScaleActive,
+      viewportGestureOwner,
+    });
     onViewportChange?.(autoViewport);
   }, [
     autoViewport,
@@ -841,7 +904,13 @@ export function useNativeViewportRuntime({
       setSettledViewport(viewportToApply);
       syncNativeSharedViewportIfChanged(sharedViewport, viewportToApply);
       syncNativeSharedViewportIfChanged(panStartViewport, viewportToApply);
-      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
+      resetNativeViewportGestureActiveFlags({
+        panActive,
+        pinchActive,
+        priceScaleActive,
+        timeScaleActive,
+        viewportGestureOwner,
+      });
       onViewportChange?.(viewportToApply);
 
       // A saved layout carries absolute times, so it can outrun the loaded page
