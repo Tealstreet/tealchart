@@ -80,7 +80,7 @@ export function useNativeTealchartCoreRuntime({
     onIntervalChange,
     onLatestBar,
   });
-  const { bars, barsContext, symbol, interval, isLoading, isLoadingMoreBars, requestMoreBars } = coreResult;
+  const { bars, barsContext, symbol, interval, isLoading, isLoadingMoreBars, loadFailed, requestMoreBars } = coreResult;
 
   useLayoutEffect(() => {
     chartApi.setOnLinesChanged(forceUpdate);
@@ -182,6 +182,7 @@ export function useNativeTealchartCoreRuntime({
     interval,
     isLoading,
     isLoadingMoreBars,
+    loadFailed,
     requestMoreBars,
     setImperativeTheme,
     symbol,

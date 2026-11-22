@@ -98,6 +98,12 @@ export interface ChartWidgetCoreOptions {
   onPlotsChanged?: (plots: PlotOutput[]) => void;
   onViewportChanged?: (viewport: Viewport) => void;
   onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  /**
+   * A history load or symbol resolve for this context failed. `loading: false`
+   * alone cannot say so, and hosts drew the previous market's bars as if the
+   * load had finished (AGT-127).
+   */
+  onLoadFailed?: (context: ChartWidgetDataContext) => void;
   onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
@@ -170,6 +176,7 @@ export class ChartWidgetCore {
   protected _onPlotsChanged?: (plots: PlotOutput[]) => void;
   protected _onViewportChanged?: (viewport: Viewport) => void;
   protected _onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  protected _onLoadFailed?: (context: ChartWidgetDataContext) => void;
   protected _onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
   protected _onSymbolChange?: (symbol: string) => void;
   protected _onIntervalChange?: (interval: string) => void;
@@ -184,6 +191,7 @@ export class ChartWidgetCore {
     this._onPlotsChanged = options.onPlotsChanged;
     this._onViewportChanged = options.onViewportChanged;
     this._onLoadingChanged = options.onLoadingChanged;
+    this._onLoadFailed = options.onLoadFailed;
     this._onLoadingMoreBarsChanged = options.onLoadingMoreBarsChanged;
     this._onSymbolChange = options.onSymbolChange;
     this._onIntervalChange = options.onIntervalChange;
@@ -286,6 +294,7 @@ export class ChartWidgetCore {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
         console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
         this._setLoading(false);
+        this._onLoadFailed?.(this._getDataContext());
       },
     );
   }
@@ -434,6 +443,9 @@ export class ChartWidgetCore {
 
         this._setLoading(false);
         console.error('[ChartWidgetCore] Failed to load bars:', error);
+        // The request's own market: a symbol change still resolving has not
+        // bumped the request id yet, and its failure is not the new market's.
+        this._onLoadFailed?.({ symbol: requestSymbol, interval: requestInterval, requestId });
 
         // Re-subscribe even though the history load failed, but ONLY for the
         // cache-reset caller. `_subscribeToBars` is what calls
@@ -837,7 +849,8 @@ export class ChartWidgetCore {
 
     this._symbol = symbol;
     this._onSymbolChange?.(symbol);
-    // Don't clear bars — keep old candles visible (faded) until new data arrives
+    // Bars are kept, tagged with their market; hosts must not draw another
+    // symbol's under this one (native clears them, AGT-127).
     this._hasMoreHistoricalData = true;
     this._setLoadingMoreBars(false);
     this._clearQueuedLeftHistoryBackfill();
@@ -968,6 +981,7 @@ export class ChartWidgetCore {
     this._onPlotsChanged = undefined;
     this._onViewportChanged = undefined;
     this._onLoadingChanged = undefined;
+    this._onLoadFailed = undefined;
     this._onSymbolChange = undefined;
     this._onIntervalChange = undefined;
     this._scheduleRender = () => {};
