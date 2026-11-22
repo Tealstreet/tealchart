@@ -159,16 +159,6 @@ export function withNativeLiveEdgeViewScale(viewScale: ViewScaleState): ViewScal
   };
 }
 
-/** `visibleBarCount` candles with the newest at the horizontal centre and a fitted axis (AGT-104). */
-export function createNativeCentredViewScale(visibleBarCount: number): ViewScaleState {
-  return withDefaultPricePadding({
-    visibleBarCount,
-    rightOffsetBars: visibleBarCount / 2,
-    pricePaddingTop: DEFAULT_VIEW_SCALE_PRICE_PADDING,
-    pricePaddingBottom: DEFAULT_VIEW_SCALE_PRICE_PADDING,
-  });
-}
-
 export function createNativeViewportDataKey(symbol: string, interval: string): string {
   return `${symbol}\n${interval}`;
 }
@@ -213,6 +203,16 @@ export function restoreNativeAutoOwnedViewportAcrossBars({
   );
 
   return autoScaleEnabled ? applyNativePriceAutoScale(carried, createNativeAutoScaleBars(bars)) : carried;
+}
+
+/** `visibleBarCount` candles with the newest at the horizontal centre and a fitted axis (AGT-104). */
+export function createNativeCentredViewScale(visibleBarCount: number): ViewScaleState {
+  return withDefaultPricePadding({
+    visibleBarCount,
+    rightOffsetBars: visibleBarCount / 2,
+    pricePaddingTop: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+    pricePaddingBottom: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+  });
 }
 
 /**
