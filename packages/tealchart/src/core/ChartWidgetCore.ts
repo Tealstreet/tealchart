@@ -341,6 +341,7 @@ export class ChartWidgetCore {
     // If we already have bars, update the indicator manager
     if (this._bars.length > 0) {
       manager.setBars(this._bars);
+      this._syncIndicatorHistoryWarmup();
     }
   }
 

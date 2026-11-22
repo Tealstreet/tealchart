@@ -188,3 +188,21 @@ describe('ChartWidgetCore scrollback after warm-up', () => {
     expect(core.getBars()[0]!.time).toBe(warmedStart - DEFAULT_HISTORY_BACKFILL_BAR_COUNT * INTERVAL);
   });
 });
+
+describe('ChartWidgetCore late indicator manager', () => {
+  it('pages back for warm-up when a manager with a known requirement attaches to loaded bars', () => {
+    const { datafeed, requests } = createDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '15' });
+    core.initialize();
+    const countBack = requests[0]!.periodParams.countBack!;
+    requests[0]!.onResult(makeBars(NOW - (countBack - 1) * INTERVAL, countBack));
+    expect(requests).toHaveLength(1);
+
+    const { manager } = createManager(501);
+    core.setIndicatorManager(manager);
+
+    const startTime = resolveWarmupHistoryStartTime({ intervalMs: INTERVAL, latestTime: NOW, warmupBars: 501 })!;
+    expect(requests).toHaveLength(2);
+    expect(requests[1]!.periodParams.from * 1000).toBeLessThanOrEqual(startTime);
+  });
+});
