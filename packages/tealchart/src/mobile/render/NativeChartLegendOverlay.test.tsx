@@ -110,10 +110,12 @@ describe('NativeChartLegendOverlay system text scaling', () => {
   });
 
   it('wraps the OHLC values inside the legend rather than running past the price axis', () => {
-    const rows = collectElementsByType(renderLegend(false), View).filter((row) =>
-      collectElementsByType(row.props.children as ReactNode, Text).some((text) => text.props.children === 'O'),
-    );
-    const ohlcRow = rows[rows.length - 1];
+    const holdsLabel = (view: TestElement, label: string) =>
+      collectElementsByType(view.props.children as ReactNode, Text).some((text) => text.props.children === label);
+    // Views are walked outermost first, so the last one holding both O and C is their row.
+    const ohlcRow = collectElementsByType(renderLegend(false), View)
+      .filter((view) => holdsLabel(view, 'O') && holdsLabel(view, 'C'))
+      .at(-1);
 
     expect(ohlcRow?.props.style).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
   });
