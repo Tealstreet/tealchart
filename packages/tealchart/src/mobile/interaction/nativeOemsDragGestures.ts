@@ -34,6 +34,7 @@ import {
   updateNativeBracketDragState,
   updateNativeOrderDragState,
 } from './nativeOemsDragState';
+import { resolveNativePartialBracketLadderDirection } from './nativePartialBracketZone';
 import {
   findNativeBracketDragZone,
   findNativeOrderDragZone,
@@ -246,7 +247,14 @@ export function createNativeBracketDragGesture({
   return Gesture.Pan()
     .minDistance(2)
     .onTouchesDown((event, stateManager) => {
-      if (bracketDragInteractionState.active.value) return;
+      if (bracketDragInteractionState.active.value) {
+        // A second finger joining the drag in progress.
+        if (!isNativeInitialSingleTouch(event)) return;
+        // A FIRST finger while still active: the last drag never finalized, so
+        // nothing is holding it. Resuming it committed a TP wherever the next pan
+        // ended, and a tap could never dismiss its picker (AGT-123).
+        clearNativeBracketDragState(bracketDragInteractionState);
+      }
       if (!isNativeInitialSingleTouch(event)) {
         stateManager.fail();
         return;
@@ -289,6 +297,7 @@ export function createNativeBracketDragGesture({
         getLiveNativePricePerPixel(sharedViewport, frame),
         event.x,
         event.y,
+        resolveNativePartialBracketLadderDirection(frame, event.x),
       );
     })
     .onUpdate((event) => {

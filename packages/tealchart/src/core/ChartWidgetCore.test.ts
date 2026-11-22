@@ -118,7 +118,9 @@ describe('ChartWidgetCore loaded analysis ownership', () => {
     if (snapshot.status !== 'ready') throw new Error('Expected loaded snapshot');
     expect(snapshot.snapshot.bars).toHaveLength(5);
     expect(snapshot.snapshot.bars[0]!.time).toBe(1_000_000);
-    expect(findLoadedSimilarPatterns(result.context, { range: { from: 1_000_000, to: 2_200_000 } }).status).toBe('ready');
+    expect(findLoadedSimilarPatterns(result.context, { range: { from: 1_000_000, to: 2_200_000 } }).status).toBe(
+      'ready',
+    );
     subscriptions[0]!.onTick({ ...makeBars(1_000_000, 5 * 60_000, 10).at(-1)!, close: 110 });
     const afterTick = core.getAnalysisContext({ from: 1_300_000, to: 2_500_000 });
     expect(afterTick).toMatchObject({ status: 'ready', context: { contextRevision: result.context.contextRevision } });
@@ -201,6 +203,93 @@ describe('ChartWidgetCore bar subscription after a failed reset reload', () => {
     historyRequests[0]!.onError('boom');
 
     expect(subscriptions).toHaveLength(0);
+  });
+});
+
+describe('ChartWidgetCore datafeed source identity (AGT-136)', () => {
+  // A same-symbol account switch across venues (okx-t BTCUSDT -> woo-t BTCUSDT)
+  // reaches the core only as the datafeed's reset, exactly like a reconnect.
+  // The datafeed's source identity is what tells the two apart.
+  const setup = (identity: { current: string } | null) => {
+    const controlled = createControlledDatafeed();
+    if (identity) controlled.datafeed.getSourceIdentity = () => identity.current;
+    const emitted: number[] = [];
+    const failed: string[] = [];
+    const core = new ChartWidgetCore({
+      datafeed: controlled.datafeed,
+      symbol: 'BTCUSDT',
+      interval: '5',
+      onBarsChanged: (bars) => emitted.push(bars.length),
+      onLoadFailed: (context) => failed.push(context.symbol),
+    });
+    core.initialize();
+    controlled.historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    return { ...controlled, core, emitted, failed };
+  };
+
+  it("drops the previous venue's bars when a reset arrives under a new source", () => {
+    const identity = { current: 'okx:live' };
+    const { core, emitted, historyRequests, subscriptions, unsubscribedGuids } = setup(identity);
+    const oldGuid = subscriptions[0]!.guid;
+
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+
+    expect(core.getBars()).toHaveLength(0);
+    expect(emitted.at(-1)).toBe(0);
+    expect(unsubscribedGuids).toContain(oldGuid);
+    expect(historyRequests).toHaveLength(2);
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'loading' });
+
+    historyRequests[1]!.onResult(makeBars(2_000_000, 5 * 60_000, 4));
+    expect(core.getBars()).toHaveLength(4);
+    expect(core.getBars()[0]!.time).toBe(2_000_000);
+    core.dispose();
+  });
+
+  it("never shows the previous venue's bars when the new venue's history fails", () => {
+    const identity = { current: 'okx:live' };
+    const { core, failed, historyRequests, subscriptions } = setup(identity);
+
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+    historyRequests[1]!.onError('[woo] GET /v1/kline failed with 403 Forbidden');
+
+    expect(core.getBars()).toHaveLength(0);
+    expect(failed).toEqual(['BTCUSDT']);
+    // The reset's one-shot callback is still re-armed for a later reconnect.
+    expect(subscriptions).toHaveLength(2);
+    core.dispose();
+  });
+
+  it('keeps the bars on a reconnect to the same source', () => {
+    const identity = { current: 'okx:live' };
+    const { core, historyRequests, subscriptions } = setup(identity);
+
+    subscriptions[0]!.onReset();
+    expect(core.getBars()).toHaveLength(10);
+    historyRequests[1]!.onError('reconnect reload failed');
+    expect(core.getBars()).toHaveLength(10);
+    core.dispose();
+  });
+
+  it('treats every reset as a reconnect for a datafeed that reports no source', () => {
+    const { core, subscriptions } = setup(null);
+    subscriptions[0]!.onReset();
+    expect(core.getBars()).toHaveLength(10);
+    core.dispose();
+  });
+
+  it('reports the source the loaded market belongs to', () => {
+    const identity = { current: 'okx:live' };
+    const { core, historyRequests, subscriptions } = setup(identity);
+    expect(core.getSourceIdentity()).toBe('okx:live');
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+    expect(core.getSourceIdentity()).toBe('woo:live');
+    historyRequests[1]!.onResult(makeBars(2_000_000, 5 * 60_000, 4));
+    expect(core.getSourceIdentity()).toBe('woo:live');
+    core.dispose();
   });
 });
 
@@ -851,6 +940,53 @@ describe('ChartWidgetCore interval changes during a pending resolve', () => {
   });
 });
 
+// AGT-127: a failed load used to end only in `loading: false`, which hosts
+// could not tell from a finished one, so the previous market's bars stayed up
+// under the new symbol. The failure is reported for the market that failed.
+describe('ChartWidgetCore failed loads', () => {
+  it('reports a failed history load for the market it was requested for', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 60_000, 3));
+    core.setSymbol('BTCUSDT');
+    historyRequests.at(-1)!.onError('[woo] GET /v1/kline failed with 403 Forbidden');
+
+    expect(onLoadFailed).toHaveBeenCalledTimes(1);
+    expect(onLoadFailed).toHaveBeenCalledWith(expect.objectContaining({ symbol: 'BTCUSDT', interval: '1' }));
+  });
+
+  it('reports a symbol that fails to resolve', () => {
+    const controlled = createControlledDatafeed();
+    const datafeed = {
+      ...controlled.datafeed,
+      resolveSymbol(_symbolName: string, _onResolve: unknown, onError: (reason: string) => void) {
+        onError('Unknown symbol');
+      },
+    } as IBasicDataFeed;
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+
+    expect(onLoadFailed).toHaveBeenCalledWith(expect.objectContaining({ symbol: 'BTCUSD', interval: '1' }));
+  });
+
+  it('does not report a failure that a newer request superseded', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const onLoadFailed = vi.fn();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTCUSD', interval: '1', onLoadFailed });
+
+    core.initialize();
+    core.setSymbol('BTCUSDT');
+    historyRequests[0]!.onError('superseded');
+
+    expect(onLoadFailed).not.toHaveBeenCalled();
+  });
+});
+
 // resolveSymbol blocks on the exchange's market list, which candles do not
 // need — so a datafeed that already holds history paints it straight away.
 describe('ChartWidgetCore cached first paint', () => {
@@ -878,7 +1014,13 @@ describe('ChartWidgetCore cached first paint', () => {
   // returns another market's history, or nothing at all.
   it('asks the datafeed for the market and window it is about to request', () => {
     const controlled = createControlledDatafeed();
-    const asked: Array<{ symbol: string; resolution: string; countBack: PeriodParams['countBack']; from: number; to: number }> = [];
+    const asked: Array<{
+      symbol: string;
+      resolution: string;
+      countBack: PeriodParams['countBack'];
+      from: number;
+      to: number;
+    }> = [];
     const datafeed = {
       ...controlled.datafeed,
       getCachedBars: (symbol: string, resolution: ResolutionString, periodParams: PeriodParams) => {
@@ -970,5 +1112,185 @@ describe('ChartWidgetCore cached first paint', () => {
 
     expect(() => core.initialize()).not.toThrow();
     expect(historyRequests).toHaveLength(1);
+  });
+});
+
+describe('ChartWidgetCore live gap backfill', () => {
+  const intervalMs = 60_000;
+  const start = 1_699_999_980_000; // minute-aligned
+
+  function loadOneMinuteChart() {
+    vi.useFakeTimers();
+    vi.setSystemTime(start + 10 * intervalMs);
+    const feed = createControlledDatafeed();
+    const emitted: Array<{ length: number; source: string }> = [];
+    const indicatorBars: number[] = [];
+    const core = new ChartWidgetCore({
+      datafeed: feed.datafeed,
+      symbol: 'BTC',
+      interval: '1',
+      onBarsChanged: (bars, context) => emitted.push({ length: bars.length, source: context.source }),
+      indicatorManager: {
+        setBars: (bars) => indicatorBars.push(bars.length),
+        updateBar: () => {},
+        getPlots: () => [],
+      },
+    });
+    core.initialize();
+    feed.historyRequests[0]!.onResult(makeBars(start, intervalMs, 10));
+    return { ...feed, core, emitted, indicatorBars };
+  }
+
+  it('fetches the bars a resumed stream skipped and merges them under the live bar', () => {
+    const { core, historyRequests, subscriptions, indicatorBars } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    // Backgrounded for 15 minutes: the next tick belongs to a bar 15 slots later.
+    vi.setSystemTime(start + 24 * intervalMs + 5_000);
+    const liveTime = start + 24 * intervalMs;
+    subscriptions[0]!.onTick({ time: liveTime, open: 500, high: 510, low: 490, close: 505, volume: 1 });
+
+    expect(historyRequests).toHaveLength(2);
+    const backfill = historyRequests[1]!;
+    expect(backfill.periodParams.firstDataRequest).toBe(false);
+    expect(backfill.periodParams.from).toBe(Math.floor(lastLoaded / 1000));
+    expect(backfill.periodParams.to).toBeGreaterThanOrEqual(Math.floor(liveTime / 1000));
+
+    // The venue answers through the live slot with an older copy of it.
+    const fetched = makeBars(lastLoaded, intervalMs, 16).map((bar) =>
+      bar.time === liveTime ? { ...bar, close: 1 } : bar,
+    );
+    backfill.onResult(fetched);
+
+    const bars = core.getBars();
+    expect(bars).toHaveLength(25);
+    for (let i = 1; i < bars.length; i++) expect(bars[i]!.time - bars[i - 1]!.time).toBe(intervalMs);
+    // The pre-gap bar takes its final values from history; the live bar keeps its own.
+    expect(bars[9]).toMatchObject({ time: lastLoaded, close: fetched[0]!.close });
+    expect(bars.at(-1)).toMatchObject({ time: liveTime, close: 505 });
+    expect(indicatorBars.at(-1)).toBe(25);
+  });
+
+  it('keeps ticks that arrive during the backfill', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    const liveTime = start + 20 * intervalMs;
+    vi.setSystemTime(liveTime + 1_000);
+    subscriptions[0]!.onTick({ time: liveTime, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    const nextLive = liveTime + intervalMs;
+    vi.setSystemTime(nextLive + 1_000);
+    subscriptions[0]!.onTick({ time: nextLive, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    historyRequests[1]!.onResult(makeBars(start + 9 * intervalMs, intervalMs, 13));
+
+    const bars = core.getBars();
+    // The bar that was live when the request went out closed on the stream; the
+    // venue's mid-bar copy of it must not replace it.
+    expect(bars.at(-2)).toMatchObject({ time: liveTime, close: 1 });
+    expect(bars.at(-1)).toMatchObject({ time: nextLive, close: 2 });
+    expect(bars).toHaveLength(22);
+  });
+
+  it('refetches the closed bar when the stream was silent across a rollover', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    vi.setSystemTime(lastLoaded + 5_000);
+    subscriptions[0]!.onTick({ time: lastLoaded, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    // Suspended for 50s, resumed inside the very next bar: no slot was skipped.
+    vi.setSystemTime(lastLoaded + intervalMs + 55_000);
+    subscriptions[0]!.onTick({ time: lastLoaded + intervalMs, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(2);
+    expect(historyRequests[1]!.periodParams.from).toBe(Math.floor(lastLoaded / 1000));
+  });
+
+  it('does not fetch on an ordinary rollover', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    const lastLoaded = start + 9 * intervalMs;
+    vi.setSystemTime(lastLoaded + 50_000);
+    subscriptions[0]!.onTick({ time: lastLoaded, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    vi.setSystemTime(lastLoaded + intervalMs + 1_000);
+    subscriptions[0]!.onTick({ time: lastLoaded + intervalMs, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(1);
+  });
+
+  it('does not fetch when a monthly bar rolls over out of a 31-day month', () => {
+    vi.useFakeTimers();
+    const jan = Date.UTC(2026, 0, 1);
+    const feb = Date.UTC(2026, 1, 1);
+    vi.setSystemTime(jan + 10 * 86_400_000);
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '1M' });
+    core.initialize();
+    historyRequests[0]!.onResult([{ time: jan, open: 1, high: 1, low: 1, close: 1, volume: 1 }]);
+    vi.setSystemTime(feb + 1_000);
+    subscriptions[0]!.onTick({ time: feb, open: 2, high: 2, low: 2, close: 2, volume: 1 });
+
+    expect(historyRequests).toHaveLength(1);
+  });
+
+  it('coalesces a second gap into one follow-up request', () => {
+    const { historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    vi.setSystemTime(start + 30 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 30 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    expect(historyRequests).toHaveLength(2);
+
+    historyRequests[1]!.onResult([]);
+    expect(historyRequests).toHaveLength(3);
+    expect(historyRequests[2]!.periodParams.from).toBe(Math.floor((start + 9 * intervalMs) / 1000));
+  });
+
+  it('retries a refused backfill with backoff until it lands', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    const liveTime = start + 20 * intervalMs;
+    vi.setSystemTime(liveTime + 1_000);
+    subscriptions[0]!.onTick({ time: liveTime, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+
+    historyRequests[1]!.onError('proxy token refused');
+    expect(historyRequests).toHaveLength(2);
+    vi.advanceTimersByTime(5_000);
+    expect(historyRequests).toHaveLength(3);
+    historyRequests[2]!.onError('proxy token refused');
+    vi.advanceTimersByTime(9_999);
+    expect(historyRequests).toHaveLength(3);
+    vi.advanceTimersByTime(1);
+    expect(historyRequests).toHaveLength(4);
+    expect(historyRequests[3]!.periodParams.from).toBe(Math.floor((start + 9 * intervalMs) / 1000));
+
+    historyRequests[3]!.onResult(makeBars(start + 9 * intervalMs, intervalMs, 12));
+    expect(core.getBars()).toHaveLength(21);
+  });
+
+  it('gives up after a bounded number of attempts and cancels on dispose', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    for (let i = 0; i < 6; i++) {
+      historyRequests.at(-1)!.onError('down');
+      vi.advanceTimersByTime(60_000);
+    }
+    expect(historyRequests).toHaveLength(7);
+
+    vi.setSystemTime(start + 40 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 40 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    expect(historyRequests).toHaveLength(8);
+    historyRequests.at(-1)!.onError('down');
+    core.dispose();
+    vi.advanceTimersByTime(60_000);
+    expect(historyRequests).toHaveLength(8);
+  });
+
+  it('drops a backfill that an interval change superseded', () => {
+    const { core, historyRequests, subscriptions } = loadOneMinuteChart();
+    vi.setSystemTime(start + 20 * intervalMs);
+    subscriptions[0]!.onTick({ time: start + 20 * intervalMs, open: 1, high: 1, low: 1, close: 1, volume: 1 });
+    core.setInterval('5');
+    const stale = historyRequests[1]!;
+    historyRequests[2]!.onResult(makeBars(start, 5 * intervalMs, 4));
+
+    stale.onResult(makeBars(start + 9 * intervalMs, intervalMs, 12));
+
+    expect(core.getBars()).toHaveLength(4);
   });
 });

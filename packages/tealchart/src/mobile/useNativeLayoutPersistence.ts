@@ -32,13 +32,18 @@ export interface NativeResolvedLayoutPersistence {
   saveLoadAdapter: ISaveLoadAdapter | null;
 }
 
+export interface NativeLayoutApplyContext {
+  /** The layout restored when the chart mounts, as opposed to one the user picked. */
+  coldLaunch?: boolean;
+}
+
 export interface NativeLayoutPersistenceInput {
   autoSaveDelay?: number;
   chartStore: ChartStore;
   currentSettings: ChartSettings;
   currentLayoutStorage: TealchartKeyValueStorage | null;
   currentLayoutStorageKey: string | null;
-  onApplyLayout: (settings: ChartSettings) => Promise<void> | void;
+  onApplyLayout: (settings: ChartSettings, context?: NativeLayoutApplyContext) => Promise<void> | void;
   readyToCreateDefaultLayout: boolean;
   saveLoadAdapter: ISaveLoadAdapter | null;
 }
@@ -435,7 +440,7 @@ export function useNativeLayoutPersistence({
         if (cancelled) return;
 
         applyingLayoutRef.current = true;
-        await onApplyLayoutRef.current(result.data);
+        await onApplyLayoutRef.current(result.data, { coldLaunch: true });
         setCurrentLayout({
           layoutId,
           layoutName: layoutName ?? DEFAULT_LAYOUT_NAME,

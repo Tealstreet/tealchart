@@ -41,6 +41,7 @@ import { NativeDrawingIcon } from './NativeDrawingIcon';
 import { NativeFloatingOverlay } from './NativeFloatingOverlay';
 import { NativeIndicatorStyleOverlay } from './NativeIndicatorStyleOverlay';
 import { isNativeMainPaneVisible } from './nativeSharedViewport';
+import { NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER, useNativeFontScale } from './nativeTextScaling';
 
 export interface NativeLegendIndicator {
   id: string;
@@ -283,11 +284,19 @@ function renderNativeIndicatorLegendRow({
       style={[styles.indicatorRow, { opacity: rowOpacity }]}
     >
       <View pointerEvents="none" style={styles.indicatorTextGroup}>
-        <Text numberOfLines={1} style={[styles.indicatorName, { color: textColor }]}>
+        <Text
+          maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+          numberOfLines={1}
+          style={[styles.indicatorName, { color: textColor }]}
+        >
           {name}
         </Text>
         {inputsText ? (
-          <Text numberOfLines={1} style={[styles.indicatorInputs, { color: mutedTextColor }]}>
+          <Text
+            maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+            numberOfLines={1}
+            style={[styles.indicatorInputs, { color: mutedTextColor }]}
+          >
             {inputsText}
           </Text>
         ) : null}
@@ -296,6 +305,7 @@ function renderNativeIndicatorLegendRow({
         .filter((readout) => readout.statusLine)
         .map((readout) => (
           <Text
+            maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
             key={readout.plotId}
             accessibilityLabel={`${readout.title}: ${readout.values.join(' · ')}`}
             style={[styles.ohlcValue, { color: readout.color, marginRight: 4 }]}
@@ -540,18 +550,35 @@ function NativeChartLegendOverlayView({
       {isNativeMainPaneVisible(frame) ? (
         <View pointerEvents="box-none" style={[styles.legendBlock, { left, maxWidth, top }]}>
           <View pointerEvents="none" style={styles.row}>
-            <Text numberOfLines={1} style={[styles.symbol, { color: textColor }]}>
+            <Text
+              maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+              numberOfLines={1}
+              style={[styles.symbol, { color: textColor }]}
+            >
               {symbol}
             </Text>
-            <Text style={[styles.meta, { color: mutedTextColor }]}>{formatNativeLegendInterval(interval)}</Text>
+            <Text
+              maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+              style={[styles.meta, { color: mutedTextColor }]}
+            >
+              {formatNativeLegendInterval(interval)}
+            </Text>
           </View>
           {isLoading && <NativeLegendLoadingDots color={mutedTextColor} />}
           {ohlcItems.length > 0 && (
-            <View pointerEvents="none" style={styles.row}>
+            <View pointerEvents="none" style={styles.ohlcRow}>
               {ohlcItems.map(([label, value]) => (
                 <View key={label} style={styles.ohlcItem}>
-                  <Text style={[styles.ohlcLabel, { color: mutedTextColor }]}>{label}</Text>
-                  <Text style={[styles.ohlcValue, { color: valueColor }]}>
+                  <Text
+                    maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+                    style={[styles.ohlcLabel, { color: mutedTextColor }]}
+                  >
+                    {label}
+                  </Text>
+                  <Text
+                    maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+                    style={[styles.ohlcValue, { color: valueColor }]}
+                  >
                     {formatNativeLegendPrice(value, pricePrecision)}
                   </Text>
                 </View>
@@ -668,7 +695,14 @@ export function NativeLoadingDot({ color, index }: { color: string; index: numbe
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
 
-  return <Animated.Text style={[styles.loadingDot, { color }, animatedStyle]}>•</Animated.Text>;
+  return (
+    <Animated.Text
+      maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
+      style={[styles.loadingDot, { color }, animatedStyle]}
+    >
+      •
+    </Animated.Text>
+  );
 }
 
 export function NativeLegendLoadingDots({ color }: { color: string }) {
@@ -682,6 +716,7 @@ export function NativeLegendLoadingDots({ color }: { color: string }) {
 }
 
 function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
+  const fontScale = useNativeFontScale();
   const [styleIndicatorId, setStyleIndicatorId] = React.useState<string>();
   const openStyle = React.useCallback((id: string) => setStyleIndicatorId(id), []);
   const closeStyle = React.useCallback(() => setStyleIndicatorId(undefined), []);
@@ -846,6 +881,9 @@ function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
         />
       ) : null}
       <NativeChartLegendOverlayView
+        // Text whose content did not change kept its old measurement after a text-size
+        // change, leaving the legend stretched until a relaunch (AGT-154).
+        key={fontScale}
         {...props}
         plots={plots}
         liveTailBar={liveTailBar}
@@ -878,6 +916,12 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 11,
     fontWeight: '500',
+  },
+  ohlcRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 1,
   },
   ohlcItem: {
     alignItems: 'center',

@@ -143,6 +143,7 @@ function createBracketDragState(active = false): NativeBracketDragInteractionSta
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
+    activeLadderDirection: shared(1),
     activeColor: shared(''),
     activeLineColor: shared(''),
     startPrice: shared(0),
@@ -1837,6 +1838,79 @@ describe('native gesture activation', () => {
     // preview dying on the UI thread and commitBracketMove landing on the JS one.
     expect(bracketDragInteractionState.active.value).toBe(false);
     expect(bracketDragInteractionState.activeObjectId.value).toBe('position-1');
+  });
+
+  // AGT-123: a TP drag whose finalize never arrived (a tap as the app came back to
+  // the foreground) stayed `active` with no finger down. The picker stuck open, a
+  // tap elsewhere did nothing, and the next pan anywhere on the chart resumed the
+  // dead drag and committed a TP at wherever that pan ended.
+  it('drops a stranded bracket drag on the next first touch instead of resuming it', () => {
+    const viewport = sharedViewport(viewportValue);
+    const clearNativeBracketDrag = vi.fn();
+    const commitBracketMove = vi.fn();
+    const bracketDragInteractionState = createBracketDragState(true);
+    bracketDragInteractionState.activeObjectId.value = 'order_1';
+    bracketDragInteractionState.activeObjectType.value = 'order';
+    bracketDragInteractionState.activeBracketType.value = 'tp';
+    bracketDragInteractionState.activePrice.value = 63_000;
+    bracketDragInteractionState.startPrice.value = 63_000;
+    bracketDragInteractionState.pricePerPixel.value = 10;
+    const bracketDragGesture = createNativeBracketDragGesture({
+      bracketDragInteractionState,
+      clearNativeBracketDrag,
+      commitBracketMove,
+      frame,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    // A pan on empty chart, nowhere near a TP/SL chip.
+    const emptyChart = mockStateManager();
+    bracketDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 60, y: 60 }], allTouches: [{ x: 60, y: 60 }] },
+      emptyChart,
+    );
+    expect(emptyChart.failed).toBe(true);
+    expect(bracketDragInteractionState.active.value).toBe(false);
+    expect(bracketDragInteractionState.activeObjectId.value).toBe('');
+
+    bracketDragGesture.handlers.onBegin({ x: 60, y: 60 });
+    bracketDragGesture.handlers.onUpdate({ translationX: 40, translationY: 30 });
+    bracketDragGesture.handlers.onEnd({ translationX: 40, translationY: 30 });
+    expect(commitBracketMove).not.toHaveBeenCalled();
+  });
+
+  it('keeps a live bracket drag when a second finger joins it', () => {
+    const viewport = sharedViewport(viewportValue);
+    const bracketDragInteractionState = createBracketDragState(true);
+    bracketDragInteractionState.activeObjectId.value = 'order_1';
+    const bracketDragGesture = createNativeBracketDragGesture({
+      bracketDragInteractionState,
+      clearNativeBracketDrag: () => {},
+      commitBracketMove: () => {},
+      frame,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    const secondFinger = mockStateManager();
+    bracketDragGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 60, y: 60 }],
+        allTouches: [
+          { x: 140, y: 88 },
+          { x: 60, y: 60 },
+        ],
+      },
+      secondFinger,
+    );
+    expect(secondFinger.failed).toBe(false);
+    expect(bracketDragInteractionState.active.value).toBe(true);
+    expect(bracketDragInteractionState.activeObjectId.value).toBe('order_1');
   });
 });
 
