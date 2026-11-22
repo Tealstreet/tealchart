@@ -1,6 +1,7 @@
 import { PineRuntimeArgumentError } from '../runtimeArgumentError';
 import type { Program, Expression, FunctionDeclaration, Statement, CallExpression } from '../../parser/ast';
 import { checkProgram, normalizeV5DuplicateCallArguments, type SemanticExpressionTypeContext, type SemanticType } from '../../semantic/checker';
+import { estimateHistoryRequirement, type HistoryRequirement } from '../../semantic/historyRequirement';
 import { pineVersionRules } from '../../pineVersionRules';
 import { analyze } from './analyzer';
 import type { AnalysisContext, AnalyzeOptions, SecurityCallSite } from './analyzer';
@@ -47,6 +48,10 @@ export interface CompiledScript {
   generatedCode?: string;
   securityScripts: Map<number, CompiledSecurityScript>;
   sourceScripts?: Map<number, CompiledSecurityScript>;
+  /** The normalized program this script was compiled from, re-read when inputs change the history requirement. */
+  program?: Program;
+  /** The history requirement under default inputs, computed once per compile rather than per execution. */
+  historyRequirement?: HistoryRequirement;
 }
 
 export type CompileOptions = AnalyzeOptions;
@@ -1592,6 +1597,8 @@ export function compile(ast: Program, maxBarsBack?: number, options: CompileOpti
       runtimeSourceLocations: runtimeSourceLocations(code, analysis),
       securityScripts,
       sourceScripts,
+      program: ast,
+      historyRequirement: estimateHistoryRequirement(ast),
     };
   } catch (error) {
     return {

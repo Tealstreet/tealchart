@@ -302,6 +302,11 @@ export {
   type SemanticType,
   type SemanticTypeKind,
 } from './semantic';
+export {
+  estimateHistoryRequirement,
+  MAX_HISTORY_REQUIREMENT_BARS,
+  type HistoryRequirement,
+} from './semantic/historyRequirement';
 
 // Worker
 export {

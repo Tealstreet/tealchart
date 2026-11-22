@@ -465,6 +465,19 @@ so accepted arithmetic and named explicit const values match equivalent literals
 Declared `max_bars_back` uses the same evaluation in history setup and result
 metadata; buffer sizing, growth, ceilings and host overrides remain independent.
 
+`IndicatorDeclarationMetadata.historyRequirement` (`semantic/historyRequirement.ts`)
+tells a chart host how many bars a script needs before its longest lookback
+produces a value, so the host can load that history ahead of the first visible
+bar. It is a static ESTIMATE, not a measurement: the longest `ta.*` bar-count
+argument plus the deepest static `[n]` offset, or the declared/`max_bars_back()`
+depth when larger, capped at 5000. Lengths fold through top-level names bound
+once to numbers and through `input.*` defaults or `input_<title>` overrides;
+anything else, including a name reassigned with `:=`, counts as unresolved and
+makes `source: 'unknown'`, where `bars` is only a floor. Chained lookbacks can
+need more than the longest single one, so hosts treat it as a minimum. It never
+changes execution or buffer sizing; `compile()` keeps `program` on the compiled
+script only so this estimate can be cached per input set.
+
 `math.toradians` multiplies the source by PI before dividing by 180. Preserve
 that binary64 operation order rather than precomputing PI/180.
 
