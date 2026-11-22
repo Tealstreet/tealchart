@@ -22,7 +22,13 @@ import {
   resolveViewportHistoryBackfillHint,
 } from '../../core/historyBackfill';
 import { TealchartRenderer } from '../../TealchartRenderer';
-import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
+import {
+  captureViewScale,
+  DEFAULT_VIEW_SCALE_PRICE_PADDING,
+  intervalToMs,
+  restoreViewport,
+  withDefaultPricePadding,
+} from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
 import { getNativeCandidateTimeWindow, nativeViewportCoversCandidateTimeWindow } from '../render/nativeTimeWindow';
 import {
@@ -32,9 +38,9 @@ import {
   getNativeVisibleBarsBoundingBox,
 } from './nativeAutoScale';
 import {
+  centreNativeViewportOnNewestBar,
   isNativeViewportAtLiveEdge,
-  NATIVE_LIVE_EDGE_RESUME_WINDOW_MS,
-  resolveNativeLiveEdgeResumeViewport,
+  NATIVE_REFOCUS_RECENTRE_WINDOW_MS,
 } from './nativeLiveEdgeResume';
 import { resetNativeViewportGestureActiveFlags, syncNativeViewportGestureMetrics } from './nativeViewportGestureState';
 import {
@@ -76,6 +82,12 @@ export interface NativeViewportRuntimeInput {
 }
 
 export interface NativeApplyViewportOptions {
+  /**
+   * A cold launch's layout (AGT-104, AGT-148): keep only the saved zoom, measured
+   * in bars at the layout's own interval, and open centred on the newest bar,
+   * auto-owned. A stale saved window never wins over the newest candle.
+   */
+  centreNewestBar?: { interval: string };
   /** The layout's own auto-scale setting, which the store has not applied yet during a restore. */
   autoScaleEnabled?: boolean;
   fitPriceToBars?: boolean;
@@ -105,6 +117,8 @@ export const NATIVE_EMPTY_RENDER_VIEWPORT: Viewport = {
   priceMax: 1,
 };
 const EMPTY_NATIVE_VIEWPORT_BARS: readonly Bar[] = [];
+/** A cold-launch layout restore's source bars: never the bars it lands on, so the first loaded bars restore it. */
+const NATIVE_LAYOUT_RESTORE_SOURCE_BARS: readonly Bar[] = [];
 /**
  * How long a deferred price fit waits for a backfill that may never come.
  * Generous enough for a slow round trip; the cost of being wrong is one
@@ -198,6 +212,42 @@ export function restoreNativeAutoOwnedViewportAcrossBars({
   );
 
   return autoScaleEnabled ? applyNativePriceAutoScale(carried, createNativeAutoScaleBars(bars)) : carried;
+}
+
+/** `visibleBarCount` candles with the newest at the horizontal centre and a fitted axis (AGT-104). */
+export function createNativeCentredViewScale(visibleBarCount: number): ViewScaleState {
+  return withDefaultPricePadding({
+    visibleBarCount,
+    rightOffsetBars: visibleBarCount / 2,
+    pricePaddingTop: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+    pricePaddingBottom: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+  });
+}
+
+/**
+ * AGT-156: in auto scale mode a hand-placed view showing the newest candle moves
+ * by exactly the time the newest bar advanced, so every candle shifts left one
+ * bar width per new bar and the newest keeps its x. Zoom is untouched and the
+ * axis refits. A view scrolled into history (newest bar not in view) stays put.
+ */
+export function followNativeLiveEdgeByNewBars({
+  bars,
+  previousBars,
+  viewport,
+}: {
+  bars: readonly Bar[];
+  previousBars: readonly Bar[];
+  viewport: Viewport;
+}): Viewport | null {
+  const previousLast = previousBars[previousBars.length - 1];
+  const last = bars[bars.length - 1];
+  if (!previousLast || !last || last.time <= previousLast.time) return null;
+  if (!isNativeViewportAtLiveEdge(viewport, previousBars)) return null;
+  const shift = last.time - previousLast.time;
+  return applyNativePriceAutoScale(
+    { ...viewport, startTime: viewport.startTime + shift, endTime: viewport.endTime + shift },
+    createNativeAutoScaleBars(bars),
+  );
 }
 
 export function captureNativeDataLoadViewScale({
@@ -369,6 +419,17 @@ export function useNativeViewportRuntime({
   );
   const viewportBars = barsMatchRequestedData ? bars : EMPTY_NATIVE_VIEWPORT_BARS;
   const autoViewport = useMemo(() => normalizeNativeViewport(null, viewportBars), [viewportBars]);
+  // A first load opens on the default zoom with the newest candle centred (AGT-104).
+  // `autoViewport` stays the reset target.
+  const firstLoadViewport = useMemo(() => {
+    if (!autoViewport || viewportBars.length === 0) return autoViewport;
+    const intervalMs = intervalToMs(interval) || 1;
+    return restoreViewport(
+      createNativeCentredViewScale((autoViewport.endTime - autoViewport.startTime) / intervalMs),
+      [...viewportBars],
+      intervalMs,
+    );
+  }, [autoViewport, interval, viewportBars]);
   const pendingDataLoadViewport = useMemo(
     () =>
       restoreNativeDataLoadViewport({
@@ -389,18 +450,13 @@ export function useNativeViewportRuntime({
     viewport: Viewport;
   } | null>(null);
 
-  // AGT-104: a hand-placed view at the live edge when the app left the
-  // foreground follows the bars printed while it was away (and the backfill
-  // that fills them in) once it returns. A view scrolled into history stays put.
-  const liveEdgeResumeRef = useRef<{ dataKey: string; pinnedLastBarTime: number; until: number } | null>(null);
-  const liveEdgeBackgroundRef = useRef<{ dataKey: string; pinnedLastBarTime: number } | null>(null);
-  const [liveEdgeResumeEpoch, setLiveEdgeResumeEpoch] = useState(0);
-  const liveEdgeFollowingRef = useRef(false);
-  const liveEdgeStateRef = useRef<{ bars: readonly Bar[]; dataKey: string; viewport: Viewport | null }>({
-    bars,
-    dataKey,
-    viewport: null,
-  });
+  // AGT-104: after a return from the background, a newest bar that is (or, once
+  // the backfill lands, becomes) off screen is brought back centred at the same
+  // zoom. One that is on screen is left alone.
+  const refocusRecentreRef = useRef<{ dataKey: string; until: number } | null>(null);
+  const backgroundedRef = useRef(false);
+  const [refocusEpoch, setRefocusEpoch] = useState(0);
+  const dataKeyRef = useRef(dataKey);
 
   useEffect(() => {
     priceAutoScale.bars.value = autoScaleBars;
@@ -412,8 +468,8 @@ export function useNativeViewportRuntime({
   }, [autoScaleEnabled, priceAutoScale]);
 
   const { hasDataViewport, viewport } = useMemo(
-    () => resolveNativeRenderViewport({ autoViewport, settledViewport }),
-    [autoViewport, settledViewport],
+    () => resolveNativeRenderViewport({ autoViewport: firstLoadViewport, settledViewport }),
+    [firstLoadViewport, settledViewport],
   );
   const projectionViewport = candidateViewport ?? viewport;
   const projection = useMemo(
@@ -498,6 +554,15 @@ export function useNativeViewportRuntime({
       setViewportOwnership(cancelNativeViewportOwnership(viewportOwnershipRef.current));
     }
 
+    // A cold-launch layout restore already queued for this market and interval
+    // (its interval switch is what brought us here) owns the first frame.
+    if (pendingDataLoadViewScale?.dataKey === dataKey) {
+      previousDataKeyRef.current = dataKey;
+      previousSymbolRef.current = symbol;
+      previousIntervalRef.current = interval;
+      return;
+    }
+
     const sourceBars = loadedBarsRef.current.length > 0 ? loadedBarsRef.current : bars;
     const capture = captureNativeDataLoadViewScale({
       bars: sourceBars,
@@ -515,13 +580,13 @@ export function useNativeViewportRuntime({
     // change: leaving the settled viewport in place would keep the axis on the
     // previous market's prices with no restore coming to correct it.
     if (!capture) {
-      candidateViewportRef.current = autoViewport;
-      setCandidateViewport(autoViewport);
-      setSettledViewport(autoViewport);
-      if (autoViewport) {
-        syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
-        syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
-        onViewportChange?.(autoViewport);
+      candidateViewportRef.current = firstLoadViewport;
+      setCandidateViewport(firstLoadViewport);
+      setSettledViewport(firstLoadViewport);
+      if (firstLoadViewport) {
+        syncNativeSharedViewportIfChanged(sharedViewport, firstLoadViewport);
+        syncNativeSharedViewportIfChanged(panStartViewport, firstLoadViewport);
+        onViewportChange?.(firstLoadViewport);
       }
     }
 
@@ -530,14 +595,15 @@ export function useNativeViewportRuntime({
     previousIntervalRef.current = interval;
   }, [
     autoScaleEnabled,
-    autoViewport,
     bars,
     dataKey,
+    firstLoadViewport,
     hasDataViewport,
     interval,
     onViewportChange,
     panActive,
     panStartViewport,
+    pendingDataLoadViewScale,
     pinchActive,
     priceAutoScale,
     priceScaleActive,
@@ -589,33 +655,37 @@ export function useNativeViewportRuntime({
 
   useLayoutEffect(() => {
     if (
-      !autoViewport ||
+      !firstLoadViewport ||
       !barsMatchRequestedData ||
       isLoading ||
       settledViewport ||
+      // A data-load restore lands in this same commit; adopting the auto window
+      // after it would overwrite the restore on a first load (AGT-148).
+      pendingDataLoadViewport ||
       viewportOwnershipRef.current.hasManualViewport ||
       viewportOwnershipRef.current.nativeViewportOwned
     ) {
       return;
     }
 
-    candidateViewportRef.current = autoViewport;
-    setCandidateViewport(autoViewport);
-    setSettledViewport(autoViewport);
-    syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
-    syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
-    onViewportChange?.(autoViewport);
+    candidateViewportRef.current = firstLoadViewport;
+    setCandidateViewport(firstLoadViewport);
+    setSettledViewport(firstLoadViewport);
+    syncNativeSharedViewportIfChanged(sharedViewport, firstLoadViewport);
+    syncNativeSharedViewportIfChanged(panStartViewport, firstLoadViewport);
+    onViewportChange?.(firstLoadViewport);
   }, [
-    autoViewport,
     barsMatchRequestedData,
+    firstLoadViewport,
     isLoading,
     onViewportChange,
     panStartViewport,
+    pendingDataLoadViewport,
     settledViewport,
     sharedViewport,
   ]);
 
-  // AGT-90: an auto-owned view follows new bars in the SAME render that brings them.
+  // AGT-90: a following view moves with new bars in the SAME render that brings them.
   // Following from a layout effect committed the new bars against the old window
   // first, so each rollover drew a frame or two of the wrong range. The bars the
   // settled window belongs to are state, so the render-phase update below re-runs
@@ -629,12 +699,14 @@ export function useNativeViewportRuntime({
   if (barsMatchRequestedData && !isLoading && bars.length > 0 && !Object.is(autoFollow.bars, bars)) {
     const ownership = viewportOwnershipRef.current;
     // A new market's first bars only rebase: the data-load restore frames them.
-    const followed =
+    const canFollow =
       autoFollow.dataKey === dataKey &&
       !pendingDataLoadViewport &&
       settledViewport !== null &&
-      !ownership.hasManualViewport &&
-      !ownership.nativeViewportOwned
+      !ownership.nativeViewportOwned;
+    const followed = !canFollow
+      ? null
+      : !ownership.hasManualViewport
         ? restoreNativeAutoOwnedViewportAcrossBars({
             autoScaleEnabled: priceAutoScale.active.value,
             bars,
@@ -643,7 +715,9 @@ export function useNativeViewportRuntime({
             previousInterval: autoFollow.interval,
             viewport: settledViewport,
           })
-        : null;
+        : priceAutoScale.active.value
+          ? followNativeLiveEdgeByNewBars({ bars, previousBars: autoFollow.bars, viewport: settledViewport })
+          : null;
     const moved = followed !== null && settledViewport !== null && !nativeViewportsMatch(followed, settledViewport);
     setAutoFollow({ bars, dataKey, followed: moved ? followed : null, interval: loadedBarsInterval });
     if (moved) {
@@ -801,8 +875,8 @@ export function useNativeViewportRuntime({
     // Touching the chart in the gap before bars arrive settles the question the
     // deferred restore fit was holding open.
     pendingRestorePriceFitRef.current = null;
-    // The user took the view back; a resume must not drag it to the live edge.
-    liveEdgeResumeRef.current = null;
+    // The user took the view back; a refocus must not drag it to the newest bar.
+    refocusRecentreRef.current = null;
     setViewportOwnership(beginNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
@@ -843,8 +917,35 @@ export function useNativeViewportRuntime({
   const applyNativeViewport = useCallback(
     (nextViewport?: Viewport | null, options: NativeApplyViewportOptions = {}): boolean => {
       if (!nextViewport) return false;
-      // Anything else placing the view (a layout restore) settles where it goes.
-      if (!liveEdgeFollowingRef.current) liveEdgeResumeRef.current = null;
+      // Anything placing the view (a layout restore, the recentre itself) settles
+      // where it goes.
+      refocusRecentreRef.current = null;
+      const centreNewestBar = options.centreNewestBar;
+      if (centreNewestBar) {
+        // Only the zoom survives: the data-load restore centres the newest bar (now,
+        // or when the first bars of the layout's interval land), fits the axis and
+        // leaves the view auto-owned so it follows new bars.
+        pendingRestorePriceFitRef.current = null;
+        setViewportOwnership(createNativeViewportOwnershipState());
+        resetNativeViewportGestureActiveFlags({
+          panActive,
+          pinchActive,
+          priceScaleActive,
+          timeScaleActive,
+          viewportGestureOwner,
+        });
+        setPendingDataLoadViewScale({
+          dataKey: createNativeViewportDataKey(symbol, centreNewestBar.interval),
+          liveEdge: true,
+          sourceBars: NATIVE_LAYOUT_RESTORE_SOURCE_BARS,
+          viewScale: createNativeCentredViewScale(
+            (nextViewport.endTime - nextViewport.startTime) / (intervalToMs(centreNewestBar.interval) || 1),
+          ),
+        });
+        return true;
+      }
+      // An explicit window replaces a cold-launch centring still waiting on bars.
+      setPendingDataLoadViewScale(null);
       const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
       // Decided BEFORE the fit, and from the CALLER's viewport rather than the
       // fitted one. A window that starts before the earliest loaded bar is a
@@ -939,70 +1040,57 @@ export function useNativeViewportRuntime({
       priceAutoScale,
       priceScaleActive,
       sharedViewport,
+      symbol,
       timeScaleActive,
       viewportGestureOwner,
     ],
   );
 
-  // The settled view, never the overscanned render candidate: a pan that still
-  // fits inside the candidate's window leaves the candidate a screen away from
-  // what the user sees.
   useLayoutEffect(() => {
-    liveEdgeStateRef.current = { bars: viewportBars, dataKey, viewport: hasDataViewport ? viewport : null };
-  }, [dataKey, hasDataViewport, viewport, viewportBars]);
+    dataKeyRef.current = dataKey;
+  }, [dataKey]);
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (next) => {
       if (next === 'background') {
-        const { bars: heldBars, dataKey: heldKey, viewport: heldViewport } = liveEdgeStateRef.current;
-        const last = heldBars[heldBars.length - 1];
-        liveEdgeBackgroundRef.current =
-          last && isNativeViewportAtLiveEdge(heldViewport, heldBars)
-            ? { dataKey: heldKey, pinnedLastBarTime: last.time }
-            : null;
+        backgroundedRef.current = true;
         return;
       }
-      if (next !== 'active') return;
-      const pinned = liveEdgeBackgroundRef.current;
-      liveEdgeBackgroundRef.current = null;
-      if (!pinned) return;
-      liveEdgeResumeRef.current = { ...pinned, until: Date.now() + NATIVE_LIVE_EDGE_RESUME_WINDOW_MS };
-      setLiveEdgeResumeEpoch((epoch) => epoch + 1);
+      if (next !== 'active' || !backgroundedRef.current) return;
+      backgroundedRef.current = false;
+      refocusRecentreRef.current = {
+        dataKey: dataKeyRef.current,
+        until: Date.now() + NATIVE_REFOCUS_RECENTRE_WINDOW_MS,
+      };
+      setRefocusEpoch((epoch) => epoch + 1);
     });
     return () => subscription.remove();
   }, []);
 
+  // Judged on the settled view, never the overscanned render candidate: a pan that
+  // still fits inside the candidate's window leaves it a screen away from what the
+  // user sees. Checked on every bars change in the window, because the newest bar
+  // usually arrives (live tick, AGT-88 backfill) after the return itself.
   useLayoutEffect(() => {
-    const resume = liveEdgeResumeRef.current;
-    if (!resume) return;
-    if (resume.dataKey !== dataKey || Date.now() > resume.until) {
-      liveEdgeResumeRef.current = null;
+    const refocus = refocusRecentreRef.current;
+    if (!refocus) return;
+    if (refocus.dataKey !== dataKey || Date.now() > refocus.until) {
+      refocusRecentreRef.current = null;
       return;
     }
-    // An auto-owned view already keeps its offset from the newest bar; only a
-    // hand-placed one is left behind. Never fight a gesture in progress.
-    const ownership = viewportOwnershipRef.current;
-    if (!ownership.hasManualViewport || ownership.nativeViewportOwned || !barsMatchRequestedData || isLoading) return;
-    const followed = resolveNativeLiveEdgeResumeViewport({
-      bars: viewportBars,
-      intervalMs: intervalToMs(loadedBarsInterval),
-      pinnedLastBarTime: resume.pinnedLastBarTime,
-      viewport,
-    });
-    if (!followed) return;
-    resume.pinnedLastBarTime = viewportBars[viewportBars.length - 1]!.time;
-    liveEdgeFollowingRef.current = true;
-    try {
-      applyNativeViewport(followed, { fitPriceToBars: true, neverDeferPriceFit: true });
-    } finally {
-      liveEdgeFollowingRef.current = false;
-    }
+    // Never fight a gesture in progress or a data-load restore about to land.
+    if (viewportOwnershipRef.current.nativeViewportOwned || pendingDataLoadViewport) return;
+    if (!barsMatchRequestedData || isLoading || !hasDataViewport) return;
+    if (isNativeViewportAtLiveEdge(viewport, viewportBars)) return;
+    const centred = centreNativeViewportOnNewestBar(viewport, viewportBars);
+    if (centred) applyNativeViewport(centred, { fitPriceToBars: true, neverDeferPriceFit: true });
   }, [
     applyNativeViewport,
     barsMatchRequestedData,
     dataKey,
+    hasDataViewport,
     isLoading,
-    liveEdgeResumeEpoch,
-    loadedBarsInterval,
+    pendingDataLoadViewport,
+    refocusEpoch,
     viewport,
     viewportBars,
   ]);

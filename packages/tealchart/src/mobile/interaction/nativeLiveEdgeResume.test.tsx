@@ -6,9 +6,9 @@ import { AppState } from 'react-native';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  centreNativeViewportOnNewestBar,
   isNativeViewportAtLiveEdge,
-  NATIVE_LIVE_EDGE_RESUME_WINDOW_MS,
-  resolveNativeLiveEdgeResumeViewport,
+  NATIVE_REFOCUS_RECENTRE_WINDOW_MS,
 } from './nativeLiveEdgeResume';
 import { useNativeViewportRuntime } from './useNativeViewportRuntime';
 
@@ -36,12 +36,12 @@ function shared<T>(value: T) {
 
 const appState = AppState as unknown as { emit(next: string): void };
 
-function renderRuntime(bars: Bar[]) {
+function renderRuntime(bars: Bar[], autoScaleEnabled = true) {
   const sharedViewport = { startTime: shared(0), endTime: shared(1), priceMin: shared(0), priceMax: shared(1) };
   return renderHook(
     (props: { bars: Bar[] }) =>
       useNativeViewportRuntime({
-        autoScaleEnabled: true,
+        autoScaleEnabled,
         bars: props.bars,
         barsMatchRequestedData: props.bars.length > 0,
         frame: null,
@@ -59,7 +59,7 @@ function renderRuntime(bars: Bar[]) {
         },
         panStartViewport: { startTime: shared(0), endTime: shared(1), priceMin: shared(0), priceMax: shared(1) },
         pinchActive: shared(false),
-        priceAutoScale: { active: shared(true), bars: shared([]) },
+        priceAutoScale: { active: shared(autoScaleEnabled), bars: shared([]) },
         priceScaleActive: shared(false),
         sharedViewport,
         symbol: 'BTCUSDT',
@@ -72,7 +72,7 @@ function renderRuntime(bars: Bar[]) {
 
 function placeView(result: ReturnType<typeof renderRuntime>['result'], viewport: Viewport) {
   act(() => {
-    result.current.applyNativeViewport(viewport, { autoScaleEnabled: true });
+    result.current.applyNativeViewport(viewport);
     result.current.cancelNativeViewportInteraction();
   });
 }
@@ -81,7 +81,14 @@ afterEach(() => {
   act(() => appState.emit('active'));
 });
 
-describe('native live-edge resume (AGT-104)', () => {
+const span = (view: Viewport) => view.endTime - view.startTime;
+const centre = (view: Viewport) => (view.startTime + view.endTime) / 2;
+
+// AGT-104, Sam's revised spec (2026-11-22): on refocus, if the newest candle is OFF
+// screen, bring it back centred at the same zoom; if it is on screen, do not move.
+// This replaced "follow for 150 s only if the newest bar was in view when the app
+// went to the background", which left a view scrolled into history stranded.
+describe('native refocus recentre (AGT-104)', () => {
   it('detects whether the newest bar is in view', () => {
     const bars = makeBars(10);
     const view = { startTime: 5 * INTERVAL_MS, endTime: 11 * INTERVAL_MS, priceMin: 0, priceMax: 1 };
@@ -89,101 +96,77 @@ describe('native live-edge resume (AGT-104)', () => {
     expect(isNativeViewportAtLiveEdge({ ...view, endTime: 9 * INTERVAL_MS }, bars)).toBe(false);
   });
 
-  it('shifts by the bars printed since, keeping the width', () => {
+  it('centres the newest bar keeping the width', () => {
     const view = { startTime: 5 * INTERVAL_MS, endTime: 11 * INTERVAL_MS, priceMin: 0, priceMax: 1 };
-    const followed = resolveNativeLiveEdgeResumeViewport({
-      bars: makeBars(14),
-      intervalMs: INTERVAL_MS,
-      pinnedLastBarTime: 10 * INTERVAL_MS,
-      viewport: view,
+    expect(centreNativeViewportOnNewestBar(view, makeBars(20))).toEqual({
+      ...view,
+      startTime: 17 * INTERVAL_MS,
+      endTime: 23 * INTERVAL_MS,
     });
-    expect(followed).toEqual({ ...view, startTime: 9 * INTERVAL_MS, endTime: 15 * INTERVAL_MS });
-    // Nothing printed past the right edge: no move.
-    expect(
-      resolveNativeLiveEdgeResumeViewport({
-        bars: makeBars(10),
-        intervalMs: INTERVAL_MS,
-        pinnedLastBarTime: 10 * INTERVAL_MS,
-        viewport: view,
-      }),
-    ).toBeNull();
+    expect(centreNativeViewportOnNewestBar(view, [])).toBeNull();
   });
 
-  it('scrolls a view that was at the live edge to the bars printed while backgrounded', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
-    const pinned = { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
-    placeView(result, pinned);
-
-    act(() => appState.emit('background'));
-    act(() => appState.emit('active'));
-    // The first tick and the backfill land after the return.
-    rerender({ bars: makeBars(52) });
-
-    const view = result.current.viewport;
-    expect(view.endTime - view.startTime).toBe(pinned.endTime - pinned.startTime);
-    expect(view.endTime).toBe(53 * INTERVAL_MS);
-    expect(view.startTime).toBe(42 * INTERVAL_MS);
-  });
-
-  it('leaves a view scrolled back into history alone', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
+  it('recentres a view scrolled into history, at the same zoom', () => {
+    const { result } = renderRuntime(makeBars(40));
     const history = { startTime: 10 * INTERVAL_MS, endTime: 21 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
     placeView(result, history);
 
     act(() => appState.emit('background'));
     act(() => appState.emit('active'));
+
+    expect(span(result.current.viewport)).toBe(span(history));
+    expect(centre(result.current.viewport)).toBe(40 * INTERVAL_MS);
+  });
+
+  it('recentres when the bars printed while away land off screen', () => {
+    // Auto-scale off, so nothing follows the live edge on its own.
+    const { result, rerender } = renderRuntime(makeBars(40), false);
+    const pinned = { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
+    placeView(result, pinned);
+
+    act(() => appState.emit('background'));
+    act(() => appState.emit('active'));
+    // The newest bar is still on screen until the first tick and the backfill land.
+    expect(result.current.viewport.endTime).toBe(pinned.endTime);
     rerender({ bars: makeBars(52) });
+
+    expect(span(result.current.viewport)).toBe(span(pinned));
+    expect(centre(result.current.viewport)).toBe(52 * INTERVAL_MS);
+  });
+
+  it('does not move a view whose newest bar is on screen', () => {
+    const { result, rerender } = renderRuntime(makeBars(40), false);
+    const pinned = { startTime: 30 * INTERVAL_MS, endTime: 45 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
+    placeView(result, pinned);
+
+    act(() => appState.emit('background'));
+    act(() => appState.emit('active'));
+    rerender({ bars: makeBars(43) });
+
+    expect(result.current.viewport.startTime).toBe(pinned.startTime);
+    expect(result.current.viewport.endTime).toBe(pinned.endTime);
+  });
+
+  it('does not recentre without a trip to the background', () => {
+    const { result } = renderRuntime(makeBars(40));
+    const history = { startTime: 10 * INTERVAL_MS, endTime: 21 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
+    placeView(result, history);
+
+    act(() => appState.emit('active'));
 
     expect(result.current.viewport.startTime).toBe(history.startTime);
-    expect(result.current.viewport.endTime).toBe(history.endTime);
   });
 
-  it('leaves a view the user panned back by a little alone (settled view, not the render candidate)', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
-    placeView(result, { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 });
-    const panned = { startTime: 27 * INTERVAL_MS, endTime: 38 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
-    act(() => {
-      result.current.beginNativeViewportInteraction();
-      result.current.commitPanViewport(panned);
-      result.current.cancelNativeViewportInteraction();
-    });
-
-    act(() => appState.emit('background'));
-    act(() => appState.emit('active'));
-    rerender({ bars: makeBars(52) });
-
-    expect(result.current.viewport.startTime).toBe(panned.startTime);
-    expect(result.current.viewport.endTime).toBe(panned.endTime);
-  });
-
-  it('follows from where a small pan left a view that still shows the newest bar', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
-    placeView(result, { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 });
-    const panned = { startTime: 29 * INTERVAL_MS, endTime: 40 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
-    act(() => {
-      result.current.beginNativeViewportInteraction();
-      result.current.commitPanViewport(panned);
-      result.current.cancelNativeViewportInteraction();
-    });
-
-    act(() => appState.emit('background'));
-    act(() => appState.emit('active'));
-    rerender({ bars: makeBars(52) });
-
-    expect(result.current.viewport.startTime).toBe(41 * INTERVAL_MS);
-    expect(result.current.viewport.endTime).toBe(52 * INTERVAL_MS);
-  });
-
-  it('stops following once the resume window has passed', () => {
+  it('stops checking once the refocus window has passed', () => {
     const now = vi.spyOn(Date, 'now');
     try {
       now.mockReturnValue(1_000_000);
-      const { result, rerender } = renderRuntime(makeBars(40));
+      const { result, rerender } = renderRuntime(makeBars(40), false);
       const pinned = { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
       placeView(result, pinned);
       act(() => appState.emit('background'));
       act(() => appState.emit('active'));
-      now.mockReturnValue(1_000_000 + NATIVE_LIVE_EDGE_RESUME_WINDOW_MS + 1);
+      now.mockReturnValue(1_000_000 + NATIVE_REFOCUS_RECENTRE_WINDOW_MS + 1);
       rerender({ bars: makeBars(52) });
 
       expect(result.current.viewport.endTime).toBe(pinned.endTime);
@@ -193,7 +176,7 @@ describe('native live-edge resume (AGT-104)', () => {
   });
 
   it('lets a layout restore after the return settle where it put the view', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
+    const { result, rerender } = renderRuntime(makeBars(40), false);
     placeView(result, { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 });
     act(() => appState.emit('background'));
     act(() => appState.emit('active'));
@@ -206,7 +189,7 @@ describe('native live-edge resume (AGT-104)', () => {
   });
 
   it('does not move the view once the user touches it after the return', () => {
-    const { result, rerender } = renderRuntime(makeBars(40));
+    const { result, rerender } = renderRuntime(makeBars(40), false);
     const pinned = { startTime: 30 * INTERVAL_MS, endTime: 41 * INTERVAL_MS, priceMin: 100, priceMax: 150 };
     placeView(result, pinned);
 

@@ -1071,6 +1071,16 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _handleNewBar(bar: Bar): void {
     const gapEvent = this._bars.length > 0 ? this._gapDetectionManager?.checkBarGap(bar.time) : null;
     const previousBarTime = this._bars.at(-1)?.time ?? 0;
+    // AGT-156: in auto scale mode a view showing the newest candle moves with each
+    // new bar by exactly its advance, so every candle shifts left one bar width and
+    // the newest keeps its x. A view scrolled into history stays put.
+    const followLiveEdge =
+      this._bars.length > 0 &&
+      bar.time > previousBarTime &&
+      this._viewport !== null &&
+      previousBarTime >= this._viewport.startTime &&
+      previousBarTime <= this._viewport.endTime &&
+      this._viewportController.isAutoScale('main');
 
     if (this._bars.length === 0) {
       this._bars.push(bar);
@@ -1112,6 +1122,16 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Lightweight real-time update — mutates ChartCore's bar array in place.
     // The DIRTY.BARS mark below drives the single render for this tick.
     this._ui?.updateBar(bar, this._bars);
+
+    if (followLiveEdge && this._viewport) {
+      const shift = bar.time - previousBarTime;
+      this._viewport = {
+        ...this._viewport,
+        startTime: this._viewport.startTime + shift,
+        endTime: this._viewport.endTime + shift,
+      };
+      this._ui?.setViewport(this._viewport);
+    }
 
     // Auto-scale: refit price axis if a new tick extends beyond visible range
     if (this._viewportController.isAutoScale('main') && this._viewport) {
