@@ -73,6 +73,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
+import { countdownTargetMs } from './utils/countdownTarget';
 import { resolveLabelCollisionsWithinBounds } from './utils/labelCollision';
 import {
   PriceAxisTagDomain,
@@ -282,7 +283,8 @@ function formatCountdown(targetTimeMs: number): string {
 }
 
 function getPriceLineSecondaryLabelText(line: PriceLine): string {
-  if (line.countdownToTime !== undefined) return formatCountdown(line.countdownToTime);
+  if (line.countdownToTime !== undefined)
+    return formatCountdown(countdownTargetMs(line.countdownToTime, line.countdownThenTime, Date.now()));
   return line.label.secondaryText ?? '';
 }
 
@@ -959,6 +961,7 @@ export class TealchartRenderer {
         fixed: line.id === 'last-trade',
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
+        countdownThenTime: line.countdownThenTime,
         draggable: line.draggable,
         actionState: line.actionState,
         targetPaneId: line.targetPaneId,
@@ -1102,7 +1105,9 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const secondaryText = bound.countdownToTime
+      ? formatCountdown(countdownTargetMs(bound.countdownToTime, bound.countdownThenTime, Date.now()))
+      : bound.label.secondaryText;
     const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {
@@ -5486,6 +5491,7 @@ export class TealchartRenderer {
         fixed: line.id === 'last-trade',
         renderLineOnCanvas: line.renderLineOnCanvas,
         countdownToTime: line.countdownToTime,
+        countdownThenTime: line.countdownThenTime,
         draggable: line.draggable,
         actionState: line.actionState,
         // Trading object identity for OEMS callbacks
@@ -5615,7 +5621,9 @@ export class TealchartRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const secondaryText = bound.countdownToTime
+      ? formatCountdown(countdownTargetMs(bound.countdownToTime, bound.countdownThenTime, Date.now()))
+      : bound.label.secondaryText;
     const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {

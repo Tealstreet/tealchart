@@ -11,6 +11,7 @@ import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { countdownTargetMs } from '../../utils/countdownTarget';
 import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
@@ -89,6 +90,7 @@ export function AnimatedPriceLine({
   const label = line.label.primaryText || formatNativeTradeLinePrice(line.price, pricePrecision);
   const hasCountdown = line.countdownToTime !== undefined;
   const countdownTargetTimeMs = line.countdownToTime ?? 0;
+  const countdownThenTimeMs = line.countdownThenTime;
   const staticSecondaryLabel = hasCountdown ? undefined : line.label.secondaryText;
   const secondaryLayoutLabel = hasCountdown
     ? getNativeCountdownLayoutText(formatNativeCountdown(countdownTargetTimeMs))
@@ -108,7 +110,12 @@ export function AnimatedPriceLine({
     : null;
   const countdownCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
   const countdownText = useDerivedValue(() =>
-    hasCountdown ? formatNativeCountdownWorklet(countdownTargetTimeMs, nowMs.value) : '',
+    hasCountdown
+      ? formatNativeCountdownWorklet(
+          countdownTargetMs(countdownTargetTimeMs, countdownThenTimeMs, nowMs.value),
+          nowMs.value,
+        )
+      : '',
   );
   const countdownTextX = useDerivedValue(() => {
     return axisTag.x + Math.max(0, (axisTag.width - countdownText.value.length * countdownCharacterWidth) / 2);

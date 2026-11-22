@@ -37,6 +37,8 @@ describe('buildLastTradePriceLine', () => {
       },
     });
     expect(line?.countdownToTime).toBe(1710000060000);
+    // The following close, so the tag never sits at 00:00 waiting for the next bar (AGT-90).
+    expect(line?.countdownThenTime).toBe(1710000120000);
   });
 
   it('formats the last-trade label by magnitude when market precision is absent', () => {
@@ -53,6 +55,7 @@ describe('buildLastTradePriceLine', () => {
     const line = buildLastTradePriceLine({ latestBar: { ...latestBar, time: october }, interval: '1M' });
 
     expect(line?.countdownToTime).toBe(Date.UTC(2026, 10, 1));
+    expect(line?.countdownThenTime).toBe(Date.UTC(2026, 11, 1));
   });
 
   it('returns null when there is no bar data', () => {
