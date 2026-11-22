@@ -993,6 +993,17 @@ export interface IDatafeedChartApi {
    * Additive: this is not part of the TradingView datafeed interface.
    */
   getCachedBars?(symbol: string, resolution: ResolutionString, periodParams: PeriodParams): DatafeedBar[];
+  /**
+   * Which data source (venue) the feed currently serves. A feed re-pointed at
+   * another venue under the same symbol reports it only through
+   * `onResetCacheNeededCallback`, exactly like a reconnect; a changed identity
+   * at that reset is what tells the core to treat it as a market switch
+   * (AGT-136). It must stay the same across a reconnect to the same venue.
+   *
+   * Additive: this is not part of the TradingView datafeed interface. Without
+   * it, every reset is read as a reconnect.
+   */
+  getSourceIdentity?(): string;
   subscribeBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,

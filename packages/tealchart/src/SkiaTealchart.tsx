@@ -114,7 +114,7 @@ import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeS
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
 import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
 import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserDrawingRuntime';
-import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
+import { nativeViewportMarket, useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
 import { NativeAnalysisSelectorOverlay } from './mobile/render/NativeAnalysisSelectorOverlay';
@@ -507,6 +507,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     loadFailed,
     requestMoreBars,
     setImperativeTheme,
+    sourceIdentity,
     symbol,
   } = useNativeTealchartCoreRuntime({
     datafeed,
@@ -1251,7 +1252,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceAutoScale,
     priceScaleActive,
     sharedViewport,
-    symbol,
+    symbol: nativeViewportMarket(symbol, sourceIdentity),
     timeScaleActive,
     viewportGestureOwner,
     viewportSyncEpoch,

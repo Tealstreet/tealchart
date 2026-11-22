@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   captureNativeDataLoadViewScale,
   createNativeViewportDataKey,
+  nativeViewportMarket,
   NATIVE_EMPTY_RENDER_VIEWPORT,
   resolveNativeHistoryBackfillHint,
   resolveNativeRenderViewport,
@@ -417,5 +418,21 @@ describe('useNativeViewportRuntime helpers', () => {
 
     // Same zoom either way - only the price fit differs.
     expect(refit!.endTime - refit!.startTime).toBe(carried!.endTime - carried!.startTime);
+  });
+});
+
+describe('nativeViewportMarket (AGT-136)', () => {
+  it('is a different market to the viewport after a same-symbol venue switch', () => {
+    expect(nativeViewportMarket('BTCUSDT', 'woo:live')).not.toBe(nativeViewportMarket('BTCUSDT', 'okx:live'));
+    expect(
+      shouldResetNativeViewScalePricePadding({
+        previousSymbol: nativeViewportMarket('BTCUSDT', undefined),
+        nextSymbol: nativeViewportMarket('BTCUSDT', 'woo:live'),
+      }),
+    ).toBe(true);
+  });
+
+  it('is the bare symbol for a datafeed that reports no source', () => {
+    expect(nativeViewportMarket('BTCUSDT', undefined)).toBe('BTCUSDT');
   });
 });

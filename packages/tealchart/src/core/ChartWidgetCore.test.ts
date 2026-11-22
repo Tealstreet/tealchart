@@ -206,6 +206,93 @@ describe('ChartWidgetCore bar subscription after a failed reset reload', () => {
   });
 });
 
+describe('ChartWidgetCore datafeed source identity (AGT-136)', () => {
+  // A same-symbol account switch across venues (okx-t BTCUSDT -> woo-t BTCUSDT)
+  // reaches the core only as the datafeed's reset, exactly like a reconnect.
+  // The datafeed's source identity is what tells the two apart.
+  const setup = (identity: { current: string } | null) => {
+    const controlled = createControlledDatafeed();
+    if (identity) controlled.datafeed.getSourceIdentity = () => identity.current;
+    const emitted: number[] = [];
+    const failed: string[] = [];
+    const core = new ChartWidgetCore({
+      datafeed: controlled.datafeed,
+      symbol: 'BTCUSDT',
+      interval: '5',
+      onBarsChanged: (bars) => emitted.push(bars.length),
+      onLoadFailed: (context) => failed.push(context.symbol),
+    });
+    core.initialize();
+    controlled.historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    return { ...controlled, core, emitted, failed };
+  };
+
+  it("drops the previous venue's bars when a reset arrives under a new source", () => {
+    const identity = { current: 'okx:live' };
+    const { core, emitted, historyRequests, subscriptions, unsubscribedGuids } = setup(identity);
+    const oldGuid = subscriptions[0]!.guid;
+
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+
+    expect(core.getBars()).toHaveLength(0);
+    expect(emitted.at(-1)).toBe(0);
+    expect(unsubscribedGuids).toContain(oldGuid);
+    expect(historyRequests).toHaveLength(2);
+    expect(core.getAnalysisContext()).toEqual({ status: 'unavailable', reason: 'loading' });
+
+    historyRequests[1]!.onResult(makeBars(2_000_000, 5 * 60_000, 4));
+    expect(core.getBars()).toHaveLength(4);
+    expect(core.getBars()[0]!.time).toBe(2_000_000);
+    core.dispose();
+  });
+
+  it("never shows the previous venue's bars when the new venue's history fails", () => {
+    const identity = { current: 'okx:live' };
+    const { core, failed, historyRequests, subscriptions } = setup(identity);
+
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+    historyRequests[1]!.onError('[woo] GET /v1/kline failed with 403 Forbidden');
+
+    expect(core.getBars()).toHaveLength(0);
+    expect(failed).toEqual(['BTCUSDT']);
+    // The reset's one-shot callback is still re-armed for a later reconnect.
+    expect(subscriptions).toHaveLength(2);
+    core.dispose();
+  });
+
+  it('keeps the bars on a reconnect to the same source', () => {
+    const identity = { current: 'okx:live' };
+    const { core, historyRequests, subscriptions } = setup(identity);
+
+    subscriptions[0]!.onReset();
+    expect(core.getBars()).toHaveLength(10);
+    historyRequests[1]!.onError('reconnect reload failed');
+    expect(core.getBars()).toHaveLength(10);
+    core.dispose();
+  });
+
+  it('treats every reset as a reconnect for a datafeed that reports no source', () => {
+    const { core, subscriptions } = setup(null);
+    subscriptions[0]!.onReset();
+    expect(core.getBars()).toHaveLength(10);
+    core.dispose();
+  });
+
+  it('reports the source the loaded market belongs to', () => {
+    const identity = { current: 'okx:live' };
+    const { core, historyRequests, subscriptions } = setup(identity);
+    expect(core.getSourceIdentity()).toBe('okx:live');
+    identity.current = 'woo:live';
+    subscriptions[0]!.onReset();
+    expect(core.getSourceIdentity()).toBe('woo:live');
+    historyRequests[1]!.onResult(makeBars(2_000_000, 5 * 60_000, 4));
+    expect(core.getSourceIdentity()).toBe('woo:live');
+    core.dispose();
+  });
+});
+
 describe('ChartWidgetCore data identity', () => {
   it('ignores stale history results after an interval change', () => {
     const { datafeed, historyRequests } = createControlledDatafeed();

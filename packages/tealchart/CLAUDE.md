@@ -893,10 +893,17 @@ read for the request's own market; `loadFailed` then clears the previous
 interval too and shows "Chart data unavailable" whenever nothing is drawn. A
 failed reset of the same market keeps its bars, as the section above requires.
 
-The core still cannot see a venue change under an UNCHANGED symbol string
-(okx-t BTCUSDT -> woo-t BTCUSDT): it arrives only as the datafeed's reset, which
-looks exactly like a reconnect. Covering it needs a datafeed-supplied source
-identity, not another heuristic here.
+A venue change under an UNCHANGED symbol string (okx-t BTCUSDT -> woo-t
+BTCUSDT) arrives only as the datafeed's reset, which looks exactly like a
+reconnect. The datafeed's optional `getSourceIdentity()` tells them apart
+(AGT-136): `ChartWidgetCore` records the source each market was resolved under,
+and a reset under a DIFFERENT source runs `_switchSource` — bars and plots are
+dropped (not faded), the symbol is re-resolved for the new venue and reloaded,
+and the reset is re-armed even if that load fails. `onSourceChange` reaches the
+native viewport through `nativeViewportMarket`, so the view resets as on a
+symbol switch. A reset under the same source, or from a feed that reports none,
+is still a reconnect and keeps its bars. NX's `DefaultDatafeed` reports
+`<venue>:<live|testnet>`; it must stay stable across a reconnect.
 
 ## Native live-gap backfill (`ChartWidgetCore`)
 
