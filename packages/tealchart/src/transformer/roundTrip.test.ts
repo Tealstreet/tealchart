@@ -120,27 +120,6 @@ describe('Transformer round-trip (toTvFormat → fromTvFormat)', () => {
     expect(result.data.autoScale).toBe(false);
   });
 
-  // AGT-148: a native layout records whether its window was following the market,
-  // so a later launch can reopen it at the newest bar rather than its stale times.
-  it('preserves whether the saved viewport was at the live edge', () => {
-    const viewport = { startTime: 1_000, endTime: 2_000, priceMin: 10, priceMax: 20 };
-    for (const viewportAtLiveEdge of [true, false]) {
-      const result = fromTvFormat(toTvFormat(createSettings({ viewport, viewportAtLiveEdge }), 'Test'));
-      expect(result.data.viewport).toEqual(viewport);
-      expect(result.data.viewportAtLiveEdge).toBe(viewportAtLiveEdge);
-    }
-  });
-
-  it('leaves the live-edge flag unset for a layout saved before it existed, or holding a non-boolean', () => {
-    const viewport = { startTime: 1_000, endTime: 2_000, priceMin: 10, priceMax: 20 };
-    const tv = toTvFormat(createSettings({ viewport }), 'Test');
-    expect(fromTvFormat(tv).data.viewportAtLiveEdge).toBeUndefined();
-
-    const content = JSON.parse(tv.content);
-    content._tealstreetOriginalSettings.viewportAtLiveEdge = 'yes';
-    expect(fromTvFormat({ ...tv, content: JSON.stringify(content) }).data.viewportAtLiveEdge).toBeUndefined();
-  });
-
   it('preserves mapped indicators with inputs', () => {
     const sma: IndicatorInstance = {
       id: 'sma_123',

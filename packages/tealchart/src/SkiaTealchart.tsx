@@ -44,6 +44,7 @@ import type { NativeLiveTailCommit } from './mobile/render/nativeLiveTail';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
+import type { NativeLayoutApplyContext } from './mobile/useNativeLayoutPersistence';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, CurrentLayoutState, PlotStyleOverride, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
@@ -88,7 +89,6 @@ import {
 import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
-import { isNativeViewportAtLiveEdge } from './mobile/interaction/nativeLiveEdgeResume';
 import {
   createNativePaneGeometrySignature,
   createNativeReleaseHold,
@@ -1500,7 +1500,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
   const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const applyNativeLayoutSettings = useCallback(
-    async (settings: ChartSettings) => {
+    async (settings: ChartSettings, { coldLaunch = false }: NativeLayoutApplyContext = {}) => {
       // The native chart is a controlled component: `symbol` is owned by the
       // host, so a layout restores everything except which market to show.
       // Honouring the saved symbol would push a market from whenever the layout
@@ -1550,16 +1550,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         symbol: nextSymbol,
         userDrawingState: settings.userDrawingState,
         viewport: settings.viewport,
-        viewportAtLiveEdge: settings.viewportAtLiveEdge,
         volumeHeight: settings.volumeHeight,
       });
       const restoreViewport =
         settings.viewport && shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
       if (restoreViewport) {
         applyNativeViewport(settings.viewport, {
-          // Saved while following the market: reopen at the newest bar with the
-          // saved zoom, not on the window it had hours ago (AGT-148).
-          atLiveEdge: settings.viewportAtLiveEdge === true,
+          // A cold launch opens on the newest candle at the saved zoom; the saved
+          // window is hours stale by then (AGT-104, AGT-148). A layout picked later
+          // restores where it was left.
+          centreNewestBar: coldLaunch ? { interval: settings.interval || interval } : undefined,
           // The store has not applied the layout's own auto-scale yet, so the
           // restore has to carry it rather than read the previous chart's.
           autoScaleEnabled: settings.autoScale !== false,
@@ -1581,9 +1581,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartStore, markNativeLayoutDirtyIfReady],
   );
 
-  // A primitive, so a tick that leaves the answer unchanged does not rebuild the settings.
-  const nativeViewportAtLiveEdge =
-    hasDataViewport && nativeBarsReadyForRequestedData && isNativeViewportAtLiveEdge(viewport, bars);
   const nativeLayoutSettings = useMemo(
     () =>
       createNativeChartLayoutSettings({
@@ -1598,7 +1595,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         symbol,
         userDrawingState: nativeUserDrawingState,
         viewport: hasDataViewport ? viewport : undefined,
-        viewportAtLiveEdge: hasDataViewport ? nativeViewportAtLiveEdge : undefined,
         // The native renderer sizes the volume pane from VOLUME_HEIGHT_RATIO, so
         // persisting anything else would save a height that is never drawn.
         volumeHeight: VOLUME_HEIGHT_RATIO,
@@ -1615,7 +1611,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       nativeShowIndicatorOutputAxisLabels,
       nativeShowVolume,
       nativeUserDrawingState,
-      nativeViewportAtLiveEdge,
       symbol,
       viewport,
     ],

@@ -152,8 +152,6 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
     chartType: originalSettings?.chartType ?? chartType,
     autoScale: originalSettings?.autoScale ?? true,
     viewport: originalSettings?.viewport,
-    viewportAtLiveEdge:
-      typeof originalSettings?.viewportAtLiveEdge === 'boolean' ? originalSettings.viewportAtLiveEdge : undefined,
     indicators,
     userDrawingState: deserializeUserDrawingStateFromLayout(originalSettings?.userDrawingState),
     // Merged per key rather than whole-blob: a real TradingView layout always

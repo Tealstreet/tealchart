@@ -913,24 +913,26 @@ after a resume the account route can refuse until its socket and auth recover;
 a second gap while one is in flight widens the next request instead of racing
 it, and `_loadBars` / dispose cancel all of it (AGT-88).
 
-## Native live-edge resume (`nativeLiveEdgeResume.ts`)
+## Native refocus recentre (`nativeLiveEdgeResume.ts`)
 
-A hand-placed native view (`hasManualViewport`) never follows new bars: only
-the auto-owned path re-anchors on the newest bar. So a user who zoomed at the
-live edge, backgrounded the app and came back found the bars printed meanwhile,
-and the ones the live-gap backfill above filled in, just off the right edge.
-`useNativeViewportRuntime` records at the AppState `background` edge whether
-the newest bar was in view. On the next `active` it follows the newest bar for
-`NATIVE_LIVE_EDGE_RESUME_WINDOW_MS`, which covers the backfill's retries, by
-shifting the window by the bars added and keeping its width. A view scrolled
-into history is left alone, and any gesture after the return cancels the
-follow. Do not make this follow during ordinary foreground printing: Sam asked
-for the reset on refocus only (AGT-104).
+Sam's rule (AGT-104, revised 2026-11-22): after a return from the background,
+if the newest candle is OFF screen, bring it back centred at the same zoom; if
+it is on screen, do not move. `useNativeViewportRuntime` arms a check on the
+`background` -> `active` transition and runs it on every bars change for
+`NATIVE_REFOCUS_RECENTRE_WINDOW_MS`, because the newest bar usually arrives
+after the return (live tick, AGT-88 backfill). The first recentre, a gesture,
+or any other placement (a layout restore) ends it. A view scrolled into history
+IS recentred: the earlier rule (follow for 150 s only if the newest bar was in
+view at the background edge, #1552) left those stranded and was replaced.
 
 ## Native rollover follow (`useNativeViewportRuntime`)
 
 An auto-owned native view (no manual viewport, no gesture) keeps its offset from
-the newest bar. It must follow in the SAME render that brings the new bars:
+the newest bar. So does a hand-placed one in auto scale mode while the newest
+candle is in view (AGT-156): `followNativeLiveEdgeByNewBars` shifts it by exactly
+the time the newest bar advanced, so the newest candle keeps its x, and refits
+the axis. Auto scale off, or newest candle out of view (scrolled into history),
+and the view stays put. Web does the same in `TealchartWidget._handleNewBar`. It must follow in the SAME render that brings the new bars:
 the bars the settled window belongs to are state (`autoFollow`), and a changed
 `bars` updates the window during render, so React re-runs the render before
 committing and no commit pairs the new bars with the old window. It used to
@@ -952,20 +954,23 @@ the carried price padding to the whole history, a negative axis on Hyperliquid
 ownership across intervals. A symbol switch at the same interval still carries the
 scroll position. `nativeIntervalSwitchViewport.test.tsx` is the regression test.
 
-## Native layout restore at the live edge (`viewportAtLiveEdge`)
+## Native first load centres the newest candle (AGT-104, AGT-148)
 
-A layout stores its viewport as absolute times, so one saved while following the
-market reopened hours later on the window it had then, as a manual view that
-never followed new bars (AGT-148). The save now records
-`ChartSettings.viewportAtLiveEdge` (`isNativeViewportAtLiveEdge` at save time),
-and `applyNativeViewport(..., { atLiveEdge: true })` keeps only the saved zoom:
-it queues a live-edge data-load restore, the same path an interval switch takes,
-which lands at the newest bar (now, or when the first bars arrive), fits the
-axis and stays auto-owned. A layout saved scrolled into history, or saved before
-the field existed, restores its absolute window exactly as before. The auto
+A first load opens with the newest candle centred (`firstLoadViewport`: the
+default zoom via `createNativeCentredViewScale`); `autoViewport` stays the
+double-tap reset target. A layout stores its viewport as absolute times, so a
+cold launch used to reopen hours later on the window it had then, as a manual
+view that never followed new bars. The mount restore now passes
+`{ coldLaunch: true }` to `onApplyLayout`, and `applyNativeViewport(...,
+{ centreNewestBar: { interval } })` keeps only the saved zoom, measured in bars
+at the LAYOUT's interval, and queues a data-load restore keyed to that interval
+so the interval switch the layout triggers does not replace it. It lands centred
+on the newest bar, axis fitted, auto-owned. A stale saved window never wins on a
+cold launch; a layout the user picks later still restores its absolute window,
+and any explicit window retires a centring still waiting on bars. The auto
 viewport effect stands down while a data-load restore is pending, or a first
 load would overwrite the restore in the same commit.
-`nativeLayoutLiveEdgeRestore.test.tsx` is the regression test.
+`nativeFirstLoadViewport.test.tsx` is the regression test.
 
 ## TradingView Compatibility
 

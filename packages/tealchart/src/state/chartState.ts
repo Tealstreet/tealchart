@@ -120,11 +120,6 @@ export interface ChartSettings {
     priceMin: number;
     priceMax: number;
   };
-  /**
-   * Whether `viewport` held the newest bar when saved. Absent on layouts saved
-   * before it existed, which restore their absolute window as before (AGT-148).
-   */
-  viewportAtLiveEdge?: boolean;
   /** Persisted indicators */
   indicators: IndicatorInstance[];
   /** Persisted user drawing markup */
