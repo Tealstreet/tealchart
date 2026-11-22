@@ -145,11 +145,15 @@ const styles = {
 
   symbolInfo: {
     display: 'flex',
+    flexWrap: 'wrap',
+    minWidth: '0',
+    maxWidth: '100%',
     alignItems: 'center',
     gap: '4px',
     color: 'var(--tc-text, #d1d4dc)',
     fontWeight: '500',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'normal',
+    overflowWrap: 'anywhere',
   } as Partial<CSSStyleDeclaration>,
 
   dot: {

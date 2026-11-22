@@ -553,6 +553,7 @@ function NativeChartLegendOverlayView({
             <Text
               maxFontSizeMultiplier={NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER}
               numberOfLines={1}
+              ellipsizeMode="tail"
               style={[styles.symbol, { color: textColor }]}
             >
               {symbol}
@@ -989,6 +990,7 @@ const styles = StyleSheet.create({
     width: 22,
   },
   symbol: {
+    flexShrink: 1,
     fontSize: 11,
     fontWeight: '600',
     marginRight: 6,

@@ -13,6 +13,48 @@ describe('ChartLegend layout', () => {
     clearChartStoreCache();
   });
 
+  it.each([320, 375])('wraps long symbol and exchange captions inside a %ipx chart', (width) => {
+    const host = document.createElement('div');
+    host.style.position = 'relative';
+    host.style.width = `${width}px`;
+    document.body.appendChild(host);
+    const symbol = 'LONG-SYMBOL-'.repeat(12);
+    const exchangeName = 'Long exchange display name '.repeat(8);
+    const legend = new ChartLegend({ symbol, exchangeName, interval: '60', avoidLeftTools: true });
+    legend.mount(host);
+    legend.setBars({ time: 1, open: 12345, high: 12350, low: 12340, close: 12346, volume: 1 }, null);
+    const root = legend.getElement();
+    const main = root.firstElementChild as HTMLElement;
+    const caption = main.firstElementChild as HTMLElement;
+    // Style contracts: jsdom does not measure real browser line boxes.
+    expect(caption.style.flexWrap).toBe('wrap');
+    expect(caption.style.maxWidth).toBe('100%');
+    expect(Number.parseFloat(caption.style.minWidth)).toBe(0);
+    expect(caption.style.whiteSpace).toBe('normal');
+    expect(caption.style.overflowWrap).toBe('anywhere');
+    expect(root.style.right).toBe('12px');
+    expect(main.style.maxWidth).toBe('100%');
+    expect(main.style.flexWrap).toBe('wrap');
+    expect((main.lastElementChild as HTMLElement).style.flexWrap).toBe('wrap');
+    expect(caption.textContent).toBe(`${symbol}·1h·${exchangeName}`);
+    expect(root.style.pointerEvents).toBe('none');
+    legend.unmount();
+  });
+
+  it('keeps the ordinary wide caption content-sized and in its original order', () => {
+    const host = document.createElement('div');
+    host.style.width = '1024px';
+    document.body.appendChild(host);
+    const legend = new ChartLegend({ symbol: 'BTCUSDT', exchangeName: 'Bybit', interval: '60' });
+    legend.mount(host);
+    const main = legend.getElement().firstElementChild as HTMLElement;
+    expect(main.style.width).toBe('fit-content');
+    expect(main.style.display).toBe('flex');
+    expect(main.firstElementChild?.textContent).toBe('BTCUSDT·1h·Bybit');
+    expect(legend.getElement().style.fontSize).toBe('12px');
+    legend.unmount();
+  });
+
   it.each([320, 375, 1024])('lets OHLC pairs wrap within a %ipx chart without changing their values', (width) => {
     const host = document.createElement('div');
     host.style.position = 'relative';

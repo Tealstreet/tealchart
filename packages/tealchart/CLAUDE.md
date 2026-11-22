@@ -171,6 +171,11 @@ kept in sync, and it will drift. A native top bar built that way had to have its
 horizontal scrolling disabled to hide the drift, and nobody noticed until the
 controls past the right edge became unreachable.
 
+Long web legend symbol/exchange captions wrap, including unbroken symbol tokens,
+inside the chart width. Native symbols shrink and tail-ellipsize beside their
+interval. Preserve full source strings, ordinary wide typography and existing
+pointer/gesture ownership; this is display layout, not symbol normalization.
+
 The genuine problem is different and has a different fix. React Native touches
 and gesture-handler gestures do compete over the same area, so a React Native
 control that floats over the canvas must also report its box into
