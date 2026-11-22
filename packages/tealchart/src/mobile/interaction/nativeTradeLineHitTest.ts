@@ -217,6 +217,11 @@ export function findNativeTradeLineActionZoneIndex({
   tradeLabelHeight: number;
 }): number {
   'worklet';
+  // Lines closer than a label plus its slop share a band, so the line nearest the finger
+  // wins rather than array order: an SL's ✕ 15 pt under a limit's TP chip opened the
+  // chip's picker (AGT-162). Equal distance keeps the topmost (later) zone.
+  let best = -1;
+  let bestDistance = Infinity;
   for (let index = zones.length - 1; index >= 0; index -= 1) {
     const zone = zones[index];
     const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
@@ -228,10 +233,14 @@ export function findNativeTradeLineActionZoneIndex({
       y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
       y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
     ) {
-      return index;
+      const distance = Math.abs(y - priceY);
+      if (distance < bestDistance) {
+        best = index;
+        bestDistance = distance;
+      }
     }
   }
-  return -1;
+  return best;
 }
 
 export function findNativeTradeLineActionZone(
@@ -292,23 +301,10 @@ export function isNativeBracketActionType(
 
 export function findNativeBracketDragZoneIndex(args: Parameters<typeof findNativeTradeLineActionZoneIndex>[0]): number {
   'worklet';
-  const { zones, x, y, sharedViewport, frame, tradeLabelHeight } = args;
-  for (let index = zones.length - 1; index >= 0; index -= 1) {
-    const zone = zones[index];
-    if (!isNativeBracketActionType(zone.actionType)) continue;
-    const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
-    if (!isNativeYInMainPane(priceY, frame)) continue;
-    const zoneTop = priceY - tradeLabelHeight / 2;
-    if (
-      x >= zone.x1 &&
-      x <= zone.x2 &&
-      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
-      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
-    ) {
-      return index;
-    }
-  }
-  return -1;
+  // A bracket drag starts only from the control the tap resolver would choose, so a
+  // press aimed at a neighbouring line's ✕ can never begin a TP/SL drag (AGT-162).
+  const index = findNativeTradeLineActionZoneIndex(args);
+  return index >= 0 && isNativeBracketActionType(args.zones[index].actionType) ? index : -1;
 }
 
 export function findNativeBracketDragZone(

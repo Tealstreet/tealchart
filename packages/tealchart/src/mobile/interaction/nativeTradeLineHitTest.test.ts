@@ -90,6 +90,41 @@ function bracketDragState(objectId = '', price = 0): NativeBracketDragSharedValu
   };
 }
 
+describe('native trade-line controls on lines closer than a label (AGT-162)', () => {
+  // A resting limit at price 65 carries a TP chip; a reduce-only SL line sits 15 pt below
+  // at 50. With an 18 pt label and 8 pt slop their hit bands overlap, and the chip comes
+  // later in array order, which used to win any tap in the overlap.
+  const rows: NativeTradeLineRow[] = [
+    { objectType: 'order', objectId: 'sl', price: 50 },
+    { objectType: 'order', objectId: 'limit', price: 65 },
+  ];
+  const zones: NativeTradeLineActionZone[] = [
+    { objectType: 'order', objectId: 'sl', actionType: 'cancel', price: 50, x1: 60, x2: 80 },
+    { objectType: 'order', objectId: 'limit', actionType: 'tp', price: 65, x1: 55, x2: 75 },
+  ];
+  const at = (y: number) => ({ zones, rows, x: 70, y, sharedViewport, frame, tradeLabelHeight: 18 });
+
+  it('gives a tap the control on the nearest line, not the later one in array order', () => {
+    // y=46 is 4 pt from the SL line and 11 pt from the limit's: the ✕ wins.
+    expect(findNativeTradeLineActionZone(at(46))).toMatchObject({ objectId: 'sl', actionType: 'cancel' });
+    // y=39 is 4 pt from the limit's line: its TP chip wins.
+    expect(findNativeTradeLineActionZone(at(39))).toMatchObject({ objectId: 'limit', actionType: 'tp' });
+  });
+
+  it('never starts a bracket drag from a press nearest another line\'s ✕', () => {
+    expect(findNativeBracketDragZoneIndex(at(46))).toBe(-1);
+    expect(findNativeBracketDragZone(at(39))).toMatchObject({ objectId: 'limit', actionType: 'tp' });
+  });
+
+  it('keeps the topmost zone when two lines are equally near', () => {
+    const tied: NativeTradeLineActionZone[] = [
+      { objectType: 'order', objectId: 'older', actionType: 'cancel', price: 50, x1: 60, x2: 80 },
+      { objectType: 'order', objectId: 'newer', actionType: 'cancel', price: 50, x1: 60, x2: 80 },
+    ];
+    expect(findNativeTradeLineActionZoneIndex({ ...at(50), zones: tied })).toBe(1);
+  });
+});
+
 describe('native trade-line hit testing', () => {
   it('finds the topmost matching order drag zone using live label y positions', () => {
     const rows: NativeTradeLineRow[] = [
