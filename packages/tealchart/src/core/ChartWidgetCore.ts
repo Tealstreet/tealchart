@@ -34,6 +34,11 @@ import {
   resolveLeftHistoryBackfillContinuationHint,
   resolveLeftHistoryBackfillRequest,
 } from './historyBackfill';
+import {
+  resolveInitialHistoryBarCount,
+  resolveWarmupHistoryStartTime,
+  trimBarsToHistoryAnchor,
+} from './historyWarmup';
 
 // Use generic PlotOutput type to avoid import issues across platforms
 type PlotOutput = {
@@ -75,6 +80,10 @@ export interface IIndicatorManager {
   removeScript?(scriptId: string): void;
   getPlots(): PlotOutput[];
   dispose?(): void;
+  /** Largest TealScript `historyRequirement.bars` across active studies. */
+  getHistoryRequirementBars?(): number;
+  /** Called when a study's declaration changes that requirement. */
+  setOnHistoryRequirementChanged?(callback: (() => void) | null): void;
 }
 
 /**
@@ -154,6 +163,10 @@ export class ChartWidgetCore {
   protected _hasQueuedLeftHistoryBackfill = false;
   protected _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   protected _hasMoreHistoricalData = true;
+  // Left pages launched; lets a continuation tell whether it requested another.
+  private _leftHistoryRequestSeq = 0;
+  // Paging back for indicator warm-up: studies get the bars once, when it ends.
+  private _warmupBackfillPending = false;
   protected _loadBarsRequestId = 0;
   protected _resolveSymbolRequestId = 0;
   protected _disposed = false;
@@ -204,6 +217,7 @@ export class ChartWidgetCore {
     this._onIntervalChange = options.onIntervalChange;
     this._scheduleRender = options.scheduleRender || (() => {});
     this._indicatorManager = options.indicatorManager || null;
+    this._indicatorManager?.setOnHistoryRequirementChanged?.(this._syncIndicatorHistoryWarmup);
     this._realtimeUpdateThrottleMs =
       Number.isFinite(options.realtimeUpdateThrottleMs) && options.realtimeUpdateThrottleMs! > 0
         ? options.realtimeUpdateThrottleMs!
@@ -237,12 +251,14 @@ export class ChartWidgetCore {
     this._resolveSymbolAndLoad(this._symbol);
   }
 
-  protected _buildInitialPeriodParams(interval: string) {
+  protected _buildInitialPeriodParams(interval: string, warmupBars = 0) {
     const now = Date.now();
-    const fromTime = now - INITIAL_BAR_COUNT * getIntervalMs(interval);
+    const intervalMs = getIntervalMs(interval);
+    const countBack = resolveInitialHistoryBarCount({ intervalMs, now, warmupBars });
+    const fromTime = now - countBack * intervalMs;
 
     return {
-      countBack: INITIAL_BAR_COUNT,
+      countBack,
       from: Math.floor(fromTime / 1000),
       to: Math.floor(now / 1000),
       firstDataRequest: true,
@@ -319,7 +335,9 @@ export class ChartWidgetCore {
    * Set the indicator manager (allows late injection for React hooks)
    */
   setIndicatorManager(manager: IIndicatorManager): void {
+    if (this._indicatorManager !== manager) this._indicatorManager?.setOnHistoryRequirementChanged?.(null);
     this._indicatorManager = manager;
+    manager.setOnHistoryRequirementChanged?.(this._syncIndicatorHistoryWarmup);
     // If we already have bars, update the indicator manager
     if (this._bars.length > 0) {
       manager.setBars(this._bars);
@@ -417,7 +435,8 @@ export class ChartWidgetCore {
     const requestSymbolInfo = this._symbolInfo;
     this._setLoading(true);
 
-    const periodParams = this._buildInitialPeriodParams(requestInterval);
+    this._warmupBackfillPending = false;
+    const periodParams = this._buildInitialPeriodParams(requestInterval, this._indicatorWarmupBars());
 
     this._datafeed.getBars(
       requestSymbolInfo,
@@ -430,7 +449,12 @@ export class ChartWidgetCore {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars, requestInterval), 'history load');
+        const loadedBars = dedupeBarsByTime(normalizeDatafeedBars(bars, requestInterval), 'history load');
+        const normalizedBars = trimBarsToHistoryAnchor(
+          loadedBars,
+          getIntervalMs(requestInterval),
+          this._warmupHistoryStartTime(loadedBars),
+        );
         this._bars = normalizedBars;
         // Clear old plots — they belong to the old symbol/interval
         this._plots = [];
@@ -445,6 +469,7 @@ export class ChartWidgetCore {
 
         // Notify indicator manager AFTER — worker callback fires later with new data
         this._indicatorManager?.setBars(normalizedBars);
+        this._syncIndicatorHistoryWarmup();
       },
       (error) => {
         if (this._disposed) return;
@@ -501,10 +526,11 @@ export class ChartWidgetCore {
     return hint;
   }
 
+  /** @returns whether another page was requested */
   private _loadNextLeftHistoryBackfill(
     activeHint: HistoryBackfillRequestHint | undefined,
     previousEarliestBarTime: number,
-  ): void {
+  ): boolean {
     const queuedHint = this._consumeQueuedLeftHistoryBackfill();
     const hint = resolveLeftHistoryBackfillContinuationHint({
       activeHint,
@@ -512,9 +538,45 @@ export class ChartWidgetCore {
       previousEarliestBarTime,
       queuedHint,
     });
-    if (hint !== null) {
-      this._loadMoreBars('left', hint);
-    }
+    if (hint === null) return false;
+    const seq = this._leftHistoryRequestSeq;
+    this._loadMoreBars('left', hint);
+    return this._leftHistoryRequestSeq !== seq;
+  }
+
+  private _indicatorWarmupBars(): number {
+    return this._indicatorManager?.getHistoryRequirementBars?.() ?? 0;
+  }
+
+  private _warmupHistoryStartTime(bars: Bar[]): number | null {
+    return resolveWarmupHistoryStartTime({
+      intervalMs: getIntervalMs(this._interval),
+      latestTime: bars.at(-1)?.time,
+      warmupBars: this._indicatorWarmupBars(),
+    });
+  }
+
+  /**
+   * Pages left until the loaded history covers the active studies' warm-up
+   * (see `historyWarmup.ts`). A declaration lands after its study compiles,
+   * usually after the first page, so the manager calls this then too.
+   */
+  private _syncIndicatorHistoryWarmup = (): void => {
+    if (this._disposed || this._isLoading || !this._hasMoreHistoricalData) return;
+    const earliest = this._bars[0]?.time;
+    const startTime = this._warmupHistoryStartTime(this._bars);
+    if (startTime === null || earliest === undefined || earliest <= startTime) return;
+    this._warmupBackfillPending = true;
+    const seq = this._leftHistoryRequestSeq;
+    this._loadMoreBars('left', { requiredStartTime: startTime });
+    // A busy pager queues the hint; the page in flight finishes the warm-up.
+    if (this._leftHistoryRequestSeq === seq && !this._isLoadingMoreBars) this._warmupBackfillPending = false;
+  };
+
+  private _finishWarmupBackfill(): void {
+    if (!this._warmupBackfillPending) return;
+    this._warmupBackfillPending = false;
+    if (this._bars.length > 0) this._indicatorManager?.setBars(this._bars);
   }
 
   protected _loadMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
@@ -544,6 +606,7 @@ export class ChartWidgetCore {
     }
 
     this._setLoadingMoreBars(true);
+    this._leftHistoryRequestSeq += 1;
     const requestId = this._loadBarsRequestId;
     const requestSymbol = this._symbol;
     const requestInterval = this._interval;
@@ -567,21 +630,27 @@ export class ChartWidgetCore {
         if (bars.length === 0) {
           this._hasMoreHistoricalData = false;
           this._clearQueuedLeftHistoryBackfill();
+          this._finishWarmupBackfill();
           return;
         }
 
         const existingTimes = new Set(this._bars.map((bar) => bar.time));
         const newBars = normalizeDatafeedBars(bars, requestInterval).filter((bar) => !existingTimes.has(bar.time));
-        if (newBars.length === 0) {
-          this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
-          return;
+        if (newBars.length > 0) {
+          const merged = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
+          this._bars = trimBarsToHistoryAnchor(
+            merged,
+            intervalMs,
+            this._warmupHistoryStartTime(merged),
+            previousEarliestBarTime,
+          );
+          this._emitBarsChanged('history');
+          this._scheduleRender();
         }
-
-        this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
-        this._emitBarsChanged('history');
-        this._scheduleRender();
-        this._indicatorManager?.setBars(this._bars);
-        this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+        const continued = this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+        // A warm-up hands studies its bars once, at the end, not per page.
+        if (!continued && this._warmupBackfillPending) this._finishWarmupBackfill();
+        else if (newBars.length > 0 && !this._warmupBackfillPending) this._indicatorManager?.setBars(this._bars);
       },
       (error) => {
         if (this._disposed) return;
@@ -589,6 +658,7 @@ export class ChartWidgetCore {
 
         this._setLoadingMoreBars(false);
         this._clearQueuedLeftHistoryBackfill();
+        this._finishWarmupBackfill();
         console.error('[ChartWidgetCore] Failed to load more bars:', error);
       },
     );

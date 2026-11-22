@@ -41,6 +41,7 @@ import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
 import type { Bar, TealscriptRequestDataResolver, UnifiedPaneLayout } from '../types';
 
 import { parse, TealscriptParseError } from '@tealstreet/tealscript';
+import { resolveIndicatorWarmupBars } from '../core/historyWarmup';
 import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
 import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
@@ -150,6 +151,7 @@ export class MobileIndicatorManager {
   private _declarationCache: Map<string, IndicatorDeclarationMetadata> = new Map();
   private _bars: Bar[] = [];
   private _onUpdate: (() => void) | null = null;
+  private _onHistoryRequirementChanged: (() => void) | null = null;
   private _onPlotsTail: NativeIndicatorPlotsTailCallback | null = null;
   private _events = new EventEmitter();
   private _logger = new TealchartLogger({
@@ -216,6 +218,17 @@ export class MobileIndicatorManager {
     this._tealscriptExecutionBackend = options.tealscriptExecutionBackend;
     this._restartWorkerScripts();
     this._recomputePlots();
+  }
+
+  /** Largest TealScript `historyRequirement.bars` across active indicators. */
+  getHistoryRequirementBars(): number {
+    return resolveIndicatorWarmupBars(
+      this._indicators.map((indicator) => this._declarationCache.get(indicator.instanceId) ?? indicator.declaration),
+    );
+  }
+
+  setOnHistoryRequirementChanged(callback: (() => void) | null): void {
+    this._onHistoryRequirementChanged = callback;
   }
 
   /**
@@ -727,6 +740,7 @@ export class MobileIndicatorManager {
     if (indicator) indicator.declaration = declaration;
     this._indicatorsRevision += 1;
     this._onUpdate?.();
+    this._onHistoryRequirementChanged?.();
   };
 
   private _resolveRequestData: TealscriptRequestDataResolver = (request) => {
