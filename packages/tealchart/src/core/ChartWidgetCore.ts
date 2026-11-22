@@ -584,6 +584,8 @@ export class ChartWidgetCore {
     if (this._disposed) return;
     if (direction !== 'left') return;
     if (!this._symbolInfo) return;
+    // A failed setSymbol leaves the previous symbol's info and bars: never page them under the new one.
+    if (this._symbolInfoSymbol !== this._symbol) return;
     if (this._isLoadingMoreBars) {
       this._queueLeftHistoryBackfill(hint);
       return;

@@ -206,3 +206,19 @@ describe('ChartWidgetCore late indicator manager', () => {
     expect(requests[1]!.periodParams.from * 1000).toBeLessThanOrEqual(startTime);
   });
 });
+
+describe('ChartWidgetCore left history after a failed symbol change', () => {
+  it('does not page the previous symbol under the new one', () => {
+    const { datafeed, requests } = createDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '15' });
+    core.initialize();
+    requests[0]!.onResult(makeBars(NOW - (DEFAULT_HISTORY_BACKFILL_BAR_COUNT - 1) * INTERVAL, DEFAULT_HISTORY_BACKFILL_BAR_COUNT));
+    datafeed.resolveSymbol = (_name, _onResolve, onError) => onError('unknown symbol');
+
+    core.setSymbol('ETH');
+    core.requestMoreBars('left');
+    core.setIndicatorManager(createManager(501).manager);
+
+    expect(requests).toHaveLength(1);
+  });
+});
