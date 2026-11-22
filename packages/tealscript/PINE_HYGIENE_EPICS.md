@@ -17,9 +17,8 @@ independently verified with the phased plan-execute cadence:
 3. Implement and verify the phase.
 4. Audit the implementation, fix findings, and commit the coherent phase.
 
-After a phase PR is ready, run CodeRabbit review, fix or reply to every review
-thread, wait for CI and CodeRabbit to be green, merge, and cut the next branch
-from latest `master`.
+After a phase PR is ready, wait for green CI and the repo's required approving
+review, merge, and cut the next branch from latest `master`.
 
 ## Execution Protocol
 
@@ -34,8 +33,7 @@ complete or the work is blocked:
    - implement and verify the phase
    - audit the implementation, fix findings, and commit
 4. Open one PR for the completed phase.
-5. Run CodeRabbit review, resolve or reply to every review thread, and wait for
-   CI and CodeRabbit to be green.
+5. Wait for green CI and the repo's required approving review.
 6. Merge the PR with maintainer/admin privileges when review gates are green.
 7. Cut the next branch from updated `master` and continue with the next phase.
 
