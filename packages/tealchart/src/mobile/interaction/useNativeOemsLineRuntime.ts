@@ -19,9 +19,11 @@ import { getNativeOrderObjectId, getNativePositionObjectId } from '../utils/trad
 import {
   clearNativeBracketDragState,
   clearNativeOrderDragState,
+  getNativeTradeLineSetKey,
   hasNativeOrderTouchState,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
+  shouldRetireActiveNativeBracketDrag,
 } from './nativeOemsDragState';
 import {
   startNativeBracketMoveAction,
@@ -226,6 +228,8 @@ export function useNativeOemsLineRuntime({
   } | null>(null);
   const orderHandoffSeqRef = useRef(0);
   const bracketHandoffSeqRef = useRef(0);
+  // The line set the last snapshot sync saw; null until the first one.
+  const tradeLineSetKeyRef = useRef<string | null>(null);
   const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
 
   useEffect(() => {
@@ -512,8 +516,24 @@ export function useNativeOemsLineRuntime({
   };
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
-    // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot`.
-    if (bracketDragInteractionState.active.value) return;
+    const lineIds = {
+      orderLines: lineSnapshot.orderLines,
+      positionLines: lineSnapshot.positionLines,
+      getOrderObjectId: getNativeOrderObjectId,
+      getPositionObjectId: getNativePositionObjectId,
+    };
+    const lineSetKey = getNativeTradeLineSetKey(lineIds);
+    const lineSetChanged = tradeLineSetKeyRef.current !== null && tradeLineSetKeyRef.current !== lineSetKey;
+    tradeLineSetKeyRef.current = lineSetKey;
+    // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot` -
+    // except one whose book changed under it, see `shouldRetireActiveNativeBracketDrag`.
+    if (bracketDragInteractionState.active.value) {
+      if (shouldRetireActiveNativeBracketDrag({ ...lineIds, state: bracketDragInteractionState, lineSetChanged })) {
+        bracketHandoffRef.current = null;
+        clearNativeBracketDrag();
+      }
+      return;
+    }
 
     const pendingObserved = shouldClearNativeBracketDragForSnapshot({
       state: bracketDragInteractionState,
@@ -536,6 +556,7 @@ export function useNativeOemsLineRuntime({
     releaseNativeBracketDragAfterCommit(handoffToRelease);
   }, [
     bracketDragInteractionState,
+    clearNativeBracketDrag,
     releaseNativeBracketDragAfterCommit,
     lineSnapshot.orderLines,
     lineSnapshot.positionLines,

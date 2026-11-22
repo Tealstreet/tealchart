@@ -336,3 +336,58 @@ export function shouldClearNativeBracketDragForSnapshot({
 
   return false;
 }
+
+/** Every order and position line's identity, order-independent: it changes only when a line joins or leaves. */
+export function getNativeTradeLineSetKey({
+  orderLines,
+  positionLines,
+  getOrderObjectId,
+  getPositionObjectId,
+}: {
+  orderLines: readonly OrderLineRenderData[];
+  positionLines: readonly PositionLineRenderData[];
+  getOrderObjectId: (line: OrderLineRenderData) => string;
+  getPositionObjectId: (line: PositionLineRenderData) => string;
+}): string {
+  const ids = orderLines.map((line) => `order:${getOrderObjectId(line)}`);
+  for (const line of positionLines) ids.push(`position:${getPositionObjectId(line)}`);
+  return ids.sort().join('\n');
+}
+
+/**
+ * The one exception to "nothing retires a live gesture" (AGT-123).
+ *
+ * A bracket drag whose finalize never arrived stays `active` with no finger
+ * down, so the rule above kept its picker and dashed preview line on the chart
+ * for minutes, outliving the order it belonged to. A drag whose own line has
+ * gone has nothing left to commit to, and any change to the set of lines
+ * means the book under the picker is no longer the one it was opened on, so
+ * either retires it. A genuinely live drag just ends; the next touch starts over.
+ */
+export function shouldRetireActiveNativeBracketDrag({
+  state,
+  lineSetChanged,
+  orderLines,
+  positionLines,
+  getOrderObjectId,
+  getPositionObjectId,
+}: {
+  state: NativeBracketDragInteractionState;
+  lineSetChanged: boolean;
+  orderLines: readonly OrderLineRenderData[];
+  positionLines: readonly PositionLineRenderData[];
+  getOrderObjectId: (line: OrderLineRenderData) => string;
+  getPositionObjectId: (line: PositionLineRenderData) => string;
+}): boolean {
+  if (!state.active.value) return false;
+  const objectId = state.activeObjectId.value;
+  if (!objectId) return false;
+  if (lineSetChanged) return true;
+  if (state.activeObjectType.value === 'order') {
+    return !orderLines.some((line) => getOrderObjectId(line) === objectId);
+  }
+  if (state.activeObjectType.value === 'position') {
+    return !positionLines.some((line) => getPositionObjectId(line) === objectId);
+  }
+  return false;
+}
