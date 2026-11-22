@@ -918,6 +918,28 @@ symbol switch. A reset under the same source, or from a feed that reports none,
 is still a reconnect and keeps its bars. NX's `DefaultDatafeed` reports
 `<venue>:<live|testnet>`; it must stay stable across a reconnect.
 
+## Indicator warm-up history (`core/historyWarmup.ts`)
+
+Both hosts (`TealchartWidget` on web, `ChartWidgetCore` on native) size history
+to the active TealScript studies' `historyRequirement.bars` (largest wins): a
+fresh load asks for warm-up plus the 300-bar visible page in one request (capped
+at `MAX_HISTORY_BACKFILL_BAR_COUNT`), and a declaration that arrives after the
+first page pages left to the same start. During that warm-up paging the studies
+are NOT given each page; they get the bars once, when paging ends, runs out of
+history or fails (`_finishWarmupBackfill`). Native learns the requirement via
+the optional `IIndicatorManager.getHistoryRequirementBars` /
+`setOnHistoryRequirementChanged` pair, which `MobileIndicatorManager` implements.
+
+**The start is snapped to a fixed grid** of `HISTORY_ANCHOR_GRID_BARS` bars from
+the epoch, and loaded bars are trimmed to begin on a grid line once they reach
+the warm-up start. Path-dependent scripts (signal repeat filters, `var`
+state) depend on their first bar, and a start of `now - N bars` moved every
+interval, so refreshes drew different arrows. Trimming the CHART's bars, not a
+slice handed to the study, is deliberate: plot `values` and `bar_index`
+drawings are index-aligned with the bars the study received, so feeding it a
+suffix would offset every output. Charts with no requirement are untouched.
+Gap repair keeps the default page and is not trimmed.
+
 ## Native live-gap backfill (`ChartWidgetCore`)
 
 A live stream carries only the bar in progress, so bars that closed while iOS
