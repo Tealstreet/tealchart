@@ -19,7 +19,6 @@ import { getNativeOrderObjectId, getNativePositionObjectId } from '../utils/trad
 import {
   clearNativeBracketDragState,
   clearNativeOrderDragState,
-  getNativeTradeLineSetKey,
   hasNativeOrderTouchState,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
@@ -228,8 +227,6 @@ export function useNativeOemsLineRuntime({
   } | null>(null);
   const orderHandoffSeqRef = useRef(0);
   const bracketHandoffSeqRef = useRef(0);
-  // The line set the last snapshot sync saw; null until the first one.
-  const tradeLineSetKeyRef = useRef<string | null>(null);
   const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
 
   useEffect(() => {
@@ -516,19 +513,18 @@ export function useNativeOemsLineRuntime({
   };
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
-    const lineIds = {
-      orderLines: lineSnapshot.orderLines,
-      positionLines: lineSnapshot.positionLines,
-      getOrderObjectId: getNativeOrderObjectId,
-      getPositionObjectId: getNativePositionObjectId,
-    };
-    const lineSetKey = getNativeTradeLineSetKey(lineIds);
-    const lineSetChanged = tradeLineSetKeyRef.current !== null && tradeLineSetKeyRef.current !== lineSetKey;
-    tradeLineSetKeyRef.current = lineSetKey;
     // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot` -
-    // except one whose book changed under it, see `shouldRetireActiveNativeBracketDrag`.
+    // except one whose own line has gone, see `shouldRetireActiveNativeBracketDrag`.
     if (bracketDragInteractionState.active.value) {
-      if (shouldRetireActiveNativeBracketDrag({ ...lineIds, state: bracketDragInteractionState, lineSetChanged })) {
+      if (
+        shouldRetireActiveNativeBracketDrag({
+          state: bracketDragInteractionState,
+          orderLines: lineSnapshot.orderLines,
+          positionLines: lineSnapshot.positionLines,
+          getOrderObjectId: getNativeOrderObjectId,
+          getPositionObjectId: getNativePositionObjectId,
+        })
+      ) {
         bracketHandoffRef.current = null;
         clearNativeBracketDrag();
       }

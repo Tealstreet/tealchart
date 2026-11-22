@@ -87,7 +87,7 @@ function fixture() {
 // AGT-123: the picker (and its dashed +0.00% line at the order's price) stayed on
 // the chart for minutes after its order was cancelled, because nothing may retire a
 // bracket drag while `active` - and this one was `active` with no finger down.
-describe('a bracket drag picker whose order set changed', () => {
+describe('a bracket drag picker whose order left the chart', () => {
   it('closes when its order is cancelled or filled', () => {
     const f = fixture();
     f.openPicker();
@@ -98,14 +98,27 @@ describe('a bracket drag picker whose order set changed', () => {
     expect(f.bracket.active.value).toBe(false);
   });
 
-  it('closes when any other order joins or leaves the set', () => {
+  // Review of #1557: retiring on ANY change to the line set killed a live TP/SL drag
+  // whenever some other order filled or was cancelled. Only the dragged line leaving
+  // retires it.
+  it('survives another order cancelling or filling', () => {
     const f = fixture();
     f.openPicker();
 
     f.snapshot([order('order_1', 55_300)]);
 
-    expect(f.bracket.activeObjectId.value).toBe('');
-    expect(f.bracket.active.value).toBe(false);
+    expect(f.bracket.activeObjectId.value).toBe('order_1');
+    expect(f.bracket.active.value).toBe(true);
+  });
+
+  it('survives another order joining the set', () => {
+    const f = fixture();
+    f.openPicker();
+
+    f.snapshot([order('order_1', 55_300), order('order_2', 55_197), order('order_3', 55_000)]);
+
+    expect(f.bracket.activeObjectId.value).toBe('order_1');
+    expect(f.bracket.active.value).toBe(true);
   });
 
   it('stays open across a snapshot that leaves the order set unchanged', () => {

@@ -1341,10 +1341,11 @@ stayed blocked, and the next pan anywhere resumed the dead drag and committed a
 TP where it ended. Two things now end it. The bracket gesture's FIRST touch
 while still `active` clears the stale state before hit-testing (a second finger
 joining a live drag is unaffected). And `shouldRetireActiveNativeBracketDrag`
-retires an `active` bracket drag whose own line left the snapshot or whose
-order/position line set changed at all (`getNativeTradeLineSetKey`), even during
-a real drag, which then simply ends; the user starts it again. This does not
-extend to the order-line drag, whose live-gesture rule above still holds.
+retires an `active` bracket drag whose own order/position line left the
+snapshot, even during a real drag, which then simply ends. Other lines coming
+and going never retire it: keying on the whole line set killed a live TP/SL
+drag whenever an unrelated order filled. This does not extend to the
+order-line drag, whose live-gesture rule above still holds.
 
 ## Frame timing on native
 
