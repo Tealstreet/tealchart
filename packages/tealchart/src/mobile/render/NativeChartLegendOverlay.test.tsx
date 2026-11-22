@@ -1,12 +1,13 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Bar } from '../../types';
 
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import { LOADING_DOT_COUNT } from '../../constants';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER } from './nativeTextScaling';
 import { NativeChartLegendOverlayImpl, NativeLegendLoadingDots, NativeLoadingDot, areNativeLegendActionTargetsEqual, resolveNativeLegendActionTargets } from './NativeChartLegendOverlay';
 
 interface TestElementProps {
@@ -77,6 +78,47 @@ const frameWithIndicatorPane = createNativeChartFrameFromPanes({
     { id: 'main', type: 'main', top: 36, height: 300, yMin: 63000, yMax: 64000 },
     { id: 'pane_1', type: 'indicator', top: 336, height: 152, yMin: -10, yMax: 10 },
   ],
+});
+
+describe('NativeChartLegendOverlay system text scaling', () => {
+  it('caps every legend text at the chart multiplier', () => {
+    const legend = NativeChartLegendOverlayImpl({
+      activeIndicators: [{ id: 'study_1', inputs: { length: 20 }, isVisible: true, name: 'SMA' }],
+      bars,
+      downColor: '#f04465',
+      frame,
+      indicatorPaneInfo: { study_1: { inputs: { length: 20 }, name: 'SMA', overlay: true } },
+      interval: '15',
+      isLoading: false,
+      leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98',
+      pricePrecision: 0.1,
+      symbol: 'BTC-USD',
+      textColor: '#f0f3fa',
+      upColor: '#12c48b',
+    });
+    const texts = collectElementsByType(legend, Text);
+
+    // AGT-154: uncapped, the legend reached ~3.1x at the largest accessibility size and ran
+    // off the pane. The cap stays in the band the mobile app's own trading text uses.
+    expect(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER).toBeGreaterThanOrEqual(1.2);
+    expect(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER).toBeLessThanOrEqual(1.3);
+    expect(texts.length).toBeGreaterThan(10);
+    for (const text of texts) {
+      expect(text.props.maxFontSizeMultiplier).toBe(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER);
+    }
+  });
+
+  it('wraps the OHLC values inside the legend rather than running past the price axis', () => {
+    const holdsLabel = (view: TestElement, label: string) =>
+      collectElementsByType(view.props.children as ReactNode, Text).some((text) => text.props.children === label);
+    // Views are walked outermost first, so the last one holding both O and C is their row.
+    const ohlcRow = collectElementsByType(renderLegend(false), View)
+      .filter((view) => holdsLabel(view, 'O') && holdsLabel(view, 'C'))
+      .at(-1);
+
+    expect(ohlcRow?.props.style).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
+  });
 });
 
 describe('NativeChartLegendOverlay', () => {

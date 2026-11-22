@@ -131,7 +131,9 @@ export function NativeTopBarOverlayImpl({
           },
         ]}
       >
+        {/* Bar text never scales: its boxes are Skia widths at the unscaled font (AGT-154). */}
         <Text
+          allowFontScaling={false}
           numberOfLines={1}
           style={[
             styles.symbol,
@@ -256,6 +258,7 @@ export function NativeTopBarOverlayImpl({
                   ) : null}
                   {button.type !== 'undo' && button.type !== 'redo' && button.type !== 'timeframeMenu' && (
                     <Text
+                      allowFontScaling={false}
                       numberOfLines={1}
                       style={[
                         styles.buttonText,

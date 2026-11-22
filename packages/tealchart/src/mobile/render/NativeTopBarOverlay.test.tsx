@@ -57,6 +57,16 @@ function renderOverlay(
 }
 
 describe('NativeTopBarOverlay', () => {
+  it('keeps the bar text at the size its Skia-measured geometry was laid out for', () => {
+    renderOverlay();
+
+    // AGT-154: the bar's boxes come from Skia widths at the unscaled font, so system text
+    // scaling turned the timeframes into clipped glyphs and pushed the symbol out of view.
+    for (const text of ['BTC-USD', '1m', '15m', 'Default', 'Indicators']) {
+      expect(screen.getByText(text).getAttribute('data-allow-font-scaling')).toBe('false');
+    }
+  });
+
   it('renders top-bar chrome as React Native controls', () => {
     renderOverlay();
 

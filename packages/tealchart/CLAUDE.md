@@ -133,6 +133,15 @@ it; closed overlays retain `display:none` and do not occlude the chart.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
+**Native chrome and system text size (AGT-154):** React Native text scales with
+iOS Larger Text / Android font size; Skia text does not. Text inside geometry
+computed from Skia measurements (the top bar's symbol and buttons) passes
+`allowFontScaling={false}`, or it clips at the accessibility sizes. Flex-laid-out
+chrome over the plot (the legend) passes `NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER`
+from `mobile/render/nativeTextScaling.ts`, and re-mounts on `useNativeFontScale()`:
+React Native keeps an unchanged text's old measurement after a size change, so
+the legend stayed stretched until a relaunch.
+
 **Hit-testing rule:** What draws a control decides what receives its taps.
 
 - **Drawn into the canvas** — candles, axes, crosshair, trade and price lines,
