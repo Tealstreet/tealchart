@@ -168,3 +168,23 @@ describe('ChartWidgetCore indicator warm-up', () => {
     expect(setBarsCalls[1]).toHaveLength(DEFAULT_HISTORY_BACKFILL_BAR_COUNT + 50);
   });
 });
+
+describe('ChartWidgetCore scrollback after warm-up', () => {
+  it('keeps extending history left with a default page once the warm-up is covered', () => {
+    const { datafeed, requests } = createDatafeed();
+    const { manager } = createManager(501);
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '15', indicatorManager: manager });
+
+    core.initialize();
+    const countBack = requests[0]!.periodParams.countBack!;
+    requests[0]!.onResult(makeBars(NOW - (countBack - 1) * INTERVAL, countBack));
+    const warmedStart = core.getBars()[0]!.time;
+
+    // The user scrolls back: each page is shorter than one anchor-grid cell.
+    core.requestMoreBars('left');
+    const page = requests.at(-1)!;
+    page.onResult(makeBars(warmedStart - DEFAULT_HISTORY_BACKFILL_BAR_COUNT * INTERVAL, DEFAULT_HISTORY_BACKFILL_BAR_COUNT));
+
+    expect(core.getBars()[0]!.time).toBe(warmedStart - DEFAULT_HISTORY_BACKFILL_BAR_COUNT * INTERVAL);
+  });
+});

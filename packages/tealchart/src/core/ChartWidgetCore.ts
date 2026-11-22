@@ -638,7 +638,12 @@ export class ChartWidgetCore {
         const newBars = normalizeDatafeedBars(bars, requestInterval).filter((bar) => !existingTimes.has(bar.time));
         if (newBars.length > 0) {
           const merged = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
-          this._bars = trimBarsToHistoryAnchor(merged, intervalMs, this._warmupHistoryStartTime(merged));
+          this._bars = trimBarsToHistoryAnchor(
+            merged,
+            intervalMs,
+            this._warmupHistoryStartTime(merged),
+            previousEarliestBarTime,
+          );
           this._emitBarsChanged('history');
           this._scheduleRender();
         }

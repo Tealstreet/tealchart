@@ -1258,7 +1258,12 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         if (newBars.length > 0) {
           const merged = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
-          this._bars = trimBarsToHistoryAnchor(merged, intervalMs, this._warmupHistoryStartTime(merged));
+          this._bars = trimBarsToHistoryAnchor(
+            merged,
+            intervalMs,
+            this._warmupHistoryStartTime(merged),
+            previousEarliestBarTime,
+          );
 
           // Render prepended bars immediately; Tealscript plots realign on the
           // next worker callback. Gating the bar render on onPlotsUpdated means a

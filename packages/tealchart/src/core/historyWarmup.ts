@@ -88,10 +88,19 @@ export function resolveInitialHistoryBarCount({
  * Drops the bars before the first anchor-grid line at or after `bars[0]`, so
  * the series starts on the grid. Only once the history reaches `targetStartTime`
  * (itself a grid line): before that, trimming would discard bars the warm-up
- * still needs, and with no target there is nothing to keep stable.
+ * still needs, and with no target there is nothing to keep stable. A prepend
+ * onto history that already reached the target (`previousStartTime`) is user
+ * scrollback and is kept whole: trimming it would snap back to the same grid
+ * line whenever a page is shorter than a grid cell, so history stops growing.
  */
-export function trimBarsToHistoryAnchor(bars: Bar[], intervalMs: number, targetStartTime: number | null): Bar[] {
+export function trimBarsToHistoryAnchor(
+  bars: Bar[],
+  intervalMs: number,
+  targetStartTime: number | null,
+  previousStartTime?: number,
+): Bar[] {
   if (targetStartTime === null) return bars;
+  if (previousStartTime !== undefined && previousStartTime <= targetStartTime) return bars;
   const first = bars[0];
   if (!first || !finiteNumber(intervalMs) || intervalMs <= 0) return bars;
   if (first.time > targetStartTime) return bars;
