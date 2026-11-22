@@ -2265,6 +2265,7 @@ export class ChartCore {
           b.lineWidth = line.lineWidth;
           b.renderLineOnCanvas = line.renderLineOnCanvas;
           b.countdownToTime = line.countdownToTime;
+          b.countdownThenTime = line.countdownThenTime;
           b.draggable = line.draggable;
           b.actionState = line.actionState;
           b.orderId = line.orderId;

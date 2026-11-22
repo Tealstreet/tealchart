@@ -226,6 +226,8 @@ export interface PriceLine {
    * Format: MM:SS or HH:MM:SS for times >= 1 hour.
    */
   countdownToTime?: number;
+  /** The following bar's close: the countdown runs to it once `countdownToTime` has passed. */
+  countdownThenTime?: number;
   /**
    * Whether this line is draggable (has onMove callback).
    * Only order lines with an onMove callback should be draggable.
@@ -382,6 +384,8 @@ export interface PriceLineLabelBounds {
   renderLineOnCanvas?: boolean;
   /** Countdown target time (ms) - PriceLineLayer computes secondaryText from this */
   countdownToTime?: number;
+  /** The following bar's close, counted to once `countdownToTime` has passed */
+  countdownThenTime?: number;
   /** Whether this line is draggable (has onMove callback) */
   draggable?: boolean;
   /** Current OEMS action lifecycle state for presentation and input blocking. */

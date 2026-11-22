@@ -51,5 +51,6 @@ export function buildLastTradePriceLine({
     renderLineOnCanvas,
     showAxisTag,
     countdownToTime: barCloseTime,
+    countdownThenTime: barCloseTimeMs(interval, barCloseTime),
   };
 }
