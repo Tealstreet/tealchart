@@ -115,6 +115,11 @@ node signature, so updates rebuild text and hit geometry together.
 
 **Hybrid rendering model:**
 
+Web and native OHLC legends wrap between intact label/value pairs at narrow
+chart widths. Keep the web legend right-bounded and its main row content-sized;
+native wrapping stays within the existing plot-width bound. Preserve price
+formatting, field order, cached web text nodes and pointer/gesture behavior.
+
 - **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
