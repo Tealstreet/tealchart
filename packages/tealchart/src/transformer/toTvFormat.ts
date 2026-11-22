@@ -170,6 +170,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       chartType: settings.chartType,
       autoScale: settings.autoScale,
       viewport: settings.viewport,
+      viewportAtLiveEdge: settings.viewportAtLiveEdge,
       userDrawingState: serializeUserDrawingStateForLayout(settings.userDrawingState),
       chartProperties: settings.chartProperties,
       preservedTvProperties: settings.preservedTvProperties,

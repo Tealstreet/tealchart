@@ -22,7 +22,13 @@ import {
   resolveViewportHistoryBackfillHint,
 } from '../../core/historyBackfill';
 import { TealchartRenderer } from '../../TealchartRenderer';
-import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
+import {
+  captureViewScale,
+  DEFAULT_VIEW_SCALE_PRICE_PADDING,
+  intervalToMs,
+  restoreViewport,
+  withDefaultPricePadding,
+} from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
 import { getNativeCandidateTimeWindow, nativeViewportCoversCandidateTimeWindow } from '../render/nativeTimeWindow';
 import {
@@ -76,6 +82,11 @@ export interface NativeViewportRuntimeInput {
 }
 
 export interface NativeApplyViewportOptions {
+  /**
+   * A layout saved at the live edge (AGT-148): keep the window's width and land it
+   * at the newest bar, auto-owned, instead of reopening its stale absolute times.
+   */
+  atLiveEdge?: boolean;
   /** The layout's own auto-scale setting, which the store has not applied yet during a restore. */
   autoScaleEnabled?: boolean;
   fitPriceToBars?: boolean;
@@ -105,6 +116,8 @@ export const NATIVE_EMPTY_RENDER_VIEWPORT: Viewport = {
   priceMax: 1,
 };
 const EMPTY_NATIVE_VIEWPORT_BARS: readonly Bar[] = [];
+/** A live-edge layout restore's source bars: never the bars it lands on, so the first loaded bars restore it. */
+const NATIVE_LAYOUT_RESTORE_SOURCE_BARS: readonly Bar[] = [];
 /**
  * How long a deferred price fit waits for a backfill that may never come.
  * Generous enough for a slow round trip; the cost of being wrong is one
@@ -584,6 +597,9 @@ export function useNativeViewportRuntime({
       !barsMatchRequestedData ||
       isLoading ||
       settledViewport ||
+      // A data-load restore lands in this same commit; adopting the auto window
+      // after it would overwrite the restore on a first load (AGT-148).
+      pendingDataLoadViewport ||
       viewportOwnershipRef.current.hasManualViewport ||
       viewportOwnershipRef.current.nativeViewportOwned
     ) {
@@ -602,6 +618,7 @@ export function useNativeViewportRuntime({
     isLoading,
     onViewportChange,
     panStartViewport,
+    pendingDataLoadViewport,
     settledViewport,
     sharedViewport,
   ]);
@@ -836,6 +853,32 @@ export function useNativeViewportRuntime({
       if (!nextViewport) return false;
       // Anything else placing the view (a layout restore) settles where it goes.
       if (!liveEdgeFollowingRef.current) liveEdgeResumeRef.current = null;
+      if (options.atLiveEdge === true) {
+        // Only the zoom survives, the way an interval switch lands: the data-load
+        // restore anchors it at the newest bar (now, or when the first bars land),
+        // fits the axis and leaves the view auto-owned so it follows new bars.
+        pendingRestorePriceFitRef.current = null;
+        setViewportOwnership(createNativeViewportOwnershipState());
+        resetNativeViewportGestureActiveFlags({
+          panActive,
+          pinchActive,
+          priceScaleActive,
+          timeScaleActive,
+          viewportGestureOwner,
+        });
+        setPendingDataLoadViewScale({
+          dataKey,
+          liveEdge: true,
+          sourceBars: NATIVE_LAYOUT_RESTORE_SOURCE_BARS,
+          viewScale: withNativeLiveEdgeViewScale({
+            visibleBarCount: (nextViewport.endTime - nextViewport.startTime) / (intervalToMs(interval) || 1),
+            rightOffsetBars: 0,
+            pricePaddingTop: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+            pricePaddingBottom: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+          }),
+        });
+        return true;
+      }
       const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
       // Decided BEFORE the fit, and from the CALLER's viewport rather than the
       // fitted one. A window that starts before the earliest loaded bar is a
@@ -922,6 +965,8 @@ export function useNativeViewportRuntime({
     [
       autoScaleBars,
       autoViewport,
+      dataKey,
+      interval,
       onRequestMoreBars,
       onViewportChange,
       panActive,

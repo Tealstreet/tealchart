@@ -952,6 +952,21 @@ the carried price padding to the whole history, a negative axis on Hyperliquid
 ownership across intervals. A symbol switch at the same interval still carries the
 scroll position. `nativeIntervalSwitchViewport.test.tsx` is the regression test.
 
+## Native layout restore at the live edge (`viewportAtLiveEdge`)
+
+A layout stores its viewport as absolute times, so one saved while following the
+market reopened hours later on the window it had then, as a manual view that
+never followed new bars (AGT-148). The save now records
+`ChartSettings.viewportAtLiveEdge` (`isNativeViewportAtLiveEdge` at save time),
+and `applyNativeViewport(..., { atLiveEdge: true })` keeps only the saved zoom:
+it queues a live-edge data-load restore, the same path an interval switch takes,
+which lands at the newest bar (now, or when the first bars arrive), fits the
+axis and stays auto-owned. A layout saved scrolled into history, or saved before
+the field existed, restores its absolute window exactly as before. The auto
+viewport effect stands down while a data-load restore is pending, or a first
+load would overwrite the restore in the same commit.
+`nativeLayoutLiveEdgeRestore.test.tsx` is the regression test.
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
