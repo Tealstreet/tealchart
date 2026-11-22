@@ -27,6 +27,7 @@ function makeState(overrides: Partial<TealchartCoreState> = {}): TealchartCoreSt
     isLoading: true,
     isLoadingMoreBars: false,
     loadFailed: false,
+    sourceIdentity: undefined,
     symbol: 'BTC',
     unifiedLayout: emptyLayout,
     ...overrides,
@@ -206,6 +207,14 @@ describe('tealchartCoreStateReducer load failures (AGT-127)', () => {
       tealchartCoreStateReducer(failed, { type: 'controlledDataContextChanged', symbol: 'BTCUSDT', interval: '1' })
         .loadFailed,
     ).toBe(false);
+  });
+});
+
+describe('tealchartCoreStateReducer source switch (AGT-136)', () => {
+  it('records the new source and starts a fresh load with no stale failure', () => {
+    const failed = makeState({ interval: '1', isLoading: false, loadFailed: true, symbol: 'BTCUSDT' });
+    const next = tealchartCoreStateReducer(failed, { type: 'sourceChanged', source: 'woo:live' });
+    expect(next).toMatchObject({ sourceIdentity: 'woo:live', isLoading: true, loadFailed: false, symbol: 'BTCUSDT' });
   });
 });
 

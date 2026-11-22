@@ -105,6 +105,8 @@ export interface ChartWidgetCoreOptions {
    */
   onLoadFailed?: (context: ChartWidgetDataContext) => void;
   onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  /** The datafeed switched venue under the same symbol; hosts reset the view as for a symbol switch. */
+  onSourceChange?: (source: string | undefined) => void;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
 }
@@ -133,6 +135,9 @@ export class ChartWidgetCore {
   // The symbol `_symbolInfo` was resolved for. `symbolInfo.name` cannot answer
   // this: an exchange-prefixed request resolves to a clean-symbol name.
   protected _symbolInfoSymbol: string | null = null;
+  // The datafeed source `_symbolInfo` (and the bars loaded for it) came from.
+  // A reset under a different one is a market switch, not a reconnect (AGT-136).
+  protected _symbolInfoSource: string | undefined;
   protected _bars: Bar[] = [];
   private _barsDataContext?: ChartWidgetDataContext;
   protected _viewport: Viewport | null = null;
@@ -178,6 +183,7 @@ export class ChartWidgetCore {
   protected _onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
   protected _onLoadFailed?: (context: ChartWidgetDataContext) => void;
   protected _onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  protected _onSourceChange?: (source: string | undefined) => void;
   protected _onSymbolChange?: (symbol: string) => void;
   protected _onIntervalChange?: (interval: string) => void;
   protected _scheduleRender: () => void;
@@ -193,6 +199,7 @@ export class ChartWidgetCore {
     this._onLoadingChanged = options.onLoadingChanged;
     this._onLoadFailed = options.onLoadFailed;
     this._onLoadingMoreBarsChanged = options.onLoadingMoreBarsChanged;
+    this._onSourceChange = options.onSourceChange;
     this._onSymbolChange = options.onSymbolChange;
     this._onIntervalChange = options.onIntervalChange;
     this._scheduleRender = options.scheduleRender || (() => {});
@@ -279,8 +286,9 @@ export class ChartWidgetCore {
    * setSymbol in the same tick as initialize(), and without it the init
    * callback can land last and load bars for the symbol the chart just left.
    */
-  protected _resolveSymbolAndLoad(symbol: string): void {
+  protected _resolveSymbolAndLoad(symbol: string, resubscribeOnError = false): void {
     const resolveRequestId = ++this._resolveSymbolRequestId;
+    const source = this._datafeed.getSourceIdentity?.();
 
     this._datafeed.resolveSymbol(
       symbol,
@@ -288,7 +296,8 @@ export class ChartWidgetCore {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
         this._symbolInfo = symbolInfo;
         this._symbolInfoSymbol = symbol;
-        this._loadBars();
+        this._symbolInfoSource = source;
+        this._loadBars(resubscribeOnError);
       },
       (error) => {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
@@ -627,6 +636,11 @@ export class ChartWidgetCore {
         ) {
           return;
         }
+        const source = this._datafeed.getSourceIdentity?.();
+        if (source !== undefined && source !== this._symbolInfoSource) {
+          this._switchSource();
+          return;
+        }
         // Re-subscribe even if the reload fails: honouring this callback spends
         // the datafeed's one-shot reset, so only a fresh `subscribeBars` can
         // re-arm it.
@@ -859,6 +873,37 @@ export class ChartWidgetCore {
     this._resolveSymbolAndLoad(symbol);
   }
 
+  /**
+   * The datafeed now serves another venue under the same symbol (okx-t BTCUSDT
+   * -> woo-t BTCUSDT): handled like a symbol switch, except that nothing of the
+   * previous venue may stay on screen, not even faded, because its candles read
+   * as this venue's (AGT-136). Bars are dropped, the symbol is re-resolved for the
+   * new venue's precision, and the reload re-arms the reset even if it fails.
+   */
+  protected _switchSource(): void {
+    if (this._barSubscriptionGuid) {
+      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
+      this._barSubscriptionGuid = null;
+    }
+    this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
+    this._symbolInfo = null;
+    this._symbolInfoSymbol = null;
+    this._symbolInfoSource = undefined;
+    this._bars = [];
+    this._plots = [];
+    this._hasMoreHistoricalData = true;
+    this._setLoadingMoreBars(false);
+    this._clearQueuedLeftHistoryBackfill();
+    this._setLoading(true);
+    this._emitBarsChanged('history');
+    this._onPlotsChanged?.(this._plots);
+    this._indicatorManager?.setBars(this._bars);
+    this._onSourceChange?.(this._datafeed.getSourceIdentity?.());
+    this._scheduleRender();
+    this._resolveSymbolAndLoad(this._symbol, true);
+  }
+
   setInterval(interval: ResolutionInput): void {
     if (this._disposed) return;
     const normalizedInterval = normalizeResolution(interval, this._interval);
@@ -888,6 +933,11 @@ export class ChartWidgetCore {
 
   getBars(): Bar[] {
     return this._bars;
+  }
+
+  /** The datafeed source the current market was resolved from, when the feed reports one. */
+  getSourceIdentity(): string | undefined {
+    return this._symbolInfoSource ?? this._datafeed.getSourceIdentity?.();
   }
 
   getAnalysisContext(visibleRange?: AnalysisTimeRange): AnalysisContextReadResult {
@@ -982,6 +1032,7 @@ export class ChartWidgetCore {
     this._onViewportChanged = undefined;
     this._onLoadingChanged = undefined;
     this._onLoadFailed = undefined;
+    this._onSourceChange = undefined;
     this._onSymbolChange = undefined;
     this._onIntervalChange = undefined;
     this._scheduleRender = () => {};

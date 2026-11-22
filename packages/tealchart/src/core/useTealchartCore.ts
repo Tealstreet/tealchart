@@ -44,6 +44,8 @@ export interface TealchartCoreState {
   isLoadingMoreBars: boolean;
   /** The current symbol and interval's last load failed, and nothing has retried it since. */
   loadFailed: boolean;
+  /** The datafeed source the core last switched to under an unchanged symbol (AGT-136). */
+  sourceIdentity: string | undefined;
   symbol: string;
   interval: string;
   unifiedLayout: UnifiedPaneLayout;
@@ -92,6 +94,10 @@ type TealchartCoreStateAction =
   | {
       type: 'loadFailed';
       context: ChartWidgetDataContext;
+    }
+  | {
+      type: 'sourceChanged';
+      source: string | undefined;
     }
   | {
       type: 'loadingMoreBarsChanged';
@@ -186,6 +192,14 @@ export function tealchartCoreStateReducer(
         ...state,
         loadFailed: true,
       };
+    case 'sourceChanged':
+      return {
+        ...state,
+        sourceIdentity: action.source,
+        isLoading: true,
+        isLoadingMoreBars: false,
+        loadFailed: false,
+      };
     case 'loadingMoreBarsChanged':
       if (!dataContextMatches(state, action.context)) return state;
       return {
@@ -258,6 +272,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     isLoading: enabled,
     isLoadingMoreBars: false,
     loadFailed: false,
+    sourceIdentity: undefined,
     symbol: options.symbol,
     interval: normalizeResolution(options.interval, '1h'),
     unifiedLayout: EMPTY_PANE_LAYOUT,
@@ -296,6 +311,9 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       },
       onLoadFailed: (context) => {
         dispatchCoreState({ type: 'loadFailed', context });
+      },
+      onSourceChange: (source) => {
+        dispatchCoreState({ type: 'sourceChanged', source });
       },
       onLoadingMoreBarsChanged: (loading, context) => {
         dispatchCoreState({ type: 'loadingMoreBarsChanged', loading, context });
@@ -384,6 +402,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     isLoading: coreState.isLoading,
     isLoadingMoreBars: coreState.isLoadingMoreBars,
     loadFailed: coreState.loadFailed,
+    sourceIdentity: coreState.sourceIdentity,
     symbol: coreState.symbol,
     interval: coreState.interval,
     unifiedLayout: core?.getUnifiedLayout() ?? coreState.unifiedLayout,

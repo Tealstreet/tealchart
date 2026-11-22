@@ -145,6 +145,15 @@ export function withNativeLiveEdgeViewScale(viewScale: ViewScaleState): ViewScal
   };
 }
 
+/**
+ * The market the viewport belongs to. A venue switch under the same symbol
+ * (okx-t BTCUSDT -> woo-t BTCUSDT) is a different market to the viewport, so its
+ * price fit and hand-scaled axis reset as on a symbol switch (AGT-136).
+ */
+export function nativeViewportMarket(symbol: string, sourceIdentity: string | undefined): string {
+  return sourceIdentity === undefined ? symbol : `${sourceIdentity}\n${symbol}`;
+}
+
 export function createNativeViewportDataKey(symbol: string, interval: string): string {
   return `${symbol}\n${interval}`;
 }
