@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   captureNativeDataLoadViewScale,
   createNativeViewportDataKey,
+  nativeViewportMarket,
   NATIVE_EMPTY_RENDER_VIEWPORT,
   resolveNativeHistoryBackfillHint,
   resolveNativeRenderViewport,
@@ -359,7 +360,9 @@ describe('useNativeViewportRuntime helpers', () => {
     expect((restored!.endTime - restored!.startTime) / (5 * 60_000)).toBeCloseTo(40, 4);
   });
 
-  it('drops the captured price fit on a symbol switch but keeps it across intervals', () => {
+  // This helper only answers for a symbol switch. An interval switch drops the price fit
+  // and the scroll position anyway, via `withNativeLiveEdgeViewScale` (AGT-147).
+  it('drops the captured price fit on a symbol switch', () => {
     expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'DOGE-USDC', previousSymbol: 'BTC-USD' })).toBe(true);
     expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'BTC-USD', previousSymbol: 'BTC-USD' })).toBe(false);
   });
@@ -415,5 +418,21 @@ describe('useNativeViewportRuntime helpers', () => {
 
     // Same zoom either way - only the price fit differs.
     expect(refit!.endTime - refit!.startTime).toBe(carried!.endTime - carried!.startTime);
+  });
+});
+
+describe('nativeViewportMarket (AGT-136)', () => {
+  it('is a different market to the viewport after a same-symbol venue switch', () => {
+    expect(nativeViewportMarket('BTCUSDT', 'woo:live')).not.toBe(nativeViewportMarket('BTCUSDT', 'okx:live'));
+    expect(
+      shouldResetNativeViewScalePricePadding({
+        previousSymbol: nativeViewportMarket('BTCUSDT', undefined),
+        nextSymbol: nativeViewportMarket('BTCUSDT', 'woo:live'),
+      }),
+    ).toBe(true);
+  });
+
+  it('is the bare symbol for a datafeed that reports no source', () => {
+    expect(nativeViewportMarket('BTCUSDT', undefined)).toBe('BTCUSDT');
   });
 });

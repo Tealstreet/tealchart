@@ -6,6 +6,8 @@ import {
   calculatePartialBracketPercentFromDelta,
   PARTIAL_BRACKET_DIMMED_OPACITY,
   PARTIAL_BRACKET_MARKER_INTERVAL,
+  PARTIAL_BRACKET_PERCENTS,
+  resolvePartialBracketLadderDirection,
   resolvePartialBracketMarkers,
 } from './partialBrackets';
 
@@ -148,5 +150,43 @@ describe('resolvePartialBracketMarkers', () => {
         expect(marker.centerX - marker.width / 2).toBeGreaterThanOrEqual(19.999);
       }
     });
+  });
+
+  // The side used to follow the sign of the drag, so a finger wobbling across
+  // the origin swapped every chip to the other side mid-drag. Native pins it.
+  describe('a pinned ladder direction', () => {
+    it('holds every marker still while the finger crosses the origin', () => {
+      const centers = (currentX: number) =>
+        resolvePartialBracketMarkers({ ...BASE, currentX, ladderDirection: -1 }).map((marker) => marker.centerX);
+      const still = centers(400);
+      for (const currentX of [240, 390, 410, 560]) {
+        expect(centers(currentX)).toEqual(still);
+      }
+      expect(still[4]).toBe(400 - PARTIAL_BRACKET_MARKER_INTERVAL * 4);
+    });
+
+    it('still selects by distance on the side the ladder is not drawn on', () => {
+      const active = resolvePartialBracketMarkers({ ...BASE, currentX: 500, ladderDirection: -1 }).find(
+        (marker) => marker.isActive,
+      );
+      expect(active?.percent).toBe(calculatePartialBracketPercentFromDelta(100));
+    });
+  });
+});
+
+describe('resolvePartialBracketLadderDirection', () => {
+  const bandCount = PARTIAL_BRACKET_PERCENTS.length;
+
+  it('draws to the right when the whole ladder fits there', () => {
+    expect(resolvePartialBracketLadderDirection({ dragStartX: 400, zoneLeft: 0, zoneRight: 800, bandCount })).toBe(1);
+  });
+
+  it('draws toward the open chart from a start near the right edge', () => {
+    expect(resolvePartialBracketLadderDirection({ dragStartX: 700, zoneLeft: 0, zoneRight: 760, bandCount })).toBe(-1);
+  });
+
+  it('takes the roomier side when neither fits', () => {
+    expect(resolvePartialBracketLadderDirection({ dragStartX: 150, zoneLeft: 0, zoneRight: 200, bandCount })).toBe(-1);
+    expect(resolvePartialBracketLadderDirection({ dragStartX: 50, zoneLeft: 0, zoneRight: 200, bandCount })).toBe(1);
   });
 });

@@ -18,6 +18,7 @@ import type {
   PeriodParams,
   ResolutionString,
   TealchartWidgetOptions,
+  Viewport,
   WidgetEventCallback,
 } from './types';
 
@@ -4581,6 +4582,93 @@ describe('TealchartWidget', () => {
       datafeed._subscribeCb?.(lastBarTick);
 
       expect(setRenderOptionsCalls).toHaveLength(0);
+    });
+
+    // AGT-156 (Sam, 2026-11-22): in auto scale mode each new candle pushes the series
+    // left by one candle width, so the newest keeps its x. Web never moved the view on
+    // a new bar, so candles printed off the right edge.
+    describe('live edge follow (AGT-156)', () => {
+      type WidgetViewport = { _viewport: Viewport | null; _viewportController: { disableAutoScale(id: string): void } };
+      const MINUTE = 60_000;
+
+      function setup(view: (bars: Bar[]) => Viewport) {
+        const datafeed = createMockDatafeed();
+        const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
+        const bars = makeBars(10, 1_000_000, MINUTE);
+        completeInit(datafeed, bars);
+        const internals = widget as unknown as WidgetViewport;
+        internals._viewport = view(bars);
+        const nextBar = (index: number): Bar => ({ ...bars[9]!, time: bars[9]!.time + index * MINUTE });
+        return { datafeed, internals, bars, nextBar, widget };
+      }
+
+      it('shifts a view showing the newest candle left by exactly one bar per new bar', () => {
+        const { datafeed, internals, nextBar, widget } = setup((bars) => ({
+          startTime: bars[3]!.time,
+          endTime: bars[9]!.time + 2 * MINUTE,
+          priceMin: 49_000,
+          priceMax: 51_000,
+        }));
+        const before = internals._viewport!;
+
+        datafeed._subscribeCb?.(nextBar(1));
+        expect(internals._viewport!.startTime).toBe(before.startTime + MINUTE);
+        expect(internals._viewport!.endTime).toBe(before.endTime + MINUTE);
+
+        datafeed._subscribeCb?.(nextBar(2));
+        expect(internals._viewport!.startTime).toBe(before.startTime + 2 * MINUTE);
+        expect(internals._viewport!.endTime).toBe(before.endTime + 2 * MINUTE);
+        widget.remove();
+      });
+
+      it('keeps the time window still on a tick to the bar in progress', () => {
+        const { bars, datafeed, internals, widget } = setup((bars) => ({
+          startTime: bars[3]!.time,
+          endTime: bars[9]!.time + 2 * MINUTE,
+          priceMin: 49_000,
+          priceMax: 51_000,
+        }));
+        const before = internals._viewport!;
+
+        datafeed._subscribeCb?.({ ...bars[9]!, close: bars[9]!.close + 5 });
+
+        expect(internals._viewport!.startTime).toBe(before.startTime);
+        expect(internals._viewport!.endTime).toBe(before.endTime);
+        widget.remove();
+      });
+
+      it('leaves a view scrolled into history where it is', () => {
+        const { datafeed, internals, nextBar, widget } = setup((bars) => ({
+          startTime: bars[1]!.time,
+          endTime: bars[5]!.time,
+          priceMin: 49_000,
+          priceMax: 51_000,
+        }));
+        const before = internals._viewport!;
+
+        datafeed._subscribeCb?.(nextBar(1));
+
+        expect(internals._viewport!.startTime).toBe(before.startTime);
+        expect(internals._viewport!.endTime).toBe(before.endTime);
+        widget.remove();
+      });
+
+      it('leaves the view where it is with auto scale off', () => {
+        const { datafeed, internals, nextBar, widget } = setup((bars) => ({
+          startTime: bars[3]!.time,
+          endTime: bars[9]!.time + 2 * MINUTE,
+          priceMin: 49_000,
+          priceMax: 51_000,
+        }));
+        internals._viewportController.disableAutoScale('main');
+        const before = internals._viewport!;
+
+        datafeed._subscribeCb?.(nextBar(1));
+
+        expect(internals._viewport!.startTime).toBe(before.startTime);
+        expect(internals._viewport!.endTime).toBe(before.endTime);
+        widget.remove();
+      });
     });
   });
 

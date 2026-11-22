@@ -22,6 +22,7 @@ import {
   hasNativeOrderTouchState,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
+  shouldRetireActiveNativeBracketDrag,
 } from './nativeOemsDragState';
 import {
   startNativeBracketMoveAction,
@@ -512,8 +513,23 @@ export function useNativeOemsLineRuntime({
   };
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
-    // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot`.
-    if (bracketDragInteractionState.active.value) return;
+    // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot` -
+    // except one whose own line has gone, see `shouldRetireActiveNativeBracketDrag`.
+    if (bracketDragInteractionState.active.value) {
+      if (
+        shouldRetireActiveNativeBracketDrag({
+          state: bracketDragInteractionState,
+          orderLines: lineSnapshot.orderLines,
+          positionLines: lineSnapshot.positionLines,
+          getOrderObjectId: getNativeOrderObjectId,
+          getPositionObjectId: getNativePositionObjectId,
+        })
+      ) {
+        bracketHandoffRef.current = null;
+        clearNativeBracketDrag();
+      }
+      return;
+    }
 
     const pendingObserved = shouldClearNativeBracketDragForSnapshot({
       state: bracketDragInteractionState,
@@ -536,6 +552,7 @@ export function useNativeOemsLineRuntime({
     releaseNativeBracketDragAfterCommit(handoffToRelease);
   }, [
     bracketDragInteractionState,
+    clearNativeBracketDrag,
     releaseNativeBracketDragAfterCommit,
     lineSnapshot.orderLines,
     lineSnapshot.positionLines,

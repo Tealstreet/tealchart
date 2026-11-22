@@ -25,7 +25,7 @@ import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './his
 import { EventEmitter } from '../events/EventEmitter';
 import { PaneManager } from '../rendering/PaneManager';
 import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
-import { intervalToMs } from '../utils/intervalMs';
+import { barCloseTimeMs, intervalToMs } from '../utils/intervalMs';
 import { normalizeDatafeedBar, normalizeDatafeedBars } from '../utils/normalizeDatafeedBars';
 import { normalizeResolution } from '../utils/normalizeResolution';
 import {
@@ -48,6 +48,15 @@ type PlotOutput = {
 
 // Constants
 export const INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
+/**
+ * A rollover after this much stream silence refetches the bar it closed: the
+ * runtime was suspended (iOS backgrounding) or the socket was down, so the
+ * closed bar never received its final ticks.
+ */
+export const LIVE_SILENCE_BACKFILL_MS = 30_000;
+const LIVE_GAP_BACKFILL_MAX_ATTEMPTS = 6;
+const LIVE_GAP_BACKFILL_RETRY_BASE_MS = 5_000;
+const LIVE_GAP_BACKFILL_RETRY_MAX_MS = 60_000;
 
 /**
  * Convert resolution string to milliseconds
@@ -89,7 +98,15 @@ export interface ChartWidgetCoreOptions {
   onPlotsChanged?: (plots: PlotOutput[]) => void;
   onViewportChanged?: (viewport: Viewport) => void;
   onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  /**
+   * A history load or symbol resolve for this context failed. `loading: false`
+   * alone cannot say so, and hosts drew the previous market's bars as if the
+   * load had finished (AGT-127).
+   */
+  onLoadFailed?: (context: ChartWidgetDataContext) => void;
   onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  /** The datafeed switched venue under the same symbol; hosts reset the view as for a symbol switch. */
+  onSourceChange?: (source: string | undefined) => void;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
 }
@@ -118,6 +135,9 @@ export class ChartWidgetCore {
   // The symbol `_symbolInfo` was resolved for. `symbolInfo.name` cannot answer
   // this: an exchange-prefixed request resolves to a clean-symbol name.
   protected _symbolInfoSymbol: string | null = null;
+  // The datafeed source `_symbolInfo` (and the bars loaded for it) came from.
+  // A reset under a different one is a market switch, not a reconnect (AGT-136).
+  protected _symbolInfoSource: string | undefined;
   protected _bars: Bar[] = [];
   private _barsDataContext?: ChartWidgetDataContext;
   protected _viewport: Viewport | null = null;
@@ -144,6 +164,12 @@ export class ChartWidgetCore {
 
   // Subscription tracking
   protected _barSubscriptionGuid: string | null = null;
+  // Wall-clock receipt of the last live bar, for the rollover silence check.
+  protected _lastLiveBarAt = 0;
+  // Earliest bar time a live-gap backfill must cover; set while one is in flight.
+  protected _liveGapBackfillFrom: number | null = null;
+  protected _liveGapBackfillPending = false;
+  protected _liveGapRetryTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Managers
   protected _paneManager: PaneManager;
@@ -155,7 +181,9 @@ export class ChartWidgetCore {
   protected _onPlotsChanged?: (plots: PlotOutput[]) => void;
   protected _onViewportChanged?: (viewport: Viewport) => void;
   protected _onLoadingChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  protected _onLoadFailed?: (context: ChartWidgetDataContext) => void;
   protected _onLoadingMoreBarsChanged?: (loading: boolean, context: ChartWidgetDataContext) => void;
+  protected _onSourceChange?: (source: string | undefined) => void;
   protected _onSymbolChange?: (symbol: string) => void;
   protected _onIntervalChange?: (interval: string) => void;
   protected _scheduleRender: () => void;
@@ -169,7 +197,9 @@ export class ChartWidgetCore {
     this._onPlotsChanged = options.onPlotsChanged;
     this._onViewportChanged = options.onViewportChanged;
     this._onLoadingChanged = options.onLoadingChanged;
+    this._onLoadFailed = options.onLoadFailed;
     this._onLoadingMoreBarsChanged = options.onLoadingMoreBarsChanged;
+    this._onSourceChange = options.onSourceChange;
     this._onSymbolChange = options.onSymbolChange;
     this._onIntervalChange = options.onIntervalChange;
     this._scheduleRender = options.scheduleRender || (() => {});
@@ -256,8 +286,9 @@ export class ChartWidgetCore {
    * setSymbol in the same tick as initialize(), and without it the init
    * callback can land last and load bars for the symbol the chart just left.
    */
-  protected _resolveSymbolAndLoad(symbol: string): void {
+  protected _resolveSymbolAndLoad(symbol: string, resubscribeOnError = false): void {
     const resolveRequestId = ++this._resolveSymbolRequestId;
+    const source = this._datafeed.getSourceIdentity?.();
 
     this._datafeed.resolveSymbol(
       symbol,
@@ -265,12 +296,14 @@ export class ChartWidgetCore {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
         this._symbolInfo = symbolInfo;
         this._symbolInfoSymbol = symbol;
-        this._loadBars();
+        this._symbolInfoSource = source;
+        this._loadBars(resubscribeOnError);
       },
       (error) => {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
         console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
         this._setLoading(false);
+        this._onLoadFailed?.(this._getDataContext());
       },
     );
   }
@@ -376,6 +409,7 @@ export class ChartWidgetCore {
 
     const requestId = ++this._loadBarsRequestId;
     this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
     this._setLoadingMoreBars(false);
     this._clearQueuedLeftHistoryBackfill();
     const requestSymbol = this._symbol;
@@ -418,6 +452,9 @@ export class ChartWidgetCore {
 
         this._setLoading(false);
         console.error('[ChartWidgetCore] Failed to load bars:', error);
+        // The request's own market: a symbol change still resolving has not
+        // bumped the request id yet, and its failure is not the new market's.
+        this._onLoadFailed?.({ symbol: requestSymbol, interval: requestInterval, requestId });
 
         // Re-subscribe even though the history load failed, but ONLY for the
         // cache-reset caller. `_subscribeToBars` is what calls
@@ -570,6 +607,7 @@ export class ChartWidgetCore {
     }
 
     this._barSubscriptionGuid = `chart_${this._symbol}_${this._interval}_${Date.now()}`;
+    this._lastLiveBarAt = 0;
     const subscriptionGuid = this._barSubscriptionGuid;
     const subscriptionSymbol = this._symbol;
     const subscriptionInterval = this._interval;
@@ -598,6 +636,11 @@ export class ChartWidgetCore {
         ) {
           return;
         }
+        const source = this._datafeed.getSourceIdentity?.();
+        if (source !== undefined && source !== this._symbolInfoSource) {
+          this._switchSource();
+          return;
+        }
         // Re-subscribe even if the reload fails: honouring this callback spends
         // the datafeed's one-shot reset, so only a fresh `subscribeBars` can
         // re-arm it.
@@ -608,6 +651,9 @@ export class ChartWidgetCore {
 
   protected _handleNewBar(bar: Bar): void {
     if (this._disposed) return;
+    const receivedAt = Date.now();
+    const silentForMs = this._lastLiveBarAt ? receivedAt - this._lastLiveBarAt : 0;
+    this._lastLiveBarAt = receivedAt;
     if (this._bars.length === 0) {
       this._bars.push(bar);
     } else {
@@ -624,12 +670,128 @@ export class ChartWidgetCore {
           this._emitRealtimeUpdate();
         }
         this._bars.push(bar);
+        // A live stream only carries the bar in progress. Bars that closed while
+        // the app was backgrounded or the socket was down never arrive on it, so
+        // fetch them — and the final values of the bar the gap started on.
+        const skippedBars = bar.time > barCloseTimeMs(this._interval, lastBar.time);
+        if (skippedBars || silentForMs > LIVE_SILENCE_BACKFILL_MS) {
+          this._backfillLiveGap(lastBar.time);
+        }
       } else {
         return;
       }
     }
 
     this._queueRealtimeUpdate();
+  }
+
+  /**
+   * Fetches bars from `fromTime` to now and merges them under the live bar.
+   *
+   * The live bar stays authoritative for its own slot: it is newer than any
+   * history response. A second gap while one fetch is in flight widens the
+   * range of a follow-up request instead of racing it.
+   */
+  protected _backfillLiveGap(fromTime: number): void {
+    if (this._disposed || !this._symbolInfo || this._isLoading) return;
+    if (this._liveGapBackfillFrom !== null) {
+      this._liveGapBackfillFrom = Math.min(this._liveGapBackfillFrom, fromTime);
+      this._liveGapBackfillPending = true;
+      return;
+    }
+    this._liveGapBackfillFrom = fromTime;
+    this._liveGapBackfillPending = false;
+    this._requestLiveGap(fromTime, 0);
+  }
+
+  /**
+   * A failed read retries with backoff: right after a resume the account's
+   * route can refuse until its socket and auth recover, which is exactly when
+   * the gap exists.
+   */
+  private _requestLiveGap(fromTime: number, attempt: number): void {
+    if (!this._symbolInfo) return;
+    const requestId = this._loadBarsRequestId;
+    const requestSymbol = this._symbol;
+    const requestInterval = this._interval;
+    const intervalMs = getIntervalMs(requestInterval);
+    const now = Date.now();
+    const countBack = Math.max(2, Math.ceil((now - fromTime) / intervalMs) + 1);
+    // The bar in progress when the request went out: the venue's copy of it is
+    // mid-bar, so it and anything newer stay with the stream.
+    const liveTimeAtRequest = this._bars[this._bars.length - 1]?.time ?? Number.POSITIVE_INFINITY;
+    const isCurrent = () =>
+      !this._disposed &&
+      requestId === this._loadBarsRequestId &&
+      requestSymbol === this._symbol &&
+      requestInterval === this._interval;
+    const finish = () => {
+      const followUpFrom = this._liveGapBackfillPending ? this._liveGapBackfillFrom : null;
+      this._clearLiveGapBackfill();
+      if (followUpFrom !== null) this._backfillLiveGap(followUpFrom);
+    };
+
+    this._datafeed.getBars(
+      this._symbolInfo,
+      requestInterval,
+      {
+        countBack,
+        from: Math.floor(fromTime / 1000),
+        to: Math.ceil(now / 1000),
+        firstDataRequest: false,
+      },
+      (bars) => {
+        if (!isCurrent()) return;
+        this._mergeLiveGapBars(normalizeDatafeedBars(bars, requestInterval), fromTime, liveTimeAtRequest);
+        finish();
+      },
+      (error) => {
+        if (!isCurrent()) return;
+        console.error('[ChartWidgetCore] Failed to backfill live bar gap:', error);
+        if (attempt + 1 >= LIVE_GAP_BACKFILL_MAX_ATTEMPTS) {
+          finish();
+          return;
+        }
+        const delay = Math.min(LIVE_GAP_BACKFILL_RETRY_BASE_MS * 2 ** attempt, LIVE_GAP_BACKFILL_RETRY_MAX_MS);
+        this._liveGapRetryTimer = setTimeout(() => {
+          this._liveGapRetryTimer = null;
+          if (!isCurrent() || this._liveGapBackfillFrom === null) return;
+          // The retry covers any gap that arrived while it waited.
+          this._liveGapBackfillPending = false;
+          this._requestLiveGap(this._liveGapBackfillFrom, attempt + 1);
+        }, delay);
+      },
+    );
+  }
+
+  protected _mergeLiveGapBars(fetched: Bar[], fromTime: number, liveTimeAtRequest: number): void {
+    if (this._bars.length === 0) return;
+    const byTime = new Map<number, Bar>();
+    for (const bar of this._bars) byTime.set(bar.time, bar);
+    let changed = false;
+    for (const bar of fetched) {
+      if (bar.time < fromTime || bar.time >= liveTimeAtRequest) continue;
+      const existing = byTime.get(bar.time);
+      if (existing && barValuesEqual(existing, bar)) continue;
+      byTime.set(bar.time, bar);
+      changed = true;
+    }
+    if (!changed) return;
+
+    this._clearPendingRealtimeUpdate();
+    this._bars = [...byTime.values()].sort((a, b) => a.time - b.time);
+    this._emitBarsChanged('history');
+    this._scheduleRender();
+    this._indicatorManager?.setBars(this._bars);
+  }
+
+  protected _clearLiveGapBackfill(): void {
+    this._liveGapBackfillFrom = null;
+    this._liveGapBackfillPending = false;
+    if (this._liveGapRetryTimer !== null) {
+      clearTimeout(this._liveGapRetryTimer);
+      this._liveGapRetryTimer = null;
+    }
   }
 
   protected _emitRealtimeUpdate(): void {
@@ -701,13 +863,45 @@ export class ChartWidgetCore {
 
     this._symbol = symbol;
     this._onSymbolChange?.(symbol);
-    // Don't clear bars — keep old candles visible (faded) until new data arrives
+    // Bars are kept, tagged with their market; hosts must not draw another
+    // symbol's under this one (native clears them, AGT-127).
     this._hasMoreHistoricalData = true;
     this._setLoadingMoreBars(false);
     this._clearQueuedLeftHistoryBackfill();
     this._setLoading(true);
 
     this._resolveSymbolAndLoad(symbol);
+  }
+
+  /**
+   * The datafeed now serves another venue under the same symbol (okx-t BTCUSDT
+   * -> woo-t BTCUSDT): handled like a symbol switch, except that nothing of the
+   * previous venue may stay on screen, not even faded, because its candles read
+   * as this venue's (AGT-136). Bars are dropped, the symbol is re-resolved for the
+   * new venue's precision, and the reload re-arms the reset even if it fails.
+   */
+  protected _switchSource(): void {
+    if (this._barSubscriptionGuid) {
+      this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
+      this._barSubscriptionGuid = null;
+    }
+    this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
+    this._symbolInfo = null;
+    this._symbolInfoSymbol = null;
+    this._symbolInfoSource = undefined;
+    this._bars = [];
+    this._plots = [];
+    this._hasMoreHistoricalData = true;
+    this._setLoadingMoreBars(false);
+    this._clearQueuedLeftHistoryBackfill();
+    this._setLoading(true);
+    this._emitBarsChanged('history');
+    this._onPlotsChanged?.(this._plots);
+    this._indicatorManager?.setBars(this._bars);
+    this._onSourceChange?.(this._datafeed.getSourceIdentity?.());
+    this._scheduleRender();
+    this._resolveSymbolAndLoad(this._symbol, true);
   }
 
   setInterval(interval: ResolutionInput): void {
@@ -739,6 +933,11 @@ export class ChartWidgetCore {
 
   getBars(): Bar[] {
     return this._bars;
+  }
+
+  /** The datafeed source the current market was resolved from, when the feed reports one. */
+  getSourceIdentity(): string | undefined {
+    return this._symbolInfoSource ?? this._datafeed.getSourceIdentity?.();
   }
 
   getAnalysisContext(visibleRange?: AnalysisTimeRange): AnalysisContextReadResult {
@@ -820,6 +1019,7 @@ export class ChartWidgetCore {
     this._loadBarsRequestId += 1;
     this._clearQueuedLeftHistoryBackfill();
     this._clearPendingRealtimeUpdate();
+    this._clearLiveGapBackfill();
     const subscriptionGuid = this._barSubscriptionGuid;
     this._barSubscriptionGuid = null;
     if (subscriptionGuid) {
@@ -831,6 +1031,8 @@ export class ChartWidgetCore {
     this._onPlotsChanged = undefined;
     this._onViewportChanged = undefined;
     this._onLoadingChanged = undefined;
+    this._onLoadFailed = undefined;
+    this._onSourceChange = undefined;
     this._onSymbolChange = undefined;
     this._onIntervalChange = undefined;
     this._scheduleRender = () => {};

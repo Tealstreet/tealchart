@@ -61,8 +61,21 @@ export function View({ accessibilityLabel, children, onStartShouldSetResponder, 
   );
 }
 
-export function Text({ children }: { children?: ReactNode }) {
-  return <span>{children}</span>;
+interface TextProps {
+  allowFontScaling?: boolean;
+  children?: ReactNode;
+  maxFontSizeMultiplier?: number;
+}
+
+export function Text({ allowFontScaling, children, maxFontSizeMultiplier }: TextProps) {
+  return (
+    <span
+      data-allow-font-scaling={allowFontScaling === undefined ? undefined : String(allowFontScaling)}
+      data-max-font-size-multiplier={maxFontSizeMultiplier}
+    >
+      {children}
+    </span>
+  );
 }
 
 export function TextInput({
@@ -178,5 +191,42 @@ export const Alert = {
   lastButtons: [] as AlertButton[],
   alert(_title?: string, _message?: string, buttons?: AlertButton[]): void {
     Alert.lastButtons = buttons ?? [];
+  },
+};
+
+type AppStateListener = (next: string) => void;
+const appStateListeners = new Set<AppStateListener>();
+
+// Tests drive app focus through `AppState.emit`, which updates `currentState`
+// before notifying listeners, as React Native does.
+export const AppState = {
+  currentState: 'active',
+  addEventListener(_type: 'change', listener: AppStateListener) {
+    appStateListeners.add(listener);
+    return { remove: () => appStateListeners.delete(listener) };
+  },
+  emit(next: string): void {
+    AppState.currentState = next;
+    for (const listener of [...appStateListeners]) listener(next);
+  },
+};
+
+type DimensionsListener = () => void;
+const dimensionsListeners = new Set<DimensionsListener>();
+let windowFontScale = 1;
+
+// Tests drive the system text size through `Dimensions.setFontScale`, which
+// notifies 'change' listeners as a Larger Text change does on a device.
+export const Dimensions = {
+  get(_dimension: 'window' | 'screen') {
+    return { fontScale: windowFontScale, height: 844, scale: 3, width: 390 };
+  },
+  addEventListener(_type: 'change', listener: DimensionsListener) {
+    dimensionsListeners.add(listener);
+    return { remove: () => dimensionsListeners.delete(listener) };
+  },
+  setFontScale(fontScale: number): void {
+    windowFontScale = fontScale;
+    for (const listener of [...dimensionsListeners]) listener();
   },
 };

@@ -1,5 +1,6 @@
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
@@ -12,7 +13,10 @@ import {
   getNativeLiveTailVisibleBar,
   getNativeLiveViewportMaxVolume,
   isNativeLiveLastTradeCurrent,
+  routeNativeLatestBar,
+  shouldDeferNativeLiveTail,
   toNativeLiveTailBar,
+  useNativeLiveTailChannel,
 } from './nativeLiveTail';
 
 const market = getNativeLiveTailMarket({ symbol: 'BTCUSDT', interval: '1' });
@@ -142,5 +146,85 @@ describe('canPaintNativeLiveTail', () => {
     expect(paint({ commit: { ...commit, markerOnLastBar: true } })).toBe(false);
     expect(paint({ commit: { ...commit, fittedRange: null } })).toBe(false);
     expect(paint({ bar: null })).toBe(false);
+  });
+});
+
+describe('live tail across a bar rollover (AGT-90)', () => {
+  const context = { symbol: 'BTCUSDT', interval: '1' };
+  const ohlc = (time: number, close: number, high = Math.max(100, close), low = Math.min(100, close)) => ({
+    time,
+    open: 100,
+    high,
+    low,
+    close,
+    volume: 10,
+  });
+  const toVisible = (bars: ReturnType<typeof ohlc>[]): NativeVisibleBar[] =>
+    bars.map((entry, index) => ({ ...entry, interval: 60_000, sourceIndex: index, x: 0 }));
+  const commitFor = (bars: ReturnType<typeof ohlc>[]) => ({
+    drawingLive: true,
+    fittedRange: { high: 1_000, low: 0 } as const,
+    markerOnLastBar: false,
+    lastTradeMatch: undefined,
+    market,
+    time: bars[bars.length - 1]?.time,
+  });
+  /** What the candle worklets draw: each committed bar, the last one through the live tail. */
+  const drawn = (committed: NativeVisibleBar[], tail: Parameters<typeof getNativeLiveTailVisibleBar>[2]) =>
+    committed.map((_, index) => getNativeLiveTailVisibleBar(committed, index, tail, market));
+
+  it('defers only a new slot of the committed market', () => {
+    const commit = { market, time: 120_000 };
+    expect(shouldDeferNativeLiveTail({ bar: ohlc(180_000, 1), commit, market })).toBe(true);
+    expect(shouldDeferNativeLiveTail({ bar: ohlc(120_000, 1), commit, market })).toBe(false);
+    expect(shouldDeferNativeLiveTail({ bar: ohlc(180_000, 1), commit, market: 'ETHUSDT\n1' })).toBe(false);
+    expect(shouldDeferNativeLiveTail({ bar: ohlc(180_000, 1), commit: null, market })).toBe(false);
+    expect(shouldDeferNativeLiveTail({ bar: null, commit, market })).toBe(false);
+  });
+
+  it('keeps the closing candle on its final values until the new bar commits', () => {
+    const { result } = renderHook(() => useNativeLiveTailChannel());
+    const channel = result.current;
+
+    // React committed the bar early in its life; every later tick was painted live.
+    const committedBars = [ohlc(60_000, 105), ohlc(120_000, 101)];
+    let committed = toVisible(committedBars);
+    let commit = commitFor(committedBars);
+    const finalClosing = ohlc(120_000, 118, 120, 99);
+    expect(routeNativeLatestBar({ bar: finalClosing, channel, commit, context })).toBe(true);
+    expect(drawn(committed, channel.tail.value)[1]).toMatchObject({ close: 118, high: 120 });
+
+    // The first bar of the next slot: React has to render it.
+    const opening = ohlc(180_000, 118.5);
+    act(() => {
+      expect(routeNativeLatestBar({ bar: opening, channel, commit, context })).toBe(false);
+    });
+    // Until that commit lands, the closing candle must not fall back to what React
+    // committed for it long ago.
+    expect(drawn(committed, channel.tail.value)[1]).toMatchObject({ close: 118, high: 120 });
+
+    // The commit carries the final closing bar and the new one; its layout effect flushes.
+    const nextBars = [ohlc(60_000, 105), finalClosing, opening];
+    committed = toVisible(nextBars);
+    commit = commitFor(nextBars);
+    act(() => channel.flushDeferred(commit));
+    const frame = drawn(committed, channel.tail.value);
+    expect(frame[1]).toMatchObject({ close: 118, high: 120 });
+    expect(frame[2]).toMatchObject({ time: 180_000, close: 118.5 });
+    expect(channel.tail.value).toMatchObject({ time: 180_000, close: 118.5 });
+  });
+
+  it('holds a deferred bar across a commit that does not carry it yet', () => {
+    const { result } = renderHook(() => useNativeLiveTailChannel());
+    const channel = result.current;
+    const bars = [ohlc(60_000, 105), ohlc(120_000, 101)];
+    routeNativeLatestBar({ bar: ohlc(120_000, 110), channel, commit: commitFor(bars), context });
+    routeNativeLatestBar({ bar: ohlc(180_000, 111), channel, commit: commitFor(bars), context });
+    // An unrelated render commits the same bars: the tail stays on the closing candle.
+    channel.flushDeferred(commitFor(bars));
+    expect(channel.tail.value).toMatchObject({ time: 120_000, close: 110 });
+    // A market switch releases it: the old commit no longer describes the drawn market.
+    channel.flushDeferred({ market: 'ETHUSDT\n1', time: 60_000 });
+    expect(channel.tail.value).toMatchObject({ time: 180_000, close: 111 });
   });
 });

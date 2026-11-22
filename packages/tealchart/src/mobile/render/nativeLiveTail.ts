@@ -182,6 +182,29 @@ export function canPaintNativeLiveTail({
   return commit.lastTradeMatch === undefined || isNativeLiveLastTradeCurrent(lastTrade, commit.lastTradeMatch);
 }
 
+/**
+ * Hands one core emit to the live channel; true when the channel painted it completely and
+ * React may skip it. A rollover is deferred until the commit carrying it flushes it.
+ */
+export function routeNativeLatestBar({
+  bar,
+  channel,
+  commit,
+  context,
+}: {
+  bar: Bar | null;
+  channel: Pick<NativeLiveTailChannel, 'onLatestBar'>;
+  commit: NativeLiveTailCommit | null;
+  context: { symbol: string; interval: string };
+}): boolean {
+  const market = getNativeLiveTailMarket(context);
+  if (shouldDeferNativeLiveTail({ bar, commit, market })) {
+    channel.onLatestBar(bar, context, { defer: true });
+    return false;
+  }
+  return canPaintNativeLiveTail({ bar, commit, lastTrade: channel.onLatestBar(bar, context), market });
+}
+
 export interface NativeLiveTailFormat {
   axisFont: ReturnType<typeof Skia.Font>;
   downColor?: string;
@@ -189,10 +212,38 @@ export interface NativeLiveTailFormat {
   upColor?: string;
 }
 
+/**
+ * Whether a bar must wait for the commit that carries it: a new slot of the committed
+ * market. Published early, the tail stops matching the committed last bar, which drops
+ * back to the stale values React last committed for it until the new bars render (AGT-90).
+ */
+export function shouldDeferNativeLiveTail({
+  bar,
+  commit,
+  market,
+}: {
+  bar: Bar | null;
+  commit: Pick<NativeLiveTailCommit, 'market' | 'time'> | null;
+  market: string;
+}): boolean {
+  return Boolean(
+    bar && commit && commit.market && commit.market === market && commit.time !== undefined && bar.time !== commit.time,
+  );
+}
+
 export interface NativeLiveTailChannel {
+  /** Publishes a deferred bar once the committed last bar is that bar, or the market moved on. */
+  flushDeferred: (committed: { market: string; time: number | undefined }) => void;
   lastTrade: NativeLiveLastTradeSharedValue;
-  /** Publishes the newest bar and returns the last trade it published with it. */
-  onLatestBar: (bar: Bar | null, context: { symbol: string; interval: string }) => NativeLiveLastTrade | null;
+  /**
+   * Publishes the newest bar and returns the last trade it published with it. A deferred
+   * bar is held, leaving the published tail on the committed bar, and returns null.
+   */
+  onLatestBar: (
+    bar: Bar | null,
+    context: { symbol: string; interval: string },
+    options?: { defer?: boolean },
+  ) => NativeLiveLastTrade | null;
   setFormat: (format: NativeLiveTailFormat) => void;
   /** JS-side consumers (the legend) hear each published bar without a UI round trip. */
   subscribe: (listener: (bar: NativeLiveTailBar | null) => void) => () => void;
@@ -201,22 +252,24 @@ export interface NativeLiveTailChannel {
 
 /**
  * Owns the live tail. The core reports every emit here before React does, and the
- * chart's formatting inputs arrive from render; either republishes the newest bar.
+ * chart's formatting inputs arrive from render; either republishes the bar on screen.
  */
 export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   const tail = useSharedValue<NativeLiveTailBar | null>(null);
   const lastTrade = useSharedValue<NativeLiveLastTrade | null>(null);
-  const latestRef = useRef<{ bar: Bar | null; market: string } | null>(null);
+  /** What the shared values show; a format change republishes this, never a deferred bar. */
+  const shownRef = useRef<{ bar: Bar | null; market: string } | null>(null);
+  const deferredRef = useRef<{ bar: Bar | null; market: string } | null>(null);
   const formatRef = useRef<NativeLiveTailFormat | null>(null);
   const listenersRef = useRef(new Set<(bar: NativeLiveTailBar | null) => void>());
   const lastPublishedRef = useRef<NativeLiveTailBar | null>(null);
 
   const publish = useCallback((): NativeLiveLastTrade | null => {
-    const latest = latestRef.current;
+    const shown = shownRef.current;
     const format = formatRef.current;
     const nextLastTrade =
-      latest && format ? createNativeLiveLastTrade({ ...format, bar: latest.bar, market: latest.market }) : null;
-    const nextTail = toNativeLiveTailBar(latest?.bar, latest?.market ?? '');
+      shown && format ? createNativeLiveLastTrade({ ...format, bar: shown.bar, market: shown.market }) : null;
+    const nextTail = toNativeLiveTailBar(shown?.bar, shown?.market ?? '');
     tail.value = nextTail;
     lastTrade.value = nextLastTrade;
     lastPublishedRef.current = nextTail;
@@ -225,9 +278,27 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
   }, [lastTrade, tail]);
 
   const onLatestBar = useCallback(
-    (bar: Bar | null, context: { symbol: string; interval: string }) => {
-      latestRef.current = { bar, market: getNativeLiveTailMarket(context) };
+    (bar: Bar | null, context: { symbol: string; interval: string }, options?: { defer?: boolean }) => {
+      const next = { bar, market: getNativeLiveTailMarket(context) };
+      if (options?.defer) {
+        deferredRef.current = next;
+        return null;
+      }
+      deferredRef.current = null;
+      shownRef.current = next;
       return publish();
+    },
+    [publish],
+  );
+
+  const flushDeferred = useCallback(
+    (committed: { market: string; time: number | undefined }) => {
+      const deferred = deferredRef.current;
+      if (!deferred) return;
+      if (deferred.market === committed.market && deferred.bar?.time !== committed.time) return;
+      deferredRef.current = null;
+      shownRef.current = deferred;
+      publish();
     },
     [publish],
   );
@@ -250,7 +321,7 @@ export function useNativeLiveTailChannel(): NativeLiveTailChannel {
     };
   }, []);
 
-  return { lastTrade, onLatestBar, setFormat, subscribe, tail };
+  return { flushDeferred, lastTrade, onLatestBar, setFormat, subscribe, tail };
 }
 
 /**

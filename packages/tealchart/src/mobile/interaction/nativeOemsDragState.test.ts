@@ -55,6 +55,7 @@ function createBracketDragState(): NativeBracketDragInteractionState {
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
+    activeLadderDirection: shared(1),
     activeColor: shared(''),
     activeLineColor: shared(''),
     startPrice: shared(0),
@@ -176,8 +177,9 @@ describe('native OEMS drag state', () => {
       x2: 40,
     };
 
-    expect(beginNativeBracketDragState(state, zone, 2, 80)).toBe(true);
+    expect(beginNativeBracketDragState(state, zone, 2, 80, 0, -1)).toBe(true);
     expect(state.active.value).toBe(true);
+    expect(state.activeLadderDirection.value).toBe(-1);
     expect(state.activeObjectType.value).toBe('position');
     expect(state.activeBracketType.value).toBe('tp');
     expect(state.activeEntryPrice.value).toBe(200);
@@ -190,6 +192,8 @@ describe('native OEMS drag state', () => {
     expect(state.activePrice.value).toBe(206);
     expect(state.activeDragCurrentX.value).toBe(200);
     expect(state.activePartialPercent.value).toBeLessThan(100);
+    // The ladder's side is fixed at the start; the finger cannot move it.
+    expect(state.activeLadderDirection.value).toBe(-1);
 
     clearNativeBracketDragState(state);
     expect(state.active.value).toBe(false);
@@ -200,6 +204,7 @@ describe('native OEMS drag state', () => {
     expect(state.activePositionNotional.value).toBe(0);
     expect(state.activePositionIsLong.value).toBe(true);
     expect(state.activePartialPercent.value).toBe(100);
+    expect(state.activeLadderDirection.value).toBe(1);
   });
 
   it('starts bracket drags from the bracket price while preserving the visible hit-test price', () => {
