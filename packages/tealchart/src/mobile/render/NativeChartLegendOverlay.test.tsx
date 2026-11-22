@@ -1,12 +1,14 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Bar } from '../../types';
 
-import { Pressable, Text } from 'react-native';
+import { isValidElement } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import { LOADING_DOT_COUNT } from '../../constants';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER } from './nativeTextScaling';
 import { NativeChartLegendOverlayImpl, NativeLegendLoadingDots, NativeLoadingDot, areNativeLegendActionTargetsEqual, resolveNativeLegendActionTargets } from './NativeChartLegendOverlay';
 
 interface TestElementProps {
@@ -79,6 +81,47 @@ const frameWithIndicatorPane = createNativeChartFrameFromPanes({
   ],
 });
 
+describe('NativeChartLegendOverlay system text scaling', () => {
+  it('caps every legend text at the chart multiplier', () => {
+    const legend = NativeChartLegendOverlayImpl({
+      activeIndicators: [{ id: 'study_1', inputs: { length: 20 }, isVisible: true, name: 'SMA' }],
+      bars,
+      downColor: '#f04465',
+      frame,
+      indicatorPaneInfo: { study_1: { inputs: { length: 20 }, name: 'SMA', overlay: true } },
+      interval: '15',
+      isLoading: false,
+      leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98',
+      pricePrecision: 0.1,
+      symbol: 'BTC-USD',
+      textColor: '#f0f3fa',
+      upColor: '#12c48b',
+    });
+    const texts = collectElementsByType(legend, Text);
+
+    // AGT-154: uncapped, the legend reached ~3.1x at the largest accessibility size and ran
+    // off the pane. The cap stays in the band the mobile app's own trading text uses.
+    expect(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER).toBeGreaterThanOrEqual(1.2);
+    expect(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER).toBeLessThanOrEqual(1.3);
+    expect(texts.length).toBeGreaterThan(10);
+    for (const text of texts) {
+      expect(text.props.maxFontSizeMultiplier).toBe(NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER);
+    }
+  });
+
+  it('wraps the OHLC values inside the legend rather than running past the price axis', () => {
+    const holdsLabel = (view: TestElement, label: string) =>
+      collectElementsByType(view.props.children as ReactNode, Text).some((text) => text.props.children === label);
+    // Views are walked outermost first, so the last one holding both O and C is their row.
+    const ohlcRow = collectElementsByType(renderLegend(false), View)
+      .filter((view) => holdsLabel(view, 'O') && holdsLabel(view, 'C'))
+      .at(-1);
+
+    expect(ohlcRow?.props.style).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
+  });
+});
+
 describe('NativeChartLegendOverlay', () => {
   it.each([320, 375])('allows a long native symbol to shrink beside its interval at %ipx', (width) => {
     const sizedFrame = createNativeChartFrameFromPanes({
@@ -114,6 +157,36 @@ describe('NativeChartLegendOverlay', () => {
     expect(caption!.props.numberOfLines).toBe(1);
     expect(Object.assign({}, ...[caption!.props.style].flat()).fontSize).toBe(11);
     expect(texts.some((element) => element.props.children === '1h')).toBe(true);
+  });
+
+  it.each([320, 375, 1024])('wraps intact OHLC pairs inside the %ipx native plot', (width) => {
+    const sizedFrame = createNativeChartFrameFromPanes({
+      dimensions: { width, height: 420, margins: { bottom: 32, left: 62, right: 76, top: 36 } },
+      panes: [{ id: 'main', type: 'main', top: 36, height: 352, yMin: 12000, yMax: 130000 }],
+    });
+    const legend = NativeChartLegendOverlayImpl({
+      bars: [{ time: 1, open: 12345.67, high: 123456.78, low: 12000.12, close: 12345.89, volume: 1 }],
+      downColor: '#f04465', frame: sizedFrame, interval: '60', isLoading: false, leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98', pricePrecision: 0.1, symbol: 'BTCUSDT', textColor: '#f0f3fa', upColor: '#12c48b',
+    });
+    const views = collectElementsByType(legend, View);
+    const ohlc = views.find((view) => {
+      const children = view.props.children;
+      return Array.isArray(children) && children.length === 4 &&
+        children.every((child) => isValidElement(child) && ['O', 'H', 'L', 'C'].includes(String(child.key)));
+    });
+    expect(ohlc).toBeDefined();
+    const rowStyle = Object.assign({}, ...[ohlc!.props.style].flat());
+    expect(rowStyle.flexDirection).toBe('row');
+    expect(rowStyle.flexWrap).toBe('wrap');
+    const block = views.map((view) => Object.assign({}, ...[view.props.style].flat()))
+      .find((style) => typeof style.left === 'number' && typeof style.maxWidth === 'number');
+    expect(block).toBeDefined();
+    expect(block!.left + block!.maxWidth).toBeLessThanOrEqual(sizedFrame.priceAxisHitLeft);
+    expect(collectElementsByType(ohlc, Text).map((text) => text.props.children)).toEqual([
+      'O', '12,345.7', 'H', '123,456.8', 'L', '12,000.1', 'C', '12,345.9',
+    ]);
+    expect(ohlc!.props.pointerEvents).toBe('none');
   });
 
   it('renders symbol, interval, and OHLC values', () => {

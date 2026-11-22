@@ -55,6 +55,36 @@ describe('ChartLegend layout', () => {
     legend.unmount();
   });
 
+  it.each([320, 375, 1024])('lets OHLC pairs wrap within a %ipx chart without changing their values', (width) => {
+    const host = document.createElement('div');
+    host.style.position = 'relative';
+    host.style.width = `${width}px`;
+    document.body.appendChild(host);
+    const legend = new ChartLegend({ symbol: 'BTCUSDT', interval: '60', avoidLeftTools: true });
+    legend.mount(host);
+    legend.setBars(
+      { time: 1, open: 12345.67, high: 123456.78, low: 12000.12, close: 12345.89, volume: 1 },
+      { time: 0, open: 12000, high: 12500, low: 11900, close: 12000, volume: 1 },
+    );
+
+    const root = legend.getElement();
+    const mainRow = root.firstElementChild as HTMLElement;
+    const ohlc = mainRow.lastElementChild as HTMLElement;
+    // jsdom has no layout engine: pin the bounded wrapping contract, not fake pixel measurements.
+    expect(root.style.right).toBe('12px');
+    expect(width - Number.parseFloat(root.style.left) - Number.parseFloat(root.style.right)).toBeGreaterThan(0);
+    expect(mainRow.style.maxWidth).toBe('100%');
+    expect(mainRow.style.flexWrap).toBe('wrap');
+    expect(ohlc.style.maxWidth).toBe('100%');
+    expect(ohlc.style.flexWrap).toBe('wrap');
+    expect(Array.from(ohlc.children).slice(0, 4).map((item) => item.textContent)).toEqual([
+      'O12,345.7', 'H123,456.8', 'L12,000.1', 'C12,345.9',
+    ]);
+    expect(mainRow.style.width).toBe('fit-content');
+    expect(root.style.pointerEvents).toBe('none');
+    legend.unmount();
+  });
+
   it('moves right when left drawing tools are present', () => {
     const legend = new ChartLegend({
       symbol: 'BTCUSDT',

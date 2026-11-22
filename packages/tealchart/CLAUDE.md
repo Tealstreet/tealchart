@@ -111,6 +111,11 @@ node signature, so updates rebuild text and hit geometry together.
 
 **Hybrid rendering model:**
 
+Web and native OHLC legends wrap between intact label/value pairs at narrow
+chart widths. Keep the web legend right-bounded and its main row content-sized;
+native wrapping stays within the existing plot-width bound. Preserve price
+formatting, field order, cached web text nodes and pointer/gesture behavior.
+
 - **Canvas 2D API**: Candlesticks, volume, grid, time/price axes, crosshair (high-frequency updates)
 - **Konva.js**: Interactive trading geometry on web — order/position lines with draggable labels and controls
 - **DOM / React Native overlays**: Menus, buttons, chrome controls, and toolbars that do not require per-frame chart projection
@@ -132,6 +137,15 @@ surface to hide their view while app-owned picker/settings/layout dialogs cover
 it; closed overlays retain `display:none` and do not occlude the chart.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
+
+**Native chrome and system text size (AGT-154):** React Native text scales with
+iOS Larger Text / Android font size; Skia text does not. Text inside geometry
+computed from Skia measurements (the top bar's symbol and buttons) passes
+`allowFontScaling={false}`, or it clips at the accessibility sizes. Flex-laid-out
+chrome over the plot (the legend) passes `NATIVE_CHART_MAX_FONT_SIZE_MULTIPLIER`
+from `mobile/render/nativeTextScaling.ts`, and re-mounts on `useNativeFontScale()`:
+React Native keeps an unchanged text's old measurement after a size change, so
+the legend stayed stretched until a relaunch.
 
 **Hit-testing rule:** What draws a control decides what receives its taps.
 
@@ -882,6 +896,108 @@ terminal until the chart remounts, so do not read the web backstop as cover for
 both halves — and remember `packages/tealchart` is excluded from `yarn sync`, so
 a fix here reaches mobile only through Copybara into its `vendor/tealchart`.
 
+## Native charts never draw another symbol's bars (AGT-127)
+
+`ChartWidgetCore.setSymbol` keeps the previous market's `_bars` until the new
+ones land, and the native render used to draw them faded to `LOADING_OPACITY`
+(0.7), holding that snapshot through the load. On a mobile account switch the
+previous market is another VENUE: woo-t's BTCUSDT showed okx-t's BTCUSD candles
+for the whole load, and for good once woo's kline read failed, because a failed
+load ended in `loading: false` alone. Now `nativeBarsBelongToOtherMarket` decides
+what may be drawn: a different symbol renders an empty chart (the legend's dots
+still say loading), and `shouldHoldNativeRenderSnapshotForTransition` refuses to
+hold such a snapshot. The previous INTERVAL of the same market keeps its fade
+while the replacement loads. `onLoadFailed` reports a failed resolve or history
+read for the request's own market; `loadFailed` then clears the previous
+interval too and shows "Chart data unavailable" whenever nothing is drawn. A
+failed reset of the same market keeps its bars, as the section above requires.
+
+A venue change under an UNCHANGED symbol string (okx-t BTCUSDT -> woo-t
+BTCUSDT) arrives only as the datafeed's reset, which looks exactly like a
+reconnect. The datafeed's optional `getSourceIdentity()` tells them apart
+(AGT-136): `ChartWidgetCore` records the source each market was resolved under,
+and a reset under a DIFFERENT source runs `_switchSource` — bars and plots are
+dropped (not faded), the symbol is re-resolved for the new venue and reloaded,
+and the reset is re-armed even if that load fails. `onSourceChange` reaches the
+native viewport through `nativeViewportMarket`, so the view resets as on a
+symbol switch. A reset under the same source, or from a feed that reports none,
+is still a reconnect and keeps its bars. NX's `DefaultDatafeed` reports
+`<venue>:<live|testnet>`; it must stay stable across a reconnect.
+
+## Native live-gap backfill (`ChartWidgetCore`)
+
+A live stream carries only the bar in progress, so bars that closed while iOS
+had the app suspended, or while the socket was down, never arrive on it. On
+mobile nothing else refills them: `resetData()` is not wired to the core, and
+`DefaultDatafeed`'s missing-candle check parses TradingView's `SYM_#_RES` guid,
+which the core's `chart_*` guid never matches. So `_handleNewBar` refetches
+from the last held bar to now whenever a rollover skips a slot, or arrives after
+`LIVE_SILENCE_BACKFILL_MS` of stream silence (the closed bar missed its final
+ticks). The fetched bars merge UNDER the live bar, which stays authoritative
+for its own slot. A refused read retries with bounded backoff, because right
+after a resume the account route can refuse until its socket and auth recover;
+a second gap while one is in flight widens the next request instead of racing
+it, and `_loadBars` / dispose cancel all of it (AGT-88).
+
+## Native refocus recentre (`nativeLiveEdgeResume.ts`)
+
+Sam's rule (AGT-104, revised 2026-11-22): after a return from the background,
+if the newest candle is OFF screen, bring it back centred at the same zoom; if
+it is on screen, do not move. `useNativeViewportRuntime` arms a check on the
+`background` -> `active` transition and runs it on every bars change for
+`NATIVE_REFOCUS_RECENTRE_WINDOW_MS`, because the newest bar usually arrives
+after the return (live tick, AGT-88 backfill). The first recentre, a gesture,
+or any other placement (a layout restore) ends it. A view scrolled into history
+IS recentred: the earlier rule (follow for 150 s only if the newest bar was in
+view at the background edge, #1552) left those stranded and was replaced.
+
+## Native rollover follow (`useNativeViewportRuntime`)
+
+An auto-owned native view (no manual viewport, no gesture) keeps its offset from
+the newest bar. So does a hand-placed one in auto scale mode while the newest
+candle is in view (AGT-156): `followNativeLiveEdgeByNewBars` shifts it by exactly
+the time the newest bar advanced, so the newest candle keeps its x, and refits
+the axis. Auto scale off, or newest candle out of view (scrolled into history),
+and the view stays put. Web does the same in `TealchartWidget._handleNewBar`. It must follow in the SAME render that brings the new bars:
+the bars the settled window belongs to are state (`autoFollow`), and a changed
+`bars` updates the window during render, so React re-runs the render before
+committing and no commit pairs the new bars with the old window. It used to
+follow from a layout effect, which committed one frame of the old range at every
+rollover (AGT-90). The shared viewport is written in that commit's layout phase.
+`nativeRolloverViewport.test.tsx` records each commit and fails on the old shape.
+A new market's first bars only rebase; the data-load restore frames them.
+
+## Native interval switch (`withNativeLiveEdgeViewScale`)
+
+A timeframe switch keeps the ZOOM (candles in view) and nothing else: it lands at
+the newest bar with the default right padding, refits the price axis with
+auto-scale back on, and the restored window stays auto-owned so it follows new
+bars. The view scale's `rightOffsetBars` is a bar COUNT, so carrying it scaled
+with the bar size: a 1m view 670 bars behind live (a stale restored layout)
+opened 670 hours back on 1h with no loaded bars in view, and the restore fitted
+the carried price padding to the whole history, a negative axis on Hyperliquid
+(AGT-147). Do not carry the scroll position, a manual price range or manual
+ownership across intervals. A symbol switch at the same interval still carries the
+scroll position. `nativeIntervalSwitchViewport.test.tsx` is the regression test.
+
+## Native first load centres the newest candle (AGT-104, AGT-148)
+
+A first load opens with the newest candle centred (`firstLoadViewport`: the
+default zoom via `createNativeCentredViewScale`); `autoViewport` stays the
+double-tap reset target. A layout stores its viewport as absolute times, so a
+cold launch used to reopen hours later on the window it had then, as a manual
+view that never followed new bars. The mount restore now passes
+`{ coldLaunch: true }` to `onApplyLayout`, and `applyNativeViewport(...,
+{ centreNewestBar: { interval } })` keeps only the saved zoom, measured in bars
+at the LAYOUT's interval, and queues a data-load restore keyed to that interval
+so the interval switch the layout triggers does not replace it. It lands centred
+on the newest bar, axis fitted, auto-owned. A stale saved window never wins on a
+cold launch; a layout the user picks later still restores its absolute window,
+and any explicit window retires a centring still waiting on bars. The auto
+viewport effect stands down while a data-load restore is pending, or a first
+load would overwrite the restore in the same commit.
+`nativeFirstLoadViewport.test.tsx` is the regression test.
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
@@ -1263,6 +1379,20 @@ first snapshot after touch-down still carries the pre-drag price, so it matches
 at all. Firing on those dropped the line back where it started while the finger
 was still down, with `active` false afterwards so nothing could move it again.
 
+**Except a bracket drag that outlived its touch (AGT-123).** A TP/SL drag whose
+finalize never arrived (a tap as the app returned to the foreground) stays
+`active` with no finger down: its partial picker and dashed preview line stayed
+up for minutes after the order was cancelled, the crosshair and axis pinch
+stayed blocked, and the next pan anywhere resumed the dead drag and committed a
+TP where it ended. Two things now end it. The bracket gesture's FIRST touch
+while still `active` clears the stale state before hit-testing (a second finger
+joining a live drag is unaffected). And `shouldRetireActiveNativeBracketDrag`
+retires an `active` bracket drag whose own order/position line left the
+snapshot, even during a real drag, which then simply ends. Other lines coming
+and going never retire it: keying on the whole line set killed a live TP/SL
+drag whenever an unrelated order filled. This does not extend to the
+order-line drag, whose live-gesture rule above still holds.
+
 ## Frame timing on native
 
 Two bugs lived here, and both are invisible on web because the browser's
@@ -1484,6 +1614,14 @@ Rules that keep it correct:
 - **A new last-bar consumer must read the live channel**, or it shows the
   committed bar until the next dispatch. React state `bars` is no longer updated
   per tick; only the core's own array is.
+- **A rollover is never published ahead of its commit.** The tail applies only
+  to the committed last bar, so publishing the next slot's bar early left the
+  closing candle on whatever React last committed for it, often its opening
+  values, until the new bars rendered: the rollover glitch of AGT-90.
+  `routeNativeLatestBar` defers a new slot of the committed market, and the
+  commit-ref layout effect in `SkiaTealchart` flushes it (`flushDeferred`) once
+  the committed last bar is that bar. A format change republishes the bar on
+  screen, never a deferred one.
 
 Indicator results take the same route. `MobileIndicatorManager` diffs each
 worker result against the committed plots (`nativeIndicatorTail.ts`): identical

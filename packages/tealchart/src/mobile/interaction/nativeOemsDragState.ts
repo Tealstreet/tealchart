@@ -53,6 +53,9 @@ export interface NativeBracketDragSharedValues {
   activePositionIsLong: SharedValue<boolean>;
   activePartialPercent: SharedValue<number>;
   activePartialEnabled: SharedValue<boolean>;
+  /** Side the partial ladder is drawn on (1 right, -1 left), fixed when the
+   *  drag begins so neither the finger nor a frame change can flip it. */
+  activeLadderDirection: SharedValue<number>;
   activeColor: SharedValue<string>;
   /** The bracket's own colour, for the preview's price line stroke. */
   activeLineColor: SharedValue<string>;
@@ -154,6 +157,7 @@ export function clearNativeBracketDragState(state: NativeBracketDragInteractionS
   state.activePositionIsLong.value = true;
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = false;
+  state.activeLadderDirection.value = 1;
   state.activeColor.value = '';
   state.activeLineColor.value = '';
   state.active.value = false;
@@ -165,6 +169,7 @@ export function beginNativeBracketDragState(
   pricePerPixel: number,
   dragStartX = 0,
   dragStartY = 0,
+  ladderDirection = 1,
 ): boolean {
   'worklet';
   if (zone.actionType !== 'tp' && zone.actionType !== 'sl') return false;
@@ -182,6 +187,7 @@ export function beginNativeBracketDragState(
   state.activePositionIsLong.value = zone.positionIsLong;
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = zone.partialEnabled;
+  state.activeLadderDirection.value = ladderDirection;
   state.activeColor.value = zone.color;
   state.activeLineColor.value = zone.lineColor;
   state.startPrice.value = zone.dragPrice ?? zone.price;
@@ -328,5 +334,40 @@ export function shouldClearNativeBracketDragForSnapshot({
     return !line || line.actionState?.isPending === true;
   }
 
+  return false;
+}
+
+/**
+ * The one exception to "nothing retires a live gesture" (AGT-123).
+ *
+ * A bracket drag whose finalize never arrived stays `active` with no finger
+ * down, so the rule above kept its picker and dashed preview line on the chart
+ * for minutes, outliving the order it belonged to. A drag whose own line has
+ * gone has nothing left to commit to, so that retires it even mid-gesture.
+ * Other lines coming and going never do: retiring on any change to the set
+ * killed a live TP/SL drag whenever an unrelated order filled (#1557 review).
+ */
+export function shouldRetireActiveNativeBracketDrag({
+  state,
+  orderLines,
+  positionLines,
+  getOrderObjectId,
+  getPositionObjectId,
+}: {
+  state: NativeBracketDragInteractionState;
+  orderLines: readonly OrderLineRenderData[];
+  positionLines: readonly PositionLineRenderData[];
+  getOrderObjectId: (line: OrderLineRenderData) => string;
+  getPositionObjectId: (line: PositionLineRenderData) => string;
+}): boolean {
+  if (!state.active.value) return false;
+  const objectId = state.activeObjectId.value;
+  if (!objectId) return false;
+  if (state.activeObjectType.value === 'order') {
+    return !orderLines.some((line) => getOrderObjectId(line) === objectId);
+  }
+  if (state.activeObjectType.value === 'position') {
+    return !positionLines.some((line) => getPositionObjectId(line) === objectId);
+  }
   return false;
 }

@@ -40,6 +40,30 @@ export function isNativeBarSnapshotPendingRequestedData({
 }
 
 /**
+ * Whether the bars on hand must not be drawn for the requested market at all.
+ *
+ * Another symbol's bars are another market's prices: on an account switch they
+ * are another venue's, and faded under the new label they still read as that
+ * market's chart (AGT-127). The previous interval of the same market stays
+ * faded while its replacement loads, but not once that load has failed.
+ */
+export function nativeBarsBelongToOtherMarket({
+  barsContext,
+  interval,
+  loadFailed,
+  symbol,
+}: {
+  barsContext: ChartWidgetBarsChangedContext | null;
+  interval: string;
+  loadFailed: boolean;
+  symbol: string;
+}): boolean {
+  if (!barsContext) return false;
+  if (barsContext.symbol !== symbol) return true;
+  return loadFailed && barsContext.interval !== interval;
+}
+
+/**
  * Whether to fade what is on screen.
  *
  * The fade means "these candles are not the market you asked for", not "a
@@ -53,14 +77,18 @@ export function shouldDimNativeRenderForTransition({
   barsLength,
   interval,
   isLoading,
+  loadFailed,
   symbol,
 }: {
   barsContext: ChartWidgetBarsChangedContext | null;
   barsLength: number;
   interval: string;
   isLoading: boolean;
+  /** A failed load is not pending, so nothing on screen may suggest it is. */
+  loadFailed: boolean;
   symbol: string;
 }): boolean {
+  if (loadFailed) return false;
   if (barsLength === 0) return isLoading;
 
   return isNativeBarSnapshotPendingRequestedData({
@@ -77,7 +105,9 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   hasDataViewport,
   interval,
   isLoading,
+  loadFailed,
   viewportGestureActive = false,
+  previousBarsContext,
   previousBarsLength,
   previousHasDataViewport,
   previousProjectionReady,
@@ -89,8 +119,11 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   hasDataViewport: boolean;
   interval: string;
   isLoading: boolean;
+  loadFailed: boolean;
   /** A live pan or pinch drives the canvas from shared values; freezing it mid-drag reads as the chart jumping back a few frames. */
   viewportGestureActive?: boolean;
+  /** The market the held snapshot was drawn for; `null` when its bars carried no context. */
+  previousBarsContext: ChartWidgetBarsChangedContext | null;
   previousBarsLength: number;
   previousHasDataViewport: boolean;
   previousProjectionReady: boolean;
@@ -99,6 +132,8 @@ export function shouldHoldNativeRenderSnapshotForTransition({
 }): boolean {
   const canHoldPreviousSnapshot = previousBarsLength > 0 && previousHasDataViewport && previousProjectionReady;
   if (!canHoldPreviousSnapshot) return false;
+  // Holding another market's snapshot is how its candles stayed up (AGT-127).
+  if (nativeBarsBelongToOtherMarket({ barsContext: previousBarsContext, interval, loadFailed, symbol })) return false;
   if (barsLength === 0 || !hasDataViewport || !projectionReady) return true;
   // Only the loading clause gives way to a gesture. The others mean the data on
   // hand belongs to nothing the chart can draw, and holding is still right.

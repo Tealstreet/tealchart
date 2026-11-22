@@ -1,12 +1,20 @@
+import type { ChartSettings } from '../state/chartState';
 import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
+import type { ResolutionString } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
+import { clearChartStoreCache, getChartStore } from '../state/chartState';
+import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
+import { saveTealchartLayout } from '../transformer/saveLoadIntegration';
 import {
   loadNativeCurrentLayoutState,
   resolveNativeDefaultLayoutPersistence,
   saveNativeCurrentLayoutState,
   shouldRestoreNativeLayoutViewport,
+  useNativeLayoutPersistence,
 } from './useNativeLayoutPersistence';
 
 function createMemoryStorage(): TealchartKeyValueStorage & { values: Map<string, string> } {
@@ -110,5 +118,52 @@ describe('native layout persistence defaults', () => {
 
     storage.values.set(key, JSON.stringify({ layoutId: 'layout-1' }));
     expect(await loadNativeCurrentLayoutState(storage, key)).toBeNull();
+  });
+});
+
+// AGT-104/AGT-148: the layout restored when the chart mounts opens centred on the
+// newest candle, while one the user picks later restores where it was left. The
+// apply callback is told which one it is.
+describe('native layout apply context', () => {
+  afterEach(() => clearChartStoreCache());
+
+  const settings: ChartSettings = {
+    symbol: 'BTCUSDT',
+    interval: '60' as ResolutionString,
+    showVolume: true,
+    showIndicatorOutputAxisLabels: true,
+    volumeHeight: 0.2,
+    chartType: 'candle',
+    autoScale: true,
+    indicators: [],
+    viewport: { startTime: 1_000, endTime: 2_000, priceMin: 10, priceMax: 20 },
+    version: CHART_SETTINGS_VERSION,
+  };
+
+  it('marks the mount restore as a cold launch and a picked layout as not one', async () => {
+    const storage = createMemoryStorage();
+    const persistence = resolveNativeDefaultLayoutPersistence({ chartKey: 'apply-context', storage });
+    const layoutId = await saveTealchartLayout(settings, DEFAULT_LAYOUT_NAME, persistence.saveLoadAdapter!);
+    const onApplyLayout = vi.fn();
+
+    const { result } = renderHook(() =>
+      useNativeLayoutPersistence({
+        chartStore: getChartStore('apply-context'),
+        currentLayoutStorage: persistence.currentLayoutStorage,
+        currentLayoutStorageKey: persistence.currentLayoutStorageKey,
+        currentSettings: settings,
+        onApplyLayout,
+        readyToCreateDefaultLayout: false,
+        saveLoadAdapter: persistence.saveLoadAdapter,
+      }),
+    );
+
+    await waitFor(() => expect(result.current.initialLayoutLoaded).toBe(true));
+    expect(onApplyLayout).toHaveBeenCalledTimes(1);
+    expect(onApplyLayout.mock.calls[0]![1]).toEqual({ coldLaunch: true });
+
+    await act(() => result.current.loadNativeLayout(layoutId));
+    expect(onApplyLayout).toHaveBeenCalledTimes(2);
+    expect(onApplyLayout.mock.calls[1]![1]?.coldLaunch).not.toBe(true);
   });
 });

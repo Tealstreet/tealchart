@@ -121,6 +121,7 @@ export function useNativeSkiaInteractionRuntime({
   const activeBracketDragPartialEnabled = useSharedValue(false);
   const activeBracketDragColor = useSharedValue('');
   const activeBracketDragLineColor = useSharedValue('');
+  const activeBracketDragLadderDirection = useSharedValue(1);
   const panActive = useSharedValue(false);
   const pinchActive = useSharedValue(false);
   const priceScaleActive = useSharedValue(false);
@@ -219,12 +220,14 @@ export function useNativeSkiaInteractionRuntime({
       activePositionIsLong: activeBracketDragPositionIsLong,
       activePartialPercent: activeBracketDragPartialPercent,
       activePartialEnabled: activeBracketDragPartialEnabled,
+      activeLadderDirection: activeBracketDragLadderDirection,
       activeColor: activeBracketDragColor,
       activeLineColor: activeBracketDragLineColor,
     }),
     [
       activeBracketDragColor,
       activeBracketDragLineColor,
+      activeBracketDragLadderDirection,
       activeBracketDragCurrentX,
       activeBracketDragStartY,
       activeBracketDragCurrentY,
