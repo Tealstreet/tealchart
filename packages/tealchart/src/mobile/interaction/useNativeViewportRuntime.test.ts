@@ -359,7 +359,9 @@ describe('useNativeViewportRuntime helpers', () => {
     expect((restored!.endTime - restored!.startTime) / (5 * 60_000)).toBeCloseTo(40, 4);
   });
 
-  it('drops the captured price fit on a symbol switch but keeps it across intervals', () => {
+  // This helper only answers for a symbol switch. An interval switch drops the price fit
+  // and the scroll position anyway, via `withNativeLiveEdgeViewScale` (AGT-147).
+  it('drops the captured price fit on a symbol switch', () => {
     expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'DOGE-USDC', previousSymbol: 'BTC-USD' })).toBe(true);
     expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'BTC-USD', previousSymbol: 'BTC-USD' })).toBe(false);
   });

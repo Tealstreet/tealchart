@@ -918,6 +918,19 @@ rollover (AGT-90). The shared viewport is written in that commit's layout phase.
 `nativeRolloverViewport.test.tsx` records each commit and fails on the old shape.
 A new market's first bars only rebase; the data-load restore frames them.
 
+## Native interval switch (`withNativeLiveEdgeViewScale`)
+
+A timeframe switch keeps the ZOOM (candles in view) and nothing else: it lands at
+the newest bar with the default right padding, refits the price axis with
+auto-scale back on, and the restored window stays auto-owned so it follows new
+bars. The view scale's `rightOffsetBars` is a bar COUNT, so carrying it scaled
+with the bar size: a 1m view 670 bars behind live (a stale restored layout)
+opened 670 hours back on 1h with no loaded bars in view, and the restore fitted
+the carried price padding to the whole history, a negative axis on Hyperliquid
+(AGT-147). Do not carry the scroll position, a manual price range or manual
+ownership across intervals. A symbol switch at the same interval still carries the
+scroll position. `nativeIntervalSwitchViewport.test.tsx` is the regression test.
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:
