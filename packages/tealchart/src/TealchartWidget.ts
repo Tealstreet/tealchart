@@ -74,6 +74,12 @@ import {
   resolveViewportHistoryBackfillHint,
 } from './core/historyBackfill';
 import {
+  resolveIndicatorWarmupBars,
+  resolveInitialHistoryBarCount,
+  resolveWarmupHistoryStartTime,
+  trimBarsToHistoryAnchor,
+} from './core/historyWarmup';
+import {
   isTealchartIndicatorAuditEnabled,
   isTealchartPlotDebugEnabled,
   summarizePlotsForDebug,
@@ -275,6 +281,10 @@ export class TealchartWidget implements ITealchartWebWidget {
   // Historical data loading
   private _isLoadingMoreBars = false;
   private _hasQueuedLeftHistoryBackfill = false;
+  // Left pages launched; lets a continuation tell whether it requested another.
+  private _leftHistoryRequestSeq = 0;
+  // Paging back for indicator warm-up: studies get the bars once, when it ends.
+  private _warmupBackfillPending = false;
   private _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   private _hasMoreHistoricalData = true;
 
@@ -552,6 +562,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         onDeclarationDiscovered: (scriptId, declaration) => {
           this._indicatorDeclarationMap.set(scriptId, declaration);
           this._scheduler.markDirty(DIRTY.PLOTS);
+          this._syncIndicatorHistoryWarmup();
         },
         getRuntimeOptions: () => this._getTealscriptRuntimeOptions(options),
         getLibraries: options.getTealscriptLibraries,
@@ -882,9 +893,13 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (!repair) this._isLoadingBars = true;
     this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
+    if (!repair) this._warmupBackfillPending = false;
     const now = Date.now();
     const intervalMs = intervalToMs(this._interval);
-    const countBack = TealchartWidget.INITIAL_BAR_COUNT;
+    // Gap repair keeps the default page: it merges into bars already trimmed.
+    const countBack = repair
+      ? TealchartWidget.INITIAL_BAR_COUNT
+      : resolveInitialHistoryBarCount({ intervalMs, now, warmupBars: this._indicatorWarmupBars() });
 
     // Calculate from time: go back countBack bars from now
     const fromTime = now - countBack * intervalMs;
@@ -908,7 +923,8 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        const history = dedupeBarsByTime(normalizeDatafeedBars(bars, this._interval), 'history load');
+        const loaded = dedupeBarsByTime(normalizeDatafeedBars(bars, this._interval), 'history load');
+        const history = repair ? loaded : trimBarsToHistoryAnchor(loaded, intervalMs, this._warmupHistoryStartTime(loaded));
         const historyTime = history.at(-1)?.time ?? 0;
         // Repair history may lag live candles that arrived while it was in flight.
         const normalizedBars = repair
@@ -955,6 +971,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         // came back from a view scale measured in bars, and a chart zoomed out
         // past that count shows a range none of its own bars cover.
         this._requestHistoryForViewport();
+        if (!repair) this._syncIndicatorHistoryWarmup();
       },
       (error) => {
         // Check if this request is still valid
@@ -1208,6 +1225,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (!request) return;
 
     this._isLoadingMoreBars = true;
+    this._leftHistoryRequestSeq += 1;
 
     this._datafeed.getBars(
       this._symbolInfo,
@@ -1230,6 +1248,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         if (bars.length === 0) {
           this._hasMoreHistoricalData = false;
           this._clearQueuedLeftHistoryBackfill();
+          this._finishWarmupBackfill();
           return;
         }
 
@@ -1238,16 +1257,19 @@ export class TealchartWidget implements ITealchartWebWidget {
         const newBars = normalizeDatafeedBars(bars, this._interval).filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
-          this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
+          const merged = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
+          this._bars = trimBarsToHistoryAnchor(merged, intervalMs, this._warmupHistoryStartTime(merged));
 
           // Render prepended bars immediately; Tealscript plots realign on the
           // next worker callback. Gating the bar render on onPlotsUpdated means a
           // chart with no active indicator (manager present, no scripts) never
           // repaints after scrollback, so its callback never fires.
           this._scheduler.markDirty(DIRTY.BARS);
-          this._tealScriptManager?.setBars(this._bars);
         }
-        this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+        const continued = this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
+        // A warm-up hands studies its bars once, at the end, not per page.
+        if (!continued && this._warmupBackfillPending) this._finishWarmupBackfill();
+        else if (newBars.length > 0 && !this._warmupBackfillPending) this._tealScriptManager?.setBars(this._bars);
       },
       (error) => {
         if (isSuperseded()) {
@@ -1255,6 +1277,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         }
         this._isLoadingMoreBars = false;
         this._clearQueuedLeftHistoryBackfill();
+        this._finishWarmupBackfill();
         this._logger?.error(LogCategory.Datafeed, 'Failed to load more bars', error);
       },
     );
@@ -1280,19 +1303,56 @@ export class TealchartWidget implements ITealchartWebWidget {
     return hint;
   }
 
+  /** @returns whether another page was requested */
   private _loadNextLeftHistoryBackfill(
     activeHint: HistoryBackfillRequestHint | undefined,
     previousEarliestBarTime: number,
-  ): void {
+  ): boolean {
     const hint = resolveLeftHistoryBackfillContinuationHint({
       activeHint,
       currentEarliestBarTime: this._bars[0]?.time,
       previousEarliestBarTime,
       queuedHint: this._consumeQueuedLeftHistoryBackfill(),
     });
-    if (hint !== null) {
-      this._loadMoreBars('left', hint);
-    }
+    if (hint === null) return false;
+    const seq = this._leftHistoryRequestSeq;
+    this._loadMoreBars('left', hint);
+    return this._leftHistoryRequestSeq !== seq;
+  }
+
+  private _indicatorWarmupBars(): number {
+    return resolveIndicatorWarmupBars(this._indicatorDeclarationMap.values());
+  }
+
+  private _warmupHistoryStartTime(bars: Bar[]): number | null {
+    return resolveWarmupHistoryStartTime({
+      intervalMs: intervalToMs(this._interval),
+      latestTime: bars.at(-1)?.time,
+      warmupBars: this._indicatorWarmupBars(),
+    });
+  }
+
+  /**
+   * Pages left until the loaded history covers the active studies' warm-up.
+   * A declaration arrives after its study compiles, usually after the first
+   * page has landed, so this runs then as well as after each fresh load.
+   */
+  private _syncIndicatorHistoryWarmup(): void {
+    if (this._isLoadingBars || !this._hasMoreHistoricalData) return;
+    const earliest = this._bars[0]?.time;
+    const startTime = this._warmupHistoryStartTime(this._bars);
+    if (startTime === null || earliest === undefined || earliest <= startTime) return;
+    this._warmupBackfillPending = true;
+    const seq = this._leftHistoryRequestSeq;
+    this._loadMoreBars('left', { requiredStartTime: startTime });
+    // A busy pager queues the hint; the page in flight finishes the warm-up.
+    if (this._leftHistoryRequestSeq === seq && !this._isLoadingMoreBars) this._warmupBackfillPending = false;
+  }
+
+  private _finishWarmupBackfill(): void {
+    if (!this._warmupBackfillPending) return;
+    this._warmupBackfillPending = false;
+    if (this._bars.length > 0) this._tealScriptManager?.setBars(this._bars);
   }
 
   private _reportDatafeedRecovery(decision: string, reason: string, retryInMs?: number): void {

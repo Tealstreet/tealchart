@@ -25,6 +25,7 @@ import type {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MAX_HISTORY_BACKFILL_BAR_COUNT } from './core/historyBackfill';
+import { HISTORY_ANCHOR_GRID_BARS } from './core/historyWarmup';
 import {
   createUserDrawingState,
   resolveUserDrawingObjectTreeDrawingDispatchAction,
@@ -5655,6 +5656,69 @@ describe('review 8970 independent ownership probes', () => {
     datafeed._resetCb?.();
     expect(datafeed._getBarsCalls.length).toBeGreaterThan(loads);
     expect(datafeed._subscribeCalls.length).toBeGreaterThan(before);
+    widget.remove();
+  });
+});
+
+describe('TealchartWidget indicator warm-up history', () => {
+  const HOUR = 60 * 60_000;
+  const GRID = HOUR * HISTORY_ANCHOR_GRID_BARS;
+
+  beforeEach(() => {
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return null;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    document.body.innerHTML = '';
+  });
+
+  it('pages back to the warm-up start once a declaration reports it, ending on the grid', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    const latest = Math.floor(Date.UTC(2026, 10, 22) / GRID) * GRID + 77 * HOUR;
+    const firstEarliest = latest - 299 * HOUR;
+    completeInit(datafeed, makeBars(300, firstEarliest, HOUR));
+    expect(datafeed._getBarsCalls).toHaveLength(1);
+
+    (widget as any)._indicatorDeclarationMap.set('study_1', { historyRequirement: { bars: 501 } });
+    (widget as any)._syncIndicatorHistoryWarmup();
+    expect(datafeed._getBarsCalls).toHaveLength(2);
+    expect((widget as any)._warmupBackfillPending).toBe(true);
+
+    // Short page: the warm-up is still pending and paging continues.
+    datafeed._getBarsCb?.(makeBars(100, firstEarliest - 100 * HOUR, HOUR), {});
+    expect(datafeed._getBarsCalls).toHaveLength(3);
+    expect((widget as any)._warmupBackfillPending).toBe(true);
+
+    const countBack = datafeed._getBarsCalls.at(-1)!.periodParams.countBack!;
+    const secondEarliest = firstEarliest - 100 * HOUR;
+    datafeed._getBarsCb?.(makeBars(countBack, secondEarliest - countBack * HOUR, HOUR), {});
+
+    expect(datafeed._getBarsCalls).toHaveLength(3);
+    expect((widget as any)._warmupBackfillPending).toBe(false);
+    const bars = (widget as any)._bars as Bar[];
+    expect(bars[0]!.time % GRID).toBe(0);
+    expect(bars[0]!.time).toBeLessThanOrEqual(latest - 801 * HOUR);
+
+    widget.remove();
+  });
+
+  it('sizes a fresh load to a requirement it already knows', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed, makeBars(300, Date.UTC(2026, 10, 1), HOUR));
+
+    (widget as any)._indicatorDeclarationMap.set('study_1', { historyRequirement: { bars: 501 } });
+    widget.setSymbol('ETHUSDT');
+    datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+
+    expect(datafeed._getBarsCalls.at(-1)!.periodParams.countBack).toBeGreaterThan(801);
+
     widget.remove();
   });
 });
