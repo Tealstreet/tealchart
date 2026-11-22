@@ -336,3 +336,38 @@ export function shouldClearNativeBracketDragForSnapshot({
 
   return false;
 }
+
+/**
+ * The one exception to "nothing retires a live gesture" (AGT-123).
+ *
+ * A bracket drag whose finalize never arrived stays `active` with no finger
+ * down, so the rule above kept its picker and dashed preview line on the chart
+ * for minutes, outliving the order it belonged to. A drag whose own line has
+ * gone has nothing left to commit to, so that retires it even mid-gesture.
+ * Other lines coming and going never do: retiring on any change to the set
+ * killed a live TP/SL drag whenever an unrelated order filled (#1557 review).
+ */
+export function shouldRetireActiveNativeBracketDrag({
+  state,
+  orderLines,
+  positionLines,
+  getOrderObjectId,
+  getPositionObjectId,
+}: {
+  state: NativeBracketDragInteractionState;
+  orderLines: readonly OrderLineRenderData[];
+  positionLines: readonly PositionLineRenderData[];
+  getOrderObjectId: (line: OrderLineRenderData) => string;
+  getPositionObjectId: (line: PositionLineRenderData) => string;
+}): boolean {
+  if (!state.active.value) return false;
+  const objectId = state.activeObjectId.value;
+  if (!objectId) return false;
+  if (state.activeObjectType.value === 'order') {
+    return !orderLines.some((line) => getOrderObjectId(line) === objectId);
+  }
+  if (state.activeObjectType.value === 'position') {
+    return !positionLines.some((line) => getPositionObjectId(line) === objectId);
+  }
+  return false;
+}
