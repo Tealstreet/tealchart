@@ -2,7 +2,7 @@
 
 import type { UserDrawingState } from '../drawings';
 import type { EventManagerCallbacks } from '../interaction/EventManager';
-import type { PaneLayout } from '../types';
+import type { Bar, PaneLayout } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -99,6 +99,79 @@ const drawingState: UserDrawingState = {
     },
   ],
 };
+
+describe('TealchartWidgetUI legend instrument precision', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    clearChartStoreCache();
+  });
+
+  const ohlcValues = (container: HTMLElement) => ['O', 'H', 'L', 'C'].map((label) => {
+    const element = [...container.querySelectorAll('span')].find((span) => span.textContent === label);
+    return element?.nextElementSibling;
+  });
+
+  it.each([320, 375])('retains eight decimals on initial render, ticks and precision changes at %ipx', (width) => {
+    stubCanvasContext();
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, width, 240));
+    const container = document.createElement('div');
+    container.style.width = `${width}px`;
+    document.body.appendChild(container);
+    const ui = new TealchartWidgetUI({
+      container, chartKey: `legend-precision-${width}`, symbol: 'PRECISE', interval: '60', showTopBar: false,
+      renderOptions: { pricePrecision: 1 / 100_000_000 },
+    });
+    const bar: Bar = { time: 60_000, open: 1.23456789, high: 1.23456799, low: 1.23456701, close: 1.23456791, volume: 10 };
+    try {
+      ui.setBars([bar]);
+      const elements = ohlcValues(container);
+      expect(elements.map((element) => element?.textContent)).toEqual([
+        '1.23456789', '1.23456799', '1.23456701', '1.23456791',
+      ]);
+      const tick = { ...bar, close: 1.23456792 };
+      ui.updateBar(tick, [tick]);
+      expect(ohlcValues(container)[3]).toBe(elements[3]);
+      expect(elements[3]?.textContent).toBe('1.23456792');
+
+      ui.setRenderOptions({ pricePrecision: 0.01 });
+      expect(ohlcValues(container)).toEqual(elements);
+      expect(elements.map((element) => element?.textContent)).toEqual(['1.23', '1.23', '1.23', '1.23']);
+      ui.setSymbol('WHOLE');
+      ui.setRenderOptions({ pricePrecision: 1 });
+      expect(ohlcValues(container).map((element) => element?.textContent)).toEqual(['1', '1', '1', '1']);
+      expect(bar.close).toBe(1.23456791);
+      expect(tick.close).toBe(1.23456792);
+    } finally {
+      ui.dispose();
+    }
+  });
+
+  it.each([
+    [undefined, 1.23456789, '1.23'],
+    [0.01, 1.2, '1.20'],
+    [0.25, 1234.5, '1,234.50'],
+    [1, 1234.5, '1,235'],
+    [1e-8, 1e-8, '0.00000001'],
+    [0, 1.23456789, '1.23'],
+    [-1, 1.23456789, '1.23'],
+    [NaN, 1.23456789, '1.23'],
+    [Infinity, 1.23456789, '1.23'],
+  ] as const)('formats precision %s and price %s as %s', (pricePrecision, price, expected) => {
+    stubCanvasContext();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ui = new TealchartWidgetUI({
+      container, chartKey: `legend-control-${pricePrecision}`, symbol: 'CONTROL', interval: '60', showTopBar: false,
+      renderOptions: { pricePrecision },
+    });
+    try {
+      ui.setBars([{ time: 60_000, open: price, high: price, low: price, close: price, volume: 10 }]);
+      expect(ohlcValues(container).map((element) => element?.textContent)).toEqual(Array(4).fill(expected));
+    } finally {
+      ui.dispose();
+    }
+  });
+});
 
 describe('TealchartWidgetUI user drawing text editor', () => {
   afterEach(() => {
