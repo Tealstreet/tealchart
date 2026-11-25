@@ -144,4 +144,44 @@ describe('IndicatorsModal', () => {
     expect(document.body.textContent).toContain('Demo Custom Study');
     modal.unmount();
   });
+
+  it('fits a short chart box and scrolls its list instead of clipping the last indicators', () => {
+    const observers: Array<() => void> = [];
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(private readonly callback: () => void) { observers.push(() => this.callback()); }
+      observe() {}
+      disconnect() { observers.length = 0; }
+    });
+    const chart = document.createElement('div');
+    document.body.appendChild(chart);
+    const modal = new IndicatorsModal({ onSelectIndicator: vi.fn() });
+    modal.mount(chart);
+    const overlay = chart.querySelector<HTMLElement>('[role="dialog"]')!;
+    let chartHeight = 286;
+    Object.defineProperty(overlay, 'clientHeight', { configurable: true, get: () => chartHeight });
+
+    modal.open();
+    const modalEl = overlay.firstElementChild as HTMLElement;
+    const list = modal.getContentElement();
+    expect(parseFloat(modalEl.style.maxHeight)).toBeLessThanOrEqual(chartHeight - 40);
+    expect(modalEl.style.display).toBe('flex');
+    expect(modalEl.style.flexDirection).toBe('column');
+    expect(modalEl.style.overflow).toBe('hidden');
+    expect(list.style.overflowY).toBe('auto');
+    expect(list.style.minHeight).toBe('0px');
+    expect(list.textContent).toContain('Volume');
+
+    chartHeight = 900;
+    observers.forEach((notify) => notify());
+    expect(modalEl.style.maxHeight).toBe('400px');
+
+    chartHeight = 200;
+    observers.forEach((notify) => notify());
+    expect(parseFloat(modalEl.style.maxHeight)).toBeLessThanOrEqual(chartHeight - 40);
+
+    modal.close();
+    expect(observers).toHaveLength(0);
+    modal.unmount();
+    vi.unstubAllGlobals();
+  });
 });

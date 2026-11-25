@@ -43,6 +43,10 @@ export interface IndicatorsModalOptions {
   };
 }
 
+const MAX_MODAL_HEIGHT = 400;
+const MODAL_TOP_OFFSET = 40;
+const MODAL_BOTTOM_MARGIN = 8;
+
 // Category translation key mapping
 const CATEGORY_KEYS: Record<BuiltinIndicatorCategoryId, string> = {
   tealstreet: 'categoryTealstreet',
@@ -132,15 +136,16 @@ export class IndicatorsModal extends Modal {
   private searchContainer: HTMLElement | null = null;
   private listEl: HTMLElement | null = null;
   private searchQuery = '';
+  private stopFittingHeight: (() => void) | null = null;
 
   constructor(options: IndicatorsModalOptions) {
     const modalOptions: ModalOptions = {
       title: options.translations?.title || 'Indicators',
       width: 280,
-      maxHeight: '400px',
+      maxHeight: `${MAX_MODAL_HEIGHT}px`,
       position: 'absolute',
       align: 'top',
-      paddingTop: '40px',
+      paddingTop: `${MODAL_TOP_OFFSET}px`,
       borderRadius: '4px',
       border: '1px solid var(--tc-border, #363a45)',
       showCloseButton: true,
@@ -204,6 +209,7 @@ export class IndicatorsModal extends Modal {
       this.searchInput.value = '';
     }
     this.renderList();
+    this.startFittingHeight();
 
     // Focus search input
     setTimeout(() => {
@@ -211,8 +217,42 @@ export class IndicatorsModal extends Modal {
     }, 50);
   }
 
+  protected onClose(): void {
+    this.stopFittingHeight?.();
+    this.stopFittingHeight = null;
+  }
+
+  protected onUnmount(): void {
+    this.onClose();
+    super.onUnmount();
+  }
+
   protected render(): void {
     this.renderList();
+  }
+
+  // The overlay spans the chart box, which clips at phone width (AGT-270), so the
+  // modal is capped to the overlay's height below its top offset; the list scrolls.
+  private startFittingHeight(): void {
+    this.stopFittingHeight?.();
+    const fit = () => this.fitHeightToChart();
+    fit();
+    const owner = this.overlay.ownerDocument.defaultView;
+    const Resize = (owner as (Window & typeof globalThis) | null)?.ResizeObserver;
+    const observer = Resize ? new Resize(fit) : undefined;
+    observer?.observe(this.overlay);
+    owner?.addEventListener('resize', fit);
+    this.stopFittingHeight = () => {
+      observer?.disconnect();
+      owner?.removeEventListener('resize', fit);
+    };
+  }
+
+  private fitHeightToChart(): void {
+    const chartHeight = this.overlay.clientHeight;
+    const available = chartHeight - MODAL_TOP_OFFSET - MODAL_BOTTOM_MARGIN;
+    const height = chartHeight > 0 ? Math.max(0, Math.min(MAX_MODAL_HEIGHT, available)) : MAX_MODAL_HEIGHT;
+    this.modalEl.style.maxHeight = `${height}px`;
   }
 
   private renderList(): void {
