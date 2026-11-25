@@ -82,6 +82,8 @@ const styles = {
     backgroundColor: 'var(--tc-backdrop, rgba(0, 0, 0, 0.6))',
     display: 'flex',
     zIndex: '10000',
+    // A hosted overlay gets an explicit height; its top padding must sit inside it.
+    boxSizing: 'border-box',
   } as Partial<CSSStyleDeclaration>,
 
   modal: {

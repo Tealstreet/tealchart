@@ -170,6 +170,7 @@ describe('IndicatorsModal', () => {
     expect(list.style.overflowY).toBe('auto');
     expect(list.style.minHeight).toBe('0px');
     expect(list.textContent).toContain('Volume');
+    expect(overlay.style.boxSizing).toBe('border-box');
 
     chartHeight = 900;
     observers.forEach((notify) => notify());
