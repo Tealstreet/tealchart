@@ -4955,3 +4955,7 @@ V104 arrow-direction replay scores 288 unchanged numeric/blank cells plus64
 SOURCE_BOOL plotchar exports in the own retained closed block. Absolute-index
 translations are64 observed exclusions; earlier blocks and the developing row
 earn no primary credit. The separate v103 sign-direction hold stays unchanged.
+
+sort_indices projects UDT comparison keys once per element, after resolving the sort field
+(an omitted field selects field 0 on UDTs). Singletons skip projection because sort never
+compares them; ties, missing placement, refusals and the nonmutating result are unchanged.
