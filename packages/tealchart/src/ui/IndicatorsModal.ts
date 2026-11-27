@@ -137,7 +137,9 @@ export class IndicatorsModal extends Modal {
     const modalOptions: ModalOptions = {
       title: options.translations?.title || 'Indicators',
       width: 280,
-      maxHeight: '400px',
+      // The overlay fills the chart, so 100% keeps the list's scroll viewport
+      // inside the chart's clip on short (phone-width) charts.
+      maxHeight: 'min(400px, calc(100% - 8px))',
       position: 'absolute',
       align: 'top',
       paddingTop: '40px',

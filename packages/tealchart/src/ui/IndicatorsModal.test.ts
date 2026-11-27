@@ -32,6 +32,17 @@ describe('IndicatorsModal', () => {
     document.body.innerHTML = '';
   });
 
+  it('keeps the popup inside a chart shorter than its 400px cap (AGT-270)', () => {
+    const modal = new IndicatorsModal({ onSelectIndicator: vi.fn() });
+    modal.mount(document.body);
+    modal.open();
+    const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!;
+    const popup = dialog.firstElementChild as HTMLElement;
+    expect(dialog.style.position).toBe('absolute');
+    expect(popup.style.maxHeight).toBe('min(400px, calc(100% - 8px))');
+    modal.unmount();
+  });
+
   it('renders only indicators available to the current chart runtime', () => {
     const movingAverage = BUILTIN_INDICATORS.find((indicator) => indicator.id === 'sma');
     const dwmo = BUILTIN_INDICATORS.find((indicator) => indicator.id === 'dwmo');
