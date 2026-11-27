@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   list: {
+    flexShrink: 1,
     maxHeight: 420,
   },
   overlayBadge: {
