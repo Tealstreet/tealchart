@@ -79,8 +79,8 @@ volume formatting retain their existing policies.
 
 Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
-Web OHLC legend values use `RenderOptions.pricePrecision` on creation and updates,
-including live ticks and symbol precision changes. Missing or invalid precision
+Web OHLC legend values and the bar's change use `RenderOptions.pricePrecision` on
+creation and updates, including live ticks and symbol precision changes. Missing or invalid precision
 retains magnitude formatting; formatting never rounds the stored bar values.
 
 Pine tables display the newest object per creation site and per location within
