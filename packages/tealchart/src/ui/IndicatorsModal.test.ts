@@ -39,7 +39,8 @@ describe('IndicatorsModal', () => {
     const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!;
     const popup = dialog.firstElementChild as HTMLElement;
     expect(dialog.style.position).toBe('absolute');
-    expect(popup.style.maxHeight).toBe('min(400px, calc(100% - 8px))');
+    // CSSOM serialization drops a calc() nested inside min(); the bound is unchanged.
+    expect(popup.style.maxHeight).toBe('min(400px, 100% - 8px)');
     modal.unmount();
   });
 
