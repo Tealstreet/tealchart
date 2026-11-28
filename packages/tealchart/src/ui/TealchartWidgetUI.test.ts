@@ -147,6 +147,32 @@ describe('TealchartWidgetUI legend instrument precision', () => {
   });
 
   it.each([
+    [1e-6, 0.003533, 0.003534, 0.003532, '+0.000001 (0.03%)', '-0.000001 (-0.03%)'],
+    [1, 59834, 59867, 59801, '+33 (0.06%)', '-33 (-0.06%)'],
+    [undefined, 59834, 59867, 59801, '+33.00 (0.06%)', '-33.00 (-0.06%)'],
+  ] as const)('formats the change at precision %s from %s to %s and %s', (pricePrecision, prevClose, close, tickClose, up, down) => {
+    stubCanvasContext();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ui = new TealchartWidgetUI({
+      container, chartKey: `legend-change-${pricePrecision}`, symbol: 'CHANGE', interval: '60', showTopBar: false,
+      renderOptions: { pricePrecision },
+    });
+    const changeText = () => [...container.querySelectorAll('span')].find((span) => span.textContent?.endsWith('%)'))?.textContent;
+    const previous: Bar = { time: 0, open: prevClose, high: prevClose, low: prevClose, close: prevClose, volume: 1 };
+    const bar: Bar = { time: 60_000, open: close, high: close, low: close, close, volume: 1 };
+    try {
+      ui.setBars([previous, bar]);
+      expect(changeText()).toBe(up);
+      const tick = { ...bar, close: tickClose };
+      ui.updateBar(tick, [previous, tick]);
+      expect(changeText()).toBe(down);
+    } finally {
+      ui.dispose();
+    }
+  });
+
+  it.each([
     [undefined, 1.23456789, '1.23'],
     [0.01, 1.2, '1.20'],
     [0.25, 1234.5, '1,234.50'],

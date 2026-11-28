@@ -379,7 +379,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       const change = bar.close - prevBar.close;
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
-      this.ohlcElements.changeText.nodeValue = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
+      this.ohlcElements.changeText.nodeValue = this.formatChange(change, changePercent);
       const changeColor = changeUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)';
       if (this.ohlcElements.change.style.color !== changeColor) {
         this.ohlcElements.change.style.color = changeColor;
@@ -587,9 +587,7 @@ export class ChartLegend extends Component<ChartLegendState> {
             color: changeUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)',
           },
         });
-        const changeText = document.createTextNode(
-          `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`,
-        );
+        const changeText = document.createTextNode(this.formatChange(change, changePercent));
         changeEl.appendChild(changeText);
         ohlcGroup.appendChild(changeEl);
         this.ohlcElements.change = changeEl;
@@ -752,6 +750,12 @@ export class ChartLegend extends Component<ChartLegendState> {
       return formatPriceWithPrecision(price, precision);
     }
     return formatPriceByMagnitude(price);
+  }
+
+  /** Signs the absolute move so magnitude formatting never sees a negative price. */
+  private formatChange(change: number, changePercent: number): string {
+    const sign = change < 0 ? '-' : '+';
+    return `${sign}${this.formatPrice(Math.abs(change))} (${safeToFixed(changePercent, 2)}%)`;
   }
 
   private formatInterval(interval: ResolutionString): string {
