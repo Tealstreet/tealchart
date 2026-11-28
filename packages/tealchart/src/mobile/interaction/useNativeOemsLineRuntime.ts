@@ -19,6 +19,7 @@ import { getNativeOrderObjectId, getNativePositionObjectId } from '../utils/trad
 import {
   clearNativeBracketDragState,
   clearNativeOrderDragState,
+  hasNativeBracketTouchState,
   hasNativeOrderTouchState,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
@@ -142,6 +143,32 @@ export function shouldApplyNativeBracketPreviewRelease({
   );
 }
 
+function findNativeBracketLine(
+  orderLines: readonly OrderLineRenderData[],
+  positionLines: readonly PositionLineRenderData[],
+  objectType: NativeTradeLineObjectType,
+  objectId: string,
+): OrderLineRenderData | PositionLineRenderData | undefined {
+  return objectType === 'order'
+    ? orderLines.find((line) => getNativeOrderObjectId(line) === objectId)
+    : positionLines.find((line) => getNativePositionObjectId(line) === objectId);
+}
+
+function nativeBracketMoveCallback(
+  line: OrderLineRenderData | PositionLineRenderData | undefined,
+  bracketType: NativeTradeLineBracketType,
+) {
+  return bracketType === 'tp' ? line?.callbacks?.onTPMoveEnd : line?.callbacks?.onSLMoveEnd;
+}
+
+function nativeBracketLeaseKey(
+  objectType: NativeTradeLineObjectType,
+  objectId: string,
+  bracketType: NativeTradeLineBracketType,
+) {
+  return `${objectType}\n${objectId}\n${bracketType}`;
+}
+
 export interface NativeOemsLineSnapshot {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
@@ -157,6 +184,12 @@ export interface NativeOemsLineRuntimeInput {
 }
 
 export interface NativeOemsLineRuntime {
+  beginBracketMove: (
+    objectType: NativeTradeLineObjectType,
+    objectId: string,
+    bracketType: NativeTradeLineBracketType,
+    gesture: NativeOrderMoveGesture,
+  ) => void;
   beginOrderMove: (objectId: string, price: number, gesture: NativeOrderMoveGesture) => void;
   clearNativeBracketDrag: () => void;
   clearNativeOrderDrag: () => void;
@@ -165,7 +198,8 @@ export interface NativeOemsLineRuntime {
     objectId: string,
     bracketType: NativeTradeLineBracketType,
     price: number,
-    partialPercent?: number,
+    partialPercent: number | undefined,
+    gesture: NativeOrderMoveGesture,
   ) => void;
   commitOrderMove: (objectId: string, nextPrice: number, gesture: NativeOrderMoveGesture) => void;
   commitTradeLineAction: (
@@ -217,6 +251,23 @@ export function useNativeOemsLineRuntime({
       orderMoveLease.retire();
     };
   }, [orderMoveLease, orderMoveLifetime]);
+  // A TP/SL drag holds the same touch lease and lifetime fence as an order move.
+  const bracketMoveLease = useMemo(
+    () =>
+      createNativeOrderMoveLease<OrderLineRenderData | PositionLineRenderData>(
+        () => Date.now(),
+        bracketDragInteractionState.touchSequence?.value ?? 0,
+      ),
+    [chartApi, bracketDragInteractionState],
+  );
+  const bracketMoveLifetime = useMemo(() => ({ active: false }), [bracketMoveLease]);
+  useLayoutEffect(() => {
+    bracketMoveLifetime.active = true;
+    return () => {
+      bracketMoveLifetime.active = false;
+      bracketMoveLease.retire();
+    };
+  }, [bracketMoveLease, bracketMoveLifetime]);
   // Set only between an order commit and the projection carrying its price.
   const orderHandoffRef = useRef<NativeOemsDragHandoff | null>(null);
   // Set only between a bracket commit and the projection carrying its price.
@@ -332,9 +383,41 @@ export function useNativeOemsLineRuntime({
   );
 
   const clearNativeBracketDrag = useCallback(() => {
+    bracketMoveLease.retire();
     bracketHandoffSeqRef.current += 1;
     clearNativeBracketDragState(bracketDragInteractionState);
-  }, [bracketDragInteractionState]);
+  }, [bracketDragInteractionState, bracketMoveLease]);
+
+  const beginBracketMove = useCallback(
+    (
+      objectType: NativeTradeLineObjectType,
+      objectId: string,
+      bracketType: NativeTradeLineBracketType,
+      gesture: NativeOrderMoveGesture,
+    ) => {
+      if (!bracketMoveLifetime.active) return;
+      if (!hasNativeBracketTouchState(bracketDragInteractionState)) return;
+      if (
+        !gesture ||
+        bracketDragInteractionState.touchSequence.value !== gesture.sequence ||
+        bracketDragInteractionState.touchStartedAt.value !== gesture.startedAt ||
+        bracketDragInteractionState.activeObjectId.value !== objectId ||
+        bracketDragInteractionState.activeObjectType.value !== objectType
+      )
+        return;
+      const line = findNativeBracketLine(
+        latestOrderLinesRef.current,
+        latestPositionLinesRef.current,
+        objectType,
+        objectId,
+      );
+      const captured = nativeBracketMoveCallback(line, bracketType)
+        ? { ...line!, callbacks: { ...line!.callbacks } }
+        : undefined;
+      bracketMoveLease.begin(nativeBracketLeaseKey(objectType, objectId, bracketType), gesture, captured);
+    },
+    [bracketDragInteractionState, bracketMoveLease, bracketMoveLifetime],
+  );
 
   const beginOrderMove = useCallback(
     (objectId: string, price: number, gesture: NativeOrderMoveGesture) => {
@@ -415,12 +498,51 @@ export function useNativeOemsLineRuntime({
       objectId: string,
       bracketType: NativeTradeLineBracketType,
       price: number,
-      partialPercent?: number,
+      partialPercent: number | undefined,
+      gesture: NativeOrderMoveGesture,
     ) => {
+      if (!bracketMoveLifetime.active) return;
+      const sameTouch = () =>
+        !!gesture &&
+        hasNativeBracketTouchState(bracketDragInteractionState) &&
+        bracketDragInteractionState.touchSequence.value === gesture.sequence &&
+        bracketDragInteractionState.touchStartedAt.value === gesture.startedAt;
+      if (!hasNativeBracketTouchState(bracketDragInteractionState)) {
+        bracketMoveLease.retire();
+        return;
+      }
+      const captured = bracketMoveLease.consume(nativeBracketLeaseKey(objectType, objectId, bracketType), gesture);
+      if (!captured) {
+        if (sameTouch()) clearNativeBracketDrag();
+        return;
+      }
+      if (
+        !sameTouch() ||
+        bracketDragInteractionState.activeObjectId.value !== objectId ||
+        bracketDragInteractionState.activeObjectType.value !== objectType ||
+        bracketDragInteractionState.active.value
+      )
+        return;
+      const current = findNativeBracketLine(
+        latestOrderLinesRef.current,
+        latestPositionLinesRef.current,
+        objectType,
+        objectId,
+      );
+      if (
+        !current ||
+        nativeBracketMoveCallback(current, bracketType) !== nativeBracketMoveCallback(captured, bracketType)
+      ) {
+        clearNativeBracketDrag();
+        return;
+      }
+      // Current line state with the captured callbacks: a TP/SL update during the
+      // drag is not rolled back by the optimistic preview.
+      const leased = { ...current, callbacks: captured.callbacks } as typeof current;
       const result = startNativeBracketMoveAction({
         manager: oemsActions,
-        orderLines: latestOrderLinesRef.current,
-        positionLines: latestPositionLinesRef.current,
+        orderLines: objectType === 'order' ? [leased as OrderLineRenderData] : [],
+        positionLines: objectType === 'position' ? [leased as PositionLineRenderData] : [],
         objectType,
         objectId,
         bracketType,
@@ -447,7 +569,14 @@ export function useNativeOemsLineRuntime({
         forceUpdate();
       }
     },
-    [clearNativeBracketDrag, forceUpdate, oemsActions],
+    [
+      bracketDragInteractionState,
+      bracketMoveLease,
+      bracketMoveLifetime,
+      clearNativeBracketDrag,
+      forceUpdate,
+      oemsActions,
+    ],
   );
 
   const commitTradeLineAction = useCallback(
@@ -565,6 +694,7 @@ export function useNativeOemsLineRuntime({
   }, [syncNativeBracketDragStateForSnapshot, syncNativeOrderDragStateForSnapshot]);
 
   return {
+    beginBracketMove,
     clearNativeBracketDrag,
     clearNativeOrderDrag,
     commitBracketMove,

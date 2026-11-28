@@ -148,6 +148,8 @@ function createBracketDragState(active = false): NativeBracketDragInteractionSta
     activeLineColor: shared(''),
     startPrice: shared(0),
     pricePerPixel: shared(0),
+    touchSequence: shared(0),
+    touchStartedAt: shared(0),
   };
 }
 
@@ -1028,6 +1030,7 @@ describe('native gesture activation', () => {
       tradeLineRows,
     }) as any;
     const bracketDragGesture = createNativeBracketDragGesture({
+      beginBracketMove: vi.fn(),
       bracketDragInteractionState: createBracketDragState(),
       clearNativeBracketDrag: () => {},
       commitBracketMove: () => {},
@@ -1770,6 +1773,60 @@ describe('native gesture activation', () => {
     expect(commitOrderMove).not.toHaveBeenCalled();
   });
 
+  it('refuses a bracket drag on retained state without its touch lease values', () => {
+    const viewport = sharedViewport(viewportValue);
+    const centerY = 88;
+    const price =
+      viewportValue.priceMax -
+      ((centerY - frame.mainPane.top) / frame.mainPane.height) * (viewportValue.priceMax - viewportValue.priceMin);
+    const state = createBracketDragState();
+    delete state.touchSequence;
+    delete state.touchStartedAt;
+    const begin = vi.fn(),
+      commit = vi.fn(),
+      manager = mockStateManager();
+    const gesture = createNativeBracketDragGesture({
+      beginBracketMove: begin,
+      bracketDragInteractionState: state,
+      clearNativeBracketDrag: vi.fn(),
+      commitBracketMove: commit,
+      frame,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([
+        {
+          objectType: 'order' as const,
+          objectId: 'order-1',
+          actionType: 'tp' as const,
+          price,
+          entryPrice: price,
+          dragPrice: price + 10,
+          partialEnabled: false,
+          positionNotional: 0,
+          positionIsLong: true,
+          color: '#00bcd4',
+          lineColor: '#00bcd4',
+          x1: 130,
+          x2: 156,
+        },
+      ]),
+      tradeLineRows: shared([{ objectType: 'order' as const, objectId: 'order-1', price }]),
+    }) as any;
+    expect(() => {
+      gesture.handlers.onTouchesDown(
+        { changedTouches: [{ x: 140, y: centerY }], allTouches: [{ x: 140, y: centerY }] },
+        manager,
+      );
+      gesture.handlers.onBegin({ x: 140, y: centerY });
+      gesture.handlers.onUpdate({ translationX: 0, translationY: -8 });
+      gesture.handlers.onEnd({ translationX: 0, translationY: -8 });
+      gesture.handlers.onFinalize({}, false);
+    }).not.toThrow();
+    expect(manager.failed).toBe(true);
+    expect(begin).not.toHaveBeenCalled();
+    expect(commit).not.toHaveBeenCalled();
+  });
+
   it('does not clear bracket drag state from a TP or SL tap without pan begin', () => {
     const viewport = sharedViewport(viewportValue);
     const centerY = 88;
@@ -1797,6 +1854,7 @@ describe('native gesture activation', () => {
     const commitBracketMove = vi.fn();
     const bracketDragInteractionState = createBracketDragState();
     const bracketDragGesture = createNativeBracketDragGesture({
+      beginBracketMove: vi.fn(),
       bracketDragInteractionState,
       clearNativeBracketDrag,
       commitBracketMove,
@@ -1830,7 +1888,10 @@ describe('native gesture activation', () => {
     bracketDragGesture.handlers.onUpdate({ translationX: 0, translationY: -8 });
     bracketDragGesture.handlers.onEnd({ translationX: 0, translationY: -8 });
     expect(clearNativeBracketDrag).not.toHaveBeenCalled();
-    expect(commitBracketMove).toHaveBeenCalledWith('position', 'position-1', 'tp', expect.any(Number), undefined);
+    expect(commitBracketMove).toHaveBeenCalledWith('position', 'position-1', 'tp', expect.any(Number), undefined, {
+      sequence: bracketDragInteractionState.touchSequence!.value,
+      startedAt: bracketDragInteractionState.touchStartedAt!.value,
+    });
     // The gesture ends, the preview does not. `active` falls so axis pinch, the
     // TP/SL tap targets and this gesture's own touch guard are free again, while
     // `activeObjectId` keeps the preview on screen until the projection carries
@@ -1856,6 +1917,7 @@ describe('native gesture activation', () => {
     bracketDragInteractionState.startPrice.value = 63_000;
     bracketDragInteractionState.pricePerPixel.value = 10;
     const bracketDragGesture = createNativeBracketDragGesture({
+      beginBracketMove: vi.fn(),
       bracketDragInteractionState,
       clearNativeBracketDrag,
       commitBracketMove,
@@ -1887,6 +1949,7 @@ describe('native gesture activation', () => {
     const bracketDragInteractionState = createBracketDragState(true);
     bracketDragInteractionState.activeObjectId.value = 'order_1';
     const bracketDragGesture = createNativeBracketDragGesture({
+      beginBracketMove: vi.fn(),
       bracketDragInteractionState,
       clearNativeBracketDrag: () => {},
       commitBracketMove: () => {},

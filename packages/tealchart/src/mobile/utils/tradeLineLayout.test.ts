@@ -256,6 +256,57 @@ describe('native trade line layout', () => {
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
 
+  it('adds a line-drag zone at each draggable bracket price when brackets are editable', () => {
+    const options = {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    };
+    const callbacks = { onMove: () => undefined, onTPMoveEnd: () => undefined, onSLMoveEnd: () => undefined };
+    const [editable] = buildNativeTradeLineGeometries(
+      [createOrderLine({ bracketsEditable: true, callbacks })],
+      [],
+      options,
+    );
+    const lineZones = editable?.actionZones.filter((zone) => zone.lineDrag) ?? [];
+    expect(lineZones.map((zone) => [zone.actionType, zone.price, zone.dragPrice])).toEqual([
+      ['tp', 65000, 65000],
+      ['sl', 62000, 62000],
+    ]);
+    expect(lineZones.every((zone) => zone.partialEnabled === false)).toBe(true);
+    expect(editable?.actionZones.filter((zone) => !zone.lineDrag).map((zone) => zone.actionType)).toEqual([
+      'cancel',
+      'tp',
+      'sl',
+    ]);
+
+    const [noStopCallback] = buildNativeTradeLineGeometries(
+      [createOrderLine({ bracketsEditable: true, callbacks: { onMove: () => undefined, onTPMoveEnd: () => undefined } })],
+      [],
+      options,
+    );
+    expect(noStopCallback?.actionZones.filter((zone) => zone.lineDrag).map((zone) => zone.actionType)).toEqual(['tp']);
+
+    const [legacy] = buildNativeTradeLineGeometries([createOrderLine({ callbacks })], [], options);
+    expect(legacy?.actionZones.some((zone) => zone.lineDrag)).toBe(false);
+  });
+
+  it('keeps display-only bracket chips but drops their drag and tap zones', () => {
+    const [geometry] = buildNativeTradeLineGeometries([createOrderLine({ bracketsEditable: false })], [], {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    });
+    expect(geometry?.buttons.map((button) => button.type)).toEqual(['cancel', 'tp', 'sl']);
+    expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(['cancel']);
+  });
+
   it('matches web extendLeft semantics for the left connector', () => {
     const [withoutLeftConnector] = buildNativeTradeLineGeometries(
       [createOrderLine({ extendLeft: false, lineLength: 50 })],

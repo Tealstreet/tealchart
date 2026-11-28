@@ -59,4 +59,20 @@ describe('trade line bracket price lines', () => {
       tradingLineToBracketLines(createOrderLine({ brackets: { takeProfit: 0, stopLoss: undefined } }), (price) => String(price), '#12c48b'),
     ).toEqual([]);
   });
+
+  it('makes the lines draggable only for a host that declared brackets editable', () => {
+    const callbacks = { onMove: () => undefined, onTPMoveEnd: () => undefined };
+    const format = (price: number) => String(price);
+    const editable = tradingLineToBracketLines(createOrderLine({ bracketsEditable: true, callbacks }), format, '#12c48b');
+    expect(editable.map((line) => [line.bracketOf, line.draggable])).toEqual([
+      [{ lineId: 'adapter-order', bracketType: 'tp' }, true],
+      [{ lineId: 'adapter-order', bracketType: 'sl' }, false],
+    ]);
+    for (const bracketsEditable of [undefined, false])
+      expect(
+        tradingLineToBracketLines(createOrderLine({ bracketsEditable, callbacks }), format, '#12c48b').map(
+          (line) => line.draggable,
+        ),
+      ).toEqual([false, false]);
+  });
 });

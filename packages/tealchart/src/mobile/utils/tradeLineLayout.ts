@@ -676,7 +676,9 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
           const chip = buttons.find((button) => button.type === bracketType);
           const color =
             chip?.backgroundColor ??
-            (bracketType === 'tp' ? (line.brackets?.takeProfitColor ?? positiveColor) : (line.brackets?.stopLossColor ?? negativeColor));
+            (bracketType === 'tp'
+              ? (line.brackets?.takeProfitColor ?? positiveColor)
+              : (line.brackets?.stopLossColor ?? negativeColor));
           return [
             {
               objectType,
@@ -697,21 +699,24 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
           ];
         })
       : [];
-  const actionZones: NativeTradeLineActionZone[] = [...bracketLineZones, ...actionButtons.map((button) => ({
-    objectType,
-    objectId,
-    actionType: button.type,
-    price: line.price,
-    entryPrice: positionData?.entryPrice ?? line.price,
-    dragPrice: getNativeTradeLineActionPrice(line, button.type),
-    partialEnabled: line.partialEnabled ?? false,
-    positionNotional: positionData?.notional ?? 0,
-    positionIsLong: positionData?.isLong ?? true,
-    color: button.type === 'tp' || button.type === 'sl' ? button.backgroundColor : line.lineColor,
-    lineColor: button.accentColor ?? line.lineColor,
-    x1: button.x - TRADE_LABEL_HIT_SLOP,
-    x2: button.x + button.width + TRADE_LABEL_HIT_SLOP,
-  }))];
+  const actionZones: NativeTradeLineActionZone[] = [
+    ...bracketLineZones,
+    ...actionButtons.map((button): NativeTradeLineActionZone => ({
+      objectType,
+      objectId,
+      actionType: button.type,
+      price: line.price,
+      entryPrice: positionData?.entryPrice ?? line.price,
+      dragPrice: getNativeTradeLineActionPrice(line, button.type),
+      partialEnabled: line.partialEnabled ?? false,
+      positionNotional: positionData?.notional ?? 0,
+      positionIsLong: positionData?.isLong ?? true,
+      color: button.type === 'tp' || button.type === 'sl' ? button.backgroundColor : line.lineColor,
+      lineColor: button.accentColor ?? line.lineColor,
+      x1: button.x - TRADE_LABEL_HIT_SLOP,
+      x2: button.x + button.width + TRADE_LABEL_HIT_SLOP,
+    })),
+  ];
   const dragLabelBodyRightX =
     segmentGeometryWithCorners.length > 0
       ? Math.max(...segmentGeometryWithCorners.map((segment) => segment.x + segment.width))

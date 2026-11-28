@@ -285,6 +285,35 @@ describe('native trade-line hit testing', () => {
     ).toBeNull();
   });
 
+  it('drags an editable TP line from a thin band along its own price, yielding to label controls', () => {
+    const rows: NativeTradeLineRow[] = [{ objectType: 'order', objectId: 'order-1', price: 50 }];
+    const lineZone: NativeTradeLineActionZone = {
+      objectType: 'order',
+      objectId: 'order-1',
+      actionType: 'tp',
+      price: 80,
+      entryPrice: 50,
+      dragPrice: 80,
+      partialEnabled: false,
+      positionNotional: 0,
+      positionIsLong: true,
+      color: '#00c878',
+      lineColor: '#00c878',
+      x1: 0,
+      x2: 120,
+      lineDrag: true,
+    };
+    const find = (zones: NativeTradeLineActionZone[], y: number, x = 60) =>
+      findNativeBracketDragZoneIndex({ zones, rows, x, y, sharedViewport, frame, tradeLabelHeight: 18 });
+    // Price 80 sits at y 20 in this 0-100 pane.
+    expect(find([lineZone], 20)).toBe(0);
+    expect(find([lineZone], 28)).toBe(0);
+    expect(find([lineZone], 32)).toBe(-1);
+    expect(find([lineZone], 20, 130)).toBe(-1);
+    const chip: NativeTradeLineActionZone = { ...lineZone, price: 80, lineDrag: undefined, x1: 50, x2: 70 };
+    expect(find([lineZone, chip], 20)).toBe(1);
+  });
+
   it('blocks chart panning over OEMS labels and outside the plot', () => {
     const rows: NativeTradeLineRow[] = [
       { objectType: 'order', objectId: 'order-1', price: 50 },
