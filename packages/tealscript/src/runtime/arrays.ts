@@ -457,10 +457,14 @@ export function sortIndicesArrayValue(
   const descending = isDescendingOrder(order);
   const values = getArrayValues(array);
   const field = resolveArraySortField(array, values, sortField);
+  // An undefined field means no UDT values, so keys are the values themselves. Singletons
+  // never reach the comparator, so projecting them would add field refusals sort never raised.
+  const keys =
+    field === undefined || values.length < 2 ? values : values.map((value) => comparableArraySortValue(value, field));
   const indices = values.map((_value, index) => index);
   indices.sort((leftIndex, rightIndex) => {
-    const leftValue = comparableArraySortValue(values[leftIndex], field);
-    const rightValue = comparableArraySortValue(values[rightIndex], field);
+    const leftValue = keys[leftIndex];
+    const rightValue = keys[rightIndex];
     const result = compareArrayValues(leftValue, rightValue);
     const tieOrder =
       isMissingArraySortValue(leftValue) || isMissingArraySortValue(rightValue) ? 0 : rightIndex - leftIndex;
