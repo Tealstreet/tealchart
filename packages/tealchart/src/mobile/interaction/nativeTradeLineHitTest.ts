@@ -27,6 +27,8 @@ import { resolveNativePriceAxisTagStack } from '../utils/priceAxisTagLayout';
 import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
 
 export const NATIVE_TRADE_LABEL_HIT_SLOP = 8;
+/** Half-height of the band along an editable TP/SL line: thin, so pans across the line still pan. */
+export const NATIVE_BRACKET_LINE_HIT_SLOP = 10;
 
 export function sharedPriceToNativeLineY(
   price: number,
@@ -220,6 +222,7 @@ export function findNativeTradeLineActionZoneIndex({
   // Lines closer than a label plus its slop share a band, so the line nearest the finger
   // wins rather than array order: an SL's ✕ 15 pt under a limit's TP chip opened the
   // chip's picker (AGT-162). Equal distance keeps the topmost (later) zone.
+  // A TP/SL line band yields to any label control at the same distance.
   let best = -1;
   let bestDistance = Infinity;
   for (let index = zones.length - 1; index >= 0; index -= 1) {
@@ -227,13 +230,11 @@ export function findNativeTradeLineActionZoneIndex({
     const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
     if (!isNativeYInMainPane(priceY, frame)) continue;
     const zoneTop = priceY - tradeLabelHeight / 2;
-    if (
-      x >= zone.x1 &&
-      x <= zone.x2 &&
-      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
-      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
-    ) {
-      const distance = Math.abs(y - priceY);
+    const inBand = zone.lineDrag
+      ? Math.abs(y - priceY) <= NATIVE_BRACKET_LINE_HIT_SLOP
+      : y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP && y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP;
+    if (x >= zone.x1 && x <= zone.x2 && inBand) {
+      const distance = Math.abs(y - priceY) + (zone.lineDrag ? 0.5 : 0);
       if (distance < bestDistance) {
         best = index;
         bestDistance = distance;

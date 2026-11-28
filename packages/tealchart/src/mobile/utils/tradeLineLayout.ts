@@ -60,6 +60,11 @@ export interface NativeTradeLineActionZone {
   lineColor: string;
   x1: number;
   x2: number;
+  /**
+   * A drag along an editable TP/SL line rather than its tag chip. It drags like
+   * the chip, hit-tests on a thin band and is never a tap action.
+   */
+  lineDrag?: true;
 }
 
 export interface NativeTradeLineRow {
@@ -656,7 +661,43 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     corners: getNativeTradeLineButtonCornersForVisibleButtons(buttonGeometry, index, segmentGeometryWithCorners.length),
   }));
   const positionData = objectType === 'position' ? (line as PositionLineRenderData).positionData : null;
-  const actionZones: NativeTradeLineActionZone[] = buttonGeometryWithCorners.map((button) => ({
+  const bracketsEditable = isOrderLineRenderData(line) ? line.bracketsEditable : undefined;
+  // Display-only brackets keep their chips but lose the zones that drag or tap them.
+  const actionButtons =
+    bracketsEditable === false
+      ? buttonGeometryWithCorners.filter((button) => button.type !== 'tp' && button.type !== 'sl')
+      : buttonGeometryWithCorners;
+  const bracketLineZones: NativeTradeLineActionZone[] =
+    bracketsEditable === true && isOrderLineRenderData(line)
+      ? (['tp', 'sl'] as const).flatMap((bracketType) => {
+          const price = bracketType === 'tp' ? line.brackets?.takeProfit : line.brackets?.stopLoss;
+          const moveEnd = bracketType === 'tp' ? line.callbacks?.onTPMoveEnd : line.callbacks?.onSLMoveEnd;
+          if (price === undefined || !(price > 0) || !moveEnd) return [];
+          const chip = buttons.find((button) => button.type === bracketType);
+          const color =
+            chip?.backgroundColor ??
+            (bracketType === 'tp' ? (line.brackets?.takeProfitColor ?? positiveColor) : (line.brackets?.stopLossColor ?? negativeColor));
+          return [
+            {
+              objectType,
+              objectId,
+              actionType: bracketType,
+              price,
+              entryPrice: line.price,
+              dragPrice: price,
+              partialEnabled: false,
+              positionNotional: 0,
+              positionIsLong: true,
+              color,
+              lineColor: chip?.accentColor ?? color,
+              x1: layout.lineStartX,
+              x2: layout.priceLabelLeft + layout.priceLabelWidth,
+              lineDrag: true as const,
+            },
+          ];
+        })
+      : [];
+  const actionZones: NativeTradeLineActionZone[] = [...bracketLineZones, ...actionButtons.map((button) => ({
     objectType,
     objectId,
     actionType: button.type,
@@ -670,7 +711,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     lineColor: button.accentColor ?? line.lineColor,
     x1: button.x - TRADE_LABEL_HIT_SLOP,
     x2: button.x + button.width + TRADE_LABEL_HIT_SLOP,
-  }));
+  }))];
   const dragLabelBodyRightX =
     segmentGeometryWithCorners.length > 0
       ? Math.max(...segmentGeometryWithCorners.map((segment) => segment.x + segment.width))

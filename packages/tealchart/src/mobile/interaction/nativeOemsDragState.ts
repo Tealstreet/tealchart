@@ -62,9 +62,23 @@ export interface NativeBracketDragSharedValues {
 }
 
 export interface NativeBracketDragInteractionState extends NativeBracketDragSharedValues {
+  // Optional only for retained pre-upgrade state during Fast Refresh, as for
+  // order drags: without both, a bracket drag never begins.
+  touchSequence?: SharedValue<number>;
+  touchStartedAt?: SharedValue<number>;
   active: SharedValue<boolean>;
   startPrice: SharedValue<number>;
   pricePerPixel: SharedValue<number>;
+}
+
+export function hasNativeBracketTouchState(
+  state: NativeBracketDragInteractionState,
+): state is NativeBracketDragInteractionState & {
+  touchSequence: SharedValue<number>;
+  touchStartedAt: SharedValue<number>;
+} {
+  'worklet';
+  return !!state.touchSequence && !!state.touchStartedAt;
 }
 
 export const NATIVE_BRACKET_DRAG_THRESHOLD = 5;

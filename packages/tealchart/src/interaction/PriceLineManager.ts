@@ -112,6 +112,9 @@ export interface CrosshairState {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const DRAG_THRESHOLD = 5;
+// A TP/SL line is grabbed along its dashes, so its band is thin: a full touch
+// target would swallow chart pans for 44px around every bracket.
+const BRACKET_LINE_HIT_HEIGHT = 12;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
 
@@ -478,6 +481,8 @@ export class PriceLineManager {
           b.color,
           b.lineStyle,
           b.draggable ? '1' : '0',
+          b.bracketsEditable === undefined ? '-' : b.bracketsEditable ? '1' : '0',
+          b.bracketOf ? `${b.bracketOf.lineId}:${b.bracketOf.bracketType}` : '',
           b.width,
           b.height,
           b.lineLength ?? '',
@@ -1009,10 +1014,143 @@ export class PriceLineManager {
 
       // Price axis label
       this.renderPriceAxisLabel(lineGroup, bound, priceAxisLabelX, priceAxisLabelY);
+      if (bound.bracketOf && bound.draggable) {
+        this.renderBracketLineDragHandle(lineGroup, bound, lineY, priceAxisLabelX + bound.width);
+      }
     } else {
       // Trading line (order/position) with chart label
       this.renderTradingLine(lineGroup, bound, lineY, labelCenterY, priceAxisLabelX, priceAxisLabelY, lineDash);
     }
+  }
+
+  /**
+   * A TP/SL line its host declared editable drags like the tag's TP/SL handle:
+   * the drag belongs to the parent line, resolved at gesture time, and previews
+   * and commits through the same options. There is no click; a line is not a button.
+   */
+  private renderBracketLineDragHandle(
+    group: Konva.Group,
+    bound: PriceLineLabelBounds,
+    lineY: number,
+    rightX: number,
+  ): void {
+    const bracketOf = bound.bracketOf;
+    if (!bracketOf) return;
+    const { yToPrice } = this.options;
+    const left = this.options.margins.left;
+    const hitRect = new Konva.Rect({
+      x: left,
+      y: lineY - BRACKET_LINE_HIT_HEIGHT / 2,
+      width: Math.max(0, rightX - left),
+      height: BRACKET_LINE_HIT_HEIGHT,
+      fill: 'rgba(0, 0, 0, 0.01)',
+      draggable: true,
+      listening: true,
+    });
+    hitRect.setAttr('tealchartCursor', 'pointer');
+    hitRect.dragDistance(0);
+    const originalX = hitRect.x();
+    const originalY = hitRect.y();
+    const parentBound = () => {
+      const parentGroup = this.cachedLineGroups.get(bracketOf.lineId);
+      return (parentGroup?.getAttr('boundData') as PriceLineLabelBounds | undefined) ?? null;
+    };
+    // The parent's current state decides, not this line's creation-time copy.
+    const draggableParent = () => {
+      const parent = parentBound();
+      return parent && parent.bracketsEditable === true && !parent.actionState?.isAwaitingCallback ? parent : null;
+    };
+    const pointerY = () =>
+      this.getStagePointerPosition(hitRect)?.y ?? hitRect.getAbsolutePosition().y + BRACKET_LINE_HIT_HEIGHT / 2;
+
+    hitRect.on('mousedown touchstart', (e) => {
+      if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'down')) return;
+      if (!draggableParent()) return;
+      this.selectLine(bracketOf.lineId);
+      if (!this.activeDrag) hitRect.startDrag(e);
+    });
+
+    hitRect.on('dragstart', (e) => {
+      if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'start')) return;
+      const parent = draggableParent();
+      if (!parent) {
+        this.dragCancelled = true;
+        hitRect.stopDrag();
+        return;
+      }
+      const startPointer = this.getStagePointerPosition(hitRect);
+      this.activeDrag = {
+        node: hitRect,
+        type: 'tpsl',
+        // The bracket line's own id: the canvas leaves it undrawn while the preview carries it.
+        lineId: bound.lineId,
+        positionId: parent.lineId,
+        buttonType: bracketOf.bracketType,
+        originalX,
+        originalY,
+        originalPrice: bound.price,
+        originalAbsoluteY: hitRect.getAbsolutePosition().y + BRACKET_LINE_HIT_HEIGHT / 2,
+        originalPointerX: startPointer?.x,
+        originalPointerY: startPointer?.y,
+        partialEnabled: false,
+        onCancel: () => {
+          this.options.onTPSLDragCancel?.();
+        },
+      };
+      this.dragCancelled = false;
+      this.options.onCursorChange?.('grabbing');
+    });
+
+    hitRect.on('dragmove', (e) => {
+      if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'move')) return;
+      hitRect.x(originalX);
+      const activeDrag = this.activeDrag;
+      if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
+      const parent = parentBound();
+      if (!parent) return;
+      const price = yToPrice(pointerY());
+      const startX = activeDrag.originalPointerX ?? 0;
+      if (bracketOf.bracketType === 'tp') {
+        parent.callbacks?.onTPMove?.(price, 100);
+        this.options.onTPMovePreview?.(parent.lineId, price, 100, startX, startX);
+      } else {
+        parent.callbacks?.onSLMove?.(price, 100);
+        this.options.onSLMovePreview?.(parent.lineId, price, 100, startX, startX);
+      }
+    });
+
+    hitRect.on('dragend', (e) => {
+      if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'end')) return;
+      const activeDrag = this.activeDrag;
+      hitRect.x(originalX);
+      if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) {
+        hitRect.y(originalY);
+        this.dragCancelled = false;
+        this.options.onCursorChange?.('crosshair');
+        return;
+      }
+      const finalY = pointerY();
+      const startY = activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? finalY;
+      const price = yToPrice(finalY);
+      hitRect.y(originalY);
+      this.activeDrag = null;
+      const parent = parentBound();
+      if (!this.dragCancelled && parent && Math.abs(finalY - startY) > DRAG_THRESHOLD) {
+        if (bracketOf.bracketType === 'tp') {
+          this.options.onTPDragEnd?.(parent, price, undefined);
+        } else {
+          this.options.onSLDragEnd?.(parent, price, undefined);
+        }
+        this.options.onTPSLDragEnd?.();
+      } else {
+        this.options.onTPSLDragCancel?.();
+      }
+      this.dragCancelled = false;
+      this.options.onCursorChange?.('crosshair');
+    });
+
+    this.bindLineSelectAndHover(hitRect, bracketOf.lineId);
+    group.add(hitRect);
   }
 
   private renderPriceAxisLabel(group: Konva.Group, bound: PriceLineLabelBounds, x: number, y: number): void {
@@ -1436,16 +1574,18 @@ export class PriceLineManager {
           buttonGroup.add(buttonText);
           refs.buttonTexts.push(buttonText);
 
+          // A host that declared the brackets non-editable gets a display-only chip.
+          const bracketsEditable = bound.bracketsEditable !== false;
           const hitRect = new Konva.Rect({
             x: currentX,
             y: lineY - labelHeight / 2,
             width: buttonWidth,
             height: labelHeight,
             fill: 'rgba(0, 0, 0, 0.01)',
-            draggable: true,
+            draggable: bracketsEditable,
             listening: true,
           });
-          hitRect.setAttr('tealchartCursor', 'pointer');
+          if (bracketsEditable) hitRect.setAttr('tealchartCursor', 'pointer');
           hitRect.dragDistance(0);
           const buttonType = button.type;
           const originalX = currentX;
@@ -1457,6 +1597,7 @@ export class PriceLineManager {
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isAwaitingCallback) return;
             this.selectLine(currentBound.lineId);
+            if (currentBound.bracketsEditable === false) return;
             if (!this.activeDrag) {
               hitRect.startDrag(e);
             }
@@ -1465,7 +1606,7 @@ export class PriceLineManager {
           hitRect.on('dragstart', (e) => {
             if (this.options.acceptPointerEvent && !this.options.acceptPointerEvent(e.evt, hitRect, 'start')) return;
             const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isAwaitingCallback) {
+            if (currentBound.actionState?.isAwaitingCallback || currentBound.bracketsEditable === false) {
               this.dragCancelled = true;
               hitRect.stopDrag();
               return;

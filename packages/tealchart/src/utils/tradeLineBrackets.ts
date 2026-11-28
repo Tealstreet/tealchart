@@ -19,11 +19,16 @@ export function tradingLineToBracketLines(
   const takeProfitTextColor = brackets.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
   const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
   const stopLossTextColor = brackets.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  // Only a host that declared the brackets editable gets draggable lines; the
+  // drag ends through the same TP/SL move-end callback as the tag handle.
+  const editable = 'bracketsEditable' in line && line.bracketsEditable === true;
 
   if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
     bracketLines.push({
       id: `${line.id}-tp`,
       price: brackets.takeProfit,
+      bracketOf: { lineId: line.id, bracketType: 'tp' },
+      draggable: editable && !!line.callbacks?.onTPMoveEnd,
       lineStyle: 'dashed',
       color: takeProfitColor,
       type: 'price',
@@ -44,6 +49,8 @@ export function tradingLineToBracketLines(
     bracketLines.push({
       id: `${line.id}-sl`,
       price: brackets.stopLoss,
+      bracketOf: { lineId: line.id, bracketType: 'sl' },
+      draggable: editable && !!line.callbacks?.onSLMoveEnd,
       lineStyle: 'dashed',
       color: stopLossColor,
       type: 'price',

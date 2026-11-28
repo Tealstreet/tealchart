@@ -62,6 +62,7 @@ export interface NativeChartGestureRuntimeInput {
   chartPanGestureState: NativeChartPanGestureState;
   clearNativeBracketDrag: () => void;
   commitBracketMove: Parameters<typeof createNativeBracketDragGesture>[0]['commitBracketMove'];
+  beginBracketMove: Parameters<typeof createNativeBracketDragGesture>[0]['beginBracketMove'];
   beginOrderMove: Parameters<typeof createNativeOrderDragGesture>[0]['beginOrderMove'];
   commitOrderMove: Parameters<typeof createNativeOrderDragGesture>[0]['commitOrderMove'];
   commitPanViewport: (nextViewport: Viewport) => void;
@@ -163,6 +164,7 @@ export function useNativeChartGestureRuntime({
   chartPanGestureState,
   clearNativeBracketDrag,
   commitBracketMove,
+  beginBracketMove,
   beginOrderMove,
   commitOrderMove,
   commitPanViewport,
@@ -222,6 +224,7 @@ export function useNativeChartGestureRuntime({
   const stableCancelNativeViewportInteraction = useLatestNativeCallback(cancelNativeViewportInteraction);
   const stableClearNativeBracketDrag = useLatestNativeCallback(clearNativeBracketDrag);
   const stableCommitBracketMove = useLatestNativeCallback(commitBracketMove);
+  const stableBeginBracketMove = useLatestNativeCallback(beginBracketMove);
   const stableCommitOrderMove = useLatestNativeCallback(commitOrderMove);
   const stableBeginOrderMove = useLatestNativeCallback(beginOrderMove);
   const stableCommitPanViewport = useLatestNativeCallback(commitPanViewport);
@@ -569,6 +572,7 @@ export function useNativeChartGestureRuntime({
 
   const bracketDragGesture = useMemo<GestureType>(() => {
     return createNativeBracketDragGesture({
+      beginBracketMove: stableBeginBracketMove,
       bracketDragInteractionState,
       clearNativeBracketDrag: stableClearNativeBracketDrag,
       commitBracketMove: stableCommitBracketMove,
@@ -588,6 +592,7 @@ export function useNativeChartGestureRuntime({
     resetViewVisible,
     onSelectTradeLine,
     sharedViewport,
+    stableBeginBracketMove,
     stableClearNativeBracketDrag,
     stableCommitBracketMove,
     tradeLabelHeight,

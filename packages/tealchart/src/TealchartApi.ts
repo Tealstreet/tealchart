@@ -1309,6 +1309,11 @@ export class TealchartApi {
         notifyChange();
         return this;
       },
+      setBracketsEditable(editable: boolean) {
+        data.bracketsEditable = editable;
+        notifyChange();
+        return this;
+      },
       setPartialPercents(percents: number[]) {
         data.partialPercents = percents;
         notifyChange();

@@ -125,6 +125,10 @@ export function resolveNativeCanvasTap(
       frame: ctx.frame,
       tradeLabelHeight: ctx.tradeLabelHeight,
     });
+    // A TP/SL line is dragged, not pressed: a tap on it selects its order.
+    if (zone?.lineDrag) {
+      return { kind: 'tradeLineSelect', objectType: zone.objectType, objectId: zone.objectId };
+    }
     if (zone) {
       return {
         kind: 'tradeLineAction',

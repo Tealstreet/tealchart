@@ -104,6 +104,10 @@ export function useNativeSkiaInteractionRuntime({
   const activeOrderDragObjectId = useSharedValue('');
   const activeOrderDragPrice = useSharedValue(0);
   const bracketDragActive = useSharedValue(false);
+  // A bracket touch has its own sequence: sharing the order drag's would let a
+  // TP touch void an order move still queued for JS.
+  const bracketTouchSequence = useSharedValue(0);
+  const bracketTouchStartedAt = useSharedValue(0);
   const bracketDragStartPrice = useSharedValue(0);
   const bracketDragPricePerPixel = useSharedValue(0);
   const activeBracketDragObjectId = useSharedValue('');
@@ -246,11 +250,20 @@ export function useNativeSkiaInteractionRuntime({
   const bracketDragInteractionState = useMemo<NativeBracketDragInteractionState>(
     () => ({
       ...bracketDragState,
+      touchSequence: bracketTouchSequence,
+      touchStartedAt: bracketTouchStartedAt,
       active: bracketDragActive,
       startPrice: bracketDragStartPrice,
       pricePerPixel: bracketDragPricePerPixel,
     }),
-    [bracketDragActive, bracketDragPricePerPixel, bracketDragStartPrice, bracketDragState],
+    [
+      bracketDragActive,
+      bracketDragPricePerPixel,
+      bracketDragStartPrice,
+      bracketDragState,
+      bracketTouchSequence,
+      bracketTouchStartedAt,
+    ],
   );
   const panIndicatorPaneTarget = useSharedValue<NativeIndicatorPaneScaleTarget | null>(null);
   const panPaneDividerTarget = useSharedValue<NativePaneDividerTarget | null>(null);
