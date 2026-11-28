@@ -60,6 +60,8 @@ export function computeProjectedPriceLineLabelBounds(
       renderLineOnCanvas: line.renderLineOnCanvas,
       countdownToTime: line.countdownToTime,
       draggable: line.draggable,
+      bracketsEditable: line.bracketsEditable,
+      bracketOf: line.bracketOf,
       actionState: line.actionState,
       targetPaneId: line.targetPaneId,
       // Trading object identity for OEMS callbacks

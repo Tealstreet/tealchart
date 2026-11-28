@@ -2267,6 +2267,8 @@ export class ChartCore {
           b.countdownToTime = line.countdownToTime;
           b.countdownThenTime = line.countdownThenTime;
           b.draggable = line.draggable;
+          b.bracketsEditable = line.bracketsEditable;
+          b.bracketOf = line.bracketOf;
           b.actionState = line.actionState;
           b.orderId = line.orderId;
           b.positionId = line.positionId;

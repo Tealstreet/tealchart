@@ -238,7 +238,8 @@ const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
   'onSLMoveEnd',
 ].sort();
 
-const TEALSTREET_SERIALIZABLE_ORDER_METHODS = [...TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS];
+// Tealchart-only: the TradingView bundles have no bracket editability switch.
+const TEALSTREET_SERIALIZABLE_ORDER_METHODS = [...TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS, 'setBracketsEditable'];
 const TEALSTREET_ORDER_EXTENSION_METHODS = [...TEALSTREET_SERIALIZABLE_ORDER_METHODS, 'setPnlCalculator'].sort();
 
 const TRADINGVIEW_BUNDLE_POSITION_EXTENSION_METHODS = [
@@ -663,6 +664,7 @@ describe('imperative chart API contract', () => {
       'setQuantityShort',
       'setCancelAsSubmit',
       'setPartialEnabled',
+      'setBracketsEditable',
       'setPartialPercents',
       'setCancelTooltip',
       'setModifyTooltip',

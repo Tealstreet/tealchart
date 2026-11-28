@@ -264,6 +264,68 @@ describe('PriceLineManager TP/SL dragging', () => {
     stage.destroy();
   });
 
+  it('drags an editable TP line itself, committing through the parent line', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    const onTPDragEnd = vi.fn();
+    const onTPMovePreview = vi.fn();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+      onTPDragEnd,
+      onTPMovePreview,
+    });
+    const tpLine = (draggable: boolean): PriceLineLabelBounds => ({
+      lineId: 'order-1-tp',
+      price: 200,
+      originalY: 200,
+      adjustedY: 200,
+      width: 60,
+      height: 18,
+      color: '#12c48b',
+      label: { primaryText: '200', textColor: '#ffffff' },
+      lineStyle: 'dashed',
+      type: 'price',
+      draggable,
+      bracketOf: { lineId: 'order-1', bracketType: 'tp' },
+    });
+    const lineHandle = () =>
+      (manager as unknown as PriceLineManagerProbe).cachedLineGroups
+        .get('order-1-tp')
+        ?.findOne((node: Konva.Node) => node instanceof Konva.Rect && node.draggable() && node.height() === 12) as
+        | Konva.Rect
+        | undefined;
+
+    manager.update([{ ...makeOrderBound(100), bracketsEditable: true }, tpLine(true)]);
+    const handle = lineHandle();
+    expect(handle).toBeDefined();
+    handle!.fire('dragstart');
+    handle!.y(handle!.y() + 20);
+    handle!.fire('dragmove');
+    handle!.fire('dragend');
+
+    expect(onTPMovePreview).toHaveBeenCalledWith('order-1', 220, 100, expect.any(Number), expect.any(Number));
+    expect(onTPDragEnd).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ lineId: 'order-1' }),
+      220,
+      undefined,
+    );
+
+    manager.update([makeOrderBound(100), tpLine(false)]);
+    expect(lineHandle()).toBeUndefined();
+
+    manager.dispose();
+    stage.destroy();
+  });
+
   it('bridges the bracket gap with a line so TP/SL joins the label', () => {
     stubCanvasContext();
     const container = createContainer();

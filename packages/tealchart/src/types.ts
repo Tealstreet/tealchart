@@ -248,6 +248,14 @@ export interface PriceLine {
   partialPercents?: number[];
   /** Position data for PnL calculations during drag */
   positionData?: PositionData;
+  /**
+   * Whether the host declared this line's TP/SL editable. Undefined keeps the
+   * original behaviour (tag handles drag, bracket lines do not); true also makes
+   * the bracket lines draggable; false makes both display-only.
+   */
+  bracketsEditable?: boolean;
+  /** Set on a TP/SL bracket line: the order or position line it belongs to. */
+  bracketOf?: { lineId: string; bracketType: 'tp' | 'sl' };
   /** Current bracket configuration (TP/SL prices if already set) */
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
@@ -403,6 +411,14 @@ export interface PriceLineLabelBounds {
   partialPercents?: number[];
   /** Position data for PnL calculations during drag */
   positionData?: PositionData;
+  /**
+   * Whether the host declared this line's TP/SL editable. Undefined keeps the
+   * original behaviour (tag handles drag, bracket lines do not); true also makes
+   * the bracket lines draggable; false makes both display-only.
+   */
+  bracketsEditable?: boolean;
+  /** Set on a TP/SL bracket line: the order or position line it belongs to. */
+  bracketOf?: { lineId: string; bracketType: 'tp' | 'sl' };
   /** Current bracket configuration (TP/SL prices if already set) */
   brackets?: BracketConfig | null;
   /** Adapter callbacks carried through render data for direct invocation */
@@ -1390,6 +1406,8 @@ export interface OrderLineRenderData {
   modifyTooltip: string;
   // TEALSTREET: Bracket state
   brackets: BracketConfig | null;
+  /** See `PriceLine.bracketsEditable`; set through `setBracketsEditable`. */
+  bracketsEditable?: boolean;
   partialEnabled: boolean;
   partialPercents?: number[];
   /** Current OEMS action lifecycle state for presentation and input blocking. */
@@ -1524,6 +1542,12 @@ export interface TealstreetOrderLineExtensions {
   // Bracket TP/SL controls
   setBrackets(brackets: BracketConfig | null): this;
   setPartialEnabled(enabled: boolean): this;
+  /**
+   * Whether this order's TP/SL may be dragged. Leave it unset for the original
+   * behaviour; true also lets the TP and SL lines themselves be dragged; false
+   * makes the tag handles and lines display-only. A Tealchart-only extension.
+   */
+  setBracketsEditable(editable: boolean): this;
   /**
    * Five-slot custom partial ladder for the TP/SL magnet. Both Tealchart and
    * the patched TradingView bundles implement this; the call site keeps the

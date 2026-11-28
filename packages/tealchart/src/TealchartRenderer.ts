@@ -963,6 +963,8 @@ export class TealchartRenderer {
         countdownToTime: line.countdownToTime,
         countdownThenTime: line.countdownThenTime,
         draggable: line.draggable,
+        bracketsEditable: line.bracketsEditable,
+        bracketOf: line.bracketOf,
         actionState: line.actionState,
         targetPaneId: line.targetPaneId,
         // Trading object identity for OEMS callbacks
@@ -5493,6 +5495,8 @@ export class TealchartRenderer {
         countdownToTime: line.countdownToTime,
         countdownThenTime: line.countdownThenTime,
         draggable: line.draggable,
+        bracketsEditable: line.bracketsEditable,
+        bracketOf: line.bracketOf,
         actionState: line.actionState,
         // Trading object identity for OEMS callbacks
         orderId: line.orderId,

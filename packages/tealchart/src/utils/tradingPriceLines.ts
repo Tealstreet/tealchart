@@ -38,6 +38,7 @@ export function orderLineToPriceLine(
     partialEnabled: order.partialEnabled,
     partialPercents: order.partialPercents,
     brackets: order.brackets,
+    bracketsEditable: order.bracketsEditable,
     actionState: order.actionState,
     callbacks: order.callbacks,
   };

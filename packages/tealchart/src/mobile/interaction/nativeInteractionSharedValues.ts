@@ -40,7 +40,8 @@ function areNativeTradeLineActionZonesEqual(
       zone.color === other.color &&
       zone.lineColor === other.lineColor &&
       zone.x1 === other.x1 &&
-      zone.x2 === other.x2
+      zone.x2 === other.x2 &&
+      zone.lineDrag === other.lineDrag
     );
   });
 }

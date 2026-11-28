@@ -1896,6 +1896,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const {
     clearNativeBracketDrag,
+    beginBracketMove,
     commitBracketMove,
     beginOrderMove,
     commitOrderMove,
@@ -2311,6 +2312,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartAxisPinchGestureState,
     chartPanGestureState,
     clearNativeBracketDrag,
+    beginBracketMove,
     commitBracketMove,
     beginOrderMove,
     commitOrderMove,

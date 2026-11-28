@@ -1219,6 +1219,14 @@ consumer checkouts must not supply untracked copies of this financial guard.
 Capture depends on the required `onMove` callback; the optional `onMoving`
 preview notification never decides whether an admitted order may commit.
 
+`setBracketsEditable(editable)` is a Tealstreet order-line extension. Omitted
+keeps the old behaviour (the tag's TP/SL handles drag, the lines do not); `true`
+also makes the TP/SL price lines draggable, through a Konva band on web and a
+thin `lineDrag` zone on native that yields to label controls; `false` leaves the
+brackets display-only. A line drag commits through the parent's
+`onTPMoveEnd`/`onSLMoveEnd`, and a native TP/SL drag holds the same touch lease
+and lifetime fence as an order move (`nativeBracketMoveRuntime.test.tsx`).
+
 `rendering/priceLineLayout.ts` is the shared measurement/collision/clipping pass.
 `TealchartRenderer.computeExternalPriceLineLabelBounds` supplies existing
 measurement and grow-only tag widths against a host's actual projection.

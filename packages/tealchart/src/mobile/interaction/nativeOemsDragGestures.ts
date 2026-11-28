@@ -28,6 +28,7 @@ import {
   finalizeNativeOrderDragState,
   getNativeBracketDragCommit,
   getNativeOrderDragCommit,
+  hasNativeBracketTouchState,
   hasNativeOrderTouchState,
   releaseNativeBracketDragGesture,
   releaseNativeOrderDragGesture,
@@ -211,6 +212,12 @@ export function createNativeOrderDragGesture({
 }
 
 export interface NativeBracketDragGestureInput {
+  beginBracketMove: (
+    objectType: NativeTradeLineObjectType,
+    objectId: string,
+    bracketType: NativeTradeLineBracketType,
+    gesture: NativeOrderMoveGesture,
+  ) => void;
   bracketDragInteractionState: NativeBracketDragInteractionState;
   clearNativeBracketDrag: () => void;
   commitBracketMove: (
@@ -218,7 +225,8 @@ export interface NativeBracketDragGestureInput {
     objectId: string,
     bracketType: NativeTradeLineBracketType,
     price: number,
-    partialPercent?: number,
+    partialPercent: number | undefined,
+    gesture: NativeOrderMoveGesture,
   ) => void;
   onSelectTradeLine?: (objectType: NativeTradeLineObjectType, objectId: string) => void;
   controlZones?: readonly NativeGestureControlZone[];
@@ -231,6 +239,7 @@ export interface NativeBracketDragGestureInput {
 }
 
 export function createNativeBracketDragGesture({
+  beginBracketMove,
   bracketDragInteractionState,
   clearNativeBracketDrag,
   commitBracketMove,
@@ -273,9 +282,18 @@ export function createNativeBracketDragGesture({
         frame,
         tradeLabelHeight,
       });
-      if (!zone) {
+      if (
+        !zone ||
+        !hasNativeBracketTouchState(bracketDragInteractionState) ||
+        bracketDragInteractionState.touchSequence.value >= Number.MAX_SAFE_INTEGER
+      ) {
         stateManager.fail();
+        return;
       }
+      // Issued here, at the admitted touch, like an order drag's: the commit is
+      // leased to this touch alone.
+      bracketDragInteractionState.touchSequence.value += 1;
+      bracketDragInteractionState.touchStartedAt.value = Date.now();
     })
     .onBegin((event) => {
       const zone = findNativeBracketDragZone({
@@ -299,6 +317,12 @@ export function createNativeBracketDragGesture({
         event.y,
         resolveNativePartialBracketLadderDirection(frame, event.x),
       );
+      if (hasNativeBracketTouchState(bracketDragInteractionState)) {
+        runOnJS(beginBracketMove)(zone.objectType, zone.objectId, zone.actionType as NativeTradeLineBracketType, {
+          sequence: bracketDragInteractionState.touchSequence.value,
+          startedAt: bracketDragInteractionState.touchStartedAt.value,
+        });
+      }
     })
     .onUpdate((event) => {
       updateNativeBracketDragState(bracketDragInteractionState, event.translationX, event.translationY);
@@ -318,12 +342,21 @@ export function createNativeBracketDragGesture({
       // branches above have no JS-side path that could ever retire a preview,
       // so they must keep clearing outright.
       releaseNativeBracketDragGesture(bracketDragInteractionState);
+      if (!hasNativeBracketTouchState(bracketDragInteractionState)) {
+        clearNativeBracketDragState(bracketDragInteractionState);
+        runOnJS(clearNativeBracketDrag)();
+        return;
+      }
       runOnJS(commitBracketMove)(
         payload.objectType,
         payload.objectId,
         payload.bracketType,
         payload.price,
         payload.partialPercent,
+        {
+          sequence: bracketDragInteractionState.touchSequence.value,
+          startedAt: bracketDragInteractionState.touchStartedAt.value,
+        },
       );
     })
     .onFinalize((_event, success) => {
